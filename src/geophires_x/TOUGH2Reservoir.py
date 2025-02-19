@@ -34,13 +34,13 @@ class TOUGH2Reservoir(Reservoir):
         # specific to this stype of reservoir
         self.tough2_executable_path = self.ParameterDict[self.tough2_executable_path.Name] = strParameter(
             "TOUGH2 Executable Path",
-            DefaultValue='tough3-eos1.exe',
+            DefaultValue='xt2_eos1.exe',
             UnitType=Units.NONE,
         )
         #SH added new TOUGH input file name (Doublet_hy)
         self.tough2modelfilename = self.ParameterDict[self.tough2modelfilename.Name] = strParameter(
             "TOUGH2 Model/File Name",
-            value='Doublet',
+            DefaultValue='Doublet',
             UnitType=Units.NONE,
             ErrMessage="assume default built-in TOUGH2 model (Doublet).",
             ToolTipText="File name of reservoir output in case reservoir model 5 is selected"
@@ -109,7 +109,7 @@ class TOUGH2Reservoir(Reservoir):
                     ParameterReadIn = model.InputParameters[key]
                     # handle special cases
                     if ParameterToModify.Name == "TOUGH2 Model/File Name":
-                        if self.tough2modelfilename.value == 'Doublet.dat':
+                        if self.tough2modelfilename.value.startswith('Doublet'):
                             self.usebuiltintough2model = True
                         else:
                             self.usebuiltintough2model = False
