@@ -163,7 +163,8 @@ def BuildPTCModel(plantlifetime: int, duration: int, ptc_price: float,
 
 
 def BuildPricingModel(plantlifetime: int, StartPrice: float, EndPrice: float,
-                      EscalationStartYear: int, EscalationRate: float, PTCAddition: list) -> list:
+                      EscalationStartYear: int, EscalationRate: float, PTCAddition: list,
+                      construction_years: int = 1) -> list:
     """
     BuildPricingModel builds the price model array for the project lifetime.  It is used to calculate the revenue
     stream for the project.
@@ -179,14 +180,17 @@ def BuildPricingModel(plantlifetime: int, StartPrice: float, EndPrice: float,
     :type EscalationRate: float
     :param PTCAddition: The PTC addition array for the project in $/kWh
     :type PTCAddition: list
+    :param construction_years: Number of project construction years FIXME WIP to pass from Calculate
+    :type construction_years: int
     :return: Price: The price model array for the project in $/kWh
     :rtype: list
     """
     Price = [0.0] * plantlifetime
     for i in range(0, plantlifetime, 1):
         Price[i] = StartPrice
-        if i >= EscalationStartYear:
-            Price[i] = Price[i] + ((i - EscalationStartYear) * EscalationRate)
+        project_year = i+1
+        if project_year >= EscalationStartYear:
+            Price[i] = Price[i] + ((project_year - EscalationStartYear) * EscalationRate)
         if Price[i] > EndPrice:
             Price[i] = EndPrice
         Price[i] = Price[i] + PTCAddition[i]
