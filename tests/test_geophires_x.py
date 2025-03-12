@@ -194,6 +194,33 @@ class GeophiresXTestCase(BaseTestCase):
                     self.assertDictEqual(
                         expected_result.result, geophires_result.result, msg=f'Example test: {example_file_path}'
                     )
+
+                    if 'REVENUE & CASHFLOW PROFILE' in expected_result.result:
+                        # Verify that expected results have parity with equivalent pre-fix results
+                        # (https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/54)
+                        pre_fix_result = GeophiresXResult(
+                            self._get_test_file_path(
+                                Path('examples_pre_fix', f'{Path(example_file_path).name.split(".txt")[0]}.out')
+                            )
+                        )
+
+                        e_rcp = expected_result.result['REVENUE & CASHFLOW PROFILE']
+                        pf_rcp = pre_fix_result.result['REVENUE & CASHFLOW PROFILE']
+
+                        self.assertEqual(len(e_rcp) - 1, len(pf_rcp))
+
+                        self.assertListEqual(e_rcp[0], pf_rcp[0])
+                        for i in range(1, len(e_rcp) - 1):
+                            e_rcp_entry = e_rcp[i]
+                            pf_rcp_entry = pf_rcp[i].copy()
+                            pf_rcp_entry[0] -= 1
+                            self.assertListEqual(e_rcp_entry, pf_rcp_entry)
+
+                        print(
+                            f'Verified fixed revenue & cashflow profile has parity with pre-fix version '
+                            f'for {example_file_path}.'
+                        )
+
                 except AssertionError as ae:
                     # Float deviation is observed across processor architecture in some test cases - see example
                     # https://github.com/softwareengineerprogrammer/python-geophires-x-nrel/actions/runs/6475850654/job/17588523571
