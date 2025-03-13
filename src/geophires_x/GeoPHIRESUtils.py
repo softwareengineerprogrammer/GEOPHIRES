@@ -620,3 +620,6 @@ def static_pressure_MPa(rho_kg_per_m3: float, depth_m: float) -> float:
 
     return pressure_mpa
 
+
+def none_to_empty_str(str_or_none: str) -> str:
+    return '' if str_or_none is None else str_or_none
