@@ -37,7 +37,6 @@ class TOUGH2Reservoir(Reservoir):
             DefaultValue='xt2_eos1.exe',
             UnitType=Units.NONE,
         )
-        #SH added new TOUGH input file name (Doublet_hy)
         self.tough2modelfilename = self.ParameterDict[self.tough2modelfilename.Name] = strParameter(
             "TOUGH2 Model/File Name",
             DefaultValue='Doublet',
@@ -48,7 +47,7 @@ class TOUGH2Reservoir(Reservoir):
         self.resthickness = self.ParameterDict[self.resthickness.Name] = floatParameter(
             "Reservoir Thickness",
             value=250.0,
-            Min=5,  # Decreased from 10 --> 5 m
+            Min=5,
             Max=10000,
             UnitType=Units.LENGTH,
             PreferredUnits=LengthUnit.METERS,
@@ -129,7 +128,7 @@ class TOUGH2Reservoir(Reservoir):
         model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
         super().Calculate(model)    # run calculate for the parent.
 
-        # GEOPHIRES assumes TOUGH2 executable and input file are in same directory as GEOPHIRESv3.py
+        # GEOPHIRES assumes TOUGH2 executable and input file are in same directory as GEOPHIRESv3.py, however the path can be specified inside GEOPHIRES input file
         # create tough2 input file
         path_to_exe = str(self.tough2_executable_path.value)
         if not os.path.exists(os.path.join(os.getcwd(), path_to_exe)):
@@ -150,34 +149,30 @@ class TOUGH2Reservoir(Reservoir):
             reservoirthickness = model.reserv.resthickness.value
             reservoirwidth = model.reserv.reswidth.value
             wellseperation = model.wellbores.wellsep.value
-            #productivityindex = self.PI.value
-            #SH Hardcoded DeltaXYZ grids
             DeltaXgrid = 10000/50
             DeltaYgrid = reservoirwidth/50
             DeltaZgrid = reservoirthickness
             flowrate = model.wellbores.prodwellflowrate.value
-            # YC customization
             print('Reservoir parameters passed to TOUGH from Reservoir.py \n')
             print(initialtemp, rockdensity, rockheatcap, rockperm, rockpor, rockthermalcond, reservoirthickness,
                   reservoirwidth, wellseperation, DeltaXgrid, DeltaYgrid, DeltaZgrid)
-            #print('Input PI')
-            #print(self.PI.value)
-            print('\n')
-            # end of YC customization
 
             # convert injection temperature to injection enthalpy
             arraytinj = np.array([1.8,    11.4,  23.4,  35.4,  47.4,  59.4,  71.3,  83.3,  95.2, 107.1, 118.9])
             arrayhinj = np.array([1.0E4, 5.0E4, 1.0E5, 1.5E5, 2.0E5, 2.5E5, 3.0E5, 3.5E5, 4.0E5, 4.5E5, 5.0E5])
             injenthalpy = np.interp(model.wellbores.Tinj.value,arraytinj,arrayhinj)
+            injection_cell_id = "A3Q23"
+            production_cell_id = "A3Q28"
+
             # write doublet input file
             f = open(infile,'w', encoding='UTF-8')
             f.write('Doublet\n')
             f.write('MESHMAKER1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n')
             f.write('XYZ\n')
             f.write('	      0.\n')
-            f.write('NX      50 %9.3f\n' % DeltaXgrid)      #SH changed grid dimensions
-            f.write('NY      50 %9.3f\n' % DeltaYgrid)      #SH changed grid dimensions
-            f.write('NZ       1 %9.3f\n' % DeltaZgrid)      #SH changed grid dimensions
+            f.write('NX      50 %9.3f\n' % DeltaXgrid)
+            f.write('NY      50 %9.3f\n' % DeltaYgrid)
+            f.write('NZ       1 %9.3f\n' % DeltaZgrid)
             f.write('\n')
             f.write('\n')
             f.write('\n')
@@ -201,18 +196,18 @@ class TOUGH2Reservoir(Reservoir):
             f.write('\n')
             f.write('\n')
             f.write('GENER----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n')
-            f.write('A3Q23  012                   1     COM1  %9.3f %9.1f          \n' % (flowrate, injenthalpy))   #SH changed name of file
-            f.write('A3Q28  021                   1     MASS  %9.3f             \n' % (-flowrate))                  #SH changed name of file
+            f.write('%s  012                   1     COM1  %9.3f %9.1f          \n' % (injection_cell_id, flowrate, injenthalpy))
+            f.write('%s  021                   1     MASS  %9.3f             \n' % (production_cell_id, -flowrate))
             f.write('\n')
             f.write('INCON----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n')
             f.write('\n')
             f.write('FOFT ----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n')
-            f.write('A3Q23     \n')         #SH changed name of file
-            f.write('A3Q28     \n')         #SH changed name of file
+            f.write(f'{injection_cell_id}     \n')
+            f.write(f'{production_cell_id}     \n')
             f.write('\n')
             f.write('GOFT ----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n')
-            f.write('A3Q23  012\n')         #SH changed name of file
-            f.write('A3Q28  021\n')         #SH changed name of file
+            f.write(f'{injection_cell_id}  012\n')
+            f.write(f'{production_cell_id}  021\n')
             f.write('\n')
             f.write('ENDCY\n')
             f.close()
@@ -220,11 +215,10 @@ class TOUGH2Reservoir(Reservoir):
 
         else:
             infile = model.reserv.tough2modelfilename.value
-            outfile = str('tough2output.out')
+            outfile = str('Doublet.out')
             print("GEOPHIRES will run TOUGH2 simulation with user-provided input file = "+model.reserv.tough2modelfilename.value+" ...")
 
         # run TOUGH2 executable
-        # change '%s < %s > %s' to '%s  %s  %s'
         try:
             os.system('%s  %s  %s' % (path_to_exe, infile, outfile))
         except:
@@ -233,9 +227,9 @@ class TOUGH2Reservoir(Reservoir):
 
         # read output temperature and pressure
         try:
-            fname = 'FOFT_A3Q28.csv'  # SH updated FOFT file name for producing well at 1000m separation
+            fname = f'FOFT_{production_cell_id}.csv'
             with open(fname, encoding='UTF-8') as f:
-                first_line_YC = f.readline()  # YC added this line. First line of FOFT file is file header. Content List starts at 2nd line instead.
+                first_line = f.readline()
                 content = f.readlines()
 
             NumerOfResults = len(content)
@@ -248,6 +242,7 @@ class TOUGH2Reservoir(Reservoir):
                 #changed:   1>0'
                             8>1'
                             9>2'
+                TODO - Audit index parameterization
                 """
                 SimTimes[i] = float(content[i].split(',')[0].strip('\n'))
                 ProdPressure[i] = float(content[i].split(',')[1].strip('\n'))
@@ -261,21 +256,21 @@ class TOUGH2Reservoir(Reservoir):
             # Read FOFT and GOFT files
             import pandas as pd
 
-            df = pd.read_csv('FOFT_A3Q28.csv')
-            dfG = pd.read_csv('GOFT_A3Q28___021.csv')
-            ef = pd.read_csv('FOFT_A3Q23.csv')
-            efG = pd.read_csv('GOFT_A3Q23___012.csv')
+            df = pd.read_csv(f'FOFT_{production_cell_id}.csv')
+            dfG = pd.read_csv(f'GOFT_{production_cell_id}___021.csv')
+            ef = pd.read_csv(f'FOFT_{injection_cell_id}.csv')
+            efG = pd.read_csv(f'GOFT_{injection_cell_id}___012.csv')
 
-            P0_A3Q28 = df['              PRES'].iloc[0]
-            Pf_A3Q28 = df['              PRES'].iloc[-1]
-            P0_A3Q23 = ef['              PRES'].iloc[0]
-            Pf_A3Q23 = ef['              PRES'].iloc[-1]
-            fr0_A3Q28 = dfG['               GEN'].iloc[0]
-            fr0_A3Q23 = efG['               GEN'].iloc[0]
+            P0_production_well = df['              PRES'].iloc[0]
+            Pf_production_well = df['              PRES'].iloc[-1]
+            P0_injection_well = ef['              PRES'].iloc[0]
+            Pf_injection_well = ef['              PRES'].iloc[-1]
+            fr0_production_well = dfG['               GEN'].iloc[0]
+            fr0_injection_well = efG['               GEN'].iloc[0]
 
 
-            tough3_PI = fr0_A3Q28 / (Pf_A3Q28 - P0_A3Q28)
-            tough3_II = fr0_A3Q23 / (Pf_A3Q23 - P0_A3Q23)
+            tough3_PI = fr0_production_well / (Pf_production_well - P0_production_well)
+            tough3_II = fr0_injection_well / (Pf_injection_well - P0_injection_well)
 
             print("PI = ", tough3_PI)
             print("II = ", tough3_II)
@@ -283,16 +278,17 @@ class TOUGH2Reservoir(Reservoir):
             model.wellbores.PI.value = tough3_PI
             model.wellbores.II.value = tough3_II
 
-        except:
-            print("Error: GEOPHIRES could not import production temperature and pressure from TOUGH2 output file (" +
-                  infile + ") and will abort simulation.")
+        except Exception as e:
+            raise RuntimeError(f'Error: GEOPHIRES could not import production temperature and pressure from TOUGH2'
+                               f' output file ({infile}) and will abort simulation.') from e
 
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
 
         #print(SimTimes)
         #print(ProdPressure)
         #print(ProdTemperature)
-
+        print(model.wellbores.PI.value)
+        print(model.wellbores.II.value)
 
 
 
