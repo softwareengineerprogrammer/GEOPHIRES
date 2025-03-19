@@ -222,9 +222,9 @@ class TOUGH2Reservoir(Reservoir):
         # run TOUGH2 executable
         try:
             os.system('%s  %s  %s' % (path_to_exe, infile, outfile))
-        except:
+        except Exception as e:
             print("Error: GEOPHIRES could not run TOUGH2 and will abort simulation.")
-            sys.exit()
+            raise RuntimeError(f'Error: GEOPHIRES could not run TOUGH2 and will abort simulation: {e!s}') from e
 
         # read output temperature and pressure
         try:
