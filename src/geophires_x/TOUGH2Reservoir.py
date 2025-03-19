@@ -131,6 +131,8 @@ class TOUGH2Reservoir(Reservoir):
         # GEOPHIRES assumes TOUGH2 executable and input file are in same directory as GEOPHIRESv3.py, however the path can be specified inside GEOPHIRES input file
         # create tough2 input file
         path_to_exe = str(self.tough2_executable_path.value)
+        injection_cell_id = "A3Q23"
+        production_cell_id = "A3Q28"
         if not os.path.exists(os.path.join(os.getcwd(), path_to_exe)):
             model.logger.critical('TOUGH2 executable file does not exist in current working directory. \
             GEOPHIRES will abort simulation.')
@@ -161,8 +163,7 @@ class TOUGH2Reservoir(Reservoir):
             arraytinj = np.array([1.8,    11.4,  23.4,  35.4,  47.4,  59.4,  71.3,  83.3,  95.2, 107.1, 118.9])
             arrayhinj = np.array([1.0E4, 5.0E4, 1.0E5, 1.5E5, 2.0E5, 2.5E5, 3.0E5, 3.5E5, 4.0E5, 4.5E5, 5.0E5])
             injenthalpy = np.interp(model.wellbores.Tinj.value,arraytinj,arrayhinj)
-            injection_cell_id = "A3Q23"
-            production_cell_id = "A3Q28"
+
 
             # write doublet input file
             f = open(infile,'w', encoding='UTF-8')
