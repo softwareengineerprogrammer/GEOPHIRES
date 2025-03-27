@@ -1,0 +1,1229 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "GEOPHIRES-X Result Schema",
+  "required": [],
+  "properties": {
+    "End-Use Option": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "End-Use": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Surface Application": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Average Net Electricity Production": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Electricity breakeven price": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Average Direct-Use Heat Production": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Direct-Use heat breakeven price": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Direct-Use heat breakeven price (LCOH)": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Direct-Use Cooling Breakeven Price (LCOC)": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Annual District Heating Demand": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Cooling Production": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Geothermal Heat Production": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Average Annual Peaking Fuel Heat Production": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Direct-Use Cooling Breakeven Price": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Number of production wells": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Number of injection wells": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Flowrate per production well": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Well depth": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Well depth (or total length, if not vertical)": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Geothermal gradient": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Segment 1   Geothermal gradient": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Segment 1   Thickness": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Segment 2   Geothermal gradient": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Segment 2   Thickness": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Segment 3   Geothermal gradient": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Segment 3   Thickness": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Segment 4   Geothermal gradient": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "LCOE": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ],
+      "description": "",
+      "units": "cents/kWh"
+    },
+    "LCOH": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ],
+      "description": "",
+      "units": "USD/MMBTU"
+    },
+    "Lifetime Average Well Flow Rate": {
+      "categories": [
+        "SUMMARY OF RESULTS",
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Total Avoided Carbon Emissions": {
+      "categories": [
+        "SUMMARY OF RESULTS"
+      ]
+    },
+    "Economic Model": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Interest Rate": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ],
+      "description": "",
+      "units": "%"
+    },
+    "Accrued financing during construction": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Project lifetime": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Capacity factor": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Project NPV": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ],
+      "description": "Project Net Present Value. NPV is calculated with cashflows lumped at the end of periods. See: Short W et al, 1995. \"A Manual for the Economic Evaluation of Energy Efficiency and Renewable Energy Technologies.\", p. 41. https://www.nrel.gov/docs/legosti/old/5173.pdf",
+      "units": "MUSD"
+    },
+    "Project IRR": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Project VIR=PI=PIR": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Project MOIC": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ],
+      "description": "Project Multiple of Invested Capital",
+      "units": ""
+    },
+    "Fixed Charge Rate (FCR)": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Project Payback Period": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ],
+      "description": "",
+      "units": "yr"
+    },
+    "CHP: Percent cost allocation for electrical plant": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ]
+    },
+    "Estimated Jobs Created": {
+      "categories": [
+        "ECONOMIC PARAMETERS"
+      ],
+      "description": "",
+      "units": null
+    },
+    "Adjusted Project LCOE (after incentives, grants, AddOns,etc)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Adjusted Project LCOH (after incentives, grants, AddOns,etc)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Adjusted Project CAPEX (after incentives, grants, AddOns, etc)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Adjusted Project OPEX (after incentives, grants, AddOns, etc)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Project NPV   (including AddOns)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Project IRR   (including AddOns)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Project VIR=PI=PIR   (including AddOns)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Project MOIC  (including AddOns)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Project Payback Period       (including AddOns)": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Total Add-on CAPEX": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Total Add-on OPEX": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Total Add-on Net Elec": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Total Add-on Net Heat": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Total Add-on Profit": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "AddOns Payback Period": {
+      "categories": [
+        "EXTENDED ECONOMICS"
+      ]
+    },
+    "Total Avoided Carbon Production": {
+      "categories": [
+        "CCUS ECONOMICS"
+      ]
+    },
+    "Project NPV            (including carbon credit)": {
+      "categories": [
+        "CCUS ECONOMICS"
+      ]
+    },
+    "Project IRR            (including carbon credit)": {
+      "categories": [
+        "CCUS ECONOMICS"
+      ]
+    },
+    "Project VIR=IR=PIR     (including carbon credit)": {
+      "categories": [
+        "CCUS ECONOMICS"
+      ]
+    },
+    "Project MOIC           (including carbon credit)": {
+      "categories": [
+        "CCUS ECONOMICS"
+      ]
+    },
+    "Project Payback Period (including carbon credit)": {
+      "categories": [
+        "CCUS ECONOMICS"
+      ]
+    },
+    "LCOD using grid-based electricity only": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "LCOD using natural gas only": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "LCOD using geothermal energy only": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "CO2 Intensity using grid-based electricity only": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "CO2 Intensity using natural gas only": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "CO2 Intensity using geothermal energy only": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "Geothermal LCOH": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "Geothermal Ratio (electricity vs heat)": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "Percent Energy Devoted To Process": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "Total Cost of Capture": {
+      "categories": [
+        "S-DAC-GT ECONOMICS"
+      ]
+    },
+    "Number of Production Wells": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Number of Injection Wells": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Water loss rate": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Pump efficiency": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Injection temperature": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Injection Temperature": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ],
+      "description": "",
+      "units": "degC"
+    },
+    "Average production well temperature drop": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Injection well casing ID": {
+      "categories": [
+        "ENGINEERING PARAMETERS",
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Production well casing ID": {
+      "categories": [
+        "ENGINEERING PARAMETERS",
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Number of times redrilling": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Power plant type": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Fluid": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Design": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Flow rate": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Lateral Length": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Vertical Depth": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Wellbore Diameter": {
+      "categories": [
+        "ENGINEERING PARAMETERS"
+      ]
+    },
+    "Maximum reservoir temperature": {
+      "categories": [
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Number of segments": {
+      "categories": [
+        "RESOURCE CHARACTERISTICS"
+      ]
+    },
+    "Reservoir Model": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Fracture model": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Bottom-hole temperature": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ],
+      "description": "",
+      "units": "degC"
+    },
+    "Well separation: fracture diameter": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Well separation: fracture height": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Fracture width": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Fracture area": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Number of fractures": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Fracture separation": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Reservoir volume": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Reservoir impedance": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Reservoir hydrostatic pressure": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Average reservoir pressure": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Plant outlet pressure": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Production wellhead pressure": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ],
+      "description": "",
+      "units": "kPa"
+    },
+    "Productivity Index": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Injectivity Index": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Reservoir density": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Reservoir thermal conductivity": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Reservoir heat capacity": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Reservoir porosity": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Thermal Conductivity": {
+      "categories": [
+        "RESERVOIR PARAMETERS"
+      ]
+    },
+    "Maximum Production Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Production Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ],
+      "description": "",
+      "units": "degC"
+    },
+    "Minimum Production Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Initial Production Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Reservoir Heat Extraction": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Production Wellbore Heat Transmission Model": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Wellbore Heat Transmission Model": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Production Well Temperature Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Total Average Pressure Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Injection Well Pressure Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Production Pressure": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ],
+      "description": "",
+      "units": "bar"
+    },
+    "Average Reservoir Pressure Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Production Well Pressure Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Buoyancy Pressure Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Injection Well Pump Pressure Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Production Well Pump Pressure Drop": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Heat Production": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "First Year Heat Production": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "First Year Electricity Production": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Storage Well Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Storage Well Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Storage Well Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Balance Well Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Balance Well Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Balance Well Temperature": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Annual Heat Stored": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Heat Stored": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Annual Heat Stored": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Annual Heat Supplied": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Heat Supplied": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Annual Heat Supplied": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Average Round-Trip Efficiency": {
+      "categories": [
+        "RESERVOIR SIMULATION RESULTS"
+      ]
+    },
+    "Drilling and completion costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ],
+      "description": "Wellfield cost. Includes total drilling and completion cost of all injection and production wells and laterals, plus 5% indirect costs.",
+      "units": "MUSD"
+    },
+    "Drilling and completion costs per well": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and completion costs per production well": {
+      "categories": [
+        "CAPITAL COSTS (M$)",
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and completion costs per injection well": {
+      "categories": [
+        "CAPITAL COSTS (M$)",
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and completion costs per vertical production well": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and completion costs per vertical injection well": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and completion costs per non-vertical section": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ],
+      "description": "",
+      "units": "MUSD"
+    },
+    "Drilling and completion costs (for redrilling)": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and completion costs per redrilled well": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Stimulation costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Stimulation costs (for redrilling)": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Surface power plant costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "of which Absorption Chiller Cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "of which Heat Pump Cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "of which Peaking Boiler Cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Transmission pipeline cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "District Heating System Cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ],
+      "description": "",
+      "units": "MUSD"
+    },
+    "Field gathering system costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Total surface equipment costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Exploration costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Investment Tax Credit": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Total capital costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Annualized capital costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Total CAPEX": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling Cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and Completion Costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Drilling and Completion Costs per Well": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Auxiliary Heater Cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Pump Cost": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Total Capital Costs": {
+      "categories": [
+        "CAPITAL COSTS (M$)"
+      ]
+    },
+    "Wellfield maintenance costs": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Power plant maintenance costs": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Water costs": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Average Reservoir Pumping Cost": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Absorption Chiller O&M Cost": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Average Heat Pump Electricity Cost": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Annual District Heating O&M Cost": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ],
+      "description": "",
+      "units": "MUSD/yr"
+    },
+    "Average Annual Peaking Fuel Cost": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ],
+      "description": "",
+      "units": "MUSD/yr"
+    },
+    "Average annual pumping costs": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Total operating and maintenance costs": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "OPEX": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Average annual auxiliary fuel cost": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Average annual pumping cost": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Total average annual O&M costs": {
+      "categories": [
+        "OPERATING AND MAINTENANCE COSTS (M$/yr)"
+      ]
+    },
+    "Initial geofluid availability": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Total Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Total Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Total Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Initial Total Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Net Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Net Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Net Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Initial Net Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Total Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Net Electricity Generation": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Net Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Net Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Net Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Initial Net Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Pumping Power": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Heat Pump Electricity Use": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Cooling Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Cooling Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Initial Cooling Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Cooling Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Daily District Heating Demand": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Daily District Heating Demand": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Daily District Heating Demand": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Geothermal Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Geothermal Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Geothermal Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Maximum Peaking Boiler Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Peaking Boiler Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Minimum Peaking Boiler Heat Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Initial pumping power/net installed power": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Heat to Power Conversion Efficiency": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ],
+      "description": "First law efficiency average over project lifetime",
+      "units": "%"
+    },
+    "Surface Plant Cost": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average RTES Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Auxiliary Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual RTES Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Auxiliary Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Total Heating Production": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "Average Annual Electricity Use for Pumping": {
+      "categories": [
+        "SURFACE EQUIPMENT SIMULATION RESULTS"
+      ]
+    },
+    "GEOPHIRES Version": {
+      "categories": [
+        "Simulation Metadata"
+      ]
+    }
+  }
+}
