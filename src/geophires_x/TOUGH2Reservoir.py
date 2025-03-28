@@ -44,6 +44,16 @@ class TOUGH2Reservoir(Reservoir):
             ErrMessage="assume default built-in TOUGH2 model (Doublet).",
             ToolTipText="File name of reservoir output in case reservoir model 5 is selected"
         )
+        self.injection_cell = self.ParameterDict[self.injection_cell.Name] = strParameter(
+            "Injection Well Cell ID",
+            DefaultValue='A3Q23',
+            UnitType=Units.NONE,
+        )
+        self.production_cell = self.ParameterDict[self.production_cell.Name] = strParameter(
+            "Production Well Cell ID",
+            DefaultValue='A3Q28',
+            UnitType=Units.NONE,
+        )
         self.resthickness = self.ParameterDict[self.resthickness.Name] = floatParameter(
             "Reservoir Thickness",
             value=250.0,
@@ -131,8 +141,8 @@ class TOUGH2Reservoir(Reservoir):
         # GEOPHIRES assumes TOUGH2 executable and input file are in same directory as GEOPHIRESv3.py, however the path can be specified inside GEOPHIRES input file
         # create tough2 input file
         path_to_exe = str(self.tough2_executable_path.value)
-        injection_cell_id = "A3Q23"
-        production_cell_id = "A3Q28"
+        injection_cell_id = str(self.injection_cell.value)
+        production_cell_id = str(self.production_cell.value)
         if not os.path.exists(os.path.join(os.getcwd(), path_to_exe)):
             model.logger.critical('TOUGH2 executable file does not exist in current working directory. \
             GEOPHIRES will abort simulation.')
