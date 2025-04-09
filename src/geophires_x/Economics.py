@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import numpy_financial as npf
 import geophires_x.Model as Model
-from geophires_x.EconomicsSam import calculate_sam_economics
+from geophires_x.EconomicsSam import calculate_sam_economics, calculate_sam_economics_cashflow
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
 from geophires_x.Parameter import intParameter, floatParameter, OutputParameter, ReadParameter, boolParameter, \
@@ -2829,6 +2829,10 @@ class Economics:
             self.TotalRevenue.value = [0.0] * total_duration
             self.TotalCummRevenue.value = [0.0] * total_duration
             self.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
+
+            if model.economics.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
+                calculate_sam_economics_cashflow(model)
+                return
 
             # Based on the style of the project, calculate the revenue & cumulative revenue
             if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:

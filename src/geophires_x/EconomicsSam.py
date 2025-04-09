@@ -22,6 +22,7 @@ from PySAM import Singleowner
 import PySAM.Utilityrate5 as UtilityRate
 
 import geophires_x.Model as Model
+from geophires_x.OptionList import EndUseOptions
 
 
 @lru_cache(maxsize=12)
@@ -57,6 +58,13 @@ def calculate_sam_economics(
         ('IRR', single_owner.Outputs.project_return_aftertax_irr, '%'),
         ('NPV', single_owner.Outputs.project_return_aftertax_npv * 1e-6, 'MUSD'),
         ('CAPEX', single_owner.Outputs.adjusted_installed_cost * 1e-6, 'MUSD'),
+
+        ('Electricity Price (cents/kWh)', [p * 1e-2 for p in single_owner.Outputs.cf_ppa_price], 'cents/kWh'),
+        ('Electricity Ann. Rev. (MUSD/yr)', [e * 1e-6 for e in single_owner.Outputs.cf_energy_value], '(MUSD/yr)'),
+
+        # TODO determine if this is the 'appropriate' cashflow variable
+        ('Project Net Rev (MUSD/yr)', [c * 1e-6 for c in single_owner.Outputs.cf_pretax_cashflow], 'MUSD/yr'),
+
         # ('Gross Output', gt.Outputs.gross_output, 'MW'),
         # ('Net Output', gt.Outputs.gross_output - gt.Outputs.pump_work, 'MW')
     ]
@@ -110,7 +118,7 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
 
 
 @lru_cache(maxsize=12)
-def _get_revenue_and_cashflow_profile(model: Model):
+def calculate_sam_economics_cashflow(model: Model):
     """
     ENERGY
     Electricity Provided -> cf_energy_sales
@@ -126,12 +134,95 @@ def _get_revenue_and_cashflow_profile(model: Model):
     Net Revenue -> cf_total_revenue
     """
 
+    econ = model.economics
+    sam_econ = calculate_sam_economics(model)
+
+    construction_years = model.surfaceplant.construction_years.value
+    plant_lifetime = model.surfaceplant.plant_lifetime.value
+    total_duration = plant_lifetime + construction_years
+
+    # econ.ElecRevenue.value = [0.0] * total_duration
+    # econ.ElecCummRevenue.value = [0.0] * total_duration
+    # econ.HeatRevenue.value = [0.0] * total_duration
+    # econ.HeatCummRevenue.value = [0.0] * total_duration
+    # econ.CoolingRevenue.value = [0.0] * total_duration
+    # econ.CoolingCummRevenue.value = [0.0] * total_duration
+    # econ.CarbonRevenue.value = [0.0] * total_duration
+    # econ.CarbonCummCashFlow.value = [0.0] * total_duration
+    # econ.TotalRevenue.value = [0.0] * total_duration
+    # econ.TotalCummRevenue.value = [0.0] * total_duration
+    # econ.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
+
+    def _cumm(cash_flow: list) -> list:
+        cumm_cash_flow = [0.0] * total_duration
+        for i in range(construction_years, total_duration, 1):
+            cumm_cash_flow[i] = cumm_cash_flow[i - 1] + cash_flow[i]
+
+        return cumm_cash_flow
+
+    # Based on the style of the project, calculate the revenue & cumulative revenue
+    if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
+        econ.ElecPrice.value = sam_econ['Electricity Price (cents/kWh)']['value'].copy()
+        econ.ElecRevenue.value = sam_econ['Electricity Ann. Rev. (MUSD/yr)']['value'].copy()  # FIXME WIP
+        econ.ElecCummRevenue.value = _cumm(econ.ElecRevenue.value)
+
+        # econ.ElecRevenue.value, econ.ElecCummRevenue.value = CalculateRevenue(
+        #     model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+        #     model.surfaceplant.NetkWhProduced.value, econ.ElecPrice.value)
+        # econ.TotalRevenue.value = econ.ElecRevenue.value.copy()
+        # econ.TotalCummRevenue.value = econ.ElecCummRevenue.value
+    else:
+        raise ValueError(f'Unexpected End-Use Option: {model.surfaceplant.enduse_option.value}')
+
+    if econ.DoCarbonCalculations.value:
+        raise NotImplementedError
+
+        # FIXME TODO
+        #     econ.CarbonRevenue.value, econ.CarbonCummCashFlow.value, econ.CarbonThatWouldHaveBeenProducedAnnually.value, \
+        #      econ.CarbonThatWouldHaveBeenProducedTotal.value = econ.CalculateCarbonRevenue(model,
+        #           model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+        #           econ.CarbonPrice.value, econ.GridCO2Intensity.value, econ.NaturalGasCO2Intensity.value,
+        #           model.surfaceplant.NetkWhProduced.value, model.surfaceplant.HeatkWhProduced.value)
+        #     for i in range(model.surfaceplant.construction_years.value, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
+        #         econ.TotalRevenue.value[i] = econ.TotalRevenue.value[i] + econ.CarbonRevenue.value[i]
+        #         #econ.TotalCummRevenue.value[i] = econ.TotalCummRevenue.value[i] + econ.CarbonCummCashFlow.value[i]
+
+    # FIXME WIP TODO pass/reconcile non-1 construction years in/from SAM
+    # for the sake of display, insert zeros at the beginning of the pricing arrays
+    for i in range(0, model.surfaceplant.construction_years.value, 1):
+        # econ.ElecPrice.value.insert(0, 0.0)
+        econ.HeatPrice.value.insert(0, 0.0)
+        econ.CoolingPrice.value.insert(0, 0.0)
+        econ.CarbonPrice.value.insert(0, 0.0)
+
+    # Insert the cost of construction into the front of the array that will be used to calculate NPV
+    # the convention is that the upfront CAPEX is negative
+    # This is the same for all projects
+    # ProjectCAPEXPerConstructionYear = econ.CCap.value / model.surfaceplant.construction_years.value
+    # for i in range(0, model.surfaceplant.construction_years.value, 1):
+    #     econ.TotalRevenue.value[i] = -1.0 * ProjectCAPEXPerConstructionYear
+    #     econ.TotalCummRevenue.value[i] = -1.0 * ProjectCAPEXPerConstructionYear
+    #        econ.TotalRevenue.value, econ.TotalCummRevenue.value = CalculateTotalRevenue(
+    #            model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value, econ.CCap.value,
+    #                econ.Coam.value, econ.TotalRevenue.value, econ.TotalCummRevenue.value)
+
+    econ.TotalRevenue.value = sam_econ['Project Net Rev (MUSD/yr)']['value'].copy()
+
+    econ.TotalCummRevenue.value = _cumm(econ.TotalRevenue.value)
+
+
 def _get_average_net_generation_MW(model: Model) -> float:
     return np.average(model.surfaceplant.NetElectricityProduced.value)
 
 
-def _sig_figs(val: float, num_sig_figs: int) -> float:
+def _sig_figs(val: float | list[float] | tuple[float], num_sig_figs: int) -> float:
     if val is None:
         return None
 
-    return float('%s' % float(f'%.{num_sig_figs}g' % val))  # pylint: disable=consider-using-f-string
+    if isinstance(val, list) or isinstance(val, tuple):
+        return [_sig_figs(v, num_sig_figs) for v in val]
+
+    try:
+        return float('%s' % float(f'%.{num_sig_figs}g' % val))  # pylint: disable=consider-using-f-string
+    except TypeError as te:
+        raise RuntimeError from te

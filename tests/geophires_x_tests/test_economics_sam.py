@@ -1,4 +1,5 @@
 from base_test_case import BaseTestCase
+from geophires_x.EconomicsSam import _sig_figs
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
@@ -9,8 +10,8 @@ class EconomicsSamTestCase(BaseTestCase):
     def _get_result(self, _params) -> GeophiresXResult:
         return GeophiresXClient().get_geophires_result(
             GeophiresInputParameters(
-                from_file_path=self._get_test_file_path('generic-egs-case.txt'),
-                # from_file_path=self._get_test_file_path('../examples/Fervo_Project_Cape-3.txt'), # FIXME TEMP
+                # from_file_path=self._get_test_file_path('generic-egs-case.txt'),
+                from_file_path=self._get_test_file_path('../examples/Fervo_Project_Cape-3.txt'),  # FIXME TEMP
                 params={'Economic Model': 5, **_params},
             )
         )
@@ -33,3 +34,7 @@ class EconomicsSamTestCase(BaseTestCase):
     def test_only_electricity_end_use_supported(self):
         with self.assertRaises(RuntimeError):
             self._get_result({'End-Use Option': 2})
+
+    def test_sig_figs(self):
+        self.assertListEqual(_sig_figs([1.14, 2.24], 2), [1.1, 2.2])
+        self.assertListEqual(_sig_figs((1.14, 2.24), 2), [1.1, 2.2])
