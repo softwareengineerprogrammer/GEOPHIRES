@@ -85,6 +85,7 @@ setup(
         'pylocker',
         'nrel-pysam',
         'tabulate',
+        'tqdm',
     ],
     extras_require={
         # eg:
