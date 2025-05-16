@@ -66,11 +66,6 @@ class SurfacePlantFgemOrc(SurfacePlant):
 
         model.logger.info("Init " + self.__class__.__name__ + ": " + __name__)
 
-        def degC(p: HasQuantity) -> float:
-            return p.quantity().to('degC').magnitude
-
-        # fgem_TenteringPP = np.zeros(len(model.reserv.timevector.value))
-
         # calculate power plant entering temperature
         self.TenteringPP.value = SurfacePlant.power_plant_entering_temperature(self, self.enduse_option.value,
                                                                                model.reserv.timevector.value,
@@ -144,25 +139,35 @@ class SurfacePlantFgemOrc(SurfacePlant):
         self.RemainingReservoirHeatContent.value = SurfacePlant.remaining_reservoir_heat_content(
             self, model.reserv.InitialReservoirHeatContent.value, self.HeatkWhExtracted.value)
 
+        self._calculate_fgem(model)
+        self._calculate_derived_outputs(model)
+        model.logger.info(f"complete {self.__class__.__name__}: {__name__}")
 
-        nameplate_capacity_MW = 10  # FIXME WIP
+    def _calculate_fgem(self, model: Model):
+
+        def degC(p: HasQuantity) -> float:
+            return p.quantity().to('degC').magnitude
+
+        # fgem_TenteringPP = np.zeros(len(model.reserv.timevector.value))
+
+        # nameplate_capacity_MW = 10  # FIXME WIP
         # self._fgem_geophires_orc_power_plant: GEOPHIRESORCPowerPlant = GEOPHIRESORCPowerPlant(
         #     nameplate_capacity_MW,
         #     model.reserv.Tresoutput.value
         # ) # FIXME TEMP WIP
 
+        fgem_timestep = timedelta(days=365 * (1 / model.economics.timestepsperyear.value))
         fgem_orc_power_plant = ORCPowerPlant(
-            #degC(model.reserv.Tresoutput)[0],
+            # degC(model.reserv.Tresoutput)[0],
             degC(model.wellbores.ProducedTemperature)[0],
             degC(self.ambient_temperature),
             model.wellbores.prodwellflowrate.value,
             num_prd=model.wellbores.nprod.value,
             # TODO capacity factor
-            cf =self.utilization_factor.value,
+            cf=self.utilization_factor.value,
 
-            timestep=timedelta(days=365*(1 / model.economics.timestepsperyear.value))
+            timestep=fgem_timestep
         )
-
 
         fgem_Tinj = np.zeros(len(model.reserv.timevector.value))
         fgem_ElectricityProduced = np.zeros(len(model.reserv.timevector.value))
@@ -176,5 +181,7 @@ class SurfacePlantFgemOrc(SurfacePlant):
             fgem_Tinj[t] = fgem_orc_power_plant.T_inj
             fgem_ElectricityProduced[t] = fgem_orc_power_plant.power_output_MWe
 
-        self._calculate_derived_outputs(model)
-        model.logger.info(f"complete {self.__class__.__name__}: {__name__}")
+
+        fgem_calculated = True
+
+
