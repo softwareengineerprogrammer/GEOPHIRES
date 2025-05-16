@@ -30,6 +30,6 @@ class FgemTestCase(BaseTestCase):
         return GeophiresXClient().get_geophires_result(
             GeophiresInputParameters(
                 from_file_path=file_path,
-                params={'Power Plant Type': 10, **_params},
+                params={'Power Plant Type': 10, 'Time steps per year': 12, **_params},
             )
         )
