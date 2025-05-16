@@ -7,9 +7,43 @@ from pathlib import Path
 import numpy as np
 from scipy.spatial import cKDTree
 
-from .utils.utils import *
-
 parent_path = Path(__file__).parent
+
+
+class _Utils:
+    @staticmethod
+    def heatcapacitywater(Twater):
+        """Computationally efficient correlation for water specific heat capacity based on the GEOPHIRES.
+
+        Args:
+            Twater (Union[ndarray, float]): water temperature in deg C
+
+        Returns:
+            Union[ndarray, float]: water specific heat capacity in J/kg-K
+        """
+
+        # Based on GEOPHIRES correlations (more stable XSTEAM)
+        Twater = (Twater + 273.15) / 1000
+        A = -203.6060
+        B = 1523.290
+        C = -3196.413
+        D = 2474.455
+        E = 3.855326
+        cpwater = (A + B * Twater + C * Twater**2 + D * Twater**3 + E / (Twater**2)) / 18.02 * 1000
+        return cpwater
+
+    @staticmethod
+    def nonzero(x, thresh=1e-6):
+        """Ensure input is nonzero
+
+        Args:
+            x (ndarray): input numbers
+            thresh (float, optional): threshold below which numbers are set to zero. Defaults to 1E-6.
+
+        Returns:
+            ndarray: nonzero version of input array
+        """
+        return np.maximum(thresh, x)
 
 
 class CustomUnpickler(pickle.Unpickler):
@@ -140,9 +174,13 @@ class BasePowerPlant:
             if m_tes_out > 0:
                 m_wh_to_turbine = m_turbine - m_tes_out
                 self.T_mix = (
-                    m_wh_to_turbine * heatcapacitywater(T_prd_wh) * T_prd_wh
-                    + m_tes_out * heatcapacitywater(T_tes_out) * T_tes_out
-                ) / (m_wh_to_turbine * heatcapacitywater(T_prd_wh) + m_tes_out * heatcapacitywater(T_tes_out) + 1e-3)
+                    m_wh_to_turbine * _Utils.heatcapacitywater(T_prd_wh) * T_prd_wh
+                    + m_tes_out * _Utils.heatcapacitywater(T_tes_out) * T_tes_out
+                ) / (
+                    m_wh_to_turbine * _Utils.heatcapacitywater(T_prd_wh)
+                    + m_tes_out * _Utils.heatcapacitywater(T_tes_out)
+                    + 1e-3
+                )
             else:
                 self.T_mix = T_prd_wh
 
@@ -553,7 +591,7 @@ class ORCPowerPlant(BasePowerPlant):
         self.T_inj = np.clip(model_output[1], a_min=self.Tamb_design, a_max=self.Tres_design)  # deg C
 
         if self.num_prd is None:
-            m_g = ppc / nonzero(self.power_output_MWh_kg) / 3600  # kg/s
+            m_g = ppc / _Utils.nonzero(self.power_output_MWh_kg) / 3600  # kg/s
             self.num_prd = np.ceil(m_g / m_prd).astype(int)
 
     def compute_cplant(self, MaxProducedTemperature, min_cost=0):
