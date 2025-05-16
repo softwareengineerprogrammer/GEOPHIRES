@@ -9,6 +9,7 @@ from geophires_x.EconomicsS_DAC_GT import EconomicsS_DAC_GT
 from geophires_x.GeoPHIRESUtils import read_input_file
 from geophires_x.OutputsAddOns import OutputsAddOns
 from geophires_x.OutputsS_DAC_GT import OutputsS_DAC_GT
+from geophires_x.SurfacePlantFgemORC import SurfacePlantFgemOrc
 from geophires_x.TDPReservoir import TDPReservoir
 from geophires_x.WellBores import WellBores
 from geophires_x.SurfacePlant import SurfacePlant
@@ -177,6 +178,8 @@ class Model(object):
                 self.surfaceplant = SurfacePlantSUTRA(self)
             elif self.InputParameters['Power Plant Type'].sValue in ['9', 'Industrial']:
                 self.surfaceplant = SurfacePlantIndustrialHeat(self)
+            elif self.InputParameters['Power Plant Type'].sValue in ['10', 'FGEM ORC']:
+                self.surfaceplant = SurfacePlantFgemOrc(self)
 
         # if we find out we have an add-ons, we need to instantiate it, then read for the parameters
         if 'AddOn Nickname 1' in self.InputParameters:
@@ -238,6 +241,8 @@ class Model(object):
                 self.surfaceplant = SurfacePlantSupercriticalOrc(self)
             elif self.surfaceplant.plant_type.value == PlantType.SINGLE_FLASH:
                 self.surfaceplant = SurfacePlantSingleFlash(self)
+            elif self.surfaceplant.plant_type.value == PlantType.FGEM_ORC:
+                self.surfaceplant = SurfacePlantFgemOrc(self)
             else: # default is double flash
                 self.surfaceplant = SurfacePlantDoubleFlash(self)
 

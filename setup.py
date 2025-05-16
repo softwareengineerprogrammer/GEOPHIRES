@@ -86,6 +86,8 @@ setup(
         'nrel-pysam',
         'tabulate',
         'tqdm',
+        #'sklearn',
+        'scikit-learn',
     ],
     extras_require={
         # eg:

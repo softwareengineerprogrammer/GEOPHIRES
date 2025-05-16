@@ -276,7 +276,7 @@ class SurfacePlant:
         self.plant_type = self.ParameterDict[self.plant_type.Name] = intParameter(
             "Power Plant Type",
             DefaultValue=PlantType.SUB_CRITICAL_ORC.int_value,
-            AllowableRange=[1, 2, 3, 4, 5, 6, 7, 8, 9],
+            AllowableRange=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ValuesEnum=PlantType,
             UnitType=Units.NONE,
             ErrMessage="assume default power plant type (1: subcritical ORC)",

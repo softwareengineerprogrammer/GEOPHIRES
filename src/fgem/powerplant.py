@@ -543,7 +543,7 @@ class HighEnthalpyCLGWGPowerPlant(BasePowerPlant):
 class ORCPowerPlant(BasePowerPlant):
     """On/Off-Design Air-cooled ORC Binary power plant developed in Python by Aljubran et al. (2024)."""
 
-    def __init__(self, Tres, Tamb, m_prd, num_prd=None, ppc=None, cf=1.0, k=2):
+    def __init__(self, Tres, Tamb, m_prd, num_prd=None, ppc=None, cf=1.0, k=2, timestep=timedelta(hours=1)):
         """Define attributes for the BasePowerPlant class.
 
         Args:
@@ -583,7 +583,7 @@ class ORCPowerPlant(BasePowerPlant):
 
         if ppc is None:
             ppc = max(model_output[0] * num_prd, 1)  # MWe power plant capacity for all wells
-        super(ORCPowerPlant, self).__init__(ppc, Tres, cf)
+        super(ORCPowerPlant, self).__init__(ppc, Tres, cf, timestep=timestep)
 
         self.power_output_MWh_kg = np.clip(
             model_output[0] / self.m_prd_design / 3600, a_min=0.0, a_max=2.5e-4

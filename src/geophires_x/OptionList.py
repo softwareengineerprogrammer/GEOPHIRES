@@ -64,6 +64,7 @@ class PlantType(GeophiresInputEnum):
     DISTRICT_HEATING = 7, "District Heating"
     RTES = 8, "Reservoir Thermal Energy Storage"
     INDUSTRIAL = 9, "Industrial"
+    FGEM_ORC = 10, "FGEM ORC"
 
     @staticmethod
     def from_input_string(input_string: str):
