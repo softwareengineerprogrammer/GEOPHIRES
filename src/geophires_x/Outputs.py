@@ -1,4 +1,5 @@
 import datetime
+import math
 import time
 import sys
 from pathlib import Path
@@ -274,7 +275,12 @@ class Outputs:
                 # TODO should use CurrentUnits instead of PreferredUnits
                 f.write(f'      {npv_field_label}{e_npv.value:10.2f} {e_npv.PreferredUnits.value}\n')
 
-                f.write(f'      {econ.ProjectIRR.display_name}:                                     {econ.ProjectIRR.value:10.2f} {econ.ProjectIRR.PreferredUnits.value}\n')
+                irr_output_param: OutputParameter = econ.ProjectIRR \
+                    if econ.econmodel.value != EconomicModel.SAM_SINGLE_OWNER_PPA else econ.after_tax_irr
+                irr_field_label = Outputs._field_label(irr_output_param.display_name, 49)
+                irr_display_value = f'{irr_output_param.value:10.2f}' \
+                    if not math.isnan(irr_output_param.value) else 'NaN'
+                f.write(f'      {irr_field_label}{irr_display_value} {irr_output_param.CurrentUnits.value}\n')
 
                 if econ.econmodel.value != EconomicModel.SAM_SINGLE_OWNER_PPA:
                     # VIR, MOIC, and Payback period not currently supported by SAM economic model(s)
@@ -451,7 +457,7 @@ class Outputs:
                         f.write(f'             Drilling and completion costs per injection well:    {econ.cost_one_injection_well.value:10.2f} ' + econ.cost_one_injection_well.CurrentUnits.value + NL)
                     else:
                         f.write(f'         Drilling and completion costs per well:        {model.economics.Cwell.value/(model.wellbores.nprod.value+model.wellbores.ninj.value):10.2f} ' + model.economics.Cwell.CurrentUnits.value + NL)
-                    f.write(f'         Stimulation costs:                             {model.economics.Cstim.value:10.2f} ' + model.economics.Cstim.CurrentUnits.value + NL)
+                    f.write(f'         {econ.Cstim.display_name}:                             {econ.Cstim.value:10.2f} {econ.Cstim.CurrentUnits.value}\n')
                     f.write(f'         Surface power plant costs:                     {model.economics.Cplant.value:10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
                     if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                         f.write(f'            of which Absorption Chiller Cost:           {model.economics.chillercapex.value:10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
