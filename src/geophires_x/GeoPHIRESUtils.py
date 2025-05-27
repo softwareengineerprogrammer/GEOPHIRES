@@ -100,8 +100,9 @@ def InsertImagesIntoHTML(html_path: str, short_names: set, full_names: set) -> N
     # build the string to be inserted first
     insert_string = ''
     for _ in range(len(full_names)):
-        name_to_use = short_names.pop()
-        insert_string = insert_string + f'<img src="{name_to_use}" alt="{name_to_use}">\n<br>'
+        full_name = full_names.pop()
+        name_to_use = full_name.name.replace('_', ' ').replace('.png', '')
+        insert_string = insert_string + f'<img src="{full_name.name}" alt="{name_to_use}">\n<br>'
 
     match_string = '</body>'
     with open(html_path, 'r+', encoding='UTF-8') as html_file:
@@ -252,7 +253,7 @@ def density_water_kg_per_m3(Twater_degC: float, pressure: Optional[PlainQuantity
 
     except (NotImplementedError, ValueError) as e:
         raise ValueError(f'Input temperature & pressure ({Twater_degC}, {pressure}) '
-                         f'are out of range or otherwise could not be used to calculate') from e
+                         f'are out of range or otherwise could not be used to calculate water density.') from e
 
 
 def celsius_to_kelvin(celsius: float) -> float:
@@ -298,7 +299,7 @@ def viscosity_water_Pa_sec(
 
     except (NotImplementedError, ValueError) as e:
         raise ValueError(f'Input temperature & pressure ({Twater_degC}, {pressure}) '
-                         f'are out of range or otherwise could not be used to calculate') from e
+                         f'are out of range or otherwise could not be used to calculate water viscosity.') from e
 
 
 @lru_cache
@@ -334,7 +335,7 @@ def heat_capacity_water_J_per_kg_per_K(
 
     except (NotImplementedError, ValueError) as e:
         raise ValueError(f'Input temperature & pressure ({Twater_degC}, {pressure}) '
-                         f'are out of range or otherwise could not be used to calculate') from e
+                         f'are out of range or otherwise could not be used to calculate heat capacity of water.') from e
 
 
 @lru_cache
@@ -619,4 +620,25 @@ def static_pressure_MPa(rho_kg_per_m3: float, depth_m: float) -> float:
     pressure_mpa = quantity(pressure_Pa, 'Pa').to('MPa').magnitude
 
     return pressure_mpa
+
+
+def is_int(o: Any) -> bool:
+    try:
+        float_n = float(o)
+        int_n = int(float_n)
+    except ValueError:
+        return False
+    else:
+        return float_n == int_n
+
+
+def is_float(o: Any) -> bool:
+    try:
+        float(o)
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+    else:
+        return True
 

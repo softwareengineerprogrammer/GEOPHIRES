@@ -44,6 +44,11 @@ class GeophiresXClientTestCase(BaseTestCase):
         assert result.result['SUMMARY OF RESULTS']['Average Net Electricity Production']['value'] == 5.39
         assert result.result['ENGINEERING PARAMETERS']['Power plant type']['value'] == 'Supercritical ORC'
         assert result.result['SUMMARY OF RESULTS']['End-Use Option']['value'] == 'Electricity'
+        assert (
+            'Ramey Model'
+            == result.result['RESERVOIR SIMULATION RESULTS']['Production Wellbore Heat Transmission Model']
+        )
+        assert result.result['RESERVOIR SIMULATION RESULTS']['Wellbore Heat Transmission Model'] is None
 
     def test_geophires_x_result_3(self):
         test_result_path = self._get_test_file_path('geophires-result_example-3.out')
@@ -237,36 +242,36 @@ class GeophiresXClientTestCase(BaseTestCase):
                     'Annual Project Cash Flow (MUSD/yr)',
                     'Cumm. Project Cash Flow (MUSD)',
                 ],
-                [1, 0.0, 0.0023, 0.0, 0.0, 1.14, -70.0, -70.0, -101.07, -101.07],
-                [2, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -68.86, 5.7, -95.37],
-                [3, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -67.72, 5.74, -89.63],
-                [4, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -66.59, 5.75, -83.88],
-                [5, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -65.45, 5.76, -78.12],
-                [6, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -64.31, 5.77, -72.35],
-                [7, 0.09, 0.0026, 0.012, 0.0, 1.14, 1.14, -63.17, 5.77, -66.58],
-                [8, 0.102, 0.003, 0.012, 0.0, 1.14, 1.14, -62.03, 6.28, -60.29],
-                [9, 0.114, 0.0033, 0.012, 0.0, 1.14, 1.14, -60.89, 6.8, -53.5],
-                [10, 0.126, 0.0036, 0.022, 0.0, 1.14, 1.14, -59.75, 7.31, -46.19],
-                [11, 0.138, 0.0039, 0.032, 0.0, 1.14, 1.14, -58.61, 7.82, -38.36],
-                [12, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -57.47, 8.34, -30.02],
-                [13, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -56.33, 8.34, -21.68],
-                [14, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -55.19, 8.34, -13.34],
-                [15, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -54.05, 8.35, -4.99],
-                [16, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -52.91, 8.35, 3.36],
-                [17, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -51.77, 8.35, 11.71],
-                [18, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -50.63, 8.35, 20.06],
-                [19, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -49.49, 8.35, 28.41],
-                [20, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -48.35, 8.36, 36.77],
-                [21, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -47.21, 8.36, 45.12],
-                [22, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -46.07, 8.36, 53.48],
-                [23, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -44.93, 8.36, 61.84],
-                [24, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -43.8, 8.36, 70.2],
-                [25, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -42.66, 8.36, 78.56],
-                [26, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -41.52, 8.36, 86.92],
-                [27, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -40.38, 8.36, 95.29],
-                [28, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -39.24, 8.36, 103.65],
-                [29, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -38.1, 8.37, 112.02],
-                [30, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -36.96, 8.37, 120.39],
+                [1, 0.0, 0.0023, 0.0, 0.0, 1.14, -70.0, -70.0, -95.67, -95.67],
+                [2, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -68.86, 5.75, -89.92],
+                [3, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -67.72, 5.79, -84.14],
+                [4, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -66.59, 5.8, -78.34],
+                [5, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -65.45, 5.81, -72.53],
+                [6, 0.09, 0.0023, 0.012, 0.0, 1.14, 1.14, -64.31, 5.81, -66.72],
+                [7, 0.09, 0.0026, 0.012, 0.0, 1.14, 1.14, -63.17, 5.82, -60.9],
+                [8, 0.102, 0.003, 0.012, 0.0, 1.14, 1.14, -62.03, 6.33, -54.57],
+                [9, 0.114, 0.0033, 0.012, 0.0, 1.14, 1.14, -60.89, 6.84, -47.73],
+                [10, 0.126, 0.0036, 0.022, 0.0, 1.14, 1.14, -59.75, 7.36, -40.37],
+                [11, 0.138, 0.0039, 0.032, 0.0, 1.14, 1.14, -58.61, 7.87, -32.5],
+                [12, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -57.47, 8.38, -24.12],
+                [13, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -56.33, 8.39, -15.73],
+                [14, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -55.19, 8.39, -7.34],
+                [15, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -54.05, 8.39, 1.05],
+                [16, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -52.91, 8.39, 9.44],
+                [17, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -51.77, 8.4, 17.84],
+                [18, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -50.63, 8.4, 26.24],
+                [19, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -49.49, 8.4, 34.63],
+                [20, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -48.35, 8.4, 43.03],
+                [21, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -47.21, 8.4, 51.44],
+                [22, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -46.07, 8.4, 59.84],
+                [23, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -44.93, 8.4, 68.25],
+                [24, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -43.8, 8.41, 76.65],
+                [25, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -42.66, 8.41, 85.06],
+                [26, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -41.52, 8.41, 93.47],
+                [27, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -40.38, 8.41, 101.88],
+                [28, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -39.24, 8.41, 110.29],
+                [29, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -38.1, 8.41, 118.7],
+                [30, 0.15, 0.0039, 0.036, 0.0, 1.14, 1.14, -36.96, 8.41, 127.11],
             ],
             eep,
         )
@@ -288,7 +293,7 @@ class GeophiresXClientTestCase(BaseTestCase):
             'Cooling Price (cents/kWh)',
             'Cooling Ann. Rev. (MUSD/yr)',
             'Cooling Cumm. Rev. (MUSD)',
-            'Carbon Price (USD/tonne)',
+            'Carbon Price (USD/lb)',
             'Carbon Ann. Rev. (MUSD/yr)',
             'Carbon Cumm. Rev. (MUSD)',
             'Project OPEX (MUSD/yr)',
@@ -340,10 +345,27 @@ class GeophiresXClientTestCase(BaseTestCase):
             rcf_profile,
         )
 
-    def test_ccus_profile(self):
-        test_result_path = self._get_test_file_path('result_with_ccus_profile.out')
+    def test_carbon_revenue_profile(self):
+        result_example1 = GeophiresXResult(self._get_test_file_path('examples/example1.out'))
+        self.assertTrue(GeophiresXResult.CARBON_REVENUE_PROFILE_NAME not in result_example1.result)
+
+        result_addons = GeophiresXResult(self._get_test_file_path('examples/example1_addons.out'))
+        carbon_revenue_profile = result_addons.result['CARBON REVENUE PROFILE']
+        self.assertIsNotNone(carbon_revenue_profile)
+        self.assertListEqual(
+            carbon_revenue_profile[0],
+            ['Year Since Start', 'Carbon Price (USD/lb)', 'Carbon Ann. Rev. (MUSD/yr)', 'Carbon Cumm. Rev. (MUSD)'],
+        )
+
+        self.assertListEqual([0, 0.0, 0.0, 0.0], carbon_revenue_profile[1])
+        self.assertListEqual([1, 0.01, 0.51, 0.51], carbon_revenue_profile[2])
+        self.assertListEqual([29, 0.1, 3.5, 72.36], carbon_revenue_profile[30])
+        self.assertListEqual([30, 0.1, 3.5, 75.86], carbon_revenue_profile[31])
+
+    def test_ccus_profile_legacy(self):
+        test_result_path = self._get_test_file_path('result_with_ccus_profile_legacy.out')
         result = GeophiresXResult(test_result_path)
-        ccus_profile = result.result['CCUS PROFILE']
+        ccus_profile_legacy = result.result['CCUS PROFILE']
 
         self.assertListEqual(
             [
@@ -389,7 +411,7 @@ class GeophiresXClientTestCase(BaseTestCase):
                 [30, 8035085.158, 0.1, 0.8, 0.8, 16.45, 3.07, 44.31],
                 [31, 6703146.945, 0.1, 0.67, 0.67, 17.12, 2.7, 47.01],
             ],
-            ccus_profile,
+            ccus_profile_legacy,
         )
 
     def test_non_vertical_section_cost(self):
@@ -465,37 +487,6 @@ class GeophiresXClientTestCase(BaseTestCase):
          3. Copy-paste the value of `as_csv` (in Threads & Variables tab in PyCharm) to example1_addons.csv
         """
 
-        def assertFileContentsEqual(expected_file_path, actual_file_path, tol=0.01):
-            with open(expected_file_path, encoding='utf-8') as ef:
-                expected_lines = ef.readlines()
-            with open(actual_file_path, encoding='utf-8') as af:
-                actual_lines = af.readlines()
-
-            self.assertEqual(len(expected_lines), len(actual_lines), 'The number of lines in the files do not match.')
-
-            for line_index, (expected_line, actual_line) in enumerate(zip(expected_lines, actual_lines), start=1):
-                expected_parts = expected_line.strip().split(',')
-                actual_parts = actual_line.strip().split(',')
-                self.assertEqual(
-                    len(expected_parts),
-                    len(actual_parts),
-                    f'The number of columns in line {line_index} does not match.',
-                )
-                for col_index, (expected, actual) in enumerate(zip(expected_parts, actual_parts), start=1):
-                    try:
-                        expected_float = float(expected)
-                        actual_float = float(actual)
-                        self.assertTrue(
-                            abs(expected_float - actual_float) < tol,
-                            f'Float values differ at line {line_index}, column {col_index}: {expected} != {actual}',
-                        )
-                    except ValueError:
-                        self.assertEqual(
-                            expected,
-                            actual,
-                            f'String values differ at line {line_index}, column {col_index}: {expected} != {actual}',
-                        )
-
         def assert_csv_equal(case_report_file_path, expected_csv_file_path):
             test_result_path = self._get_test_file_path(case_report_file_path)
             result = GeophiresXResult(test_result_path)
@@ -505,7 +496,7 @@ class GeophiresXClientTestCase(BaseTestCase):
             result_file = Path(tempfile.gettempdir(), f'test_csv-result_{uuid.uuid1()!s}.csv')
             with open(result_file, 'w', newline='', encoding='utf-8') as rf:
                 rf.write(as_csv)
-            assertFileContentsEqual(self._get_test_file_path(expected_csv_file_path), result_file)
+            self.assertCsvFileContentsEqual(self._get_test_file_path(expected_csv_file_path), result_file)
 
         for case in [
             ('examples/example1_addons.out', 'example1_addons.csv'),
@@ -513,6 +504,54 @@ class GeophiresXClientTestCase(BaseTestCase):
         ]:
             with self.subTest(msg=case[0]):
                 assert_csv_equal(case[0], case[1])
+
+        op_example_file = 'examples/example_overpressure.out'
+        with self.subTest(msg=op_example_file):
+            # Ensure overpressure-specific RESERVOIR POWER REQUIRED PROFILES doesn't cause issues
+            op_result = GeophiresXResult(self._get_test_file_path(op_example_file))
+            op_csv = op_result.as_csv()
+            self.assertIsNotNone(op_csv)
+
+        sam_example_file = 'examples/example_SAM-single-owner-PPA.out'
+        with self.subTest(msg=sam_example_file):
+            sam_result = GeophiresXResult(self._get_test_file_path(sam_example_file))
+            sam_csv = sam_result.as_csv()
+            self.assertIsNotNone(sam_csv)
+            sam_cf_lines = [line.split(',') for line in sam_csv.split('\n') if line.startswith('SAM CASH FLOW PROFILE')]
+            self.assertGreater(len(sam_cf_lines), 250)
+            # TODO test more of the content (but not full result given how big/complex it is, which would add undue
+            #  maintenance overhead)
+
+    def assertCsvFileContentsEqual(self, expected_file_path, actual_file_path, tol=0.01):
+        with open(expected_file_path, encoding='utf-8') as ef:
+            expected_lines = ef.readlines()
+        with open(actual_file_path, encoding='utf-8') as af:
+            actual_lines = af.readlines()
+
+        self.assertEqual(len(expected_lines), len(actual_lines), 'The number of lines in the files do not match.')
+
+        for line_index, (expected_line, actual_line) in enumerate(zip(expected_lines, actual_lines), start=1):
+            expected_parts = expected_line.strip().split(',')
+            actual_parts = actual_line.strip().split(',')
+            self.assertEqual(
+                len(expected_parts),
+                len(actual_parts),
+                f'The number of columns in line {line_index} does not match.',
+            )
+            for col_index, (expected, actual) in enumerate(zip(expected_parts, actual_parts), start=1):
+                try:
+                    expected_float = float(expected)
+                    actual_float = float(actual)
+                    self.assertTrue(
+                        abs(expected_float - actual_float) < tol,
+                        f'Float values differ at line {line_index}, column {col_index}: {expected} != {actual}',
+                    )
+                except ValueError:
+                    self.assertEqual(
+                        expected,
+                        actual,
+                        f'String values differ at line {line_index}, column {col_index}: {expected} != {actual}',
+                    )
 
     def test_parse_chp_percent_cost_allocation(self):
         result = GeophiresXResult(self._get_test_file_path('examples/example3.out'))
@@ -523,3 +562,60 @@ class GeophiresXClientTestCase(BaseTestCase):
     def test_parse_annualized_capital_costs(self):
         result = GeophiresXResult(self._get_test_file_path('examples/example1_addons.out'))
         self.assertIsNotNone(result.result['CAPITAL COSTS (M$)']['Annualized capital costs']['value'])
+
+    def test_parse_number_with_commas(self):
+        result = GeophiresXResult(self._get_test_file_path('examples/S-DAC-GT.out'))
+        sdac_e = result.result['S-DAC-GT ECONOMICS']
+        self.assertAlmostEqualWithinPercentage(499_311_405.59, sdac_e['Total Cost of Capture']['value'])
+
+        self.assertAlmostEqualWithinPercentage(0.0017, sdac_e['Geothermal LCOH']['value'])
+
+        self.assertAlmostEqualWithinPercentage(20.7259, sdac_e['Geothermal Ratio (electricity vs heat)']['value'])
+
+    def test_parse_sdacgt_profile(self):
+        result = GeophiresXResult(self._get_test_file_path('examples/S-DAC-GT.out'))
+        sdacgt_profile = result.result['S-DAC-GT PROFILE']
+        self.assertIsNotNone(sdacgt_profile)
+        self.assertEqual(
+            sdacgt_profile[0],
+            [
+                'Year Since Start',
+                'Carbon Captured (tonne/yr)',
+                'Cumm. Carbon Captured (tonne)',
+                'S-DAC-GT Annual Cost (USD/yr)',
+                'S-DAC-GT Cumm. Cash Flow (USD)',
+                'Cumm. Cost Per Tonne (USD/tonne)',
+            ],
+        )
+
+        # Values below need to be synchronized if S-DAC-GT example output values change.
+        self.assertEqual([1, 78330.8, 78330.8, 17411627.98, 17411627.98, 222.28], sdacgt_profile[1])
+
+        self.assertEqual(
+            [15, 76263.89, 1167207.48, 16952186.81, 259450710.33, 222.28],
+            sdacgt_profile[15],
+        )
+
+        self.assertEqual([30, 68860.68, 2253170.17, 15306577.89, 500842063.38, 222.28], sdacgt_profile[30])
+
+    def test_parse_economic_model(self):
+        result = GeophiresXResult(self._get_test_file_path('examples/example3.out'))
+        em = result.result['ECONOMIC PARAMETERS']['Economic Model']
+        self.assertEqual(em, 'BICYCLE')
+
+        # Test backwards compatibility with previous versions of GEOPHIRES that included an extra space before the
+        # equal sign.
+        result_legacy_em = GeophiresXResult(self._get_test_file_path('examples/example3.out'))
+        result_legacy_em._lines = ['   Economic Model  = BICYCLE']
+        em_legacy = result_legacy_em._get_equal_sign_delimited_field('Economic Model')
+        self.assertEqual(em_legacy, 'BICYCLE')
+
+    def test_parse_sam_cash_flow_profile(self):
+        result = GeophiresXResult(self._get_test_file_path('examples/example_SAM-single-owner-PPA.out'))
+        em = result.result['ECONOMIC PARAMETERS']['Economic Model']
+        self.assertEqual(em, 'SAM Single Owner PPA')
+        self.assertIn('SAM CASH FLOW PROFILE', result.result)
+
+        cash_flow = result.result['SAM CASH FLOW PROFILE']
+        self.assertIsNotNone(cash_flow)
+        self.assertListEqual([''] + [f'Year {y}' for y in range(21)], cash_flow[0])

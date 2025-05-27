@@ -5,11 +5,13 @@ from pathlib import Path
 from typing import Optional
 
 from geophires_x.OptionList import PlantType
+from geophires_x.OptionList import WellDrillingCostCorrelation
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import _get_logger
 from geophires_x_client.geophires_input_parameters import EndUseOption
 from geophires_x_client.geophires_input_parameters import GeophiresInputParameters
+from geophires_x_tests.test_options_list import WellDrillingCostCorrelationTestCase
 from tests.base_test_case import BaseTestCase
 
 
@@ -156,6 +158,7 @@ class GeophiresXTestCase(BaseTestCase):
         def get_output_file_for_example(example_file: str):
             return self._get_test_file_path(Path('examples', f'{example_file.split(".txt")[0]}.out'))
 
+        # @formatter:off
         example_files = list(
             filter(
                 lambda example_file_path: example_file_path.startswith(
@@ -167,6 +170,13 @@ class GeophiresXTestCase(BaseTestCase):
                 self._list_test_files_dir(test_files_dir='examples'),
             )
         )
+        # @formatter:on
+
+        # Run SBT examples last because they take an inordinately long time (tens of seconds even on a fast machine).
+        # This reduces time spent waiting for tests to run if you are iterating on changes that affect non-SBT examples.
+        for ef in [_ef for _ef in example_files if _ef.startswith('example_SBT')]:
+            example_files.remove(ef)
+            example_files.append(ef)
 
         assert len(example_files) > 0  # test integrity check - no files means something is misconfigured
         regenerate_cmds = []
@@ -377,9 +387,9 @@ Print Output to Console, 1"""
                 .result['SUMMARY OF RESULTS']['Electricity breakeven price']['value']
             )
 
-        self.assertAlmostEqual(9.61, get_fcr_lcoe(0.05), places=1)
-        self.assertAlmostEqual(3.33, get_fcr_lcoe(0.0001), places=1)
-        self.assertAlmostEqual(104.34, get_fcr_lcoe(0.8), places=0)
+        self.assertAlmostEqual(8.82, get_fcr_lcoe(0.05), places=1)
+        self.assertAlmostEqual(3.19, get_fcr_lcoe(0.0001), places=1)
+        self.assertAlmostEqual(93.48, get_fcr_lcoe(0.8), places=0)
 
     def test_vapor_pressure_above_critical_temperature(self):
         """https://github.com/NREL/GEOPHIRES-X/issues/214"""
@@ -559,30 +569,65 @@ Print Output to Console, 1"""
 
         client = GeophiresXClient()
 
-        # noinspection PyPep8Naming
-        def assertHasLogRecordWithMessage(logs_, message):
-            assert message in [record.message for record in logs_.records]
-
         with self.assertLogs(level='INFO') as logs:
             result = client.get_geophires_result(input_params(discount_rate='0.042'))
 
-            assert result is not None
-            assert result.result['ECONOMIC PARAMETERS']['Interest Rate']['value'] == 4.2
-            assert result.result['ECONOMIC PARAMETERS']['Interest Rate']['unit'] == '%'
-            assertHasLogRecordWithMessage(
+            self.assertIsNotNone(result)
+            self.assertEqual(4.2, result.result['ECONOMIC PARAMETERS']['Interest Rate']['value'])
+            self.assertEqual('%', result.result['ECONOMIC PARAMETERS']['Interest Rate']['unit'])
+            self.assertHasLogRecordWithMessage(
                 logs, 'Set Fixed Internal Rate to 4.2 percent because Discount Rate was provided (0.042)'
             )
 
         with self.assertLogs(level='INFO') as logs2:
             result2 = client.get_geophires_result(input_params(fixed_internal_rate='4.2'))
 
-            assert result2 is not None
-            assert result2.result['ECONOMIC PARAMETERS']['Interest Rate']['value'] == 4.2
-            assert result2.result['ECONOMIC PARAMETERS']['Interest Rate']['unit'] == '%'
+            self.assertIsNotNone(result2)
+            self.assertEqual(4.2, result2.result['ECONOMIC PARAMETERS']['Interest Rate']['value'])
+            self.assertEqual('%', result2.result['ECONOMIC PARAMETERS']['Interest Rate']['unit'])
 
-            assertHasLogRecordWithMessage(
+            self.assertHasLogRecordWithMessage(
                 logs2, 'Set Discount Rate to 0.042 because Fixed Internal Rate was provided (4.2 percent)'
             )
+
+    def test_discount_initial_year_cashflow(self):
+        def _get_result(base_example: str, do_discount: bool) -> GeophiresXResult:
+            return GeophiresXClient().get_geophires_result(
+                GeophiresInputParameters(
+                    # TODO switch over to generic EGS case to avoid thrash from example updates
+                    # from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+                    from_file_path=self._get_test_file_path(f'examples/{base_example}.txt'),
+                    params={
+                        'Discount Initial Year Cashflow': do_discount,
+                    },
+                )
+            )
+
+        def _npv(r: GeophiresXResult) -> dict:
+            return r.result['ECONOMIC PARAMETERS']['Project NPV']['value']
+
+        self.assertEqual(4580.36, _npv(_get_result('Fervo_Project_Cape-3', False)))
+        self.assertEqual(4280.71, _npv(_get_result('Fervo_Project_Cape-3', True)))
+
+        def _extended_economics_npv(r: GeophiresXResult) -> dict:
+            return r.result['EXTENDED ECONOMICS']['Project NPV   (including AddOns)']['value']
+
+        add_ons_result_without_discount = _get_result('example1_addons', False)
+        add_ons_result_with_discount = _get_result('example1_addons', True)
+
+        self.assertGreater(_npv(add_ons_result_without_discount), _npv(add_ons_result_with_discount))
+
+        ee_npv_without_discount = _extended_economics_npv(add_ons_result_without_discount)
+        assert ee_npv_without_discount < 0, (
+            'Test is expecting example1_addons extended economics NPV to be negative '
+            'as a precondition - if this error is encountered, '
+            'create a test-only copy of the previous version of example1_addons and '
+            'use it in this test (like geophires_x_tests/generic-egs-case.txt).'
+        )
+
+        # Discounting first year causes negative NPVs to be less negative (according to Google Sheets,
+        # which was used to manually validate the expected NPVs here).
+        self.assertLess(ee_npv_without_discount, _extended_economics_npv(add_ons_result_with_discount))
 
     def test_transmission_pipeline_cost(self):
         result = GeophiresXClient().get_geophires_result(
@@ -670,3 +715,209 @@ Print Output to Console, 1"""
         self.assertIsNotNone(_c_non_vert(r_1)['value'])
 
         self.assertEqual(_c_non_vert(r_1)['value'], _c_non_vert(_get_result(2))['value'])
+
+    def test_single_time_step_per_year(self):
+        result_1 = GeophiresXClient().get_geophires_result(
+            GeophiresInputParameters(
+                from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+                params={'Time steps per year': 1},
+            )
+        )
+
+        result_1_final_val = result_1.heat_electricity_extraction_generation_profile[-1][1]
+        self.assertGreater(result_1_final_val, 0)
+
+        result_2 = GeophiresXClient().get_geophires_result(
+            GeophiresInputParameters(
+                from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+                params={'Time steps per year': 2},
+            )
+        )
+
+        result_2_final_val = result_2.heat_electricity_extraction_generation_profile[-1][1]
+        self.assertAlmostEqual(result_2_final_val, result_1_final_val, delta=1.5)
+
+        # TODO enable once https://github.com/NREL/GEOPHIRES-X/issues/352 is resolved
+        # result_1_1 = GeophiresXClient().get_geophires_result(
+        #     GeophiresInputParameters(
+        #         from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+        #         params={
+        #             'Time steps per year': 1,
+        #             'Plant Lifetime': 1
+        #         },
+        #     )
+        # )
+        #
+        # self.assertIsNotNone(result_1_1)
+
+    def test_multiple_construction_years(self):
+        construction_years = 2
+        result = GeophiresXClient().get_geophires_result(
+            GeophiresInputParameters(
+                from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+                params={'Construction Years': construction_years},
+            )
+        )
+
+        total_capex = result.result['CAPITAL COSTS (M$)']['Total capital costs']['value']
+
+        rcp = result.result['REVENUE & CASHFLOW PROFILE']
+        project_lifetime = 25
+        self.assertEqual(project_lifetime + construction_years, len(rcp) - 1)  # Subtract 1 for headers
+        net_rev_idx = 14
+        net_cashflow_idx = 15
+
+        # Example expected output for first 2 years:
+        # [
+        #    ...
+        #   [0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -657.4, -657.4]
+        #   [1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -657.4, -1314.79]
+        #   ...
+        # ]
+
+        yearly_net_rev = -1 * total_capex / construction_years
+        self.assertAlmostEqual(yearly_net_rev, rcp[1][net_rev_idx], places=1)
+        self.assertAlmostEqual(yearly_net_rev, rcp[1][net_cashflow_idx], places=1)
+        self.assertAlmostEqual(yearly_net_rev, rcp[2][net_rev_idx], places=1)
+        self.assertEqual(-1 * total_capex, rcp[2][net_cashflow_idx])
+
+        pre_rev_idx = min(net_rev_idx, net_cashflow_idx)
+        self.assertListEqual([0] * pre_rev_idx, rcp[1][:pre_rev_idx])
+        self.assertListEqual([1] + [0] * (pre_rev_idx - 1), rcp[2][:pre_rev_idx])
+
+    def test_drilling_cost_curves(self):
+        """
+        Note this is similar to
+        geophires_x_tests.test_options_list.WellDrillingCostCorrelationTestCase.test_drilling_cost_curve_correlations;
+        this test ensures that the indirect cost factor is responsible for the discrepancy between GEOPHIRES-calculated
+        drilling cost per well and the raw value calculated by the curve.
+        """
+
+        indirect_cost_factor = 1.05  # See TODO re:parameterizing at src/geophires_x/Economics.py:652
+
+        for test_case in WellDrillingCostCorrelationTestCase.COST_CORRELATION_TEST_CASES:
+            correlation: WellDrillingCostCorrelation = test_case[0]
+            depth_m = test_case[1]
+            expected_cost_musd = test_case[2]
+            with self.subTest(msg=str(f'{correlation.name}, {depth_m}m')):
+                result = GeophiresXClient().get_geophires_result(
+                    GeophiresInputParameters(
+                        from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+                        params={
+                            'Well Drilling Cost Correlation': correlation.int_value,
+                            'Reservoir Depth': f'{depth_m} meter',
+                            'Number of Production Wells': 1,
+                            'Number of Injection Wells': 1,
+                            'Well Drilling and Completion Capital Cost Adjustment Factor': 1,
+                        },
+                    )
+                )
+
+                cost_per_well_val = result.result['CAPITAL COSTS (M$)']['Drilling and completion costs per well'][
+                    'value'
+                ]
+                self.assertAlmostEqual(indirect_cost_factor * expected_cost_musd, cost_per_well_val, delta=0.1)
+
+    def test_segment_thickness_output(self):
+        thickness_1 = 0.793
+        thickness_2 = 1.646
+        result = GeophiresXClient().get_geophires_result(
+            GeophiresInputParameters(
+                from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+                params={
+                    'Number of Segments': 3,
+                    'Gradient 1': 42.69972,
+                    'Gradient 2': 51.66667,
+                    'Thickness 1': thickness_1,
+                    'Gradient 3': 46.9697,
+                    'Thickness 2': thickness_2,
+                },
+            )
+        )
+
+        self.assertEqual(thickness_1, result.result['SUMMARY OF RESULTS']['Segment 1   Thickness']['value'])
+        self.assertEqual(thickness_2, result.result['SUMMARY OF RESULTS']['Segment 2   Thickness']['value'])
+
+    def test_field_gathering_cost(self):
+        fg_cost = 2.99
+        result = GeophiresXClient().get_geophires_result(
+            GeophiresInputParameters(
+                from_file_path=self._get_test_file_path('geophires_x_tests/generic-egs-case.txt'),
+                params={
+                    'Field Gathering System Capital Cost': fg_cost,
+                },
+            )
+        )
+
+        self.assertEqual(fg_cost, result.result['CAPITAL COSTS (M$)']['Field gathering system costs']['value'])
+
+    def test_heat_pump_lcoh_bicycle(self):
+        result = GeophiresXClient().get_geophires_result(
+            GeophiresInputParameters(
+                from_file_path=self._get_test_file_path('examples/example10_HP.txt'),
+                params={
+                    'Economic Model': 3,
+                },
+            )
+        )
+
+        lcoh = result.result['SUMMARY OF RESULTS']['Direct-Use heat breakeven price (LCOH)']['value']
+        self.assertTrue(10 < lcoh < 20)  # Sanity-check that value is non-zero and broadly within the expected range.
+
+    def test_ags_temperature_limitations(self):
+        client = GeophiresXClient()
+
+        with self.assertRaises(RuntimeError) as e:
+            params = GeophiresInputParameters(
+                {
+                    'Is AGS': True,
+                    'Well Geometry Configuration': 1,
+                    'Injection Temperature': 60,
+                    'Gradient 1': 60,
+                    'Reservoir Depth': 8,
+                    'Cylindrical Reservoir Input Depth': 8,
+                    'Economic Model': 3,
+                }
+            )
+            client.get_geophires_result(params)
+        self.assertIn(' exceeds ', str(e.exception))
+
+        with self.assertRaises(RuntimeError) as e:
+            params = GeophiresInputParameters(
+                {
+                    'Is AGS': True,
+                    'Closed-loop Configuration': 2,
+                    'Gradient 1': 25,
+                    'Reservoir Depth': 3,
+                    'Injection Temperature': 60,
+                    'Economic Model': 4,
+                }
+            )
+            client.get_geophires_result(params)
+        self.assertIn('failed to validate CLGS input value', str(e.exception))
+
+    def test_negative_electricity_production_raises_error(self):
+        client = GeophiresXClient()
+        with self.assertRaises(RuntimeError) as e:
+            params = GeophiresInputParameters(
+                {
+                    'Reservoir Depth': 5,
+                    'Gradient 1': 112,
+                    'Power Plant Type': 2,
+                    'Maximum Temperature': 600,
+                }
+            )
+            client.get_geophires_result(params)
+        self.assertIn('Electricity production calculated as negative', str(e.exception))
+
+    def test_sbt_coaxial_raises_error(self):
+        client = GeophiresXClient()
+        with self.assertRaises(RuntimeError) as e:
+            params = GeophiresInputParameters(
+                {
+                    'Reservoir Model': 8,
+                    'Well Geometry Configuration': 2,
+                }
+            )
+            client.get_geophires_result(params)
+        self.assertIn('SBT with coaxial configuration is not implemented', str(e.exception))
