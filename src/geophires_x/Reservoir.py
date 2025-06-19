@@ -544,7 +544,7 @@ class Reservoir:
         # This also deals with all the special cases that need to be taken care of
         # after a value has been read in and checked.
         # If you choose to subclass this master class, you can also choose to override this method (or not),
-        # and if you do, do it before or after you call you own version of this method.  If you do, you can
+        # and if you do, do it before or after you call your own version of this method.  If you do, you can
         # also choose to call this method from you class, which can effectively modify all these
         # superclass parameters in your class.
 
@@ -720,8 +720,9 @@ class Reservoir:
         temperatureindex = max(loc for loc, val in enumerate(self.depth.value > totaldepth) if val)
 
         # temperatureindex = max(loc for loc, val in enumerate(self.depth.value > totaldepth) if val is True)
-        self.Trock.value = intersecttemperature[temperatureindex] + self.gradient.value[temperatureindex] * \
-                           (self.depth.value - totaldepth[temperatureindex])
+        self.Trock.value = self.gradient.value[temperatureindex] * (self.depth.value - totaldepth[temperatureindex])
+        #self.Trock.value = intersecttemperature[temperatureindex] + self.gradient.value[temperatureindex] * \
+        #                   (self.depth.value - totaldepth[temperatureindex])
 
         # calculate average geothermal gradient
         if self.numseg.value == 1:
