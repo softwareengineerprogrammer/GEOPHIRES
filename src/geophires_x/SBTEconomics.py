@@ -1,8 +1,8 @@
 import sys, math
 import numpy as np
 import geophires_x.Model as Model
-from .Economics import Economics, calculate_cost_of_one_vertical_well, BuildPTCModel, BuildPricingModel, \
-    CalculateRevenue, CalculateFinancialPerformance, CalculateLCOELCOHLCOC
+from .Economics import Economics, calculate_cost_of_one_vertical_well, BuildPTCModel, CalculateRevenue, CalculateFinancialPerformance, CalculateLCOELCOHLCOC
+from .EconomicsUtils import BuildPricingModel
 from .OptionList import Configuration, WellDrillingCostCorrelation, PlantType
 from geophires_x.Parameter import floatParameter
 from geophires_x.Units import *
@@ -755,19 +755,19 @@ class SBTEconomics(Economics):
             self.ElecRevenue.value, self.ElecCummRevenue.value = CalculateRevenue(
                 model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
                 model.surfaceplant.NetkWhProduced.value, self.ElecPrice.value)
-            self.TotalRevenue.value = self.ElecRevenue.value
+            self.TotalRevenue.value = self.ElecRevenue.value.copy()
             #self.TotalCummRevenue.value = self.ElecCummRevenue.value
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER]:
             self.HeatRevenue.value, self.HeatCummRevenue.value = CalculateRevenue(
                 model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
                 model.surfaceplant.HeatkWhProduced.value, self.HeatPrice.value)
-            self.TotalRevenue.value = self.HeatRevenue.value
+            self.TotalRevenue.value = self.HeatRevenue.value.copy()
             #self.TotalCummRevenue.value = self.HeatCummRevenue.value
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value in [PlantType.ABSORPTION_CHILLER]:
             self.CoolingRevenue.value, self.CoolingCummRevenue.value = CalculateRevenue(
                 model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
                 model.surfaceplant.cooling_kWh_Produced.value, self.CoolingPrice.value)
-            self.TotalRevenue.value = self.CoolingRevenue.value
+            self.TotalRevenue.value = self.CoolingRevenue.value.copy()
             #self.TotalCummRevenue.value = self.CoolingCummRevenue.value
         elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
                                                         EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,

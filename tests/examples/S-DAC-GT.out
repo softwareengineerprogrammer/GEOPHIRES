@@ -4,9 +4,9 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.7.1
- Simulation Date: 2025-01-22
- Simulation Time:  10:48
+ GEOPHIRES Version: 3.7.23
+ Simulation Date: 2025-03-10
+ Simulation Time:  10:42
  Calculation Time:      0.107 sec
 
                            ***SUMMARY OF RESULTS***
@@ -14,8 +14,8 @@ Simulation Metadata
       End-Use Option: Cogeneration Topping Cycle, Heat sales considered as extra income
       Average Net Electricity Production:                    19.62 MW
       Average Direct-Use Heat Production:                    13.19 MW
-      Electricity breakeven price:                           10.69 cents/kWh
-      Direct-Use heat breakeven price (LCOH):               -56.33 USD/MMBTU
+      Electricity breakeven price:                           10.68 cents/kWh
+      Direct-Use heat breakeven price (LCOH):               -56.08 USD/MMBTU
       Number of production wells:                             3
       Number of injection wells:                              3
       Flowrate per production well:                          70.0 kg/sec
@@ -29,10 +29,10 @@ Simulation Metadata
       Accrued financing during construction:                  0.00
       Project lifetime:                                      30 yr
       Capacity factor:                                       90.0 %
-      Project NPV:                                         -82.22 MUSD
-      Project IRR:                                          -5.99 %
+      Project NPV:                                         -82.17 MUSD
+      Project IRR:                                          -5.86 %
       Project VIR=PI=PIR:                                    0.20
-      Project MOIC:                                         -0.31
+      Project MOIC:                                         -0.30
       Project Payback Period:                          N/A
       CHP: Percent cost allocation for electrical plant:      92.25 %
 
@@ -119,14 +119,14 @@ Simulation Metadata
       Average Net Electricity Generation:                    19.62 MW
       Minimum Net Electricity Generation:                    16.96 MW
       Initial Net Electricity Generation:                    20.98 MW
-      Average Annual Total Electricity Generation:           87.03 GWh
-      Average Annual Net Electricity Generation:             85.57 GWh
+      Average Annual Total Electricity Generation:           87.28 GWh
+      Average Annual Net Electricity Generation:             85.81 GWh
       Initial pumping power/net installed power:              0.89 %
       Maximum Net Heat Production:                           14.05 MW
       Average Net Heat Production:                           13.19 MW
       Minimum Net Heat Production:                           11.35 MW
       Initial Net Heat Production:                           14.05 MW
-      Average Annual Heat Production:                        -4.73 GWh
+      Average Annual Heat Production:                        -4.76 GWh
       Average Pumping Power:                                  0.19 MW
       Heat to Power Conversion Efficiency:                   16.55 %
 
@@ -203,7 +203,7 @@ Simulation Metadata
   27                -8.3                   74.6                    982.47              -25.82               133.54
   28                -8.7                   73.5                    975.32              -29.33               138.10
   29                -9.2                   72.4                    968.21              -32.82               142.63
-  30                -8.7                   64.2                    865.37              -35.93               146.68
+  30                -9.6                   71.3                    961.52              -36.28               147.13
 
 
                              ********************************
@@ -211,66 +211,67 @@ Simulation Metadata
                              ********************************
 Year            Electricity             |            Heat                  |           Cooling                 |         Carbon                    |          Project
 Since     Price   Ann. Rev.  Cumm. Rev. |   Price   Ann. Rev.   Cumm. Rev. |  Price   Ann. Rev.   Cumm. Rev.   |   Price   Ann. Rev.   Cumm. Rev.  | OPEX    Net Rev.      Net Cashflow
-Start    (cents/kWh)(MUSD/yr) (MUSD)    |(cents/kWh) (MUSD/yr)    (MUSD)   |(cents/kWh) (MUSD/yr)    (MUSD)    |(USD/tonne) (MUSD/yr)    (MUSD)    |(MUSD/yr) (MUSD/yr)    (MUSD)
+Start    (cents/kWh)(MUSD/yr) (MUSD)    |(cents/kWh) (MUSD/yr)    (MUSD)   |(cents/kWh) (MUSD/yr)    (MUSD)    |(USD/lb)    (MUSD/yr)    (MUSD)    |(MUSD/yr) (MUSD/yr)    (MUSD)
 ________________________________________________________________________________________________________________________________________________________________________________________
-  1      0.00           0.00   0.00     |    0.00     0.00         0.00    |    0.00     0.00         0.00     |    0.00     0.00         0.00     |  0.00     -102.56     -102.56
-  2      5.50           5.15   5.15     |    2.50    -0.06        -0.06    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -100.66
-  3      5.50           5.15  10.30     |    2.50    -0.06        -0.13    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -98.77
-  4      5.50           5.15  15.45     |    2.50    -0.06        -0.19    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -96.87
-  5      5.50           5.15  20.60     |    2.50    -0.06        -0.25    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -94.97
-  6      5.50           5.15  25.74     |    2.50    -0.06        -0.32    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.89     -93.08
-  7      5.50           5.15  30.89     |    2.50    -0.06        -0.38    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.89     -91.19
-  8      5.50           5.14  36.03     |    2.50    -0.06        -0.45    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.88     -89.30
-  9      5.50           5.13  41.16     |    2.50    -0.07        -0.51    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.87     -87.43
- 10      5.50           5.11  46.26     |    2.50    -0.07        -0.58    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.85     -85.58
- 11      5.50           5.08  51.35     |    2.50    -0.07        -0.65    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.82     -83.76
- 12      5.50           5.05  56.40     |    2.50    -0.07        -0.72    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.79     -81.97
- 13      5.50           5.01  61.41     |    2.50    -0.08        -0.80    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.74     -80.22
- 14      5.50           4.97  66.38     |    2.50    -0.08        -0.89    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.69     -78.53
- 15      5.50           4.92  71.29     |    2.50    -0.09        -0.97    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.64     -76.89
- 16      5.50           4.86  76.16     |    2.50    -0.09        -1.07    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.58     -75.31
- 17      5.50           4.81  80.96     |    2.50    -0.10        -1.17    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.52     -73.80
- 18      5.50           4.75  85.71     |    2.50    -0.11        -1.28    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.45     -72.35
- 19      5.50           4.68  90.40     |    2.50    -0.12        -1.40    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.38     -70.97
- 20      5.50           4.62  95.02     |    2.50    -0.13        -1.52    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.31     -69.66
- 21      5.50           4.56  99.57     |    2.50    -0.13        -1.66    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.23     -68.43
- 22      5.50           4.49  104.06     |    2.50    -0.14        -1.80    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.16     -67.27
- 23      5.50           4.43  108.49     |    2.50    -0.15        -1.96    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.08     -66.19
- 24      5.50           4.36  112.85     |    2.50    -0.16        -2.12    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.01     -65.18
- 25      5.50           4.30  117.15     |    2.50    -0.17        -2.29    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.93     -64.25
- 26      5.50           4.23  121.38     |    2.50    -0.18        -2.48    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.86     -63.40
- 27      5.50           4.17  125.54     |    2.50    -0.20        -2.67    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.78     -62.61
- 28      5.50           4.10  129.65     |    2.50    -0.21        -2.88    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.71     -61.91
- 29      5.50           4.04  133.69     |    2.50    -0.22        -3.10    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.63     -61.27
- 30      5.50           3.98  137.67     |    2.50    -0.23        -3.33    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.56     -60.71
+  0      0.00           0.00   0.00     |    0.00     0.00         0.00    |    0.00     0.00         0.00     |    0.00     0.00         0.00     |  0.00     -102.56     -102.56
+  1      5.50           5.15   5.15     |    2.50    -0.06        -0.06    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -100.66
+  2      5.50           5.15  10.30     |    2.50    -0.06        -0.13    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -98.77
+  3      5.50           5.15  15.45     |    2.50    -0.06        -0.19    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -96.87
+  4      5.50           5.15  20.60     |    2.50    -0.06        -0.25    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.90     -94.97
+  5      5.50           5.15  25.74     |    2.50    -0.06        -0.32    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.89     -93.08
+  6      5.50           5.15  30.89     |    2.50    -0.06        -0.38    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.89     -91.19
+  7      5.50           5.14  36.03     |    2.50    -0.06        -0.45    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.88     -89.30
+  8      5.50           5.13  41.16     |    2.50    -0.07        -0.51    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.87     -87.43
+  9      5.50           5.11  46.26     |    2.50    -0.07        -0.58    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.85     -85.58
+ 10      5.50           5.08  51.35     |    2.50    -0.07        -0.65    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.82     -83.76
+ 11      5.50           5.05  56.40     |    2.50    -0.07        -0.72    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.79     -81.97
+ 12      5.50           5.01  61.41     |    2.50    -0.08        -0.80    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.74     -80.22
+ 13      5.50           4.97  66.38     |    2.50    -0.08        -0.89    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.69     -78.53
+ 14      5.50           4.92  71.29     |    2.50    -0.09        -0.97    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.64     -76.89
+ 15      5.50           4.86  76.16     |    2.50    -0.09        -1.07    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.58     -75.31
+ 16      5.50           4.81  80.96     |    2.50    -0.10        -1.17    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.52     -73.80
+ 17      5.50           4.75  85.71     |    2.50    -0.11        -1.28    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.45     -72.35
+ 18      5.50           4.68  90.40     |    2.50    -0.12        -1.40    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.38     -70.97
+ 19      5.50           4.62  95.02     |    2.50    -0.13        -1.52    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.31     -69.66
+ 20      5.50           4.56  99.57     |    2.50    -0.13        -1.66    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.23     -68.43
+ 21      5.50           4.49  104.06     |    2.50    -0.14        -1.80    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.16     -67.27
+ 22      5.50           4.43  108.49     |    2.50    -0.15        -1.96    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.08     -66.19
+ 23      5.50           4.36  112.85     |    2.50    -0.16        -2.12    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      1.01     -65.18
+ 24      5.50           4.30  117.15     |    2.50    -0.17        -2.29    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.93     -64.25
+ 25      5.50           4.23  121.38     |    2.50    -0.18        -2.48    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.86     -63.40
+ 26      5.50           4.17  125.54     |    2.50    -0.20        -2.67    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.78     -62.61
+ 27      5.50           4.10  129.65     |    2.50    -0.21        -2.88    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.71     -61.91
+ 28      5.50           4.04  133.69     |    2.50    -0.22        -3.10    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.63     -61.27
+ 29      5.50           3.98  137.67     |    2.50    -0.23        -3.33    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.56     -60.71
+ 30      5.50           3.92  141.59     |    2.50    -0.24        -3.57    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  3.19      0.49     -60.22
 
 
 
-                            ***S_DAC_GT ECONOMICS***
+                            ***S-DAC-GT ECONOMICS***
 
 
       S-DAC-GT Report: Levelized Cost of Direct Air Capture (LCOD)
-      Using grid-based electricity only:     387.69 USD/tonne
-      Using natural gas only:                312.00 USD/tonne
-      Using geothermal energy only:          288.87 USD/tonne
+      LCOD using grid-based electricity only:     387.69 USD/tonne
+      LCOD using natural gas only:                312.00 USD/tonne
+      LCOD using geothermal energy only:          288.87 USD/tonne
 
       S-DAC-GT Report: CO2 Intensity of process (percent of CO2 mitigated that is emitted by S-DAC process)
-      Using grid-based electricity only:      94.52%
-      Using natural gas only:                 64.85%
-      Using geothermal energy only:           36.91%
+      CO2 Intensity using grid-based electricity only:      94.52 %
+      CO2 Intensity using natural gas only:                 64.85 %
+      CO2 Intensity using geothermal energy only:           36.91 %
 
       Geothermal LCOH:                         0.0017 USD/kWh
-      Geothermal Ratio (electricity vs heat):   20.7259%
-      Percent Energy Devoted To Process:    50.0000%
+      Geothermal Ratio (electricity vs heat):   20.7259 %
+      Percent Energy Devoted To Process:    50.0000 %
 
-      Total Tonnes of CO2 Captured:      2,246,284.10 tonne
-      Total Cost of Capture:             499,311,405.59 USD
+      Total Tonnes of CO2 Captured:      2,253,170.17 tonne
+      Total Cost of Capture:             500,842,063.38 USD
 
 
                 **********************
-                *  S_DAC_GT PROFILE  *
+                *  S-DAC-GT PROFILE  *
                 **********************
-Year       Carbon      Cumm. Carbon     S_DAC_GT           S_DAC_GT Cumm.      Cumm. Cost
+Year       Carbon      Cumm. Carbon     S-DAC-GT           S-DAC-GT Cumm.      Cumm. Cost
 Since      Captured     Captured       Annual Cost          Cash Flow        Cost Per Tonne
 Start     (tonne/yr)   (tonne)          (USD/yr)               (USD)           (USD/tonne)
      1    78,330.80   78,330.80    17,411,627.98         17,411,627.98         222.28
@@ -302,4 +303,4 @@ Start     (tonne/yr)   (tonne)          (USD/yr)               (USD)           (
     27    70,361.40   2,045,120.04    15,640,162.58         454,595,997.86         222.28
     28    69,849.14   2,114,969.18    15,526,295.96         470,122,293.82         222.28
     29    69,340.31   2,184,309.49    15,413,191.67         485,535,485.49         222.28
-    30    61,974.61   2,246,284.10    13,775,920.11         499,311,405.59         222.28
+    30    68,860.68   2,253,170.17    15,306,577.89         500,842,063.38         222.28

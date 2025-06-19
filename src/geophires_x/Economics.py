@@ -1,10 +1,14 @@
 import math
-import os
 import sys
 import numpy as np
 import numpy_financial as npf
 import geophires_x.Model as Model
-from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType
+from geophires_x import EconomicsSam
+from geophires_x.EconomicsSam import calculate_sam_economics, SamEconomicsCalculations
+from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter, nominal_discount_rate_parameter, \
+    real_discount_rate_parameter
+from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
+    _WellDrillingCostCorrelationCitation
 from geophires_x.Parameter import intParameter, floatParameter, OutputParameter, ReadParameter, boolParameter, \
     coerce_int_params_to_enum_values
 from geophires_x.Units import *
@@ -162,37 +166,6 @@ def BuildPTCModel(plantlifetime: int, duration: int, ptc_price: float,
     return Price
 
 
-def BuildPricingModel(plantlifetime: int, StartPrice: float, EndPrice: float,
-                      EscalationStartYear: int, EscalationRate: float, PTCAddition: list) -> list:
-    """
-    BuildPricingModel builds the price model array for the project lifetime.  It is used to calculate the revenue
-    stream for the project.
-    :param plantlifetime: The lifetime of the project in years
-    :type plantlifetime: int
-    :param StartPrice: The price in the first year of the project in $/kWh
-    :type StartPrice: float
-    :param EndPrice: The price in the last year of the project in $/kWh
-    :type EndPrice: float
-    :param EscalationStartYear: The year the price escalation starts in years (not including construction years) in years
-    :type EscalationStartYear: int
-    :param EscalationRate: The rate of price escalation in $/kWh/year
-    :type EscalationRate: float
-    :param PTCAddition: The PTC addition array for the project in $/kWh
-    :type PTCAddition: list
-    :return: Price: The price model array for the project in $/kWh
-    :rtype: list
-    """
-    Price = [0.0] * plantlifetime
-    for i in range(0, plantlifetime, 1):
-        Price[i] = StartPrice
-        if i >= EscalationStartYear:
-            Price[i] = Price[i] + ((i - EscalationStartYear) * EscalationRate)
-        if Price[i] > EndPrice:
-            Price[i] = EndPrice
-        Price[i] = Price[i] + PTCAddition[i]
-    return Price
-
-
 def CalculateTotalRevenue(plantlifetime: int, ConstructionYears: int, CAPEX: float, OPEX: float, AnnualRev):
     """
     CalculateRevenue calculates the revenue stream for the project.  It is used to calculate the revenue
@@ -304,12 +277,29 @@ def CalculateCarbonRevenue(model, plant_lifetime: int, construction_years: int, 
     return cash_flow_musd, cumm_cash_flow_musd, carbon_that_would_have_been_produced_annually_lbs, carbon_that_would_have_been_produced_total_lbs
 
 
+def calculate_npv(
+    discount_rate_tenths: float,
+    cashflow_series: list,
+    discount_initial_year_cashflow: bool
+) -> float:
+    # TODO warn/raise exception if discount rate > 1 (i.e. it's probably not converted from percent to tenths)
+
+    npv_cashflow_series = cashflow_series.copy()  # Copy to guard against unintentional mutation of consumer field
+
+    if discount_initial_year_cashflow:
+        # Enable Excel-style NPV calculation - see https://github.com/NREL/GEOPHIRES-X/discussions/344
+        npv_cashflow_series = [0, *npv_cashflow_series]
+
+    return npf.npv(discount_rate_tenths, npv_cashflow_series)
+
+
 def CalculateFinancialPerformance(plantlifetime: int,
                                   FixedInternalRate: float,
                                   TotalRevenue: list,
                                   TotalCummRevenue: list,
                                   CAPEX: float,
-                                  OPEX: float):
+                                  OPEX: float,
+                                  discount_initial_year_cashflow: bool = False):
     """
     CalculateFinancialPerformance calculates the financial performance of the project.  It is used to calculate the
     financial performance of the project. It is used to calculate the revenue stream for the project.
@@ -325,6 +315,9 @@ def CalculateFinancialPerformance(plantlifetime: int,
     :type CAPEX: float
     :param OPEX: The total annual operating cost of the project in MUSD
     :type OPEX: float
+    :param discount_initial_year_cashflow: Whether to discount the initial year of cashflow used to calculate NPV
+    :type discount_initial_year_cashflow: bool
+
     :return: NPV: The net present value of the project in MUSD
     :rtype: float
     :return: IRR: The internal rate of return of the project in %
@@ -336,7 +329,8 @@ def CalculateFinancialPerformance(plantlifetime: int,
     :rtype: tuple
     """
     # Calculate financial performance values using numpy financials
-    NPV = npf.npv(FixedInternalRate / 100, TotalRevenue)
+
+    NPV = calculate_npv(FixedInternalRate / 100, TotalRevenue.copy(), discount_initial_year_cashflow)
     IRR = npf.irr(TotalRevenue)
     if math.isnan(IRR):
         IRR = 0.0
@@ -350,28 +344,30 @@ def CalculateFinancialPerformance(plantlifetime: int,
     return NPV, IRR, VIR, MOIC
 
 
-def CalculateLCOELCOHLCOC(self, model: Model) -> tuple:
+def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple:
     """
     CalculateLCOELCOH calculates the levelized cost of electricity and heat for the project.
+    :param econ: Economics object
+    :type econ: :class:`~geophires_x.Economics.Economics`
     :param model: The model object
     :type model: :class:`~geophires_x.Model.Model`
     :return: LCOE: The levelized cost of electricity and LCOH: The levelized cost of heat and LCOC: The levelized cost of cooling
     :rtype: tuple
     """
     LCOE = LCOH = LCOC = 0.0
-    CCap_elec = (self.CCap.value * self.CAPEX_heat_electricity_plant_ratio.value)
-    Coam_elec = (self.Coam.value * self.CAPEX_heat_electricity_plant_ratio.value)
-    CCap_heat = (self.CCap.value * (1.0 - self.CAPEX_heat_electricity_plant_ratio.value))
-    Coam_heat = (self.Coam.value * (1.0 - self.CAPEX_heat_electricity_plant_ratio.value))
+    CCap_elec = (econ.CCap.value * econ.CAPEX_heat_electricity_plant_ratio.value)
+    Coam_elec = (econ.Coam.value * econ.CAPEX_heat_electricity_plant_ratio.value)
+    CCap_heat = (econ.CCap.value * (1.0 - econ.CAPEX_heat_electricity_plant_ratio.value))
+    Coam_heat = (econ.Coam.value * (1.0 - econ.CAPEX_heat_electricity_plant_ratio.value))
     # Calculate LCOE/LCOH/LCOC
-    if self.econmodel.value == EconomicModel.FCR:
+    if econ.econmodel.value == EconomicModel.FCR:
         if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
-            LCOE = (self.FCR.value * (1 + self.inflrateconstruction.value) * self.CCap.value + self.Coam.value) / \
+            LCOE = (econ.FCR.value * (1 + econ.inflrateconstruction.value) * econ.CCap.value + econ.Coam.value) / \
                    np.average(model.surfaceplant.NetkWhProduced.value) * 1E8  # cents/kWh
         elif (model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and
               model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP, PlantType.DISTRICT_HEATING]):
-            LCOH = (self.FCR.value * (1 + self.inflrateconstruction.value) * self.CCap.value + self.Coam.value +
-                    self.averageannualpumpingcosts.value) / np.average(
+            LCOH = (econ.FCR.value * (1 + econ.inflrateconstruction.value) * econ.CCap.value + econ.Coam.value +
+                    econ.averageannualpumpingcosts.value) / np.average(
                 model.surfaceplant.HeatkWhProduced.value) * 1E8  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
         # co-gen
@@ -381,39 +377,39 @@ def CalculateLCOELCOHLCOC(self, model: Model) -> tuple:
                                                         EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
                                                         EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
                                                         EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
-            LCOE = (self.FCR.value * (1 + self.inflrateconstruction.value) * CCap_elec + Coam_elec) /  np.average(model.surfaceplant.NetkWhProduced.value) * 1E8  # cents/kWh
-            LCOH = (self.FCR.value * (1 + self.inflrateconstruction.value) * CCap_heat + Coam_heat + self.averageannualpumpingcosts.value) / np.average(model.surfaceplant.HeatkWhProduced.value) * 1E8  # cents/kWh
+            LCOE = (econ.FCR.value * (1 + econ.inflrateconstruction.value) * CCap_elec + Coam_elec) / np.average(model.surfaceplant.NetkWhProduced.value) * 1E8  # cents/kWh
+            LCOH = (econ.FCR.value * (1 + econ.inflrateconstruction.value) * CCap_heat + Coam_heat + econ.averageannualpumpingcosts.value) / np.average(model.surfaceplant.HeatkWhProduced.value) * 1E8  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
 
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
-            LCOC = (self.FCR.value * (
-                    1 + self.inflrateconstruction.value) * self.CCap.value + self.Coam.value + self.averageannualpumpingcosts.value) / np.average(
+            LCOC = (econ.FCR.value * (
+                1 + econ.inflrateconstruction.value) * econ.CCap.value + econ.Coam.value + econ.averageannualpumpingcosts.value) / np.average(
                 model.surfaceplant.cooling_kWh_Produced.value) * 1E8  # cents/kWh
             LCOC = LCOC * 2.931  # $/Million Btu
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:
-            LCOH = (self.FCR.value * (
-                    1 + self.inflrateconstruction.value) * self.CCap.value + self.Coam.value + self.averageannualpumpingcosts.value + self.averageannualheatpumpelectricitycost.value) / np.average(
+            LCOH = (econ.FCR.value * (
+                1 + econ.inflrateconstruction.value) * econ.CCap.value + econ.Coam.value + econ.averageannualpumpingcosts.value + econ.averageannualheatpumpelectricitycost.value) / np.average(
                 model.surfaceplant.HeatkWhProduced.value) * 1E8  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
-            LCOH = (self.FCR.value * (
-                    1 + self.inflrateconstruction.value) * self.CCap.value + self.Coam.value + self.averageannualpumpingcosts.value + self.averageannualngcost.value) / model.surfaceplant.annual_heating_demand.value * 1E2  # cents/kWh
+            LCOH = (econ.FCR.value * (
+                1 + econ.inflrateconstruction.value) * econ.CCap.value + econ.Coam.value + econ.averageannualpumpingcosts.value + econ.averageannualngcost.value) / model.surfaceplant.annual_heating_demand.value * 1E2  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
-    elif self.econmodel.value == EconomicModel.STANDARDIZED_LEVELIZED_COST:
-        discountvector = 1. / np.power(1 + self.discountrate.value,
+    elif econ.econmodel.value == EconomicModel.STANDARDIZED_LEVELIZED_COST:
+        discount_vector = 1. / np.power(1 + econ.discountrate.value,
                                        np.linspace(0, model.surfaceplant.plant_lifetime.value - 1,
                                                    model.surfaceplant.plant_lifetime.value))
         if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
-            LCOE = ((1 + self.inflrateconstruction.value) * self.CCap.value + np.sum(
-                self.Coam.value * discountvector)) / np.sum(
-                model.surfaceplant.NetkWhProduced.value * discountvector) * 1E8  # cents/kWh
+            LCOE = ((1 + econ.inflrateconstruction.value) * econ.CCap.value + np.sum(
+                econ.Coam.value * discount_vector)) / np.sum(
+                model.surfaceplant.NetkWhProduced.value * discount_vector) * 1E8  # cents/kWh
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and \
             model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP, PlantType.DISTRICT_HEATING]:
-            self.averageannualpumpingcosts.value = np.average(
+            econ.averageannualpumpingcosts.value = np.average(
                 model.surfaceplant.PumpingkWh.value) * model.surfaceplant.electricity_cost_to_buy.value / 1E6  # M$/year
-            LCOH = ((1 + self.inflrateconstruction.value) * self.CCap.value + np.sum((
-                                                                                         self.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discountvector)) / np.sum(
-                model.surfaceplant.HeatkWhProduced.value * discountvector) * 1E8  # cents/kWh
+            LCOH = ((1 + econ.inflrateconstruction.value) * econ.CCap.value + np.sum((
+                                                                                         econ.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discount_vector)) / np.sum(
+                model.surfaceplant.HeatkWhProduced.value * discount_vector) * 1E8  # cents/kWh
             LCOH = LCOH * 2.931  # $/MMBTU
 
         # co-gen
@@ -423,51 +419,53 @@ def CalculateLCOELCOHLCOC(self, model: Model) -> tuple:
                                                         EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
                                                         EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
                                                         EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
-            LCOE = ((1 + self.inflrateconstruction.value) * CCap_elec + np.sum(Coam_elec * discountvector)) / np.sum(model.surfaceplant.NetkWhProduced.value * discountvector) * 1E8  # cents/kWh
-            LCOH = ((1 + self.inflrateconstruction.value) * CCap_heat +
-                    np.sum((Coam_heat + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discountvector)) / np.sum(model.surfaceplant.HeatkWhProduced.value * discountvector) * 1E8  # cents/kWh
+            LCOE = ((1 + econ.inflrateconstruction.value) * CCap_elec + np.sum(Coam_elec * discount_vector)) / np.sum(model.surfaceplant.NetkWhProduced.value * discount_vector) * 1E8  # cents/kWh
+            LCOH = ((1 + econ.inflrateconstruction.value) * CCap_heat +
+                    np.sum((Coam_heat + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discount_vector)) / np.sum(model.surfaceplant.HeatkWhProduced.value * discount_vector) * 1E8  # cents/kWh
             LCOH = LCOH * 2.931  # $/MMBTU
 
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
-            LCOC = ((1 + self.inflrateconstruction.value) * self.CCap.value + np.sum((
-                                                                                         self.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discountvector)) / np.sum(
-                model.surfaceplant.cooling_kWh_Produced.value * discountvector) * 1E8  # cents/kWh
+            LCOC = ((1 + econ.inflrateconstruction.value) * econ.CCap.value + np.sum((
+                                                                                         econ.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discount_vector)) / np.sum(
+                model.surfaceplant.cooling_kWh_Produced.value * discount_vector) * 1E8  # cents/kWh
             LCOC = LCOC * 2.931  # $/Million Btu
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:
-            LCOH = ((1 + self.inflrateconstruction.value) * self.CCap.value + np.sum(
-                (self.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6 +
-                 model.surfaceplant.heat_pump_electricity_kwh_used.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discountvector)) / np.sum(
-                model.surfaceplant.HeatkWhProduced.value * discountvector) * 1E8  # cents/kWh
+            LCOH = ((1 + econ.inflrateconstruction.value) * econ.CCap.value + np.sum(
+                (econ.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6 +
+                 model.surfaceplant.heat_pump_electricity_kwh_used.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6) * discount_vector)) / np.sum(
+                model.surfaceplant.HeatkWhProduced.value * discount_vector) * 1E8  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
-            LCOH = ((1 + self.inflrateconstruction.value) * self.CCap.value + np.sum(
-                (self.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6 +
-                 self.annualngcost.value) * discountvector)) / np.sum(
-                model.surfaceplant.annual_heating_demand.value * discountvector) * 1E2  # cents/kWh
+            LCOH = ((1 + econ.inflrateconstruction.value) * econ.CCap.value + np.sum(
+                (econ.Coam.value + model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6 +
+                 econ.annualngcost.value) * discount_vector)) / np.sum(
+                model.surfaceplant.annual_heating_demand.value * discount_vector) * 1E2  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
-
+    elif econ.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
+        # Designated as nominal (as opposed to real) in parameter tooltip text
+        LCOE = econ.sam_economics_calculations.lcoe_nominal.quantity().to(convertible_unit(econ.LCOE.CurrentUnits.value)).magnitude
     else:
         # must be BICYCLE
         # average return on investment (tax and inflation adjusted)
-        iave = self.FIB.value * self.BIR.value * (1 - self.CTR.value) + (1 - self.FIB.value) * self.EIR.value
+        i_ave = econ.FIB.value * econ.BIR.value * (1 - econ.CTR.value) + (1 - econ.FIB.value) * econ.EIR.value
         # capital recovery factor
-        CRF = iave / (1 - np.power(1 + iave, -model.surfaceplant.plant_lifetime.value))
-        inflationvector = np.power(1 + self.RINFL.value, np.linspace(1, model.surfaceplant.plant_lifetime.value, model.surfaceplant.plant_lifetime.value))
-        discountvector = 1. / np.power(1 + iave, np.linspace(1, model.surfaceplant.plant_lifetime.value, model.surfaceplant.plant_lifetime.value))
-        NPVcap = np.sum((1 + self.inflrateconstruction.value) * self.CCap.value * CRF * discountvector)
-        NPVfc = np.sum((1 + self.inflrateconstruction.value) * self.CCap.value * self.PTR.value * inflationvector * discountvector)
-        NPVit = np.sum(self.CTR.value / (1 - self.CTR.value) * ((1 + self.inflrateconstruction.value) * self.CCap.value * CRF - self.CCap.value / model.surfaceplant.plant_lifetime.value) * discountvector)
-        NPVitc = (1 + self.inflrateconstruction.value) * self.CCap.value * self.RITC.value / (1 - self.CTR.value)
+        CRF = i_ave / (1 - np.power(1 + i_ave, -model.surfaceplant.plant_lifetime.value))
+        inflation_vector = np.power(1 + econ.RINFL.value, np.linspace(1, model.surfaceplant.plant_lifetime.value, model.surfaceplant.plant_lifetime.value))
+        discount_vector = 1. / np.power(1 + i_ave, np.linspace(1, model.surfaceplant.plant_lifetime.value, model.surfaceplant.plant_lifetime.value))
+        NPV_cap = np.sum((1 + econ.inflrateconstruction.value) * econ.CCap.value * CRF * discount_vector)
+        NPV_fc = np.sum((1 + econ.inflrateconstruction.value) * econ.CCap.value * econ.PTR.value * inflation_vector * discount_vector)
+        NPV_it = np.sum(econ.CTR.value / (1 - econ.CTR.value) * ((1 + econ.inflrateconstruction.value) * econ.CCap.value * CRF - econ.CCap.value / model.surfaceplant.plant_lifetime.value) * discount_vector)
+        NPV_itc = (1 + econ.inflrateconstruction.value) * econ.CCap.value * econ.RITC.value / (1 - econ.CTR.value)
 
         if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
-            NPVoandm = np.sum(self.Coam.value * inflationvector * discountvector)
-            NPVgrt = self.GTR.value / (1 - self.GTR.value) * (NPVcap + NPVoandm + NPVfc + NPVit - NPVitc)
-            LCOE = (NPVcap + NPVoandm + NPVfc + NPVit + NPVgrt - NPVitc) / np.sum(model.surfaceplant.NetkWhProduced.value * inflationvector * discountvector) * 1E8
+            NPV_oandm = np.sum(econ.Coam.value * inflation_vector * discount_vector)
+            NPV_grt = econ.GTR.value / (1 - econ.GTR.value) * (NPV_cap + NPV_oandm + NPV_fc + NPV_it - NPV_itc)
+            LCOE = (NPV_cap + NPV_oandm + NPV_fc + NPV_it + NPV_grt - NPV_itc) / np.sum(model.surfaceplant.NetkWhProduced.value * inflation_vector * discount_vector) * 1E8
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP, PlantType.DISTRICT_HEATING]:
             PumpingCosts = model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6
-            NPVoandm = np.sum((self.Coam.value + PumpingCosts) * inflationvector * discountvector)
-            NPVgrt = self.GTR.value / (1 - self.GTR.value) * (NPVcap + NPVoandm + NPVfc + NPVit - NPVitc)
-            LCOH = (NPVcap + NPVoandm + NPVfc + NPVit + NPVgrt - NPVitc) / np.sum(model.surfaceplant.HeatkWhProduced.value * inflationvector * discountvector) * 1E8
+            NPV_oandm = np.sum((econ.Coam.value + PumpingCosts) * inflation_vector * discount_vector)
+            NPV_grt = econ.GTR.value / (1 - econ.GTR.value) * (NPV_cap + NPV_oandm + NPV_fc + NPV_it - NPV_itc)
+            LCOH = (NPV_cap + NPV_oandm + NPV_fc + NPV_it + NPV_grt - NPV_itc) / np.sum(model.surfaceplant.HeatkWhProduced.value * inflation_vector * discount_vector) * 1E8
             LCOH = LCOH * 2.931  # $/MMBTU
         # co-gen
         elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
@@ -477,51 +475,51 @@ def CalculateLCOELCOHLCOC(self, model: Model) -> tuple:
                                                         EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
                                                         EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
 
-            NPVcap_elec = np.sum((1 + self.inflrateconstruction.value) * CCap_elec * CRF * discountvector)
-            NPVfc_elec = np.sum((1 + self.inflrateconstruction.value) * CCap_elec * self.PTR.value * inflationvector * discountvector)
-            NPVit_elec = np.sum(self.CTR.value / (1 - self.CTR.value) * ((1 + self.inflrateconstruction.value) * CCap_elec * CRF - CCap_elec / model.surfaceplant.plant_lifetime.value) * discountvector)
-            NPVitc_elec = (1 + self.inflrateconstruction.value) * CCap_elec * self.RITC.value / (1 - self.CTR.value)
-            NPVoandm_elec = np.sum(Coam_elec * inflationvector * discountvector)
-            NPVgrt_elec = self.GTR.value / (1 - self.GTR.value) * (NPVcap_elec + NPVoandm_elec + NPVfc_elec + NPVit_elec - NPVitc_elec)
+            NPVcap_elec = np.sum((1 + econ.inflrateconstruction.value) * CCap_elec * CRF * discount_vector)
+            NPVfc_elec = np.sum((1 + econ.inflrateconstruction.value) * CCap_elec * econ.PTR.value * inflation_vector * discount_vector)
+            NPVit_elec = np.sum(econ.CTR.value / (1 - econ.CTR.value) * ((1 + econ.inflrateconstruction.value) * CCap_elec * CRF - CCap_elec / model.surfaceplant.plant_lifetime.value) * discount_vector)
+            NPVitc_elec = (1 + econ.inflrateconstruction.value) * CCap_elec * econ.RITC.value / (1 - econ.CTR.value)
+            NPVoandm_elec = np.sum(Coam_elec * inflation_vector * discount_vector)
+            NPVgrt_elec = econ.GTR.value / (1 - econ.GTR.value) * (NPVcap_elec + NPVoandm_elec + NPVfc_elec + NPVit_elec - NPVitc_elec)
 
             LCOE = ((NPVcap_elec + NPVoandm_elec + NPVfc_elec + NPVit_elec + NPVgrt_elec - NPVitc_elec) /
-                    np.sum(model.surfaceplant.NetkWhProduced.value * inflationvector * discountvector) * 1E8)
+                    np.sum(model.surfaceplant.NetkWhProduced.value * inflation_vector * discount_vector) * 1E8)
 
-            NPVcap_heat = np.sum((1 + self.inflrateconstruction.value) * CCap_heat * CRF * discountvector)
-            NPVfc_heat = np.sum((1 + self.inflrateconstruction.value) * (self.CCap.value * (1.0 - self.CAPEX_heat_electricity_plant_ratio.value)) * self.PTR.value * inflationvector * discountvector)
-            NPVit_heat = np.sum(self.CTR.value / (1 - self.CTR.value) * ((1 + self.inflrateconstruction.value) * CCap_heat * CRF - CCap_heat / model.surfaceplant.plant_lifetime.value) * discountvector)
-            NPVitc_heat = (1 + self.inflrateconstruction.value) * CCap_heat * self.RITC.value / (1 - self.CTR.value)
-            NPVoandm_heat = np.sum((self.Coam.value * (1.0 - self.CAPEX_heat_electricity_plant_ratio.value)) * inflationvector * discountvector)
-            NPVgrt_heat = self.GTR.value / (1 - self.GTR.value) * (NPVcap_heat + NPVoandm_heat + NPVfc_heat + NPVit_heat - NPVitc_heat)
+            NPV_cap_heat = np.sum((1 + econ.inflrateconstruction.value) * CCap_heat * CRF * discount_vector)
+            NPV_fc_heat = np.sum((1 + econ.inflrateconstruction.value) * (econ.CCap.value * (1.0 - econ.CAPEX_heat_electricity_plant_ratio.value)) * econ.PTR.value * inflation_vector * discount_vector)
+            NPV_it_heat = np.sum(econ.CTR.value / (1 - econ.CTR.value) * ((1 + econ.inflrateconstruction.value) * CCap_heat * CRF - CCap_heat / model.surfaceplant.plant_lifetime.value) * discount_vector)
+            NPV_itc_heat = (1 + econ.inflrateconstruction.value) * CCap_heat * econ.RITC.value / (1 - econ.CTR.value)
+            NPV_oandm_heat = np.sum((econ.Coam.value * (1.0 - econ.CAPEX_heat_electricity_plant_ratio.value)) * inflation_vector * discount_vector)
+            NPV_grt_heat = econ.GTR.value / (1 - econ.GTR.value) * (NPV_cap_heat + NPV_oandm_heat + NPV_fc_heat + NPV_it_heat - NPV_itc_heat)
 
-            LCOH = ((NPVcap_heat + NPVoandm_heat + NPVfc_heat + NPVit_heat + NPVgrt_heat - NPVitc_heat) /
-                    np.sum(model.surfaceplant.HeatkWhProduced.value * inflationvector * discountvector) * 1E8)
+            LCOH = ((NPV_cap_heat + NPV_oandm_heat + NPV_fc_heat + NPV_it_heat + NPV_grt_heat - NPV_itc_heat) /
+                    np.sum(model.surfaceplant.HeatkWhProduced.value * inflation_vector * discount_vector) * 1E8)
             LCOH = LCOH * 2.931  # $/MMBTU
 
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
             PumpingCosts = model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6
-            NPVoandm = np.sum((self.Coam.value + PumpingCosts) * inflationvector * discountvector)
-            NPVgrt = self.GTR.value / (1 - self.GTR.value) * (NPVcap + NPVoandm + NPVfc + NPVit - NPVitc)
-            LCOC = (NPVcap + NPVoandm + NPVfc + NPVit + NPVgrt - NPVitc) / np.sum(
-                model.surfaceplant.cooling_kWh_Produced.value * inflationvector * discountvector) * 1E8
+            NPV_oandm = np.sum((econ.Coam.value + PumpingCosts) * inflation_vector * discount_vector)
+            NPV_grt = econ.GTR.value / (1 - econ.GTR.value) * (NPV_cap + NPV_oandm + NPV_fc + NPV_it - NPV_itc)
+            LCOC = (NPV_cap + NPV_oandm + NPV_fc + NPV_it + NPV_grt - NPV_itc) / np.sum(
+                model.surfaceplant.cooling_kWh_Produced.value * inflation_vector * discount_vector) * 1E8
             LCOC = LCOC * 2.931  # $/MMBTU
 
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:
             PumpingCosts = model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6
             HeatPumpElecCosts = model.surfaceplant.heat_pump_electricity_kwh_used.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6
-            NPVoandm = np.sum((self.Coam.value + PumpingCosts + HeatPumpElecCosts) * inflationvector * discountvector)
-            NPVgrt = self.GTR.value / (1 - self.GTR.value) * (NPVcap + NPVoandm + NPVfc + NPVit - NPVitc)
-            LCOH = (NPVcap + NPVoandm + NPVfc + NPVit + NPVgrt - NPVitc) / np.sum(
-                model.surfaceplant.HeatkWhProduced.value * inflationvector * discountvector) * 1E8
-            LCOH = self.LCOH.value * 2.931  # $/MMBTU
+            NPV_oandm = np.sum((econ.Coam.value + PumpingCosts + HeatPumpElecCosts) * inflation_vector * discount_vector)
+            NPV_grt = econ.GTR.value / (1 - econ.GTR.value) * (NPV_cap + NPV_oandm + NPV_fc + NPV_it - NPV_itc)
+            LCOH = (NPV_cap + NPV_oandm + NPV_fc + NPV_it + NPV_grt - NPV_itc) / np.sum(
+                model.surfaceplant.HeatkWhProduced.value * inflation_vector * discount_vector) * 1E8
+            LCOH = LCOH * 2.931  # $/MMBTU
 
         elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
             PumpingCosts = model.surfaceplant.PumpingkWh.value * model.surfaceplant.electricity_cost_to_buy.value / 1E6
-            NPVoandm = np.sum(
-                (self.Coam.value + PumpingCosts + self.annualngcost.value) * inflationvector * discountvector)
-            NPVgrt = self.GTR.value / (1 - self.GTR.value) * (NPVcap + NPVoandm + NPVfc + NPVit - NPVitc)
-            LCOH = (NPVcap + NPVoandm + NPVfc + NPVit + NPVgrt - NPVitc) / np.sum(
-                model.surfaceplant.annual_heating_demand.value * inflationvector * discountvector) * 1E2
+            NPV_oandm = np.sum(
+                (econ.Coam.value + PumpingCosts + econ.annualngcost.value) * inflation_vector * discount_vector)
+            NPV_grt = econ.GTR.value / (1 - econ.GTR.value) * (NPV_cap + NPV_oandm + NPV_fc + NPV_it - NPV_itc)
+            LCOH = (NPV_cap + NPV_oandm + NPV_fc + NPV_it + NPV_grt - NPV_itc) / np.sum(
+                model.surfaceplant.annual_heating_demand.value * inflation_vector * discount_vector) * 1E2
             LCOH = LCOH * 2.931  # $/MMBTU
 
     return LCOE, LCOH, LCOC
@@ -566,7 +564,7 @@ class Economics:
         self.econmodel = self.ParameterDict[self.econmodel.Name] = intParameter(
             "Economic Model",
             DefaultValue=EconomicModel.STANDARDIZED_LEVELIZED_COST.int_value,
-            AllowableRange=[1, 2, 3, 4],
+            AllowableRange=[1, 2, 3, 4, 5],
             ValuesEnum=EconomicModel,
             Required=True,
             ErrMessage="assume default economic model (2)",
@@ -855,10 +853,28 @@ class Economics:
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
             ErrMessage=f'assume default discount rate ({discount_rate_default_val})',
-            ToolTipText="Discount rate used in the Standard Levelized Cost Model. "
+            ToolTipText="Discount rate used in the Standard Levelized Cost Model and SAM Economic Models. "
                         "Discount Rate is synonymous with Fixed Internal Rate. If one is provided, the other's value "
                         "will be automatically set to the same value."
         )
+
+
+        self.discount_initial_year_cashflow = self.ParameterDict[self.discount_initial_year_cashflow.Name] = boolParameter(
+            'Discount Initial Year Cashflow',
+            DefaultValue=False,
+            UnitType=Units.NONE,
+            ToolTipText='Whether to discount cashflow in the initial project year when calculating NPV '
+                        '(Net Present Value). '
+                        'The default value of False conforms to NREL\'s standard convention for NPV calculation '
+                        '(Short W et al, 1995. https://www.nrel.gov/docs/legosti/old/5173.pdf). '
+                        'A value of True will, by contrast, cause NPV calculation to follow the convention used by '
+                        'Excel, Google Sheets, and other common spreadsheet software. '
+                        'Although NREL\'s NPV convention may typically be considered more technically correct, '
+                        'Excel-style NPV calculation might be preferred for familiarity '
+                        'or compatibility with existing business processes. '
+                        'See https://github.com/NREL/GEOPHIRES-X/discussions/344 for further details.'
+        )
+
         self.FIB = self.ParameterDict[self.FIB.Name] = floatParameter(
             "Fraction of Investment in Bonds",
             DefaultValue=0.5,
@@ -965,9 +981,15 @@ class Economics:
             UnitType=Units.NONE,
             ErrMessage="assume default well drilling cost correlation (10)",
             ToolTipText="Select the built-in well drilling and completion cost correlation: " +
-                        '; '.join([f'{it.int_value}: {it.value}' for it in WellDrillingCostCorrelation])
-        )
+                        '; '.join([f'{it.int_value}: {it.value}'
+                                   for it in WellDrillingCostCorrelation]) +
+                        f'. '
+                        f'Baseline correlations (1-4) are from '
+                        f'{_WellDrillingCostCorrelationCitation.NREL_COST_CURVE_2025.value}.'
+                        f' Intermediate and ideal correlations (6-17) are from '
+                        f'{_WellDrillingCostCorrelationCitation.GEOVISION.value}.'
 
+        )
         self.DoAddOnCalculations = self.ParameterDict[self.DoAddOnCalculations.Name] = boolParameter(
             "Do AddOn Calculations",
             DefaultValue=False,
@@ -1221,7 +1243,13 @@ class Economics:
             Max=100,
             UnitType=Units.ENERGYCOST,
             PreferredUnits=EnergyCostUnit.DOLLARSPERKWH,
-            CurrentUnits=EnergyCostUnit.DOLLARSPERKWH
+            CurrentUnits=EnergyCostUnit.DOLLARSPERKWH,
+            ToolTipText="The maximum price to which the electricity sale price can escalate. For example, if "
+                        "Starting Electricity Sale Price = 0.10 USD/kWh and Electricity Escalation Rate = "
+                        "0.01 USD/kWh/yr: Electricity Price will reach 0.15 USD/kWh after 4 years of escalation. "
+                        "The price will then remain at 0.15 USD/kWh for the remaining years of the project lifetime. "
+                        "If the Ending Electricity Sale Price is not reached by escalation during the project "
+                        "lifetime, then the value will have no effect beyond allowing escalation to occur every year."
         )
         self.ElecEscalationStart = self.ParameterDict[self.ElecEscalationStart.Name] = intParameter(
             "Electricity Escalation Start Year",
@@ -1491,6 +1519,9 @@ class Economics:
         self.annualheatincome = 0.0
         self.InputFile = ""
         self.Cplantcorrelation = 0.0
+
+        self.sam_economics_calculations: SamEconomicsCalculations = None
+
         sclass = str(__class__).replace("<class \'", "")
         self.MyClass = sclass.replace("\'>", "")
         self.MyPath = os.path.abspath(__file__)
@@ -1517,12 +1548,13 @@ class Economics:
         self.CarbonPrice = self.OutputParameterDict[self.CarbonPrice.Name] = OutputParameter(
             "Carbon Price Model",
             UnitType=Units.COSTPERMASS,
-            PreferredUnits=CostPerMassUnit.DOLLARSPERTONNE,
-            CurrentUnits=CostPerMassUnit.DOLLARSPERTONNE
+            PreferredUnits=CostPerMassUnit.DOLLARSPERLB,
+            CurrentUnits=CostPerMassUnit.DOLLARSPERLB
         )
 
         self.LCOC = self.OutputParameterDict[self.LCOC.Name] = OutputParameter(
             Name="LCOC",
+            display_name='Direct-Use Cooling Breakeven Price (LCOC)',
             UnitType=Units.ENERGYCOST,
             PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,
             CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU
@@ -1530,24 +1562,28 @@ class Economics:
 
         self.LCOE = self.OutputParameterDict[self.LCOE.Name] = OutputParameter(
             Name="LCOE",
+            display_name='Electricity breakeven price',
             UnitType=Units.ENERGYCOST,
             PreferredUnits=EnergyCostUnit.CENTSSPERKWH,
-            CurrentUnits=EnergyCostUnit.CENTSSPERKWH
+            CurrentUnits=EnergyCostUnit.CENTSSPERKWH,
+            ToolTipText="For SAM economic models, this is the nominal LCOE value (as opposed to real)."
         )
         self.LCOH = self.OutputParameterDict[self.LCOH.Name] = OutputParameter(
             Name="LCOH",
+            display_name='Direct-Use heat breakeven price (LCOH)',
             UnitType=Units.ENERGYCOST,
-            PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,
+            PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,  # $/MMBTU
             CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU
-        )  # $/MMBTU
+        )
         self.Cstim = self.OutputParameterDict[self.Cstim.Name] = OutputParameter(
-            Name="O&M Surface Plant costs",
+            Name="O&M Surface Plant costs",  # FIXME wrong name - should be Stimulation Costs
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
         )
         self.Cexpl = self.OutputParameterDict[self.Cexpl.Name] = OutputParameter(
             Name="Exploration cost",
+            display_name='Exploration costs',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
@@ -1555,6 +1591,7 @@ class Economics:
 
         self.Cwell = self.OutputParameterDict[self.Cwell.Name] = OutputParameter(
             Name="Wellfield cost",
+            display_name='Drilling and completion costs',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
@@ -1565,6 +1602,7 @@ class Economics:
         )
         self.Coamwell = self.OutputParameterDict[self.Coamwell.Name] = OutputParameter(
             Name="O&M Wellfield cost",
+            display_name='Wellfield maintenance costs',
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR
@@ -1577,30 +1615,35 @@ class Economics:
         )
         self.Coamplant = self.OutputParameterDict[self.Coamplant.Name] = OutputParameter(
             Name="O&M Surface Plant costs",
+            display_name='Power plant maintenance costs',
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR
         )
         self.Cgath = self.OutputParameterDict[self.Cgath.Name] = OutputParameter(
             Name="Field gathering system cost",
+            display_name='Field gathering system costs',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
         )
         self.Cpiping = self.OutputParameterDict[self.Cpiping.Name] = OutputParameter(
             Name="Transmission pipeline costs",
+            display_name='Transmission pipeline cost',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
         )
         self.Coamwater = self.OutputParameterDict[self.Coamwater.Name] = OutputParameter(
             Name="O&M Make-up Water costs",
+            display_name='Water costs',
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR
         )
         self.CCap = self.OutputParameterDict[self.CCap.Name] = OutputParameter(
             Name="Total Capital Cost",
+            display_name='Total capital costs',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
@@ -1611,8 +1654,6 @@ class Economics:
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR
         )
-#        self.averageannualpumpingcosts = self.OutputParameterDict[
-#            self.averageannualpumpingcosts.Name] = OutputParameter(  #typo here!??!
         self.averageannualpumpingcosts = OutputParameter(
             Name="Average Annual Pumping Costs",
             UnitType=Units.CURRENCYFREQUENCY,
@@ -1723,6 +1764,7 @@ class Economics:
         self.CarbonThatWouldHaveBeenProducedTotal = self.OutputParameterDict[
             self.CarbonThatWouldHaveBeenProducedTotal.Name] = OutputParameter(
             "Total Saved Carbon Production",
+            display_name='Total Avoided Carbon Emissions',
             UnitType=Units.MASS,
             PreferredUnits=MassUnit.LB,
             CurrentUnits=MassUnit.LB
@@ -1733,32 +1775,53 @@ class Economics:
             PreferredUnits=PercentUnit.PERCENT,
             CurrentUnits=PercentUnit.PERCENT
         )
+
+        self.real_discount_rate = self.OutputParameterDict[self.real_discount_rate.Name] = (
+            real_discount_rate_parameter())
+        self.nominal_discount_rate = self.OutputParameterDict[self.nominal_discount_rate.Name] = (
+            nominal_discount_rate_parameter())
+        self.wacc = self.OutputParameterDict[self.wacc.Name] = wacc_output_parameter()
+
+        # TODO this is displayed as "Project Net Revenue" in Revenue & Cashflow Profile which is probably not an
+        #   accurate synonym for annual revenue
         self.TotalRevenue = self.OutputParameterDict[self.TotalRevenue.Name] = OutputParameter(
             Name="Annual Revenue from Project",
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR
         )
+
+        # TODO this is displayed as "Project Net Cashflow" in Revenue & Cashflow Profile which is probably not an
+        #   accurate synonym for cumulative revenue
         self.TotalCummRevenue = self.OutputParameterDict[self.TotalCummRevenue.Name] = OutputParameter(
             Name="Cumulative Revenue from Project",
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
         )
+
         self.ProjectNPV = self.OutputParameterDict[self.ProjectNPV.Name] = OutputParameter(
             "Project Net Present Value",
+            display_name='Project NPV',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
-            CurrentUnits=CurrencyUnit.MDOLLARS
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText='NPV is calculated with cashflows lumped at the end of periods. '
+                        'See: Short W et al, 1995. '
+                        '"A Manual for the Economic Evaluation of Energy Efficiency and Renewable Energy '
+                        'Technologies.", p. 41. '
+                        'https://www.nrel.gov/docs/legosti/old/5173.pdf'
         )
         self.ProjectIRR = self.OutputParameterDict[self.ProjectIRR.Name] = OutputParameter(
             "Project Internal Rate of Return",
+            display_name='Project IRR',
             UnitType=Units.PERCENT,
             CurrentUnits=PercentUnit.PERCENT,
             PreferredUnits=PercentUnit.PERCENT,
         )
         self.ProjectVIR = self.OutputParameterDict[self.ProjectVIR.Name] = OutputParameter(
             "Project Value Investment Ratio",
+            display_name='Project VIR=PI=PIR',
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH
@@ -1778,6 +1841,7 @@ class Economics:
         )
         self.RITCValue = self.OutputParameterDict[self.RITCValue.Name] = OutputParameter(
             Name="Investment Tax Credit Value",
+            display_name='Investment Tax Credit',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
@@ -1837,6 +1901,10 @@ class Economics:
         """
         model.logger.info(f'Init {__class__!s}: {sys._getframe().f_code.co_name}')
 
+        def _warn(_msg: str) -> None:
+            print(f'Warning: {_msg}')
+            model.logger.warning(_msg)
+
         if len(model.InputParameters) > 0:
             # loop through all the parameters that the user wishes to set, looking for parameters that match this object
             for item in self.ParameterDict.items():
@@ -1857,315 +1925,214 @@ class Economics:
 
                     elif ParameterToModify.Name == "Reservoir Stimulation Capital Cost Adjustment Factor":
                         if self.ccstimfixed.Valid and ParameterToModify.Valid:
-                            print("Warning: Provided reservoir stimulation cost adjustment factor not considered" +
+                            _warn("Provided reservoir stimulation cost adjustment factor not considered" +
                                   " because valid total reservoir stimulation cost provided.")
-                            model.logger.warning(
-                                "Provided reservoir stimulation cost adjustment factor not considered" +
-                                " because valid total reservoir stimulation cost provided.")
                         elif not self.ccstimfixed.Provided and not ParameterToModify.Provided:
                             ParameterToModify.value = 1.0
-                            print("Warning: No valid reservoir stimulation total cost or adjustment factor provided." +
-                                  " GEOPHIRES will assume default built-in reservoir stimulation cost correlation with" +
-                                  " adjustment factor = 1.")
-                            model.logger.warning("No valid reservoir stimulation total cost or adjustment factor" +
+                            _warn("No valid reservoir stimulation total cost or adjustment factor" +
                                                  " provided. GEOPHIRES will assume default built-in reservoir stimulation cost correlation" +
                                                  " with adjustment factor = 1.")
                         elif self.ccstimfixed.Provided and not self.ccstimfixed.Valid:
-                            print("Warning: Provided reservoir stimulation cost outside of range 0-100. GEOPHIRES" +
-                                  " will assume default built-in reservoir stimulation cost correlation with" +
-                                  " adjustment factor = 1.")
-                            model.logger.warning(
+                            _warn(
                                 "Provided reservoir stimulation cost outside of range 0-100. GEOPHIRES" +
                                 " will assume default built-in reservoir stimulation cost correlation with" +
                                 " adjustment factor = 1.")
                             ParameterToModify.value = 1.0
                         elif not self.ccstimfixed.Provided and ParameterToModify.Provided and not ParameterToModify.Valid:
-                            print("Warning: Provided reservoir stimulation cost adjustment factor outside of" +
-                                  " range 0-10. GEOPHIRES will assume default reservoir stimulation cost correlation with" +
-                                  " adjustment factor = 1.")
-                            model.logger.warning("Provided reservoir stimulation cost adjustment factor outside of" +
+                            _warn("Provided reservoir stimulation cost adjustment factor outside of" +
                                                  " range 0-10. GEOPHIRES will assume default reservoir stimulation cost correlation with" +
                                                  " adjustment factor = 1.")
                             ParameterToModify.value = 1.0
                     elif ParameterToModify.Name == "Exploration Capital Cost Adjustment Factor":
                         if self.totalcapcost.Valid:
                             if self.ccexplfixed.Provided:
-                                print("Warning: Provided exploration cost not considered because valid" +
-                                      " total capital cost provided.")
-                                model.logger.warning("Warning: Provided exploration cost not considered" +
+                                _warn("Warning: Provided exploration cost not considered" +
                                                      " because valid total capital cost provided.")
                             if ParameterToModify.Provided:
-                                print("Warning: Provided exploration cost adjustment factor not considered because" +
-                                      " valid total capital cost provided.")
-                                model.logger.warning("Warning: Provided exploration cost not considered because valid" +
+                                _warn("Warning: Provided exploration cost not considered because valid" +
                                                      " total capital cost provided.")
                         else:
                             if self.ccexplfixed.Valid and ParameterToModify.Valid:
-                                print("Warning: Provided exploration cost adjustment factor not considered" +
-                                      " because valid total exploration cost provided.")
-                                model.logger.warning("Provided exploration cost adjustment factor not" +
+                                _warn("Provided exploration cost adjustment factor not" +
                                                      " considered because valid total exploration cost provided.")
                             elif not self.ccexplfixed.Provided and not ParameterToModify.Provided:
                                 ParameterToModify.value = 1.0
-                                print("Warning: No valid exploration total cost or adjustment factor provided." +
-                                      " GEOPHIRES will assume default built-in exploration cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("No valid exploration total cost or adjustment factor provided." +
+                                _warn("No valid exploration total cost or adjustment factor provided." +
                                                      " GEOPHIRES will assume default built-in exploration cost correlation with" +
                                                      " adjustment factor = 1.")
                             elif self.ccexplfixed.Provided and not self.ccexplfixed.Valid:
-                                print("Warning: Provided exploration cost outside of range 0-100. GEOPHIRES" +
-                                      " will assume default built-in exploration cost correlation with adjustment factor = 1.")
-                                model.logger.warning("Provided exploration cost outside of range 0-100. GEOPHIRES" +
+                                _warn("Provided exploration cost outside of range 0-100. GEOPHIRES" +
                                                      " will assume default built-in exploration cost correlation with adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                             elif not self.ccexplfixed.Provided and ParameterToModify.Provided and not ParameterToModify.Valid:
-                                print("Warning: Provided exploration cost adjustment factor outside of range 0-10." +
-                                      " GEOPHIRES will assume default exploration cost correlation with adjustment factor = 1.")
-                                model.logger.warning("Provided exploration cost adjustment factor outside of" +
+                                _warn("Provided exploration cost adjustment factor outside of" +
                                                      " range 0-10. GEOPHIRES will assume default exploration cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                     elif ParameterToModify.Name == "Well Drilling and Completion Capital Cost Adjustment Factor":
                         if self.per_production_well_cost.Valid and ParameterToModify.Valid:
-                            msg = ('Provided well drilling and completion cost adjustment factor not considered '
+                            _warn('Provided well drilling and completion cost adjustment factor not considered '
                                    'because valid total well drilling and completion cost provided.')
-                            print(f'Warning: {msg}')
-                            model.logger.warning(msg)
                         elif not self.per_production_well_cost.Provided and not self.production_well_cost_adjustment_factor.Provided:
                             ParameterToModify.value = 1.0
-                            msg = ("No valid well drilling and completion total cost or adjustment factor provided. "
+                            _warn("No valid well drilling and completion total cost or adjustment factor provided. "
                                    "GEOPHIRES will assume default built-in well drilling and completion cost "
                                    "correlation with adjustment factor = 1.")
-                            print(f'Warning: {msg}')
-                            model.logger.warning(msg)
                         elif self.per_production_well_cost.Provided and not self.per_production_well_cost.Valid:
-                            msg = ("Provided well drilling and completion cost outside of range 0-1000. GEOPHIRES "
+                            _warn("Provided well drilling and completion cost outside of range 0-1000. GEOPHIRES "
                                    "will assume default built-in well drilling and completion cost correlation "
                                    "with adjustment factor = 1.")
-                            print(f'Warning: {msg}')
-                            model.logger.warning(msg)
                             self.production_well_cost_adjustment_factor.value = 1.0
                         elif not self.per_production_well_cost.Provided and self.production_well_cost_adjustment_factor.Provided and not self.production_well_cost_adjustment_factor.Valid:
-                            msg = ("Provided well drilling and completion cost adjustment factor outside of range "
+                            _warn("Provided well drilling and completion cost adjustment factor outside of range "
                                    "0-10. GEOPHIRES will assume default built-in well drilling and completion cost "
                                    "correlation with adjustment factor = 1.")
-                            print(f'Warning: {msg}')
-                            model.logger.warning(msg)
                             self.production_well_cost_adjustment_factor.value = 1.0
                     elif ParameterToModify.Name == "Wellfield O&M Cost Adjustment Factor":
                         if self.oamtotalfixed.Valid:
                             if self.oamwellfixed.Provided:
-                                print("Warning: Provided total wellfield O&M cost not considered because" +
-                                      " valid total annual O&M cost provided.")
-                                model.logger.warning("Provided total wellfield O&M cost not considered because" +
+                                _warn("Provided total wellfield O&M cost not considered because" +
                                                      " valid total annual O&M cost provided.")
                             if ParameterToModify.Provided:
-                                print("Warning: Provided wellfield O&M cost adjustment factor not considered because" +
-                                      " valid total annual O&M cost provided.")
-                                model.logger.warning("Provided wellfield O&M cost adjustment factor not considered" +
+                                _warn("Provided wellfield O&M cost adjustment factor not considered" +
                                                      " because valid total annual O&M cost provided.")
                         else:
                             if self.oamwellfixed.Valid and ParameterToModify.Valid:
-                                print("Warning: Provided wellfield O&M cost adjustment factor not considered" +
-                                      " because valid total wellfield O&M cost provided.")
-                                model.logger.warning("Provided wellfield O&M cost adjustment factor not considered" +
+                                _warn("Provided wellfield O&M cost adjustment factor not considered" +
                                                      " because valid total wellfield O&M cost provided.")
                             elif not self.oamwellfixed.Provided and not ParameterToModify.Provided:
                                 ParameterToModify.value = 1.0
-                                print("Warning: No valid total wellfield O&M cost or adjustment factor provided." +
-                                      " GEOPHIRES will assume default built-in wellfield O&M cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("No valid total wellfield O&M cost or adjustment factor" +
+                                _warn("No valid total wellfield O&M cost or adjustment factor" +
                                                      " provided. GEOPHIRES will assume default built-in wellfield O&M cost correlation" +
                                                      " with adjustment factor = 1.")
                             elif self.oamwellfixed.Provided and not self.oamwellfixed.Valid:
-                                print("Warning: Provided total wellfield O&M cost outside of range 0-100." +
-                                      " GEOPHIRES will assume default built-in wellfield O&M cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("Provided total wellfield O&M cost outside of range 0-100." +
+                                _warn("Provided total wellfield O&M cost outside of range 0-100." +
                                                      " GEOPHIRES will assume default built-in wellfield O&M cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                             elif not self.oamwellfixed.Provided and self.oamwelladjfactor.Provided and not self.oamwelladjfactor.Valid:
-                                print("Warning: Provided wellfield O&M cost adjustment factor outside of range 0-10." +
-                                      " GEOPHIRES will assume default wellfield O&M cost correlation with adjustment factor = 1.")
-                                model.logger.warning("Provided wellfield O&M cost adjustment factor outside of" +
+                                _warn("Provided wellfield O&M cost adjustment factor outside of" +
                                                      " range 0-10. GEOPHIRES will assume default wellfield O&M cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                     elif ParameterToModify.Name == "Surface Plant Capital Cost Adjustment Factor":
                         if self.totalcapcost.Valid:
                             if self.ccplantfixed.Provided:
-                                print("Warning: Provided surface plant cost not considered because valid" +
-                                      " total capital cost provided.")
-                                model.logger.warning("Provided surface plant cost not considered because valid" +
+                                _warn("Provided surface plant cost not considered because valid" +
                                                      " total capital cost provided.")
                             if ParameterToModify.Provided:
-                                print("Warning: Provided surface plant cost adjustment factor not considered" +
-                                      " because valid total capital cost provided.")
-                                model.logger.warning("Provided surface plant cost adjustment factor not considered" +
+                                _warn("Provided surface plant cost adjustment factor not considered" +
                                                      " because valid total capital cost provided.")
                         else:
                             if self.ccplantfixed.Valid and ParameterToModify.Valid:
-                                print("Warning: Provided surface plant cost adjustment factor not considered because" +
-                                      " valid total surface plant cost provided.")
-                                model.logger.warning("Provided surface plant cost adjustment factor not considered" +
+                                _warn("Provided surface plant cost adjustment factor not considered" +
                                                      " because valid total surface plant cost provided.")
                             elif not self.ccplantfixed.Provided and not ParameterToModify.Provided:
                                 ParameterToModify.value = 1.0
-                                print("Warning: No valid surface plant total cost or adjustment factor provided." +
-                                      " GEOPHIRES will assume default built-in surface plant cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("No valid surface plant total cost or adjustment factor" +
+                                _warn("No valid surface plant total cost or adjustment factor" +
                                                      " provided. GEOPHIRES will assume default built-in surface plant cost correlation" +
                                                      " with adjustment factor = 1.")
                             elif self.ccplantfixed.Provided and not self.ccplantfixed.Valid:
-                                print("Warning: Provided surface plant cost outside of range 0-1000." +
-                                      " GEOPHIRES will assume default built-in surface plant cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("Provided surface plant cost outside of range 0-1000." +
+                                _warn("Provided surface plant cost outside of range 0-1000." +
                                                      " GEOPHIRES will assume default built-in surface plant cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                             elif not self.ccplantfixed.Provided and self.ccplantadjfactor.Provided and not self.ccplantadjfactor.Valid:
-                                print("Warning: Provided surface plant cost adjustment factor outside of range 0-10." +
-                                      " GEOPHIRES will assume default surface plant cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("Provided surface plant cost adjustment factor outside of" +
+                                _warn("Provided surface plant cost adjustment factor outside of" +
                                                      " range 0-10. GEOPHIRES will assume default surface plant cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                     elif ParameterToModify.Name == "Field Gathering System Capital Cost Adjustment Factor":
                         if self.totalcapcost.Valid:
                             if self.ccgathfixed.Provided:
-                                print("Warning: Provided field gathering system cost not considered because valid" +
-                                      " total capital cost provided.")
-                                model.logger.warning(
+                                _warn(
                                     "Provided field gathering system cost not considered because valid" +
                                     " total capital cost provided.")
                             if ParameterToModify.Provided:
-                                print("Warning: Provided field gathering system cost adjustment factor not" +
-                                      " considered because valid total capital cost provided.")
-                                model.logger.warning("Provided field gathering system cost adjustment factor not" +
+                                _warn("Provided field gathering system cost adjustment factor not" +
                                                      " considered because valid total capital cost provided.")
                         else:
                             if self.ccgathfixed.Valid and ParameterToModify.Valid:
-                                print("Warning: Provided field gathering system cost adjustment factor not" +
-                                      " considered because valid total field gathering system cost provided.")
-                                model.logger.warning("Provided field gathering system cost adjustment factor not" +
+                                _warn("Provided field gathering system cost adjustment factor not" +
                                                      " considered because valid total field gathering system cost provided.")
                             elif not self.ccgathfixed.Provided and not ParameterToModify.Provided:
                                 ParameterToModify.value = 1.0
-                                print("Warning: No valid field gathering system total cost or adjustment factor" +
-                                      " provided. GEOPHIRES will assume default built-in field gathering system cost" +
-                                      " correlation with adjustment factor = 1.")
-                                model.logger.warning("No valid field gathering system total cost or adjustment factor" +
+                                _warn("No valid field gathering system total cost or adjustment factor" +
                                                      " provided. GEOPHIRES will assume default built-in field gathering system cost" +
                                                      " correlation with adjustment factor = 1.")
                             elif self.ccgathfixed.Provided and not self.ccgathfixed.Valid:
-                                print("Warning: Provided field gathering system cost outside of range 0-100." +
-                                      " GEOPHIRES will assume default built-in field gathering system cost correlation" +
-                                      " with adjustment factor = 1.")
-                                model.logger.warning("Provided field gathering system cost outside of range 0-100." +
+                                _warn("Provided field gathering system cost outside of range 0-100." +
                                                      " GEOPHIRES will assume default built-in field gathering system cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                             elif not self.ccgathfixed.Provided and ParameterToModify.Provided and not ParameterToModify.Valid:
-                                print("Warning: Provided field gathering system cost adjustment factor" +
-                                      " outside of range 0-10. GEOPHIRES will assume default field gathering system" +
-                                      " cost correlation with adjustment factor = 1.")
-                                model.logger.warning("Provided field gathering system cost adjustment factor" +
+                                _warn("Provided field gathering system cost adjustment factor" +
                                                      " outside of range 0-10. GEOPHIRES will assume default field gathering system cost" +
                                                      " correlation with adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                     elif ParameterToModify.Name == "Water Cost Adjustment Factor":
                         if self.oamtotalfixed.Valid:
                             if self.oamwaterfixed.Provided:
-                                print("Warning: Provided total water cost not considered because valid" +
-                                      " total annual O&M cost provided.")
-                                model.logger.warning("Provided total water cost not considered because valid" +
+                                _warn("Provided total water cost not considered because valid" +
                                                      " total annual O&M cost provided.")
                             if ParameterToModify.Provided:
-                                print("Warning: Provided water cost adjustment factor not considered because" +
-                                      " valid total annual O&M cost provided.")
-                                model.logger.warning("Provided water cost adjustment factor not considered because" +
+                                _warn("Provided water cost adjustment factor not considered because" +
                                                      " valid total annual O&M cost provided.")
                         else:
                             if self.oamwaterfixed.Valid and ParameterToModify.Valid:
-                                print("Warning: Provided water cost adjustment factor not considered because" +
-                                      " valid total water cost provided.")
-                                model.logger.warning("Provided water cost adjustment factor not considered because" +
+                                _warn("Provided water cost adjustment factor not considered because" +
                                                      " valid total water cost provided.")
                             elif not self.oamwaterfixed.Provided and not ParameterToModify.Provided:
                                 ParameterToModify.value = 1.0
-                                print("Warning: No valid total water cost or adjustment factor provided." +
-                                      " GEOPHIRES will assume default built-in water cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("No valid total water cost or adjustment factor provided." +
+                                _warn("No valid total water cost or adjustment factor provided." +
                                                      " GEOPHIRES will assume default built-in water cost correlation with" +
                                                      " adjustment factor = 1.")
                             elif self.oamwaterfixed.Provided and not self.oamwaterfixed.Valid:
-                                print("Warning: Provided total water cost outside of range 0-100. GEOPHIRES" +
-                                      " will assume default built-in water cost correlation with adjustment factor = 1.")
-                                model.logger.warning("Provided total water cost outside of range 0-100. GEOPHIRES" +
+                                _warn("Provided total water cost outside of range 0-100. GEOPHIRES" +
                                                      " will assume default built-in water cost correlation with adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                             elif not self.oamwaterfixed.Provided and ParameterToModify.Provided and not ParameterToModify.Valid:
-                                print("Warning: Provided water cost adjustment factor outside of range 0-10." +
-                                      " GEOPHIRES will assume default water cost correlation with adjustment factor = 1.")
-                                model.logger.warning("Provided water cost adjustment factor outside of range 0-10." +
+                                _warn("Provided water cost adjustment factor outside of range 0-10." +
                                                      " GEOPHIRES will assume default water cost correlation with adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                     elif ParameterToModify.Name == "Surface Plant O&M Cost Adjustment Factor":
                         if self.oamtotalfixed.Valid:
                             if self.oamplantfixed.Provided:
-                                print("Warning: Provided total surface plant O&M cost not considered because" +
-                                      " valid total annual O&M cost provided.")
-                                model.logger.warning("Provided total surface plant O&M cost not considered because" +
+                                _warn("Provided total surface plant O&M cost not considered because" +
                                                      " valid total annual O&M cost provided.")
                             if ParameterToModify.Provided:
-                                print("Warning: Provided surface plant O&M cost adjustment factor not considered" +
-                                      " because valid total annual O&M cost provided.")
-                                model.logger.warning(
+                                _warn(
                                     "Provided surface plant O&M cost adjustment factor not considered" +
                                     " because valid total annual O&M cost provided.")
                         else:
                             if self.oamplantfixed.Valid and ParameterToModify.Valid:
-                                print("Warning: Provided surface plant O&M cost adjustment factor not considered" +
-                                      " because valid total surface plant O&M cost provided.")
-                                model.logger.warning(
+                                _warn(
                                     "Provided surface plant O&M cost adjustment factor not considered" +
                                     " because valid total surface plant O&M cost provided.")
                             elif not self.oamplantfixed.Provided and not ParameterToModify.Provided:
                                 ParameterToModify.value = 1.0
-                                print("Warning: No valid surface plant O&M cost or adjustment factor provided." +
-                                      " GEOPHIRES will assume default built-in surface plant O&M cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("No valid surface plant O&M cost or adjustment factor provided." +
+                                _warn("No valid surface plant O&M cost or adjustment factor provided." +
                                                      " GEOPHIRES will assume default built-in surface plant O&M cost correlation with" +
                                                      " adjustment factor = 1.")
                             elif self.oamplantfixed.Provided and not self.oamplantfixed.Valid:
-                                print("Warning: Provided surface plant O&M cost outside of range 0-100." +
-                                      " GEOPHIRES will assume default built-in surface plant O&M cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("Provided surface plant O&M cost outside of range 0-100." +
+                                _warn("Provided surface plant O&M cost outside of range 0-100." +
                                                      " GEOPHIRES will assume default built-in surface plant O&M cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
                             elif not self.oamplantfixed.Provided and ParameterToModify.Provided and not ParameterToModify.Valid:
-                                print("Warning: Provided surface plant O&M cost adjustment factor outside of" +
-                                      " range 0-10. GEOPHIRES will assume default surface plant O&M cost correlation with" +
-                                      " adjustment factor = 1.")
-                                model.logger.warning("Provided surface plant O&M cost adjustment factor outside of" +
+                                _warn("Provided surface plant O&M cost adjustment factor outside of" +
                                                      " range 0-10. GEOPHIRES will assume default surface plant O&M cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
+
             if self.HeatStartPrice.value > self.HeatEndPrice.value:
                 s = f'{self.HeatStartPrice.Name} ({self.HeatStartPrice.quantity()}) cannot be ' \
                     f'greater than {self.HeatEndPrice.Name} ({self.HeatEndPrice.quantity()}).  ' \
                     f'GEOPHIRES will assume {self.HeatStartPrice.Name} is equal to {self.HeatEndPrice.Name}.'
                 model.logger.warning(s)
+
+            if self.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
+                EconomicsSam.validate_read_parameters(model)
         else:
             model.logger.info("No parameters read because no content provided")
 
@@ -2353,9 +2320,9 @@ class Economics:
                             1750 * injpumphpcorrected ** 0.7) * 3 * injpumphpcorrected ** (-0.11)
                 self.Cpumps = Cpumpsinj + Cpumpsprod
 
-        # Based on GETEM 2016 #1.15 for 15% contingency and 1.12 for 12% indirect costs
-        self.Cgath.value = 1.15 * self.ccgathadjfactor.value * 1.12 * (
-                (model.wellbores.nprod.value + model.wellbores.ninj.value) * 750 * 500. + self.Cpumps) / 1E6
+            # Based on GETEM 2016: 1.15 for 15% contingency and 1.12 for 12% indirect costs
+            self.Cgath.value = 1.15 * self.ccgathadjfactor.value * 1.12 * (
+                    (model.wellbores.nprod.value + model.wellbores.ninj.value) * 750 * 500. + self.Cpumps) / 1E6
 
         # plant costs
         if (model.surfaceplant.enduse_option.value == EndUseOptions.HEAT
@@ -2623,7 +2590,7 @@ class Economics:
         else:
             self.CCap.value = self.totalcapcost.value
 
-        # update the capitol costs, assuming the entire ITC is used to reduce the capitol costs
+        # update the capital costs, assuming the entire ITC is used to reduce the capital costs
         if self.RITC.Provided:
             self.RITCValue.value = self.RITC.value * self.CCap.value
             self.CCap.value = self.CCap.value - self.RITCValue.value
@@ -2765,13 +2732,13 @@ class Economics:
                                                  self.HeatEscalationStart.value, self.HeatEscalationRate.value,
                                                  self.PTCHeatPrice)
         self.CoolingPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                 self.CoolingStartPrice.value, self.CoolingEndPrice.value,
-                                                 self.CoolingEscalationStart.value, self.CoolingEscalationRate.value,
-                                                 self.PTCCoolingPrice)
+                                                    self.CoolingStartPrice.value, self.CoolingEndPrice.value,
+                                                    self.CoolingEscalationStart.value, self.CoolingEscalationRate.value,
+                                                    self.PTCCoolingPrice)
         self.CarbonPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                 self.CarbonStartPrice.value, self.CarbonEndPrice.value,
-                                                 self.CarbonEscalationStart.value, self.CarbonEscalationRate.value,
-                                                 self.PTCCarbonPrice)
+                                                   self.CarbonStartPrice.value, self.CarbonEndPrice.value,
+                                                   self.CarbonEscalationStart.value, self.CarbonEscalationRate.value,
+                                                   self.PTCCarbonPrice)
 
         # do the additional economic calculations first, if needed, so the summaries below work.
         if self.DoAddOnCalculations.value:
@@ -2779,111 +2746,48 @@ class Economics:
         if self.DoSDACGTCalculations.value:
             model.sdacgteconomics.Calculate(model)
 
-        # Calculate cashflow and cumulative cash flow
-        total_duration = model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value
-        self.ElecRevenue.value = [0.0] * total_duration
-        self.ElecCummRevenue.value = [0.0] * total_duration
-        self.HeatRevenue.value = [0.0] * total_duration
-        self.HeatCummRevenue.value = [0.0] * total_duration
-        self.CoolingRevenue.value = [0.0] * total_duration
-        self.CoolingCummRevenue.value = [0.0] * total_duration
-        self.CarbonRevenue.value = [0.0] * total_duration
-        self.CarbonCummCashFlow.value = [0.0] * total_duration
-        self.TotalRevenue.value = [0.0] * total_duration
-        self.TotalCummRevenue.value = [0.0] * total_duration
-        self.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
-
-        # Based on the style of the project, calculate the revenue & cumulative revenue
-        if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
-            self.ElecRevenue.value, self.ElecCummRevenue.value = CalculateRevenue(
-                model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
-                model.surfaceplant.NetkWhProduced.value, self.ElecPrice.value)
-            self.TotalRevenue.value = self.ElecRevenue.value
-            #self.TotalCummRevenue.value = self.ElecCummRevenue.value
-        elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER]:
-            self.HeatRevenue.value, self.HeatCummRevenue.value = CalculateRevenue(
-                model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
-                model.surfaceplant.HeatkWhProduced.value, self.HeatPrice.value)
-            self.TotalRevenue.value = self.HeatRevenue.value
-            #self.TotalCummRevenue.value = self.HeatCummRevenue.value
-        elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value in [PlantType.ABSORPTION_CHILLER]:
-            self.CoolingRevenue.value, self.CoolingCummRevenue.value = CalculateRevenue(
-                model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
-                model.surfaceplant.cooling_kWh_Produced.value, self.CoolingPrice.value)
-            self.TotalRevenue.value = self.CoolingRevenue.value
-            #self.TotalCummRevenue.value = self.CoolingCummRevenue.value
-        elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:  # co-gen
-            # else:
-            self.ElecRevenue.value, self.ElecCummRevenue.value = CalculateRevenue(
-                model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
-                model.surfaceplant.NetkWhProduced.value, self.ElecPrice.value)
-            self.HeatRevenue.value, self.HeatCummRevenue.value = CalculateRevenue(
-                model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
-                model.surfaceplant.HeatkWhProduced.value, self.HeatPrice.value)
-
-            for i in range(0, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
-                self.TotalRevenue.value[i] = self.ElecRevenue.value[i] + self.HeatRevenue.value[i]
-                #if i > 0:
-                #    self.TotalCummRevenue.value[i] = self.TotalCummRevenue.value[i - 1] + self.TotalRevenue.value[i]
-
-        if self.DoCarbonCalculations.value:
-            self.CarbonRevenue.value, self.CarbonCummCashFlow.value, self.CarbonThatWouldHaveBeenProducedAnnually.value, \
-             self.CarbonThatWouldHaveBeenProducedTotal.value = CalculateCarbonRevenue(model,
-                  model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
-                  self.CarbonPrice.value, self.GridCO2Intensity.value, self.NaturalGasCO2Intensity.value,
-                  model.surfaceplant.NetkWhProduced.value, model.surfaceplant.HeatkWhProduced.value)
-            for i in range(model.surfaceplant.construction_years.value, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
-                self.TotalRevenue.value[i] = self.TotalRevenue.value[i] + self.CarbonRevenue.value[i]
-                #self.TotalCummRevenue.value[i] = self.TotalCummRevenue.value[i] + self.CarbonCummCashFlow.value[i]
-
-        # for the sake of display, insert zeros at the beginning of the pricing arrays
-        for i in range(0, model.surfaceplant.construction_years.value, 1):
-            self.ElecPrice.value.insert(0, 0.0)
-            self.HeatPrice.value.insert(0, 0.0)
-            self.CoolingPrice.value.insert(0, 0.0)
-            self.CarbonPrice.value.insert(0, 0.0)
-
-        # Insert the cost of construction into the front of the array that will be used to calculate NPV
-        # the convention is that the upfront CAPEX is negative
-        # This is the same for all projects
-        ProjectCAPEXPerConstructionYear = self.CCap.value / model.surfaceplant.construction_years.value
-        for i in range(0, model.surfaceplant.construction_years.value, 1):
-            self.TotalRevenue.value[i] = -1.0 * ProjectCAPEXPerConstructionYear
-            self.TotalCummRevenue.value[i] = -1.0 * ProjectCAPEXPerConstructionYear
-#        self.TotalRevenue.value, self.TotalCummRevenue.value = CalculateTotalRevenue(
-#            model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value, self.CCap.value,
-#                self.Coam.value, self.TotalRevenue.value, self.TotalCummRevenue.value)
-
-        # Do a one-time calculation that accounts for OPEX - no OPEX in the first year.
-        for i in range(model.surfaceplant.construction_years.value,
-                       model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
-            self.TotalRevenue.value[i] = self.TotalRevenue.value[i] - self.Coam.value
-
-        # Now do a one-time calculation that calculates the cumulative cash flow after everything else has been accounted for
-        for i in range(1, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
-            self.TotalCummRevenue.value[i] = self.TotalCummRevenue.value[i-1] + self.TotalRevenue.value[i]
+        self.calculate_cashflow(model)
 
         # Calculate more financial values using numpy financials
         self.ProjectNPV.value, self.ProjectIRR.value, self.ProjectVIR.value, self.ProjectMOIC.value = \
-            CalculateFinancialPerformance(model.surfaceplant.plant_lifetime.value, self.FixedInternalRate.value,
-                                          self.TotalRevenue.value, self.TotalCummRevenue.value, self.CCap.value,
-                                          self.Coam.value)
+            CalculateFinancialPerformance(
+                model.surfaceplant.plant_lifetime.value,
+                self.FixedInternalRate.value,
+                self.TotalRevenue.value,
+                self.TotalCummRevenue.value,
+                self.CCap.value,
+                self.Coam.value,
+                self.discount_initial_year_cashflow.value
+            )
+
+        non_calculated_output_placeholder_val = -1
+        if self.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
+            self.sam_economics_calculations = calculate_sam_economics(model)
+            self.wacc.value = self.sam_economics_calculations.wacc.value
+            self.nominal_discount_rate.value = self.sam_economics_calculations.nominal_discount_rate.value
+            self.ProjectNPV.value = self.sam_economics_calculations.project_npv.quantity().to(
+                convertible_unit(self.ProjectNPV.CurrentUnits)).magnitude
+            self.ProjectIRR.value = self.sam_economics_calculations.project_irr.quantity().to(
+                convertible_unit(self.ProjectIRR.CurrentUnits)).magnitude
+
+            self.ProjectVIR.value = non_calculated_output_placeholder_val  # TODO SAM VIR
+            self.ProjectMOIC.value = non_calculated_output_placeholder_val  # TODO SAM MOIC
 
         # Calculate the project payback period
-        self.ProjectPaybackPeriod.value = 0.0   # start by assuming the project never pays back
-        for i in range(0, len(self.TotalCummRevenue.value), 1):
+
+        if self.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
+            # TODO SAM project payback period
+            self.ProjectPaybackPeriod.value = non_calculated_output_placeholder_val
+        else:
+            self.ProjectPaybackPeriod.value = 0.0  # start by assuming the project never pays back
+            for i in range(0, len(self.TotalCummRevenue.value), 1):
                 # find out when the cumm cashflow goes from negative to positive
                 if self.TotalCummRevenue.value[i] > 0 >= self.TotalCummRevenue.value[i - 1]:
-                    # we just crossed the threshold into positive project cummcashflow, so we can calculate payback period
+                    # we just crossed the threshold into positive project cummcashflow,
+                    # so we can calculate payback period
                     dFullDiff = self.TotalCummRevenue.value[i] + math.fabs(self.TotalCummRevenue.value[(i - 1)])
                     dPerc = math.fabs(self.TotalCummRevenue.value[(i - 1)]) / dFullDiff
                     self.ProjectPaybackPeriod.value = i + dPerc
-
 
         # Calculate LCOE/LCOH
         self.LCOE.value, self.LCOH.value, self.LCOC.value = CalculateLCOELCOHLCOC(self, model)
@@ -2896,6 +2800,103 @@ class Economics:
         self._calculate_derived_outputs(model)
         model.logger.info(f'complete {__class__!s}: {sys._getframe().f_code.co_name}')
 
+
+    def calculate_cashflow(self, model: Model) -> None:
+            """
+            Calculate cashflow and cumulative cash flow
+
+            Note that these calculations are irrelevant and ignored for SAM economic models, except for
+            carbon calculations.
+            """
+
+            total_duration = model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value
+            self.ElecRevenue.value = [0.0] * total_duration
+            self.ElecCummRevenue.value = [0.0] * total_duration
+            self.HeatRevenue.value = [0.0] * total_duration
+            self.HeatCummRevenue.value = [0.0] * total_duration
+            self.CoolingRevenue.value = [0.0] * total_duration
+            self.CoolingCummRevenue.value = [0.0] * total_duration
+            self.CarbonRevenue.value = [0.0] * total_duration
+            self.CarbonCummCashFlow.value = [0.0] * total_duration
+            self.TotalRevenue.value = [0.0] * total_duration
+            self.TotalCummRevenue.value = [0.0] * total_duration
+            self.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
+
+            # Based on the style of the project, calculate the revenue & cumulative revenue
+            if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
+                self.ElecRevenue.value, self.ElecCummRevenue.value = CalculateRevenue(
+                    model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+                    model.surfaceplant.NetkWhProduced.value, self.ElecPrice.value)
+                self.TotalRevenue.value = self.ElecRevenue.value.copy()
+                #self.TotalCummRevenue.value = self.ElecCummRevenue.value
+            elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER]:
+                self.HeatRevenue.value, self.HeatCummRevenue.value = CalculateRevenue(
+                    model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+                    model.surfaceplant.HeatkWhProduced.value, self.HeatPrice.value)
+                self.TotalRevenue.value = self.HeatRevenue.value.copy()
+                #self.TotalCummRevenue.value = self.HeatCummRevenue.value
+            elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT and model.surfaceplant.plant_type.value in [PlantType.ABSORPTION_CHILLER]:
+                self.CoolingRevenue.value, self.CoolingCummRevenue.value = CalculateRevenue(
+                    model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+                    model.surfaceplant.cooling_kWh_Produced.value, self.CoolingPrice.value)
+                self.TotalRevenue.value = self.CoolingRevenue.value.copy()
+                #self.TotalCummRevenue.value = self.CoolingCummRevenue.value
+            elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
+                                                            EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
+                                                            EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY,
+                                                            EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
+                                                            EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
+                                                            EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:  # co-gen
+                # else:
+                self.ElecRevenue.value, self.ElecCummRevenue.value = CalculateRevenue(
+                    model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+                    model.surfaceplant.NetkWhProduced.value, self.ElecPrice.value)
+                self.HeatRevenue.value, self.HeatCummRevenue.value = CalculateRevenue(
+                    model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+                    model.surfaceplant.HeatkWhProduced.value, self.HeatPrice.value)
+
+                for i in range(0, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
+                    self.TotalRevenue.value[i] = self.ElecRevenue.value[i] + self.HeatRevenue.value[i]
+                    #if i > 0:
+                    #    self.TotalCummRevenue.value[i] = self.TotalCummRevenue.value[i - 1] + self.TotalRevenue.value[i]
+
+            if self.DoCarbonCalculations.value:
+                self.CarbonRevenue.value, self.CarbonCummCashFlow.value, self.CarbonThatWouldHaveBeenProducedAnnually.value, \
+                 self.CarbonThatWouldHaveBeenProducedTotal.value = CalculateCarbonRevenue(model,
+                      model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value,
+                      self.CarbonPrice.value, self.GridCO2Intensity.value, self.NaturalGasCO2Intensity.value,
+                      model.surfaceplant.NetkWhProduced.value, model.surfaceplant.HeatkWhProduced.value)
+                for i in range(model.surfaceplant.construction_years.value, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
+                    self.TotalRevenue.value[i] = self.TotalRevenue.value[i] + self.CarbonRevenue.value[i]
+                    #self.TotalCummRevenue.value[i] = self.TotalCummRevenue.value[i] + self.CarbonCummCashFlow.value[i]
+
+            # for the sake of display, insert zeros at the beginning of the pricing arrays
+            for i in range(0, model.surfaceplant.construction_years.value, 1):
+                self.ElecPrice.value.insert(0, 0.0)
+                self.HeatPrice.value.insert(0, 0.0)
+                self.CoolingPrice.value.insert(0, 0.0)
+                self.CarbonPrice.value.insert(0, 0.0)
+
+            # Insert the cost of construction into the front of the array that will be used to calculate NPV
+            # the convention is that the upfront CAPEX is negative
+            # This is the same for all projects
+            ProjectCAPEXPerConstructionYear = self.CCap.value / model.surfaceplant.construction_years.value
+            for i in range(0, model.surfaceplant.construction_years.value, 1):
+                self.TotalRevenue.value[i] = -1.0 * ProjectCAPEXPerConstructionYear
+                self.TotalCummRevenue.value[i] = -1.0 * ProjectCAPEXPerConstructionYear
+    #        self.TotalRevenue.value, self.TotalCummRevenue.value = CalculateTotalRevenue(
+    #            model.surfaceplant.plant_lifetime.value, model.surfaceplant.construction_years.value, self.CCap.value,
+    #                self.Coam.value, self.TotalRevenue.value, self.TotalCummRevenue.value)
+
+            # Do a one-time calculation that accounts for OPEX - no OPEX in the first year.
+            for i in range(model.surfaceplant.construction_years.value,
+                           model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
+                self.TotalRevenue.value[i] = self.TotalRevenue.value[i] - self.Coam.value
+
+            # Now do a one-time calculation that calculates the cumulative cash flow after everything else has been accounted for
+            for i in range(1, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
+                self.TotalCummRevenue.value[i] = self.TotalCummRevenue.value[i-1] + self.TotalRevenue.value[i]
+
     def _calculate_derived_outputs(self, model: Model) -> None:
         """
         Subclasses should call _calculate_derived_outputs at the end of their Calculate methods to populate output
@@ -2907,6 +2908,10 @@ class Economics:
                 self.cost_lateral_section.quantity().to(self.cost_per_lateral_section.CurrentUnits).magnitude
                 / model.wellbores.numnonverticalsections.value
             )
+
+        if hasattr(self, 'discountrate'):
+            self.real_discount_rate.value = self.discountrate.quantity().to(convertible_unit(
+                self.real_discount_rate.CurrentUnits)).magnitude
 
     def __str__(self):
         return "Economics"

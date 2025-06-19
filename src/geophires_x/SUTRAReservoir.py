@@ -1,4 +1,6 @@
 import sys
+
+from .MatplotlibUtils import plt_show, plt_figure
 from .Parameter import strParameter, OutputParameter
 from .Units import *
 import geophires_x.Model as Model
@@ -209,7 +211,7 @@ class SUTRAReservoir(Reservoir):
 
         # create plots of imported SUTRA data
         plt.close('all')
-        plt.figure(1)
+        plt_figure(1)
         year = np.arange(1, 31, 1)  # make an array of days for plot x-axis
         plt.plot(year, abs(self.AnnualHeatStored.value), label='Annual Heat Stored')
         plt.plot(year, abs(self.AnnualHeatSupplied.value), label='Annual Heat Supplied')
@@ -218,9 +220,9 @@ class SUTRAReservoir(Reservoir):
         #plt.ylim([0, max(model.surfaceplant.daily_heating_demand.value) * 1.05])
         plt.legend()
         plt.title('SUTRA Heat Balance')
-        plt.show(block=False)
+        plt_show(block=False)
 
-        plt.figure(2)
+        plt_figure(2)
         plt.plot(self.TimeProfile.value[0:-1:2], self.TargetHeat.value[0:-1:2], label='Target Heat')
         plt.plot(self.TimeProfile.value[0:-1:2], self.SimulatedHeat.value[0:-1:2], label='Simulated Heat')
         plt.xlabel('Hour')
@@ -228,9 +230,9 @@ class SUTRAReservoir(Reservoir):
         #plt.ylim([0, max(model.surfaceplant.daily_heating_demand.value) * 1.05])
         plt.legend()
         plt.title('SUTRA Target and Simulated Heat')
-        plt.show(block=False)
+        plt_show(block=False)
 
-        plt.figure(3)
+        plt_figure(3)
         plt.plot(self.TimeProfile.value[0:-1:2], self.StorageWellFlowRate.value[0:-1:2], label='Storage Well Flow Rate')
         plt.plot(self.TimeProfile.value[0:-1:2], self.BalanceWellFlowRate.value[0:-1:2], label='Balance Well Flow Rate')
         plt.xlabel('Hour')
@@ -238,9 +240,9 @@ class SUTRAReservoir(Reservoir):
         #plt.ylim([0, max(model.surfaceplant.daily_heating_demand.value) * 1.05])
         plt.legend()
         plt.title('SUTRA Well Flow Rates')
-        plt.show(block=False)
+        plt_show(block=False)
 
-        plt.figure(4)
+        plt_figure(4)
         plt.plot(self.TimeProfile.value[0:-1:2], self.StorageWellTemperature.value[0:-1:2], label='Storage Well Temperature')
         plt.plot(self.TimeProfile.value[0:-1:2], self.BalanceWellTemperature.value[0:-1:2], label='Balance Well Temperature')
         plt.xlabel('Hour')
@@ -248,6 +250,6 @@ class SUTRAReservoir(Reservoir):
         # plt.ylim([0, max(model.surfaceplant.daily_heating_demand.value) * 1.05])
         plt.legend()
         plt.title('SUTRA Well Temperatures')
-        plt.show(block=False)
+        plt_show(block=False)
 
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)

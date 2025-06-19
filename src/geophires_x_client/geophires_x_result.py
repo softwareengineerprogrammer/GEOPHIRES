@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import re
 from io import StringIO
 from pathlib import Path
 from types import MappingProxyType
+from typing import Any
+from typing import ClassVar
+
+from geophires_x.GeoPHIRESUtils import is_float
+from geophires_x.GeoPHIRESUtils import is_int
 
 from .common import _get_logger
 from .geophires_input_parameters import EndUseOption
@@ -61,6 +67,9 @@ class GeophiresXResult:
             'ECONOMIC PARAMETERS': [
                 _EqualSignDelimitedField('Economic Model'),
                 'Interest Rate',  # %
+                'Real Discount Rate',
+                'Nominal Discount Rate',
+                'WACC',
                 'Accrued financing during construction',
                 'Project lifetime',
                 'Capacity factor',
@@ -97,6 +106,19 @@ class GeophiresXResult:
                 'Project VIR=IR=PIR     (including carbon credit)',
                 'Project MOIC           (including carbon credit)',
                 'Project Payback Period (including carbon credit)',
+            ],
+            'S-DAC-GT ECONOMICS': [
+                # TODO S-DAC-GT Report sub-titles as string value fields
+                'LCOD using grid-based electricity only',
+                'LCOD using natural gas only',
+                'LCOD using geothermal energy only',
+                'CO2 Intensity using grid-based electricity only',
+                'CO2 Intensity using natural gas only',
+                'CO2 Intensity using geothermal energy only',
+                'Geothermal LCOH',
+                'Geothermal Ratio (electricity vs heat)',
+                'Percent Energy Devoted To Process',
+                'Total Cost of Capture',
             ],
             'ENGINEERING PARAMETERS': [
                 'Number of Production Wells',
@@ -143,10 +165,15 @@ class GeophiresXResult:
                 # TODO moved to power generation profile, parse from there
                 #  'Annual Thermal Drawdown (%/year)',
                 'Bottom-hole temperature',
+                'Well separation: fracture diameter',
                 'Well separation: fracture height',
-                'Fracture area',
                 'Fracture width',
+                'Fracture area',
+                'Number of fractures',
+                'Fracture separation',
+                # TODO reservoir volume note
                 'Reservoir volume',
+                'Reservoir impedance',
                 'Reservoir hydrostatic pressure',
                 'Average reservoir pressure',
                 'Plant outlet pressure',
@@ -166,10 +193,16 @@ class GeophiresXResult:
                 'Initial Production Temperature',
                 'Average Reservoir Heat Extraction',
                 _EqualSignDelimitedField('Production Wellbore Heat Transmission Model'),
+                _EqualSignDelimitedField('Wellbore Heat Transmission Model'),
                 'Average Production Well Temperature Drop',
+                'Total Average Pressure Drop',
+                'Average Injection Well Pressure Drop',
+                'Average Production Pressure',  # AGS
+                'Average Reservoir Pressure Drop',
+                'Average Production Well Pressure Drop',
+                'Average Buoyancy Pressure Drop',
                 'Average Injection Well Pump Pressure Drop',
                 'Average Production Well Pump Pressure Drop',
-                'Average Production Pressure',
                 'Average Heat Production',
                 'First Year Heat Production',
                 'Average Net Electricity Production',
@@ -187,7 +220,6 @@ class GeophiresXResult:
                 'Average Annual Heat Supplied',
                 'Minimum Annual Heat Supplied',
                 'Average Round-Trip Efficiency',
-                'Total Average Pressure Drop',
             ],
             'CAPITAL COSTS (M$)': [
                 'Drilling and completion costs',
@@ -299,6 +331,29 @@ class GeophiresXResult:
         'Reservoir Model',
     )
 
+    _REVENUE_AND_CASHFLOW_PROFILE_HEADERS: ClassVar[list[str]] = [
+        'Year Since Start',
+        'Electricity Price (cents/kWh)',
+        'Electricity Ann. Rev. (MUSD/yr)',
+        'Electricity Cumm. Rev. (MUSD)',
+        'Heat Price (cents/kWh)',
+        'Heat Ann. Rev. (MUSD/yr)',
+        'Heat Cumm. Rev. (MUSD)',
+        'Cooling Price (cents/kWh)',
+        'Cooling Ann. Rev. (MUSD/yr)',
+        'Cooling Cumm. Rev. (MUSD)',
+        'Carbon Price (USD/lb)',
+        'Carbon Ann. Rev. (MUSD/yr)',
+        'Carbon Cumm. Rev. (MUSD)',
+        'Project OPEX (MUSD/yr)',
+        'Project Net Rev. (MUSD/yr)',
+        'Project Net Cashflow (MUSD)',
+    ]
+
+    CCUS_PROFILE_LEGACY_NAME: ClassVar[str] = 'CCUS PROFILE'
+    CARBON_REVENUE_PROFILE_NAME: ClassVar[str] = 'CARBON REVENUE PROFILE'
+    _CARBON_PRICE_FIELD_NAME: ClassVar[str] = 'Carbon Price (USD/lb)'
+
     def __init__(self, output_file_path, logger_name=None):
         if logger_name is None:
             logger_name = __name__
@@ -345,9 +400,19 @@ class GeophiresXResult:
         if revenue_and_cashflow_profile is not None:
             self.result['REVENUE & CASHFLOW PROFILE'] = revenue_and_cashflow_profile
 
-        ccus_profile = self._get_ccus_profile()
-        if ccus_profile is not None:
-            self.result['CCUS PROFILE'] = ccus_profile
+        carbon_revenue_or_ccus_profile_key, carbon_revenue_or_ccus_profile = (
+            self._get_carbon_revenue_or_ccus_legacy_profile()
+        )
+        if carbon_revenue_or_ccus_profile is not None:
+            self.result[carbon_revenue_or_ccus_profile_key] = carbon_revenue_or_ccus_profile
+
+        sdacgt_profile = self._get_sdacgt_profile()
+        if sdacgt_profile is not None:
+            self.result['S-DAC-GT PROFILE'] = sdacgt_profile
+
+        sam_cash_flow_profile = self._get_sam_cash_flow_profile()
+        if sam_cash_flow_profile is not None:
+            self.result['SAM CASH FLOW PROFILE'] = sam_cash_flow_profile
 
         self.result['metadata'] = {'output_file_path': self.output_file_path}
         for metadata_field in GeophiresXResult._METADATA_FIELDS:
@@ -396,32 +461,58 @@ class GeophiresXResult:
                         v_u = ValueUnit(value_unit)
                         csv_entries.append([category, field_display, '', v_u.value_display, v_u.unit_display])
             else:
-                if category not in (
+                if category in (
                     'POWER GENERATION PROFILE',
                     'HEAT AND/OR ELECTRICITY EXTRACTION AND GENERATION PROFILE',
                     'EXTENDED ECONOMIC PROFILE',
-                    'CCUS PROFILE',
                     'REVENUE & CASHFLOW PROFILE',
+                    GeophiresXResult.CARBON_REVENUE_PROFILE_NAME,
+                    GeophiresXResult.CCUS_PROFILE_LEGACY_NAME,
+                    'S-DAC-GT PROFILE',
                 ):
-                    raise RuntimeError('unexpected category')
 
-                for i in range(len(fields[0][1:])):
-                    field_profile = fields[0][i + 1]
-                    unit_split = field_profile.split(' (')
-                    field_display = unit_split[0]
-                    unit_display = ''
-                    if len(unit_split) > 1:
-                        unit_display = unit_split[1].replace(')', '')
-                    for j in range(len(fields[1:])):
-                        year_entry = fields[j + 1]
-                        year = year_entry[0]
-                        profile_year_val = year_entry[i + 1]
-                        csv_entries.append([category, field_display, year, profile_year_val, unit_display])
+                    for i in range(len(fields[0][1:])):
+                        field_profile = fields[0][i + 1]
+                        name_unit_split = field_profile.split(' (')
+                        field_display = name_unit_split[0]
+                        unit_display = ''
+                        if len(name_unit_split) > 1:
+                            unit_display = name_unit_split[1].replace(')', '')
+                        for j in range(len(fields[1:])):
+                            year_entry = fields[j + 1]
+                            year = year_entry[0]
+                            profile_year_val = year_entry[i + 1]
+                            csv_entries.append([category, field_display, year, profile_year_val, unit_display])
+                elif category == 'SAM CASH FLOW PROFILE':
+                    for row_num in range(len(fields) - 1):
+                        row_idx = row_num + 1
+                        row_data = fields[row_idx]
+                        if len(row_data) > 1:
+                            name_unit_split = GeophiresXResult._get_sam_cash_flow_row_name_unit_split(
+                                fields[row_idx][0]
+                            )
+                            row_name = name_unit_split[0]
+                            unit_display = name_unit_split[1]
+                            for year in range(len(row_data) - 1):
+                                row_datapoint = row_data[year + 1]
+                                csv_entries.append([category, row_name, year, row_datapoint, unit_display])
+
+                else:
+                    raise RuntimeError(f'Unexpected category: {category}')
 
         for csv_entry in csv_entries:
             w.writerow(csv_entry)
 
         return f.getvalue()
+
+    @staticmethod
+    def _get_sam_cash_flow_row_name_unit_split(first_entry_in_row) -> list[str]:
+        name_unit_split = [it[::-1] for it in first_entry_in_row[::-1].split('( ', maxsplit=1)][::-1]
+        if len(name_unit_split) < 2:
+            name_unit_split.append('')
+
+        name_unit_split[1] = name_unit_split[1].replace(')', '')
+        return name_unit_split
 
     @property
     def json_output_file_path(self) -> Path:
@@ -477,8 +568,13 @@ class GeophiresXResult:
         return {'value': self._parse_number(str_val, field=f'field "{field_name}"'), 'unit': unit}
 
     def _get_equal_sign_delimited_field(self, field_name):
-        metadata_marker = f'{field_name} = '
-        matching_lines = set(filter(lambda line: metadata_marker in line, self._lines))
+        metadata_markers = (
+            f'  {field_name} = ',
+            # Previous versions of GEOPHIRES erroneously included an extra space after the field name so we include
+            # the pattern for it for backwards compatibility with existing .out files.
+            f'  {field_name}  = ',
+        )
+        matching_lines = set(filter(lambda line: any(m in line for m in metadata_markers), self._lines))
 
         if len(matching_lines) == 0:
             self._logger.debug(f'Equal sign-delimited field not found: {field_name}')
@@ -486,10 +582,17 @@ class GeophiresXResult:
 
         if len(matching_lines) > 1:
             self._logger.warning(
-                f'Found multiple ({len(matching_lines)}) entries for equal sign-delimited field: {field_name}\n\t{matching_lines}'
+                f'Found multiple ({len(matching_lines)}) entries for equal sign-delimited field: '
+                f'{field_name}\n\t{matching_lines}'
             )
 
-        return matching_lines.pop().split(metadata_marker)[1].replace('\n', '')
+        matching_line = matching_lines.pop()
+        for marker in metadata_markers:
+            if marker in matching_line:
+                return matching_line.split(marker)[1].replace('\n', '')
+
+        self._logger.error(f'Unexpected error extracting equal sign-delimited field {field_name}')  # Shouldn't happen
+        return None
 
     @property
     def power_generation_profile(self):
@@ -518,24 +621,7 @@ class GeophiresXResult:
     def _get_revenue_and_cashflow_profile(self):
         def extract_table_header(lines: list) -> list:
             # Tried various regexy approaches to extract this programmatically but landed on hard-coding.
-            return [
-                'Year Since Start',
-                'Electricity Price (cents/kWh)',
-                'Electricity Ann. Rev. (MUSD/yr)',
-                'Electricity Cumm. Rev. (MUSD)',
-                'Heat Price (cents/kWh)',
-                'Heat Ann. Rev. (MUSD/yr)',
-                'Heat Cumm. Rev. (MUSD)',
-                'Cooling Price (cents/kWh)',
-                'Cooling Ann. Rev. (MUSD/yr)',
-                'Cooling Cumm. Rev. (MUSD)',
-                'Carbon Price (USD/tonne)',
-                'Carbon Ann. Rev. (MUSD/yr)',
-                'Carbon Cumm. Rev. (MUSD)',
-                'Project OPEX (MUSD/yr)',
-                'Project Net Rev. (MUSD/yr)',
-                'Project Net Cashflow (MUSD)',
-            ]
+            return GeophiresXResult._REVENUE_AND_CASHFLOW_PROFILE_HEADERS
 
         try:
             lines = self._get_profile_lines('REVENUE & CASHFLOW PROFILE')
@@ -573,12 +659,87 @@ class GeophiresXResult:
             self._logger.debug(f'Failed to get extended economic profile: {e}')
             return None
 
-    def _get_ccus_profile(self):
+    def _get_sdacgt_profile(self):
+        def extract_table_header(lines: list) -> list:
+            # Tried various regexy approaches to extract this programmatically but landed on hard-coding.
+            return [
+                'Year Since Start',
+                'Carbon Captured (tonne/yr)',
+                'Cumm. Carbon Captured (tonne)',
+                'S-DAC-GT Annual Cost (USD/yr)',
+                'S-DAC-GT Cumm. Cash Flow (USD)',
+                'Cumm. Cost Per Tonne (USD/tonne)',
+            ]
+
+        try:
+            lines = self._get_profile_lines('S-DAC-GT PROFILE')
+            profile = [extract_table_header(lines)]
+            profile.extend(self._extract_addons_style_table_data(lines))
+            return profile
+        except BaseException as e:
+            self._logger.debug(f'Failed to get S-DAC-GT profile: {e}')
+            return None
+
+    def _get_carbon_revenue_or_ccus_legacy_profile(self) -> tuple:
         """
-        FIXME TODO - transform from revenue & cashflow if present (CCUS profile replaced by revenue & cashflow
-            profile in 49ff3a1213ac778ed53120626807e9a680d1ddcf)
+        :return: tuple[profile key name, profile]
         """
 
+        profile_legacy = self._get_ccus_profile_legacy()
+        if profile_legacy is not None:
+            # Earlier versions of GEOPHIRES referred to the profile containing carbon revenue as the 'CCUS PROFILE';
+            # the name was changed to 'CARBON REVENUE PROFILE' for technical accuracy, as it does not include data
+            # for capture or storage, only revenue according to carbon avoided given a carbon price. However, we still
+            # check for and parse CCUS profile if it is present in order to retain backwards compatibility in terms
+            # of the client being able to read results from previous GEOPHIRES versions.
+            return GeophiresXResult.CCUS_PROFILE_LEGACY_NAME, profile_legacy
+
+        revenue_and_cashflow_profile = self._get_revenue_and_cashflow_profile()
+        if revenue_and_cashflow_profile is None:
+            return None, None
+
+        headers = [
+            'Year Since Start',
+            # 'Carbon Avoided (pound)', # Present in legacy CCUS profile but not in Revenue & Cashflow
+            GeophiresXResult._CARBON_PRICE_FIELD_NAME,  # Legacy field name: 'CCUS Price (USD/lb)'
+            'Carbon Ann. Rev. (MUSD/yr)',  # Legacy field name:  'CCUS Revenue (MUSD/yr)'
+            # 'CCUS Annual Cash Flow (MUSD/yr)', # Present in legacy CCUS profile but not in Revenue & Cashflow
+            'Carbon Cumm. Rev. (MUSD)',  # # Legacy field name: 'CCUS Cumm. Cash Flow (MUSD)'
+            # 'Project Annual Cash Flow (MUSD/yr)',  # Present in legacy CCUS profile but not in Revenue & Cashflow
+            # 'Project Cumm. Cash Flow (MUSD)',  # Present in legacy CCUS profile but not in Revenue & Cashflow
+        ]
+
+        carbon_price_index = revenue_and_cashflow_profile[0].index(GeophiresXResult._CARBON_PRICE_FIELD_NAME)
+        has_ccus_profile_in_revenue_and_cashflow = (
+            len(revenue_and_cashflow_profile) > 1
+            and GeophiresXResult._CARBON_PRICE_FIELD_NAME in revenue_and_cashflow_profile[0]
+            # Treat all-zero values as not having CCUS profile
+            and any(it != 0 for it in [x[carbon_price_index] for x in revenue_and_cashflow_profile[1:]])
+        )
+
+        if not has_ccus_profile_in_revenue_and_cashflow:
+            return None, None
+
+        try:
+            profile = [headers]
+
+            headers_with_rcp_index = [
+                (header, GeophiresXResult._REVENUE_AND_CASHFLOW_PROFILE_HEADERS.index(header)) for header in headers
+            ]
+
+            for i in range(1, len(revenue_and_cashflow_profile)):
+                ccus_entry = []
+                for j in range(len(headers_with_rcp_index)):
+                    rcp_index = headers_with_rcp_index[j][1]
+                    ccus_entry.append(revenue_and_cashflow_profile[i][rcp_index])
+                profile.append(ccus_entry)
+
+            return GeophiresXResult.CARBON_REVENUE_PROFILE_NAME, profile
+        except BaseException as e:
+            self._logger.debug(f'Failed to get {GeophiresXResult.CARBON_REVENUE_PROFILE_NAME}: {e}')
+            return None, None
+
+    def _get_ccus_profile_legacy(self):
         def extract_table_header(lines: list) -> list:
             # Tried various regexy approaches to extract this programmatically but landed on hard-coding.
             return [
@@ -593,13 +754,51 @@ class GeophiresXResult:
             ]
 
         try:
-            lines = self._get_profile_lines('CCUS PROFILE')
+            lines = self._get_profile_lines(GeophiresXResult.CCUS_PROFILE_LEGACY_NAME)
             profile = [extract_table_header(lines)]
             profile.extend(self._extract_addons_style_table_data(lines))
             return profile
         except BaseException as e:
-            self._logger.debug(f'Failed to get CCUS profile: {e}')
+            self._logger.debug(f'Failed to get legacy {GeophiresXResult.CCUS_PROFILE_LEGACY_NAME}: {e}')
             return None
+
+    def _get_sam_cash_flow_profile(self) -> list[Any]:
+        profile_name = 'SAM CASH FLOW PROFILE'
+
+        try:
+            s1 = f'*  {profile_name}  *'
+            _lines_joined = ''.join(self._lines)
+            if s1 not in _lines_joined:
+                return None
+
+            profile_text = _lines_joined.split(s1)[1]
+            profile_text = re.split(r'^\s*-{20,}\s*$\n?', profile_text, flags=re.MULTILINE)[1]
+            rd = csv.reader(StringIO(profile_text), delimiter='\t', skipinitialspace=True)
+            profile_lines = []
+            for row in rd:
+                row_clean = []
+                for entry_display in row:
+                    row_clean.append(
+                        GeophiresXResult._get_sam_cash_flow_profile_entry_display_to_entry_val(entry_display)
+                    )
+                profile_lines.append(row_clean)
+
+            return profile_lines
+        except BaseException as e:
+            self._logger.debug(f'Failed to get SAM cash flow profile: {e}')
+            return None
+
+    @staticmethod
+    def _get_sam_cash_flow_profile_entry_display_to_entry_val(entry_display: str) -> Any:
+        if entry_display is None:
+            return None
+
+        ed_san = entry_display.strip().replace(',', '') if type(entry_display) is str else entry_display
+        if is_float(ed_san):
+            if not math.isnan(float(ed_san)):
+                return float(ed_san) if not is_int(ed_san) else int(float(ed_san))
+
+        return entry_display.strip()
 
     def _extract_addons_style_table_data(self, lines: list):
         """TODO consolidate with _get_data_from_profile_lines"""
@@ -659,10 +858,11 @@ class GeophiresXResult:
         return data
 
     def _parse_number(self, number_str, field='string') -> int | float:
-        if number_str == 'N/A':
+        if number_str == 'N/A' or number_str is None:
             return None
 
         try:
+            number_str = number_str.replace(',', '')
             if '.' in number_str:
                 # TODO should probably ideally use decimal.Decimal to preserve precision,
                 #  i.e. 1.00 for USD instead of 1.0
