@@ -8,7 +8,7 @@ from geophires_x.Reservoir import Reservoir
 
 class TOUGH2Reservoir(Reservoir):
     """
-    This class models the TOUGH2 Reservoir.
+    This class models the TOUGH2/TOUGH3 Reservoir.
     """
     def __init__(self, model: Model):
         """
@@ -138,8 +138,9 @@ class TOUGH2Reservoir(Reservoir):
         model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
         super().Calculate(model)    # run calculate for the parent.
 
-        # GEOPHIRES assumes TOUGH2 executable and input file are in same directory as GEOPHIRESv3.py, however the path can be specified inside GEOPHIRES input file
-        # create tough2 input file
+        # GEOPHIRES assumes TOUGH2 executable and input file are in same directory as GEOPHIRESv3.py,
+        # however the path can be specified inside GEOPHIRES input file
+        # Create TOUGH2/TOUGH3 input file
         path_to_exe = str(self.tough2_executable_path.value)
         injection_cell_id = str(self.injection_cell.value)
         production_cell_id = str(self.production_cell.value)
@@ -163,7 +164,7 @@ class TOUGH2Reservoir(Reservoir):
             wellseperation = model.wellbores.wellsep.value
             DeltaXgrid = 10000/50
             DeltaYgrid = reservoirwidth/50
-            DeltaZgrid = reservoirthickness
+            DeltaZgrid = reservoirthickness/5
             flowrate = model.wellbores.prodwellflowrate.value
             print('Reservoir parameters passed to TOUGH from Reservoir.py \n')
             print(initialtemp, rockdensity, rockheatcap, rockperm, rockpor, rockthermalcond, reservoirthickness,
@@ -174,16 +175,15 @@ class TOUGH2Reservoir(Reservoir):
             arrayhinj = np.array([1.0E4, 5.0E4, 1.0E5, 1.5E5, 2.0E5, 2.5E5, 3.0E5, 3.5E5, 4.0E5, 4.5E5, 5.0E5])
             injenthalpy = np.interp(model.wellbores.Tinj.value,arraytinj,arrayhinj)
 
-
             # write doublet input file
             f = open(infile,'w', encoding='UTF-8')
             f.write('Doublet\n')
             f.write('MESHMAKER1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n')
             f.write('XYZ\n')
-            f.write('	      0.\n')
+            f.write('         0.\n')
             f.write('NX      50 %9.3f\n' % DeltaXgrid)
             f.write('NY      50 %9.3f\n' % DeltaYgrid)
-            f.write('NZ       1 %9.3f\n' % DeltaZgrid)
+            f.write('NZ       5 %9.3f\n' % DeltaZgrid)
             f.write('\n')
             f.write('\n')
             f.write('\n')
@@ -255,22 +255,19 @@ class TOUGH2Reservoir(Reservoir):
                             9>2'
                 TODO - Audit index parameterization
                 """
-                SimTimes[i] = float(content[i].split(',')[0].strip('\n'))
-                ProdPressure[i] = float(content[i].split(',')[1].strip('\n'))
-                ProdTemperature[i] = float(content[i].split(',')[2].strip('\n'))
-
-
+                SimTimes[i] = float(content[i].split(',')[0].strip('\n'))           # Simulation time
+                ProdPressure[i] = float(content[i].split(',')[1].strip('\n'))       # Production well pressure
+                ProdTemperature[i] = float(content[i].split(',')[2].strip('\n'))    # Production well temperature
 
             model.reserv.Tresoutput.value = np.interp(model.reserv.timevector.value*365*24*3600,SimTimes,ProdTemperature)
 
-
-            # Read FOFT and GOFT files
+            # Read FOFT and GOFT files to calculate Productivity Index (PI) and Injectivity Index (II)
             import pandas as pd
 
             df = pd.read_csv(f'FOFT_{production_cell_id}.csv')
             dfG = pd.read_csv(f'GOFT_{production_cell_id}___021.csv')
-            ef = pd.read_csv(f'FOFT_{injection_cell_id}.csv')
-            efG = pd.read_csv(f'GOFT_{injection_cell_id}___012.csv')
+            ef = pd.read_csv(f'FOFT_{injection_cell_id.replace(" ", "_")}.csv')
+            efG = pd.read_csv(f'GOFT_{injection_cell_id.replace(" ", "_")}___012.csv')
 
             P0_production_well = df['              PRES'].iloc[0]
             Pf_production_well = df['              PRES'].iloc[-1]
@@ -280,12 +277,11 @@ class TOUGH2Reservoir(Reservoir):
             fr0_injection_well = efG['               GEN'].iloc[0]
 
 
-            tough3_PI = fr0_production_well / (Pf_production_well - P0_production_well)
-            tough3_II = fr0_injection_well / (Pf_injection_well - P0_injection_well)
+            tough3_PI = fr0_production_well / ((Pf_production_well - P0_production_well) / 100)
+            tough3_II = fr0_injection_well / ((Pf_injection_well - P0_injection_well) / 100)
 
-            print("PI = ", tough3_PI)
-            print("II = ", tough3_II)
-
+            print("TOUGH PI = ", tough3_PI)
+            print("TOUGH II = ", tough3_II)
             model.wellbores.PI.value = tough3_PI
             model.wellbores.II.value = tough3_II
 
@@ -294,12 +290,6 @@ class TOUGH2Reservoir(Reservoir):
                                f' output file ({infile}) and will abort simulation.') from e
 
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
-
-        #print(SimTimes)
-        #print(ProdPressure)
-        #print(ProdTemperature)
-        print(model.wellbores.PI.value)
-        print(model.wellbores.II.value)
 
 
 
