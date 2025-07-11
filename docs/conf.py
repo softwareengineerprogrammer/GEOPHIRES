@@ -19,7 +19,7 @@ year = '2025'
 author = 'NREL'
 copyright = f'{year}, {author}'
 version = '3.9.30-alpha.0'
-release = '3.9.30-alpha.0'
+release = version
 
 pygments_style = 'trac'
 templates_path = ['./templates']
