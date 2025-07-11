@@ -18,7 +18,7 @@ project = 'geophires-x'
 year = '2025'
 author = 'NREL'
 copyright = f'{year}, {author}'
-version = '3.9.30-alpha.0'
+version = '3.9.30-alpha.1'
 release = version
 
 pygments_style = 'trac'
