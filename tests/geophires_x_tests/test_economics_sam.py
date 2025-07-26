@@ -198,12 +198,8 @@ class EconomicsSamTestCase(BaseTestCase):
 
         self.assertIn('Invalid End-Use Option (Direct-Use Heat)', str(e.exception))
 
-    def test_only_1_construction_year_supported(self):
-        with self.assertRaises(RuntimeError) as e:
-            self._get_result({'Construction Years': 2})
-
-        self.assertIn('Invalid Construction Years (2)', str(e.exception))
-        self.assertIn('SAM_SINGLE_OWNER_PPA only supports Construction Years  = 1.', str(e.exception))
+    def test_multiple_construction_years_supported(self):
+        self.assertIsNotNone(self._get_result({'Construction Years': 2}))
 
     def test_ppa_pricing_model(self):
         self.assertListEqual(
@@ -525,6 +521,28 @@ class EconomicsSamTestCase(BaseTestCase):
         }
         r: GeophiresXResult = self._get_result(never_pays_back_params)
         self.assertIsNone(_payback_period(r))
+
+    def test_accrued_financing_during_construction(self):
+        def _accrued_financing(_r: GeophiresXResult) -> float:
+            return _r.result['ECONOMIC PARAMETERS']['Accrued financing during construction']['value']
+
+        params1 = {
+            'Construction Years': 3,
+            'Inflation Rate': 0.04769,
+        }
+        r1: GeophiresXResult = self._get_result(
+            params1, file_path=self._get_test_file_path('generic-egs-case-3_no-inflation-rate-during-construction.txt')
+        )
+        self.assertEqual(15.0, _accrued_financing(r1))
+
+        params2 = {
+            'Construction Years': 3,
+            'Inflation Rate During Construction': 0.15,
+        }
+        r2: GeophiresXResult = self._get_result(
+            params2, file_path=self._get_test_file_path('generic-egs-case-3_no-inflation-rate-during-construction.txt')
+        )
+        self.assertEqual(15.0, _accrued_financing(r2))
 
     @staticmethod
     def _new_model(input_file: Path, additional_params: dict[str, Any] | None = None, read_and_calculate=True) -> Model:
