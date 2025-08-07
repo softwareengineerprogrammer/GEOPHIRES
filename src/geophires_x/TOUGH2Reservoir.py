@@ -1,5 +1,9 @@
 import sys
+from typing import Required
+
 import numpy as np
+from geophires_x.Parameter import intParameter
+
 from .Parameter import floatParameter, strParameter
 from .Units import *
 import geophires_x.Model as Model
@@ -45,15 +49,89 @@ class TOUGH2Reservoir(Reservoir):
             ToolTipText="File name of reservoir output in case reservoir model 5 is selected"
         )
         self.injection_cell = self.ParameterDict[self.injection_cell.Name] = strParameter(
-            "Injection Well Cell ID",
+            "Vertical Injection Well Cell ID",
             DefaultValue='A3Q23',
             UnitType=Units.NONE,
         )
         self.production_cell = self.ParameterDict[self.production_cell.Name] = strParameter(
-            "Production Well Cell ID",
+            "Vertical Production Well Cell ID",
             DefaultValue='A3Q28',
             UnitType=Units.NONE,
         )
+
+        # Horizontal Wells
+
+        self.numhinjcell = self.ParameterDict[self.numhinjcell.Name] = intParameter(
+            "Number of Horizontal Injection Well Cells",
+            DefaultValue=0,
+            AllowableRange=[0, 1, 2, 3, 4, 5],
+            UnitType=Units.NONE,
+            Required=True,
+            ErrMessage="Assume no horizontal injection well",
+            ToolTipText="Number of cells assumed as horizontal injection wells"
+        )
+        self.hrz_inj_ID1 = self.ParameterDict[self.hrz_inj_ID1.Name] = strParameter(
+            "Horizontal Injection Well Cell ID 1",
+            DefaultValue='A3R23',
+            UnitType=Units.NONE,
+        )
+        self.hrz_inj_ID2 = self.ParameterDict[self.hrz_inj_ID2.Name] = strParameter(
+            "Horizontal Injection Well Cell ID 2",
+            DefaultValue='A3S23',
+            UnitType=Units.NONE,
+        )
+        self.hrz_inj_ID3 = self.ParameterDict[self.hrz_inj_ID3.Name] = strParameter(
+            "Horizontal Injection Well Cell ID 3",
+            DefaultValue='A3T23',
+            UnitType=Units.NONE,
+        )
+        self.hrz_inj_ID4 = self.ParameterDict[self.hrz_inj_ID4.Name] = strParameter(
+            "Horizontal Injection Well Cell ID 4",
+            DefaultValue='A3U23',
+            UnitType=Units.NONE,
+        )
+        self.hrz_inj_ID5 = self.ParameterDict[self.hrz_inj_ID5.Name] = strParameter(
+            "Horizontal Injection Well Cell ID 5",
+            DefaultValue='A3V23',
+            UnitType=Units.NONE,
+        )
+        self.numhprodcell = self.ParameterDict[self.numhprodcell.Name] = intParameter(
+            "Number of Horizontal Production Well Cells",
+            DefaultValue=0,
+            AllowableRange=[0, 1, 2, 3, 4, 5],
+            UnitType=Units.NONE,
+            Required=True,
+            ErrMessage="Assume no horizontal production well",
+            ToolTipText="Number of cells assumed as horizontal production wells"
+        )
+        self.hrz_prod_ID1 = self.ParameterDict[self.hrz_prod_ID1.Name] = strParameter(
+            "Horizontal Production Well Cell ID 1",
+            DefaultValue='A3R28',
+            UnitType=Units.NONE,
+        )
+        self.hrz_prod_ID2 = self.ParameterDict[self.hrz_prod_ID2.Name] = strParameter(
+            "Horizontal Production Well Cell ID 2",
+            DefaultValue='A3S28',
+            UnitType=Units.NONE,
+        )
+        self.hrz_prod_ID3 = self.ParameterDict[self.hrz_prod_ID3.Name] = strParameter(
+            "Horizontal Production Well Cell ID 3",
+            DefaultValue='A3T28',
+            UnitType=Units.NONE,
+        )
+        self.hrz_prod_ID4 = self.ParameterDict[self.hrz_prod_ID4.Name] = strParameter(
+            "Horizontal Production Well Cell ID 4",
+            DefaultValue='A3U28',
+            UnitType=Units.NONE,
+        )
+        self.hrz_prod_ID5 = self.ParameterDict[self.hrz_prod_ID5.Name] = strParameter(
+            "Horizontal Production Well Cell ID 5",
+            DefaultValue='A3V28',
+            UnitType=Units.NONE,
+        )
+
+        # End of Horizontal Wells
+
         self.resthickness = self.ParameterDict[self.resthickness.Name] = floatParameter(
             "Reservoir Thickness",
             value=250.0,
@@ -144,6 +222,7 @@ class TOUGH2Reservoir(Reservoir):
         path_to_exe = str(self.tough2_executable_path.value)
         injection_cell_id = str(self.injection_cell.value)
         production_cell_id = str(self.production_cell.value)
+
         if not os.path.exists(os.path.join(os.getcwd(), path_to_exe)):
             model.logger.critical('TOUGH2 executable file does not exist in current working directory. \
             GEOPHIRES will abort simulation.')
@@ -288,8 +367,8 @@ class TOUGH2Reservoir(Reservoir):
             fr0_injection_well = efG['               GEN'].iloc[0]
 
 
-            tough3_PI = fr0_production_well / ((Pf_production_well - P0_production_well) / 100)
-            tough3_II = fr0_injection_well / ((Pf_injection_well - P0_injection_well) / 100)
+            tough3_PI = fr0_production_well / ((Pf_production_well - P0_production_well) / 100000)
+            tough3_II = fr0_injection_well / ((Pf_injection_well - P0_injection_well) / 100000)
 
             print("TOUGH PI = ", tough3_PI)
             print("TOUGH II = ", tough3_II)
