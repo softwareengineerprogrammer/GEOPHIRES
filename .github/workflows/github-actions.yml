@@ -101,14 +101,28 @@ jobs:
         python-version: ${{ matrix.python }}
         architecture: ${{ matrix.python_arch }}
 
-    - name: test [unix-like shells]
-      if: runner.os != 'Windows'
+    - name: test [linux]
+      if: runner.os == 'Linux'
       run: |
         ${{ steps.setup.outputs.python-path }} -m venv .venv
         source .venv/bin/activate
         python -m pip install --upgrade pip
         pip install -r ci/requirements.txt
         tox -e ${{ matrix.tox_env }} -v
+
+    - name: test [macos]
+      if: runner.os == 'macOS'
+      run: |
+        ${{ steps.setup.outputs.python-path }} -m venv .venv
+        source .venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r ci/requirements.txt
+        # Install the project in editable mode, which also installs its dependencies
+        pip install -e .
+        # Install test-specific dependencies
+        pip install pytest pytest-cov
+        # Run pytest directly, bypassing tox for the test execution step
+        pytest --cov --cov-report=term-missing --cov-report=xml -vv tests
 
     - name: test [windows]
       if: runner.os == 'Windows'
