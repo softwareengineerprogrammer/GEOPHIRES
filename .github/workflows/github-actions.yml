@@ -102,7 +102,6 @@ jobs:
         architecture: ${{ matrix.python_arch }}
 
     - name: test
-      shell: zsh {0}
       run: |
         ${{ steps.setup.outputs.python-path }} -m venv .venv
         source .venv/bin/activate
@@ -125,7 +124,6 @@ jobs:
           python-version: '3.11'
           architecture: 'x64'
       - name: generate coverage report
-        shell: zsh {0}
         run: |
           ${{ steps.setup.outputs.python-path }} -m venv .venv
           source .venv/bin/activate
@@ -155,7 +153,6 @@ jobs:
         architecture: 'x64'
 
     - name: generate docs
-      shell: zsh {0}
       run: |
         ${{ steps.setup.outputs.python-path }} -m venv .venv
         source .venv/bin/activate
