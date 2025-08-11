@@ -101,10 +101,21 @@ jobs:
         python-version: ${{ matrix.python }}
         architecture: ${{ matrix.python_arch }}
 
-    - name: test
+    - name: test [unix-like shells]
+      if: runner.os != 'Windows'
       run: |
         ${{ steps.setup.outputs.python-path }} -m venv .venv
         source .venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r ci/requirements.txt
+        tox -e ${{ matrix.tox_env }} -v
+
+    - name: test [windows]
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        ${{ steps.setup.outputs.python-path }} -m venv .venv
+        . .venv\Scripts\activate
         python -m pip install --upgrade pip
         pip install -r ci/requirements.txt
         tox -e ${{ matrix.tox_env }} -v
