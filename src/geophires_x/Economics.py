@@ -975,10 +975,36 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
-            ToolTipText="The percentage of the project's gross annual revenue paid to the royalty holder. "
+            ToolTipText="The fraction of the project's gross annual revenue paid to the royalty holder. "
                         "This is modeled as a variable production-based operating expense, reducing the developer's "
                         "taxable income."
         )
+
+        self.royalty_escalation_rate = self.ParameterDict[self.royalty_escalation_rate.Name] = floatParameter(
+            'Royalty Rate Escalation',
+            DefaultValue=0.,
+            Min=0.0,
+            Max=1.0,
+            UnitType=Units.PERCENT,
+            PreferredUnits=PercentUnit.TENTH,
+            CurrentUnits=PercentUnit.TENTH,
+            ToolTipText="The additive amount the royalty rate increases each year. For example, a value of 0.001 "
+                        "increases a 4% rate (0.04) to 4.1% (0.041) in the next year."
+        )
+
+        self.maximum_royalty_rate = self.ParameterDict[self.maximum_royalty_rate.Name] = floatParameter(
+            'Royalty Rate Maximum',
+            DefaultValue=1.0,  # Default to 100% (no effective cap)
+            Min=0.0,
+            Max=1.0,
+            UnitType=Units.PERCENT,
+            PreferredUnits=PercentUnit.TENTH,
+            CurrentUnits=PercentUnit.TENTH,
+            ToolTipText="The maximum royalty rate after escalation, expressed as a fraction (e.g., 0.06 for a 6% cap)."
+        )
+
+        # TODO support custom royalty rate schedule as a list parameter
+        #  (as an alternative to specifying rate/escalation/max)
 
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(
             'Royalty Holder Discount Rate',
@@ -3188,6 +3214,34 @@ class Economics:
                                                    self.CarbonStartPrice.value, self.CarbonEndPrice.value,
                                                    self.CarbonEscalationStart.value, self.CarbonEscalationRate.value,
                                                    self.PTCCarbonPrice)
+
+    def get_royalty_rate_schedule(self, model: Model) -> list[float]:
+        """
+        Builds a year-by-year schedule of royalty rates based on escalation and cap.
+
+        :type model: :class:`~geophires_x.Model.Model`
+        :return: schedule: A list of rates as fractions (e.g., 0.05 for 5%).
+        """
+
+        def r(x: float) -> float:
+            """Ignore apparent float precision issue"""
+            _precision = 8
+            return round(x, _precision)
+
+        plant_lifetime = model.surfaceplant.plant_lifetime.value
+
+        escalation_rate = r(self.royalty_escalation_rate.value)
+        max_rate = r(self.maximum_royalty_rate.value)
+
+        schedule = []
+        current_rate = r(self.royalty_rate.value)
+        for _ in range(plant_lifetime):
+            current_rate = r(current_rate)
+            schedule.append(min(current_rate, max_rate))
+            current_rate += escalation_rate
+
+        return schedule
+
 
     def calculate_cashflow(self, model: Model) -> None:
             """
