@@ -39,11 +39,12 @@ from geophires_x.EconomicsUtils import (
     project_payback_period_parameter,
     inflation_cost_during_construction_output_parameter,
     total_capex_parameter_output_parameter,
+    royalty_cost_output_parameter,
 )
 from geophires_x.GeoPHIRESUtils import is_float, is_int, sig_figs, quantity
 from geophires_x.OptionList import EconomicModel, EndUseOptions
 from geophires_x.Parameter import Parameter, OutputParameter, floatParameter
-from geophires_x.Units import convertible_unit, EnergyCostUnit, CurrencyUnit, Units
+from geophires_x.Units import convertible_unit, EnergyCostUnit, CurrencyUnit, Units, CurrencyFrequencyUnit
 
 
 @dataclass
@@ -59,6 +60,8 @@ class SamEconomicsCalculations:
 
     capex: OutputParameter = field(default_factory=total_capex_parameter_output_parameter)
 
+    royalties_opex: OutputParameter = field(default_factory=royalty_cost_output_parameter)
+
     project_npv: OutputParameter = field(
         default_factory=lambda: OutputParameter(
             UnitType=Units.CURRENCY,
@@ -71,7 +74,9 @@ class SamEconomicsCalculations:
     wacc: OutputParameter = field(default_factory=wacc_output_parameter)
     moic: OutputParameter = field(default_factory=moic_parameter)
     project_vir: OutputParameter = field(default_factory=project_vir_parameter)
+
     project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
+    """TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413"""
 
 
 def validate_read_parameters(model: Model):
@@ -168,6 +173,13 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.project_npv.value = sf(single_owner.Outputs.project_return_aftertax_npv * 1e-6)
     sam_economics.capex.value = single_owner.Outputs.adjusted_installed_cost * 1e-6
 
+    royalty_rate = model.economics.royalty_rate.quantity().to('dimensionless').magnitude
+    ppa_revenue_row = _cash_flow_profile_row(cash_flow, 'PPA revenue ($)')
+    royalties_unit = sam_economics.royalties_opex.CurrentUnits.value.replace('/yr', '')
+    sam_economics.royalties_opex.value = [
+        quantity(x * royalty_rate, 'USD').to(royalties_unit).magnitude for x in ppa_revenue_row
+    ]
+
     sam_economics.nominal_discount_rate.value, sam_economics.wacc.value = _calculate_nominal_discount_rate_and_wacc(
         model, single_owner
     )
@@ -248,6 +260,7 @@ def _calculate_project_vir(cash_flow: list[list[Any]], model) -> float | None:
 
 
 def _calculate_project_payback_period(cash_flow: list[list[Any]], model) -> float | None:
+    """TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413"""
     try:
         after_tax_cash_flow = _cash_flow_profile_row(cash_flow, 'Total after-tax returns ($)')
         cumm_cash_flow = np.zeros(len(after_tax_cash_flow))
@@ -395,13 +408,28 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     geophires_ptr_tenths = Decimal(econ.PTR.value)
     ret['property_tax_rate'] = float(geophires_ptr_tenths * Decimal(100))
 
-    ret['ppa_price_input'] = _ppa_pricing_model(
+    ppa_price_schedule_per_kWh = _ppa_pricing_model(
         model.surfaceplant.plant_lifetime.value,
         econ.ElecStartPrice.value,
         econ.ElecEndPrice.value,
         econ.ElecEscalationStart.value,
         econ.ElecEscalationRate.value,
     )
+    ret['ppa_price_input'] = ppa_price_schedule_per_kWh
+
+    royalty_rate_schedule = _get_royalty_rate_schedule(model)
+    if model.economics.royalty_rate.Provided:
+        # For each year, calculate the royalty as a $/MWh variable cost.
+        # The royalty is a percentage of revenue (MWh * $/MWh). By setting the
+        # variable O&M rate to (PPA Price * Royalty Rate), SAM's calculation
+        # (Rate * MWh) will correctly yield the total royalty payment.
+        variable_om_schedule_per_MWh = [
+            (price_kwh * 1000) * royalty_fraction  # TODO use pint unit conversion instead
+            for price_kwh, royalty_fraction in zip(ppa_price_schedule_per_kWh, royalty_rate_schedule)
+        ]
+
+        # The PySAM parameter for variable operating cost in $/MWh is 'om_production'.
+        ret['om_production'] = variable_om_schedule_per_MWh
 
     # Debt/equity ratio ('Fraction of Investment in Bonds' parameter)
     ret['debt_percent'] = _pct(econ.FIB)
@@ -450,6 +478,10 @@ def _ppa_pricing_model(
     return BuildPricingModel(
         plant_lifetime, start_price, end_price, escalation_start_year, escalation_rate, [0] * plant_lifetime
     )
+
+
+def _get_royalty_rate_schedule(model: Model) -> list[float]:
+    return model.economics.get_royalty_rate_schedule(model)
 
 
 def _get_max_total_generation_kW(model: Model) -> float:
