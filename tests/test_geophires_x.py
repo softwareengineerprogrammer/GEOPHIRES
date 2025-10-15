@@ -1,3 +1,4 @@
+import math
 import os
 import tempfile
 import uuid
@@ -36,7 +37,9 @@ class GeophiresXTestCase(BaseTestCase):
         assert result is not None
         self.assertIsNotNone(result)
         self.assertEqual(result.result['metadata']['End-Use Option'], 'DIRECT_USE_HEAT')
-        self.assertEqual(result.result['RESERVOIR PARAMETERS']['Reservoir Model'], 'Multiple Parallel Fractures Model')
+        self.assertEqual(
+            result.result['RESERVOIR PARAMETERS']['Reservoir Model'], 'Multiple Parallel Fractures Model (Gringarten)'
+        )
         self.assertEqual(result.result['RESERVOIR PARAMETERS']['Fracture model'], 'Circular fracture with known area')
         self.assertEqual(
             result.result['RESERVOIR SIMULATION RESULTS']['Production Wellbore Heat Transmission Model'], 'Ramey Model'
@@ -58,14 +61,12 @@ class GeophiresXTestCase(BaseTestCase):
         )
 
         del result.result['metadata']
-        del result_same_input.result['metadata']
+        if 'metadata' in result_same_input.result:
+            del result_same_input.result['metadata']
+
         self.assertDictEqual(result.result, result_same_input.result)
 
-        # See TODO in geophires_x_client.geophires_input_parameters.GeophiresInputParameters.__hash__ - if/when hashes
-        # of equivalent sets of parameters are made equal, the commented assertion below will test that caching is
-        # working as expected.
-        # assert result == result_same_input
-
+    # noinspection PyMethodMayBeStatic
     def test_geophires_x_end_use_electricity(self):
         client = GeophiresXClient()
         result = client.get_geophires_result(
@@ -194,6 +195,9 @@ class GeophiresXTestCase(BaseTestCase):
                 del expected_result.result['metadata']
                 del expected_result.result['Simulation Metadata']
 
+                self._sanitize_nan(geophires_result)
+                self._sanitize_nan(expected_result)
+
                 try:
                     self.assertDictEqual(
                         expected_result.result, geophires_result.result, msg=f'Example test: {example_file_path}'
@@ -243,6 +247,22 @@ class GeophiresXTestCase(BaseTestCase):
 
         if len(regenerate_cmds) > 0:
             print(f'Command to regenerate {len(regenerate_cmds)} failed examples:\n{" && ".join(regenerate_cmds)}')
+
+    # noinspection PyMethodMayBeStatic
+    def _sanitize_nan(self, r: GeophiresXResult) -> None:
+        """
+        Workaround for float('nan') != float('nan')
+        See https://stackoverflow.com/questions/51728427/unittest-how-to-assert-if-the-two-possibly-nan-values-are-equal
+
+        TODO generalize beyond After-tax IRR
+        """
+        irr_key = 'After-tax IRR'
+        if irr_key in r.result['ECONOMIC PARAMETERS']:
+            try:
+                if math.isnan(r.result['ECONOMIC PARAMETERS'][irr_key]['value']):
+                    r.result['ECONOMIC PARAMETERS'][irr_key]['value'] = 'NaN'
+            except TypeError:
+                pass
 
     def _get_unequal_dicts_approximate_percent_difference(self, d1: dict, d2: dict) -> Optional[float]:
         for i in range(99):

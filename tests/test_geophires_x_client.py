@@ -1,10 +1,10 @@
 import tempfile
-import unittest
 import uuid
 from pathlib import Path
 
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
+from geophires_x_client import ImmutableGeophiresInputParameters
 from geophires_x_client.geophires_input_parameters import EndUseOption
 from geophires_x_client.geophires_input_parameters import GeophiresInputParameters
 from tests.base_test_case import BaseTestCase
@@ -14,7 +14,7 @@ from tests.base_test_case import BaseTestCase
 class GeophiresXClientTestCase(BaseTestCase):
     """
     Note that these are tests of the geophires_x_client package only and not of the core geophires_x package.
-    If a test calls geophires_x_client.GeophiresXClient.get_geophires_result then it belongs in
+    If a test calls geophires_x_client.GeophiresXClient.get_geophires_result then it generally belongs in
     test_geophires_x.GeophiresXTestCase.
     """
 
@@ -421,26 +421,22 @@ class GeophiresXClientTestCase(BaseTestCase):
         self.assertIsNotNone(entry['value'])
         self.assertEqual(entry['unit'], 'MUSD')
 
-    @unittest.skip(
-        'Not currently relevant - '
-        'see TODO in geophires_x_client.geophires_input_parameters.GeophiresInputParameters.__hash__'
-    )
     def test_input_hashing(self):
-        input1 = GeophiresInputParameters(
+        input1 = ImmutableGeophiresInputParameters(
             {'End-Use Option': EndUseOption.DIRECT_USE_HEAT.value, 'Gradient 1': 50, 'Maximum Temperature': 250}
         )
 
-        input2 = GeophiresInputParameters(
+        input2 = ImmutableGeophiresInputParameters(
             {'Maximum Temperature': 250, 'End-Use Option': EndUseOption.DIRECT_USE_HEAT.value, 'Gradient 1': 50}
         )
 
-        assert hash(input1) == hash(input2)
+        self.assertEqual(hash(input1), hash(input2))
 
-        input3 = GeophiresInputParameters(
+        input3 = ImmutableGeophiresInputParameters(
             {'Maximum Temperature': 420, 'End-Use Option': EndUseOption.DIRECT_USE_HEAT.value, 'Gradient 1': 69}
         )
 
-        assert hash(input1) != hash(input3)
+        self.assertNotEqual(hash(input1), hash(input3))
 
     def test_input_with_non_default_units(self):
         client = GeophiresXClient()
@@ -619,3 +615,19 @@ class GeophiresXClientTestCase(BaseTestCase):
         cash_flow = result.result['SAM CASH FLOW PROFILE']
         self.assertIsNotNone(cash_flow)
         self.assertListEqual([''] + [f'Year {y}' for y in range(21)], cash_flow[0])
+
+    def test_stash_cwd(self):
+        start_cwd = Path.cwd()
+        GeophiresXClient().get_geophires_result(
+            GeophiresInputParameters(
+                {
+                    'End-Use Option': EndUseOption.DIRECT_USE_HEAT.value,
+                    'Reservoir Model': 1,
+                    'Time steps per year': 1,
+                    'Reservoir Depth': 3,
+                    'Gradient 1': 50,
+                }
+            )
+        )
+
+        self.assertEqual(start_cwd, Path.cwd())

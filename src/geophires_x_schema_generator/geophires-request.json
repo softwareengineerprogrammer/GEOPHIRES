@@ -2,7 +2,7 @@
   "definitions": {},
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "title": "GEOPHIRES-X Request Schema",
+  "title": "GEOPHIRES Request Schema",
   "required": [
     "Reservoir Model",
     "Reservoir Depth",
@@ -37,12 +37,11 @@
     "Dead-state Pressure",
     "Economic Model",
     "Time steps per year",
-    "Operation & Maintenance Cost of Surface Plant",
-    "Capital Cost for Power Plant for Electricity Generation"
+    "Operation & Maintenance Cost of Surface Plant"
   ],
   "properties": {
     "Reservoir Model": {
-      "description": "0: Simple cylindrical; 1: Multiple Parallel Fractures; 2: 1-D Linear Heat Sweep; 3: Single Fracture m/A Thermal Drawdown; 4: Annual Percentage Thermal Drawdown; 5: User-Provided Temperature Profile; 6: TOUGH2 Simulator; 7: SUTRA; 8: SBT",
+      "description": "0: Simple cylindrical; 1: Multiple Parallel Fractures (Gringarten); 2: 1-D Linear Heat Sweep; 3: Single Fracture m/A Thermal Drawdown; 4: Annual Percentage Thermal Drawdown; 5: User-Provided Temperature Profile; 6: TOUGH2 Simulator; 7: SUTRA; 8: SBT",
       "type": "integer",
       "units": null,
       "category": "Reservoir",
@@ -57,7 +56,7 @@
         },
         {
           "name": "MULTIPLE_PARALLEL_FRACTURES",
-          "value": "Multiple Parallel Fractures",
+          "value": "Multiple Parallel Fractures (Gringarten)",
           "int_value": 1
         },
         {
@@ -226,7 +225,7 @@
       "maximum": 100.0
     },
     "Reservoir Volume Option": {
-      "description": "Specifies how the reservoir volume, and fracture distribution (for reservoir models 1 and 2) are calculated. The reservoir volume is used by GEOPHIRES to estimate the stored heat in place. The fracture distribution is needed as input for the EGS fracture-based reservoir models 1 and 2: Specify number of fractures and fracture separation, 2: Specify reservoir volume and fracture separation, 3: Specify reservoir volume and number of fractures, 4: Specify reservoir volume only (sufficient for reservoir models 3, 4, 5 and 6)",
+      "description": "Specifies how the reservoir volume, and fracture distribution (for reservoir models 1 and 2) are calculated. The reservoir volume is used by GEOPHIRES to estimate the stored heat in place. The fracture distribution is needed as input for the EGS fracture-based reservoir models 1 and 2. 1: FRAC_NUM_SEP: Specify number of fractures and fracture separation; 2: RES_VOL_FRAC_SEP: Specify reservoir volume and fracture separation; 3: RES_VOL_FRAC_NUM: Specify reservoir volume and number of fractures; 4: RES_VOL_ONLY: Specify reservoir volume only",
       "type": "integer",
       "units": null,
       "category": "Reservoir",
@@ -321,7 +320,7 @@
       "category": "Reservoir",
       "default": 10,
       "minimum": 1,
-      "maximum": 149
+      "maximum": 99999
     },
     "Fracture Separation": {
       "description": "Separation of identical parallel fractures with uniform spatial distribution             in EGS fracture-based reservoir",
@@ -638,6 +637,15 @@
       "minimum": 0,
       "maximum": 200
     },
+    "Number of Doublets": {
+      "description": "Pass this parameter to set the Number of Production Wells and Number of Injection Wells to same value.",
+      "type": "integer",
+      "units": null,
+      "category": "Well Bores",
+      "default": 2,
+      "minimum": 0,
+      "maximum": 200
+    },
     "Production Well Diameter": {
       "description": "Inner diameter of production wellbore (assumed constant along the wellbore) to calculate             frictional pressure drop and wellbore heat transmission with Rameys model",
       "type": "number",
@@ -693,7 +701,7 @@
       "maximum": 500.0
     },
     "Reservoir Impedance": {
-      "description": "Reservoir resistance to flow per well-pair. For EGS-type reservoirs when the injection well             is in hydraulic communication with the production well, this parameter specifies the overall pressure drop             in the reservoir between injection well and production well (see docs)",
+      "description": "Reservoir resistance to flow per well-pair. For EGS-type reservoirs when the injection well is in hydraulic communication with the production well, this parameter specifies the overall pressure drop in the reservoir between injection well and production well (see docs)",
       "type": "number",
       "units": "GPa.s/m**3",
       "category": "Well Bores",
@@ -948,13 +956,13 @@
       "maximum": 100.0
     },
     "Number of Multilateral Sections": {
-      "description": "Number of Nonvertical Wellbore Sections",
+      "description": "Number of Nonvertical Wellbore Sections, aka laterals or horizontals. Note that this is the total number of sections for the entire project and not the number of sections per well. For example, a project with 2 injectors and 2 producers with 3 laterals per well should set Number of Multilateral Sections = 2 * 2 * 3 = 12.",
       "type": "integer",
       "units": null,
       "category": "Well Bores",
       "default": 0,
       "minimum": 0,
-      "maximum": 100
+      "maximum": 1199
     },
     "Multilaterals Cased": {
       "description": "If set to True, casing & cementing are assumed to comprise 50% of drilling costs (doubling cost compared to uncased).",
@@ -1486,6 +1494,15 @@
       "minimum": 0,
       "maximum": 10
     },
+    "Capital Cost for Power Plant for Electricity Generation": {
+      "description": "",
+      "type": "number",
+      "units": "USD/kW",
+      "category": "Economics",
+      "default": 3000,
+      "minimum": 0.0,
+      "maximum": 10000.0
+    },
     "Field Gathering System Capital Cost": {
       "description": "Total field gathering system capital cost",
       "type": "number",
@@ -1595,7 +1612,7 @@
       "maximum": null
     },
     "Fraction of Investment in Bonds": {
-      "description": "Fraction of geothermal project financing through bonds (see docs)",
+      "description": "Fraction of geothermal project financing through bonds (debt).",
       "type": "number",
       "units": "",
       "category": "Economics",
@@ -1667,7 +1684,7 @@
       "maximum": 1.0
     },
     "Inflation Rate During Construction": {
-      "description": "",
+      "description": "For SAM Economic Models, this value is treated as an indirect EPC capital cost percentage.",
       "type": "number",
       "units": "",
       "category": "Economics",
@@ -1860,6 +1877,15 @@
       "default": 0.85,
       "minimum": 0,
       "maximum": 1
+    },
+    "Peaking Boiler Cost per kW": {
+      "description": "Peaking boiler cost per kW of maximum peaking boiler demand",
+      "type": "number",
+      "units": "USD/kW",
+      "category": "Economics",
+      "default": 65,
+      "minimum": 0,
+      "maximum": 1000
     },
     "District Heating Piping Cost Rate": {
       "description": "District heating piping cost rate ($/m)",
@@ -2218,15 +2244,6 @@
       "units": "USD/kW",
       "category": "Economics",
       "default": 100.0,
-      "minimum": 0.0,
-      "maximum": 10000.0
-    },
-    "Capital Cost for Power Plant for Electricity Generation": {
-      "description": "",
-      "type": "number",
-      "units": "USD/kW",
-      "category": "Economics",
-      "default": 3000.0,
       "minimum": 0.0,
       "maximum": 10000.0
     },

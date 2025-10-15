@@ -280,11 +280,11 @@ Then push both commits and tags to your fork:
     To github.com:softwareengineerprogrammer/python-geophires-x-nrel.git
      * [new tag]         v3.2.3 -> v3.2.3
 
-Once a version bump is merged into the main repository with a Pull Request, tags must be manually pushed (GitHub `doesn't include tags in PRs <https://stackoverflow.com/questions/12278660/adding-tags-to-a-pull-request>`__):
+Once a version bump is merged into the main repository with a Pull Request, tag must be manually pushed (GitHub `doesn't include tags in PRs <https://stackoverflow.com/questions/12278660/adding-tags-to-a-pull-request>`__):
 
 .. code-block::
 
-    (venv) ➜  python-geophires-x git:(main) git push origin --tags
+    (venv) ➜  python-geophires-x git:(main) git push origin tag v3.2.3
 
 
 Documentation Updates

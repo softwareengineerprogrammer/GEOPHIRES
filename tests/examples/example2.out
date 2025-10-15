@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.8.4
- Simulation Date: 2025-03-19
- Simulation Time:  10:30
- Calculation Time:      0.211 sec
+ GEOPHIRES Version: 3.9.12
+ Simulation Date: 2025-05-29
+ Simulation Time:  09:02
+ Calculation Time:      0.215 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -25,21 +25,21 @@ Simulation Metadata
 
       Economic Model = Standard Levelized Cost
       Interest Rate:                                          5.00 %
-      Accrued financing during construction:                  0.00
+      Accrued financing during construction:                  0.00 %
       Project lifetime:                                      25 yr
       Capacity factor:                                       90.0 %
       Project NPV:                                          10.25 MUSD
       Project IRR:                                           7.84 %
       Project VIR=PI=PIR:                                    1.29
       Project MOIC:                                          0.70
-      Project Payback Period:                               11.38 yr
+      Project Payback Period:                                      11.38 yr
 
                           ***ENGINEERING PARAMETERS***
 
       Number of Production Wells:                             2
       Number of Injection Wells:                              2
       Well depth:                                             3.0 kilometer
-      Water loss rate:                                        0.0
+      Water loss rate:                                        0.0 %
       Pump efficiency:                                       80.0 %
       Injection temperature:                                 70.0 degC
       Production Wellbore heat transmission calculated with Ramey's model
@@ -65,7 +65,7 @@ Simulation Metadata
       Well separation: fracture diameter:                   300.00 meter
       Fracture area:                                      70685.83 m**2
       Number of fractures calculated with reservoir volume and fracture separation as input
-      Number of fractures:                                   30.47
+      Number of fractures:                                    31
       Fracture separation:                                   60.00 meter
       Reservoir volume:                               125000000 m**3
       Reservoir impedance:                                  0.2000 GPa.s/m**3

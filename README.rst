@@ -14,7 +14,9 @@ Various reservoir conditions (EGS, doublets, etc.) and end-use options (electric
 Users are encouraged to build upon to the GEOPHIRES framework to implement their own correlations and models.
 See the `Documentation`_ section below for more information.
 
-GEOPHIRES-X is the successor version to `GEOPHIRES v2.0 <https://github.com/NREL/GEOPHIRES-v2>`__ (see `CHANGELOG <CHANGELOG.rst>`__ for more info).
+This repository is the canonical source for the modern GEOPHIRES simulator, which succeeds the legacy `GEOPHIRES v2.0 <https://github.com/NREL/GEOPHIRES-v2>`__.
+The name GEOPHIRES-X refers to the initial modernized (v3) framework.
+See the `CHANGELOG <CHANGELOG.rst>`__ for a detailed history of changes and release notes.
 
 Free software: `MIT license <LICENSE>`__
 
@@ -56,9 +58,9 @@ Free software: `MIT license <LICENSE>`__
     :alt: Supported implementations
     :target: https://pypi.org/project/geophires-x
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/softwareengineerprogrammer/GEOPHIRES-X/v3.9.7.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/softwareengineerprogrammer/GEOPHIRES-X/v3.9.31.svg
     :alt: Commits since latest release
-    :target: https://github.com/softwareengineerprogrammer/GEOPHIRES-X/compare/v3.9.7...main
+    :target: https://github.com/softwareengineerprogrammer/GEOPHIRES-X/compare/v3.9.31...main
 
 .. |docs| image:: https://readthedocs.org/projects/GEOPHIRES-X/badge/?style=flat
     :target: https://nrel.github.io/GEOPHIRES-X
@@ -81,176 +83,9 @@ Free software: `MIT license <LICENSE>`__
 Getting Started
 ===============
 
-Web Interface
--------------
-
 A web interface is available at `gtp.scientificwebservices.com/geophires <https://gtp.scientificwebservices.com/geophires>`__.
 
-The short URL `bit.ly/geophires <https://bit.ly/geophires>`__ redirects to the same location.
-
-Installation
-------------
-
-Pip Package
-^^^^^^^^^^^
-
-If you do not need to view or edit GEOPHIRES-X source code, you can consume GEOPHIRES-X as a regular, non-editable python package::
-
-    pip3 install https://github.com/NREL/GEOPHIRES-X/archive/main.zip
-
-
-.. (Eventually package will be published to PyPi, enabling ``pip install geophires-x``)
-
-
-Editable Installation (Recommended)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-An editable installation is recommended for most users. It will allow you to run GEOPHIRES-X locally,
-view its Python files in an IDE or text editor,
-and create your own extensions as described in `How to extend GEOPHIRES-X <docs/How-to-extend-GEOPHIRES-X.md#how-to-extend-geophires-x>`__.
-
-Prerequisites:
-
-1. Python 3.8+: You must have Python 3.8 or later installed on your machine. Python can be downloaded at `python.org/downloads <https://www.python.org/downloads/>`__. (On Ubuntu: ``alias python=python3`` if not aliased already.)
-2. `Git <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`__
-3. Virtual environment (aka ``virtualenv``): `Install virtual environment on your machine <https://virtualenv.pypa.io/en/latest/installation.html#via-pip>`__ if you don't have it already
-4. On Windows, you will need Admin privileges (required to successfully activate the virtual environment)
-
-Steps:
-
-1. Open a command line (i.e. Terminal on Mac, PowerShell on Windows)
-2. Create a directory for GEOPHIRES::
-
-    mkdir my-geophires-project
-    cd my-geophires-project
-
-3. Create a virtual environment::
-
-    python -m venv venv
-
-4. Source the virtual environment:
-
-   - Windows::
-
-       venv\Scripts\activate
-
-   - macOS/Linux::
-
-       source venv/bin/activate
-
-5. Install the ``geophires-x`` package::
-
-    pip3 install -e git+https://github.com/NREL/GEOPHIRES-X.git#egg=geophires-x --src .
-
-6. Run on an example file::
-
-    cd geophires-x
-    cd tests
-    cd examples
-    python -mgeophires_x example1.txt
-
-7. View and edit source code by opening the ``my-geophires-project/`` directory in an IDE or editor such as `PyCharm <https://www.jetbrains.com/pycharm/>`__, `Spyder <https://www.spyder-ide.org/>`__, or `Visual Studio Code <https://code.visualstudio.com/>`__. The GEOPHIRES-X source code will be located in the ``my-geophires-project/geophires-x`` directory. You can add your own python files in ``my-geophires-x/`` that use the source as a module as shown below.
-
-To update the editable installation with the latest GEOPHIRES version::
-
-    cd geophires-x
-    git pull
-    # resolve merge conflicts, if any
-    pip install -e .
-
-
-
-Usage
------
-
-Python
-^^^^^^
-
-Example usage in Python:
-
-.. code:: python
-
-    from geophires_x_client import GeophiresXClient
-    from geophires_x_client.geophires_input_parameters import GeophiresInputParameters
-
-    client = GeophiresXClient()
-    result = client.get_geophires_result(
-                GeophiresInputParameters({
-                    "Gradient 1": "69",
-                    "Reservoir Depth": "5",
-                    "End-Use Option": "1",
-                    "Power Plant Type": "4"
-                })
-            )
-
-    with open(result.output_file_path, 'r') as f:
-        print(f.read())
-
-If you followed the editable installation example above, put this code in ``my-geophires-project/main.py``, then run::
-
-   python main.py
-
-You will then see output including a case report::
-
-    (venv) ➜  my-geophires-project python main.py
-    No valid plant outlet pressure provided. GEOPHIRES will assume default plant outlet pressure (100 kPa)
-    No valid plant outlet pressure provided. GEOPHIRES will assume default plant outlet pressure (100 kPa)
-
-                                   *****************
-                                   ***CASE REPORT***
-                                   *****************
-
-    Simulation Metadata
-    ----------------------
-     GEOPHIRES Version: 3.4.42
-     Simulation Date: 2024-07-08
-     Simulation Time:  10:07
-     Calculation Time:      0.047 sec
-
-                               ***SUMMARY OF RESULTS***
-
-          End-Use Option: Electricity
-          Average Net Electricity Production:                    23.94 MW
-          Electricity breakeven price:                            5.04 cents/kWh
-
-    [...]
-
-
-You may also pass parameters as a text file:
-
-.. code:: python
-
-    from pathlib import Path
-    from geophires_x_client import GeophiresXClient
-    from geophires_x_client.geophires_input_parameters import GeophiresInputParameters
-
-    # https://github.com/NREL/GEOPHIRES-X/blob/main/tests/examples/example1.txt
-    example_file_path = Path('geophires-x/tests/examples/example1.txt').absolute()
-
-    client = GeophiresXClient()
-    result = client.get_geophires_result(
-                GeophiresInputParameters(from_file_path=example_file_path)
-            )
-
-    with open(result.output_file_path, 'r') as f:
-        print(f.read())
-
-
-`test_geophires_x.py <tests/test_geophires_x.py>`__ has additional examples of how to consume and call `GeophiresXClient <src/geophires_x_client/__init__.py#L14>`__.
-
-
-Command Line
-^^^^^^^^^^^^
-
-If you installed with pip (editable or non-), you may run GEOPHIRES from the command line, passing your input file as an argument::
-
-   python -mgeophires_x my_geophires_input.txt
-
-You may also optionally pass the output file as well::
-
-   python -mgeophires_x my_geophires_input.txt my_geophires_result.out
-
-(If you do not pass an output file argument a default name will be used.)
+To run GEOPHIRES locally or to modify the source code, see the `Getting Started Guide <INSTALL.rst>`__.
 
 
 Documentation
@@ -272,7 +107,8 @@ or user-provided components.
 .. |GEOPHIRES Architecture Diagram| image:: References/geophires-architecture-diagram_2024-11-20.png
     :alt: GEOPHIRES Architecture Diagram
 
-GEOPHIRES has a variety of different reservoir models including (1) Multiple parallel fractures model;
+GEOPHIRES has a variety of different reservoir models including
+(1) Multiple parallel fractures model (Gringarten);
 (2) 1-Dimensional linear heat sweep model;
 (3) M/A thermal drawdown parameter model;
 (4) Percentage temperature drawdown model;
@@ -293,17 +129,15 @@ electricity: (1) fixed charge rate (FCR) model;
 (2) standard discounting levelized cost model;
 (3) BICYCLE model;
 (4) CLGS;
-(5) SAM Single-owner PPA.
-
-.. TODO link to SAM Economic Model docs
+(5) `SAM Single-owner PPA <https://nrel.github.io/GEOPHIRES-X/SAM-Economic-Models.html>`__.
 
 The capital and O&M costs for the different geothermal system components (exploration,
 well drilling, surface plant, etc.) are either provided by the user or calculated with built-in
 correlations.
 
 For more information on the theoretical basis for GEOPHIRES see
-`GEOPHIRES v2.0: updated geothermal techno‐economic simulation tool (Beckers & McCabe, 2019) <https://github.com/NREL/GEOPHIRES-X/blob/fb5caadfa419c3bd05de656a33700d085fbc0432/References/GEOPHIRES%20v2.0%20User%20Manual.pdf>`__
-and `GEOPHIRES reference materials <References/references.md#geophires>`__.
+`GEOPHIRES v2.0: updated geothermal techno‐economic simulation tool (Beckers & McCabe, 2019) <https://github.com/NREL/GEOPHIRES-X/blob/fb5caadfa419c3bd05de656a33700d085fbc0432/References/Beckers%202019%20GEOPHIRES%20v2.pdf>`__
+and `GEOPHIRES reference materials <References/README.md#geophires>`__.
 
 Parameters
 ----------
@@ -454,6 +288,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `Fervo_Project_Cape-3.txt <tests/examples/Fervo_Project_Cape-3.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape-3.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-3>`__
+   * - Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-4.html>`__)
+     - `Fervo_Project_Cape-4.txt <tests/examples/Fervo_Project_Cape-4.txt>`__
+     - `.out <tests/examples/Fervo_Project_Cape-4.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-4>`__
    * - Superhot Rock (SHR) Example 1
      - `example_SHR-1.txt <tests/examples/example_SHR-1.txt>`__
      - `.out <tests/examples/example_SHR-1.out>`__
@@ -462,10 +300,14 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SHR-2.txt <tests/examples/example_SHR-2.txt>`__
      - `.out <tests/examples/example_SHR-2.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-2>`__
-   * - SAM Single Owner PPA
+   * - SAM Single Owner PPA: 50 MWe
      - `example_SAM-single-owner-PPA.txt <tests/examples/example_SAM-single-owner-PPA.txt>`__
      - `.out <tests/examples/example_SAM-single-owner-PPA.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA>`__
+   * - SAM Single Owner PPA: 400 MWe BICYCLE Comparison
+     - `example_SAM-single-owner-PPA-2.txt <tests/examples/example_SAM-single-owner-PPA-2.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-2.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-2>`__
 
 .. raw:: html
 
@@ -507,7 +349,7 @@ Extending GEOPHIRES-X
 Additional Documentation
 ------------------------
 
-Additional materials can be found in `/References </References/references.md>`__.
+Additional materials can be found in `/References </References/README.md>`__.
 
 
 Development

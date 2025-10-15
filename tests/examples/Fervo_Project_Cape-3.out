@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.7.23
- Simulation Date: 2025-03-10
- Simulation Time:  10:42
- Calculation Time:      0.871 sec
+ GEOPHIRES Version: 3.9.28
+ Simulation Date: 2025-07-02
+ Simulation Time:  12:19
+ Calculation Time:      0.956 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -23,15 +23,15 @@ Simulation Metadata
 
                            ***ECONOMIC PARAMETERS***
 
-      Economic Model  = BICYCLE
-      Accrued financing during construction:                  5.00
+      Economic Model = BICYCLE
+      Accrued financing during construction:                  5.00 %
       Project lifetime:                                      20 yr
       Capacity factor:                                       90.0 %
       Project NPV:                                        4580.36 MUSD
       Project IRR:                                          43.75 %
       Project VIR=PI=PIR:                                    5.27
       Project MOIC:                                          6.30
-      Project Payback Period:                                3.38 yr
+      Project Payback Period:                                       3.38 yr
       Estimated Jobs Created:                                 976
 
                           ***ENGINEERING PARAMETERS***
@@ -39,7 +39,7 @@ Simulation Metadata
       Number of Production Wells:                            39
       Number of Injection Wells:                             39
       Well depth:                                             2.6 kilometer
-      Water loss rate:                                        5.0
+      Water loss rate:                                        5.0 %
       Pump efficiency:                                       80.0 %
       Injection temperature:                                 56.7 degC
       Production Wellbore heat transmission calculated with Ramey's model
@@ -60,14 +60,14 @@ Simulation Metadata
 
                            ***RESERVOIR PARAMETERS***
 
-      Reservoir Model = Multiple Parallel Fractures Model
+      Reservoir Model = Multiple Parallel Fractures Model (Gringarten)
       Bottom-hole temperature:                              201.72 degC
       Fracture model = Rectangular
       Well separation: fracture height:                    2000.00 meter
       Fracture width:                                               10000.00 meter
       Fracture area:                                    20000000.00 m**2
       Reservoir volume calculated with fracture separation and number of fractures as input
-      Number of fractures:                                  149.00
+      Number of fractures:                                    149
       Fracture separation:                                   30.00 meter
       Reservoir volume:                              88800000000 m**3
       Reservoir impedance:                                  0.0010 GPa.s/m**3
