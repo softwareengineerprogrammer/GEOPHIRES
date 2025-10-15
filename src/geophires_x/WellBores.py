@@ -443,7 +443,6 @@ def get_hydrostatic_pressure_kPa(
     https://workingincaes.inl.gov/SiteAssets/CAES%20Files/FORGE/inl_ext-16-38751%20GETEM%20User%20Manual%20Final.pdf
     """
     CP = 4.64E-7
-    #CP = 9.51E-2
     CT = 9E-4 / (30.796 * Trock_degC ** (-0.552))
     return 0 + 1. / CP * (math.exp(
         density_water_kg_per_m3(Tsurf_degC, pressure=lithostatic_pressure) * 9.81 * CP / 1000 * (
@@ -1011,7 +1010,7 @@ class WellBores:
             ToolTipText='; '.join([f'{it.int_value}: {it.value}' for it in WorkingFluid])
         )
 
-        # Input data for subsurface condition
+        # Inputs data for subsurface condition
         self.Nonvertical_length = self.ParameterDict[self.Nonvertical_length.Name] = floatParameter(
             "Nonvertical Length per Multilateral Section",
             DefaultValue=1000.0,

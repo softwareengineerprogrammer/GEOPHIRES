@@ -129,7 +129,7 @@ class SurfacePlantAGS(SurfacePlant):
             ErrMessage="assume default Dead-state pressure (1e5 Pa)"
         )
 
-        # Input data for electricity generation with CO2
+        # Inputs data for electricity generation with CO2
         self.Turbine_isentropic_efficiency = self.ParameterDict[
             self.Turbine_isentropic_efficiency.Name] = floatParameter(
             "Isentropic Efficiency for CO2 Turbine",
