@@ -6,7 +6,7 @@ import sys
 import os
 
 parser = argparse.ArgumentParser(description='GEOPHIRES-X CLI')
-parser.add_argument('input-file', nargs=1, help='Inputs file path')
+parser.add_argument('input-file', nargs=1, help='Input file path')
 parser.add_argument('output-file', nargs='?', help='Output file path')
 parsed_args = {k: v for k, v in vars(parser.parse_args()).items() if v is not None}
 

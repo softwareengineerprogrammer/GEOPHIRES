@@ -5,7 +5,7 @@ from enum import Enum
 
 class GeophiresInputEnum(str, Enum):
     """
-    Inputs enums have a name, integer input value, and string value
+    Input enums have a name, integer input value, and string value
 
     TODO implement from_int/from_input_string here instead of child classes
     """

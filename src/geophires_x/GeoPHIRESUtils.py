@@ -251,7 +251,7 @@ def density_water_kg_per_m3(Twater_degC: float, pressure: Optional[PlainQuantity
             return CP.PropsSI('D', 'T', celsius_to_kelvin(Twater_degC), 'Q', 0, 'Water')
 
     except (NotImplementedError, ValueError) as e:
-        raise ValueError(f'Inputs temperature & pressure ({Twater_degC}, {pressure}) '
+        raise ValueError(f'Input temperature & pressure ({Twater_degC}, {pressure}) '
                          f'are out of range or otherwise could not be used to calculate water density.') from e
 
 
@@ -297,7 +297,7 @@ def viscosity_water_Pa_sec(
             return CP.PropsSI('V', 'T', celsius_to_kelvin(Twater_degC), 'Q', 0, 'Water')
 
     except (NotImplementedError, ValueError) as e:
-        raise ValueError(f'Inputs temperature & pressure ({Twater_degC}, {pressure}) '
+        raise ValueError(f'Input temperature & pressure ({Twater_degC}, {pressure}) '
                          f'are out of range or otherwise could not be used to calculate water viscosity.') from e
 
 
@@ -333,7 +333,7 @@ def heat_capacity_water_J_per_kg_per_K(
             return CP.PropsSI('C', 'T', celsius_to_kelvin(Twater_degC), 'Q', 0, 'Water')
 
     except (NotImplementedError, ValueError) as e:
-        raise ValueError(f'Inputs temperature & pressure ({Twater_degC}, {pressure}) '
+        raise ValueError(f'Input temperature & pressure ({Twater_degC}, {pressure}) '
                          f'are out of range or otherwise could not be used to calculate heat capacity of water.') from e
 
 
@@ -383,16 +383,16 @@ def vapor_pressure_water_kPa(temperature_degC: float) -> float:
     """
 
     if not isinstance(temperature_degC, (int, float)):
-        raise ValueError(f'Inputs temperature ({temperature_degC}) must be a number')
+        raise ValueError(f'Input temperature ({temperature_degC}) must be a number')
     if temperature_degC < 0:
-        raise ValueError(f'Inputs temperature ({temperature_degC}C) must be greater than or equal to 0')
+        raise ValueError(f'Input temperature ({temperature_degC}C) must be greater than or equal to 0')
 
     try:
         return (quantity(CP.PropsSI('P', 'T', celsius_to_kelvin(temperature_degC), 'Q', 0, 'Water'), 'Pa')
                 .to('kPa').magnitude)
 
     except (NotImplementedError, ValueError) as e:
-        raise ValueError(f'Inputs temperature ({temperature_degC}C) is out of range or otherwise not implemented') from e
+        raise ValueError(f'Input temperature ({temperature_degC}C) is out of range or otherwise not implemented') from e
 
 
 @lru_cache
@@ -413,7 +413,7 @@ def entropy_water_kJ_per_kg_per_K(temperature_degC: float, pressure: Optional[Pl
     try:
         temperature_degC = float(temperature_degC)
     except ValueError:
-        raise TypeError(f'Inputs temperature ({temperature_degC}) must be a float')
+        raise TypeError(f'Input temperature ({temperature_degC}) must be a float')
 
     try:
         if pressure is not None:
@@ -422,7 +422,7 @@ def entropy_water_kJ_per_kg_per_K(temperature_degC: float, pressure: Optional[Pl
         else:
             return CP.PropsSI('S', 'T', celsius_to_kelvin(temperature_degC), 'Q', 0, 'Water') * 1e-3
     except (NotImplementedError, ValueError) as e:
-        raise ValueError(f'Inputs temperature {temperature_degC} is out of range or otherwise not implemented') from e
+        raise ValueError(f'Input temperature {temperature_degC} is out of range or otherwise not implemented') from e
 
 
 @lru_cache
@@ -443,7 +443,7 @@ def enthalpy_water_kJ_per_kg(temperature_degC: float, pressure: Optional[PlainQu
     try:
         temperature_degC = float(temperature_degC)
     except ValueError:
-        raise TypeError(f'Inputs temperature ({temperature_degC}) must be a float')
+        raise TypeError(f'Input temperature ({temperature_degC}) must be a float')
 
     try:
         if pressure is not None:
@@ -453,7 +453,7 @@ def enthalpy_water_kJ_per_kg(temperature_degC: float, pressure: Optional[PlainQu
             return CP.PropsSI('H', 'T', celsius_to_kelvin(temperature_degC), 'Q', 0, 'Water') * 1e-3
 
     except (NotImplementedError, ValueError) as e:
-        raise ValueError(f'Inputs temperature {temperature_degC} is out of range or otherwise not implemented') from e
+        raise ValueError(f'Input temperature {temperature_degC} is out of range or otherwise not implemented') from e
 
 
 @lru_cache
@@ -470,7 +470,7 @@ def UtilEff_func(temperature_degC: float) -> float:
     """
 
     if not isinstance(temperature_degC, (int, float)):
-        raise ValueError(f'Inputs temperature ({temperature_degC}) must be a number')
+        raise ValueError(f'Input temperature ({temperature_degC}) must be a number')
 
     if temperature_degC < _T[0] or temperature_degC > _T[-1]:
         raise ValueError(f'Temperature ({temperature_degC}) must be within the range of {_T[0]} to {_T[-1]} degrees C.')

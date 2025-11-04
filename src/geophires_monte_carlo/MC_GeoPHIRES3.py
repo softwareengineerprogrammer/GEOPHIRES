@@ -342,7 +342,7 @@ def main(command_line_args=None):
     # get the values off the command line
     parser = argparse.ArgumentParser()
     parser.add_argument('Code_File', help='Code File')
-    parser.add_argument('Input_file', help='Inputs file')
+    parser.add_argument('Input_file', help='Input file')
     parser.add_argument('MC_Settings_file', help='MC Settings file')
     parser.add_argument('MC_OUTPUT_FILE', help='Output file', nargs='?')
 
@@ -448,7 +448,7 @@ def main(command_line_args=None):
         if '-9999.0' not in line and len(s) > 1:
             line = line.strip()
             if len(line) > 10:
-                line, sep, tail = line.partition(', (')  # strip off the Inputs Variable Values
+                line, sep, tail = line.partition(', (')  # strip off the Input Variable Values
                 line = line.replace('(', '').replace(')', '')  # strip off the ()
                 results.append([float(y) for y in line.split(',')])
         else:
