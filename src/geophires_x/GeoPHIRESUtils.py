@@ -501,7 +501,7 @@ def read_input_file(return_dict_1, logger=None, input_file_name=None):
 
     # read input data (except input from optional filenames)
     if input_file_name is None:
-        logger.warning('Inputs file name not provided, checking sys.argv')
+        logger.warning('Input file name not provided, checking sys.argv')
         if len(sys.argv) > 1:
             input_file_name = sys.argv[1]
             logger.warning(f'Using input file from sys.argv: {input_file_name}')
