@@ -37,8 +37,10 @@ from geophires_x.EconomicsUtils import (
     moic_parameter,
     project_vir_parameter,
     project_payback_period_parameter,
+    total_capex_parameter_output_parameter,
+    royalty_cost_output_parameter,
 )
-from geophires_x.GeoPHIRESUtils import is_float, is_int, sig_figs
+from geophires_x.GeoPHIRESUtils import is_float, is_int, sig_figs, quantity
 from geophires_x.OptionList import EconomicModel, EndUseOptions
 from geophires_x.Parameter import Parameter, OutputParameter, floatParameter
 from geophires_x.Units import convertible_unit, EnergyCostUnit, CurrencyUnit, Units
@@ -55,12 +57,9 @@ class SamEconomicsCalculations:
         )
     )
 
-    capex: OutputParameter = field(
-        default_factory=lambda: OutputParameter(
-            UnitType=Units.CURRENCY,
-            CurrentUnits=CurrencyUnit.MDOLLARS,
-        )
-    )
+    capex: OutputParameter = field(default_factory=total_capex_parameter_output_parameter)
+
+    royalties_opex: OutputParameter = field(default_factory=royalty_cost_output_parameter)
 
     project_npv: OutputParameter = field(
         default_factory=lambda: OutputParameter(
@@ -74,7 +73,9 @@ class SamEconomicsCalculations:
     wacc: OutputParameter = field(default_factory=wacc_output_parameter)
     moic: OutputParameter = field(default_factory=moic_parameter)
     project_vir: OutputParameter = field(default_factory=project_vir_parameter)
+
     project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
+    """TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413"""
 
 
 def validate_read_parameters(model: Model):
@@ -171,6 +172,14 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.project_npv.value = sf(single_owner.Outputs.project_return_aftertax_npv * 1e-6)
     sam_economics.capex.value = single_owner.Outputs.adjusted_installed_cost * 1e-6
 
+    if model.economics.royalty_rate.Provided:
+        # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
+        # updated if more O&M production-based expenses are added to SAM-EM
+        sam_economics.royalties_opex.value = [
+            quantity(it, 'USD / year').to(sam_economics.royalties_opex.CurrentUnits).magnitude
+            for it in _cash_flow_profile_row(cash_flow, 'O&M production-based expense ($)')
+        ]
+
     sam_economics.nominal_discount_rate.value, sam_economics.wacc.value = _calculate_nominal_discount_rate_and_wacc(
         model, single_owner
     )
@@ -251,6 +260,7 @@ def _calculate_project_vir(cash_flow: list[list[Any]], model) -> float | None:
 
 
 def _calculate_project_payback_period(cash_flow: list[list[Any]], model) -> float | None:
+    """TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413"""
     try:
         after_tax_cash_flow = _cash_flow_profile_row(cash_flow, 'Total after-tax returns ($)')
         cumm_cash_flow = np.zeros(len(after_tax_cash_flow))
@@ -337,7 +347,6 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
 def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     """
     TODO:
-        - Construction years
         - Break out indirect costs (instead of lumping all into direct cost):
             https://github.com/NREL/GEOPHIRES-X/issues/383
     """
@@ -354,9 +363,26 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     # calling with PySAM. But, we set it here anyway for the sake of technical compliance.
     ret['flip_target_year'] = model.surfaceplant.plant_lifetime.value
 
-    itc = econ.RITCValue.quantity()
-    total_capex = econ.CCap.quantity() + itc
-    ret['total_installed_cost'] = (total_capex * (1 + econ.inflrateconstruction.value)).to('USD').magnitude
+    total_capex = econ.CCap.quantity()
+
+    if econ.inflrateconstruction.Provided:
+        inflation_during_construction_factor = 1.0 + econ.inflrateconstruction.quantity().to('dimensionless').magnitude
+    else:
+        inflation_during_construction_factor = math.pow(
+            1.0 + econ.RINFL.value, model.surfaceplant.construction_years.value
+        )
+    econ.accrued_financing_during_construction_percentage.value = (
+        quantity(inflation_during_construction_factor - 1, 'dimensionless')
+        .to(convertible_unit(econ.accrued_financing_during_construction_percentage.CurrentUnits))
+        .magnitude
+    )
+
+    econ.inflation_cost_during_construction.value = (
+        (total_capex * (inflation_during_construction_factor - 1))
+        .to(econ.inflation_cost_during_construction.CurrentUnits)
+        .magnitude
+    )
+    ret['total_installed_cost'] = (total_capex * inflation_during_construction_factor).to('USD').magnitude
 
     opex_musd = econ.Coam.value
     ret['om_fixed'] = [opex_musd * 1e6]
@@ -382,13 +408,11 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     geophires_ptr_tenths = Decimal(econ.PTR.value)
     ret['property_tax_rate'] = float(geophires_ptr_tenths * Decimal(100))
 
-    ret['ppa_price_input'] = _ppa_pricing_model(
-        model.surfaceplant.plant_lifetime.value,
-        econ.ElecStartPrice.value,
-        econ.ElecEndPrice.value,
-        econ.ElecEscalationStart.value,
-        econ.ElecEscalationRate.value,
-    )
+    ppa_price_schedule_per_kWh = _get_ppa_price_schedule_per_kWh(model)
+    ret['ppa_price_input'] = ppa_price_schedule_per_kWh
+
+    if model.economics.royalty_rate.Provided:
+        ret['om_production'] = _get_royalties_variable_om_USD_per_MWh_schedule(model)
 
     # Debt/equity ratio ('Fraction of Investment in Bonds' parameter)
     ret['debt_percent'] = _pct(econ.FIB)
@@ -402,7 +426,30 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
 
     ret['ibi_oth_amount'] = (econ.OtherIncentives.quantity() + econ.TotalGrant.quantity()).to('USD').magnitude
 
+    if model.economics.DoAddOnCalculations.value:
+        add_on_profit_per_year = np.sum(model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude)
+        add_on_profit_series = [add_on_profit_per_year]
+        ret['cp_capacity_payment_amount'] = add_on_profit_series
+        ret['cp_capacity_payment_type'] = 1
+
     return ret
+
+
+def _get_royalties_variable_om_USD_per_MWh_schedule(model: Model):
+    royalty_rate_schedule = _get_royalty_rate_schedule(model)
+    ppa_price_schedule_per_kWh = _get_ppa_price_schedule_per_kWh(model)
+
+    # For each year, calculate the royalty as a $/MWh variable cost.
+    # The royalty is a percentage of revenue (MWh * $/MWh). By setting the
+    # variable O&M rate to (PPA Price * Royalty Rate), SAM's calculation
+    # (Rate * MWh) will correctly yield the total royalty payment.
+    variable_om_schedule_USD_per_MWh = [
+        quantity(price_kWh, model.economics.ElecStartPrice.CurrentUnits).to('USD / megawatt_hour').magnitude
+        * royalty_fraction
+        for price_kWh, royalty_fraction in zip(ppa_price_schedule_per_kWh, royalty_rate_schedule)
+    ]
+
+    return variable_om_schedule_USD_per_MWh
 
 
 def _get_fed_and_state_tax_rates(geophires_ctr_tenths: float) -> tuple[list[float]]:
@@ -422,15 +469,36 @@ def _pct(econ_value: Parameter) -> float:
     return econ_value.quantity().to(convertible_unit('%')).magnitude
 
 
+def _get_ppa_price_schedule_per_kWh(model: Model) -> list:
+    """
+    :return: quantity list of PPA price schedule per kWh in econ.ElecStartPrice.CurrentUnits
+    """
+
+    econ = model.economics
+    pricing_model = _ppa_pricing_model(
+        model.surfaceplant.plant_lifetime.value,
+        econ.ElecStartPrice.value,
+        econ.ElecEndPrice.value,
+        econ.ElecEscalationStart.value,
+        econ.ElecEscalationRate.value,
+    )
+
+    return [quantity(it, econ.ElecStartPrice.CurrentUnits).magnitude for it in pricing_model]
+
+
 def _ppa_pricing_model(
     plant_lifetime: int, start_price: float, end_price: float, escalation_start_year: int, escalation_rate: float
-) -> list:
+) -> list[float]:
     # See relevant comment in geophires_x.EconomicsUtils.BuildPricingModel re:
     # https://github.com/NREL/GEOPHIRES-X/issues/340?title=Price+Escalation+Start+Year+seemingly+off+by+1.
     # We use the same utility method here for the sake of consistency despite technical incorrectness.
     return BuildPricingModel(
         plant_lifetime, start_price, end_price, escalation_start_year, escalation_rate, [0] * plant_lifetime
     )
+
+
+def _get_royalty_rate_schedule(model: Model) -> list[float]:
+    return model.economics.get_royalty_rate_schedule(model)
 
 
 def _get_max_total_generation_kW(model: Model) -> float:

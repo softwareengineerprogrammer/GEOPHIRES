@@ -23,6 +23,10 @@ Geothermal_district_heating_system_with_peaking_boilers.png
 *.html
 !docs/*.html
 
+# TODO may want to add this to source
+regenerate-schemas.sh
+requirements_2025-08-11.txt
+
 # C extensions
 *.so
 
@@ -80,6 +84,8 @@ nosetests.xml
 .pydevproject
 .vscode
 
+ai.md
+
 # Complexity
 output/*.html
 output/*/index.html
@@ -100,6 +106,9 @@ _site/
 /Useful sites for Sphinx docstrings.txt
 /.github/workflows/workflows.7z
 
+# TODO unignore once favicon is correctly configured
+docs/_images/geophires-favicon.png
+
 # Mypy Cache
 .mypy_cache/
 
@@ -110,6 +119,21 @@ _site/
 /src/geophires_x/CLG Simulator/clg_tea_v3_SCO2_elec.py
 /src/geophires_x/CLG Simulator/clgs_v2.py
 
+# TOUGH
+CO2TAB
+Doublet.dat
+Doublet.out
+FOFT_*.csv
+GENER
+GOFT_*.csv
+INCON
+INFILE
+MESH*
+OUTPUT_ELEME.csv
+SAVE
+TABLE
+rcc3.out
+tough_debug_output/
 
 # Temp
 ai.md

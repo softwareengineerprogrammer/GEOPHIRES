@@ -3,7 +3,7 @@ import numpy as np
 from pint.facets.plain import PlainQuantity
 
 from .Parameter import floatParameter, intParameter, boolParameter, OutputParameter, ReadParameter, \
-    coerce_int_params_to_enum_values
+    coerce_int_params_to_enum_values, Parameter
 from geophires_x.GeoPHIRESUtils import vapor_pressure_water_kPa, quantity, static_pressure_MPa
 from geophires_x.GeoPHIRESUtils import density_water_kg_per_m3
 from geophires_x.GeoPHIRESUtils import viscosity_water_Pa_sec
@@ -521,9 +521,9 @@ def ProdPressureDropAndPumpingPowerUsingIndexes(
             Pprodwellhead = ppwellhead_kPa
             if Pprodwellhead < Pminimum_kPa:
                 Pprodwellhead = Pminimum_kPa
-                msg = (f'Provided production wellhead pressure ({Pprodwellhead}kPa) '
-                       f'under minimum pressure ({Pminimum_kPa}kPa). '
-                       f'GEOPHIRES will assume minimum wellhead pressure')
+                msg = (f'Provided production wellhead pressure ({Pprodwellhead:.2f} kPa) '
+                       f'under minimum pressure ({Pminimum_kPa:.2f} kPa). '
+                       f'GEOPHIRES will assume minimum wellhead pressure.')
 
                 print(f'Warning: {msg}')
                 model.logger.warning(msg)
@@ -631,21 +631,24 @@ def InjPressureDropAndPumpingPowerUsingIndexes(
 
     if productionwellpumping:
         # Excess pressure covers non-condensable gas pressure and net positive suction head for the pump
-        Pexcess_kPa = 344.7 # = 50 psi
+        Pexcess_kPa = 344.7  # = 50 psi
 
         # Minimum production pump inlet pressure and minimum wellhead pressure
         if Trock_degC < 373.9:
             Pminimum_kPa = vapor_pressure_water_kPa(Trock_degC) + Pexcess_kPa
-        else: #above the critical water temperature, vapor no longer occurs and vapor pressure can no longer be calculated. A "dummy" vapor pressure can be assumed as the fluid phase no longer impacts the pump depth.
-            Pminimum_kPa = 100 #setting artificially to 1 bar = 100 kPa
+        else:
+            # Above the critical water temperature, vapor no longer occurs and vapor pressure can no longer be
+            # calculated. A "dummy" vapor pressure can be assumed as the fluid phase no longer impacts the pump depth.
+            Pminimum_kPa = 100  # setting artificially to 1 bar = 100 kPa
         if usebuiltinppwellheadcorrelation:
             Pprodwellhead = Pminimum_kPa  # production wellhead pressure [kPa]
         else:
             Pprodwellhead = ppwellhead
             if Pprodwellhead < Pminimum_kPa:
                 Pprodwellhead = Pminimum_kPa
-                msg = (f'Provided production wellhead pressure ({Pprodwellhead}) under minimum pressure ({Pminimum_kPa}). '
-                       f'GEOPHIRES will assume minimum wellhead pressure')
+                msg = (f'Provided production wellhead pressure ({Pprodwellhead:.2f} kPa) under minimum pressure '
+                       f'({Pminimum_kPa:.2f} kPa). '
+                       f'GEOPHIRES will assume minimum wellhead pressure.')
                 print(f'Warning: {msg}')
                 model.logger.warning(msg)
 
@@ -738,6 +741,7 @@ class WellBores:
                         "same value."
         )
 
+        # noinspection SpellCheckingInspection
         self.prodwelldiam = self.ParameterDict[self.prodwelldiam.Name] = floatParameter(
             "Production Well Diameter",
             DefaultValue=8.0,
@@ -748,9 +752,10 @@ class WellBores:
             CurrentUnits=LengthUnit.INCHES,
             Required=True,
             ErrMessage="assume default production well diameter (8 inch)",
-            ToolTipText="Inner diameter of production wellbore (assumed constant along the wellbore) to calculate \
-            frictional pressure drop and wellbore heat transmission with Rameys model"
+            ToolTipText='Inner diameter of production wellbore (assumed constant along the wellbore) to calculate '
+                        'frictional pressure drop and wellbore heat transmission with Rameys model'
         )
+        # noinspection SpellCheckingInspection
         self.injwelldiam = self.ParameterDict[self.injwelldiam.Name] = floatParameter(
             "Injection Well Diameter",
             DefaultValue=8.0,
@@ -761,8 +766,8 @@ class WellBores:
             CurrentUnits=LengthUnit.INCHES,
             Required=True,
             ErrMessage="assume default injection well diameter (8 inch)",
-            ToolTipText="Inner diameter of production wellbore (assumed constant along the wellbore) to calculate "
-                        "frictional pressure drop and wellbore heat transmission with Rameys model"
+            ToolTipText='Inner diameter of injection wellbore (assumed constant along the wellbore) to calculate '
+                        'frictional pressure drop and wellbore heat transmission with Rameys model'
         )
         self.rameyoptionprod = self.ParameterDict[self.rameyoptionprod.Name] = boolParameter(
             "Ramey Production Wellbore Model",
@@ -824,17 +829,28 @@ class WellBores:
                         'production well, this parameter specifies the overall pressure drop in the reservoir between '
                         'injection well and production well (see docs)'
         )
+
+        well_separation_default_value_m = 1000
+        well_separation_default_unit = LengthUnit.INCHES
+        well_separation_preferred_unit = LengthUnit.METERS
+        well_separation_unit_mismatch_note = (f'. (Note that the default unit is '
+                                              f'{well_separation_default_unit.name.lower()}.)'
+                                              if well_separation_default_unit != well_separation_preferred_unit else '')
+        # noinspection SpellCheckingInspection
         self.wellsep = self.ParameterDict[self.wellsep.Name] = floatParameter(
             "Well Separation",
-            DefaultValue=1000.0,
+            DefaultValue=int(quantity(well_separation_default_value_m, 'm')
+                             .to(well_separation_default_unit.value).magnitude),
             Min=10.,
-            Max=10000.,
+            Max=int(quantity(10000, 'm').to(well_separation_default_unit.value).magnitude),
             UnitType=Units.LENGTH,
-            PreferredUnits=LengthUnit.METERS,
-            CurrentUnits=LengthUnit.INCHES,
-            ErrMessage="assume default well separation (1000 m)",
-            ToolTipText="Well separation for built-in TOUGH2 doublet reservoir model"
+            PreferredUnits=well_separation_preferred_unit,
+            CurrentUnits=well_separation_default_unit,
+            ErrMessage=f'assume default well separation ({well_separation_default_value_m} m)',
+            ToolTipText=f'Well separation for built-in TOUGH2 doublet reservoir model'
+                        f'{well_separation_unit_mismatch_note}'
         )
+
         self.Tinj = self.ParameterDict[self.Tinj.Name] = floatParameter(
             "Injection Temperature",
             DefaultValue=70.0,
@@ -1086,6 +1102,21 @@ class WellBores:
         self.MyPath = __file__
 
         # Results - used by other objects or printed in output downstream
+
+        self.injection_well_casing_inner_diameter = self.OutputParameterDict[self.injection_well_casing_inner_diameter.Name] = OutputParameter(
+            Name='Injection well casing ID',
+            UnitType=self.injwelldiam.UnitType,
+            PreferredUnits=self.injwelldiam.PreferredUnits,
+            CurrentUnits=self.injwelldiam.CurrentUnits,
+            ToolTipText=self.injwelldiam.ToolTipText,
+        )
+        self.production_well_casing_inner_diameter = self.OutputParameterDict[self.production_well_casing_inner_diameter.Name] = OutputParameter(
+            Name='Production well casing ID',
+            UnitType=self.prodwelldiam.UnitType,
+            PreferredUnits=self.prodwelldiam.PreferredUnits,
+            CurrentUnits=self.prodwelldiam.CurrentUnits,
+            ToolTipText=self.prodwelldiam.ToolTipText,
+        )
         self.production_reservoir_pressure = self.OutputParameterDict[self.production_reservoir_pressure.Name] = OutputParameter(
             Name="Calculated Reservoir Pressure",
             value=self.Phydrostatic.value,
@@ -1109,6 +1140,7 @@ class WellBores:
         )
         self.redrill = self.OutputParameterDict[self.redrill.Name] = OutputParameter(
             Name="redrill",
+            display_name='Number of times redrilling',
             UnitType=Units.NONE
         )
         self.PumpingPowerProd = self.OutputParameterDict[self.PumpingPowerProd.Name] = OutputParameter(
@@ -1525,4 +1557,19 @@ class WellBores:
             # negative pumping power values become zero (b/c we are not generating electricity)
             self.PumpingPower.value = [0. if x < 0. else x for x in self.PumpingPower.value]
 
+        self._sync_output_params_from_input_params()
+
         model.logger.info(f'complete {self.__class__.__name__}: {__name__}')
+
+    def _sync_output_params_from_input_params(self) -> None:
+        """
+        Handles setting output parameters whose values are based on 1:1 corresponding input parameters.
+        """
+
+        def _set_output_param_from_input_param(input_param: Parameter, output_param: OutputParameter) -> None:
+            output_param.value = input_param.quantity().to(output_param.CurrentUnits).magnitude
+
+        # Injection/production well casing ID have same value as inputs but exist as separate output parameters due to
+        # having a different display name.
+        _set_output_param_from_input_param(self.injwelldiam, self.injection_well_casing_inner_diameter)
+        _set_output_param_from_input_param(self.prodwelldiam, self.production_well_casing_inner_diameter)

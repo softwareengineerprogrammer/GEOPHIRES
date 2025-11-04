@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import sys
 import pandas as pd
 from geophires_x.Outputs import Outputs
-from geophires_x.OutputsRich import OutputTableItem
+from geophires_x.OutputsUtils import OutputTableItem
 
 NL = "\n"
 
@@ -10,13 +12,13 @@ class OutputsAddOns(Outputs):
     """
     Class to handle output of the AddOns values
     """
-    def PrintOutputs(self, model) -> tuple:
+    def PrintOutputs(self, model) -> tuple[pd.DataFrame, list]:
 
         """
         The PrintOutputs function prints the results of the AddOns to a text file and to the screen.
         :param model: Model: The container class of the application, giving access to everything else, including the logger
         :type model: :class:`~geophires_x.Model.Model`
-        :return: None
+        :return: tuple of addon_df, addon_results
         """
         model.logger.info(f'Init {str(__class__)}: {__name__}')
 
@@ -27,10 +29,8 @@ class OutputsAddOns(Outputs):
         try:
             with open(self.output_file, 'a', encoding='UTF-8') as f:
                 addon_results: list[OutputTableItem] = []
-                f.write(NL)
-                f.write(NL)
-                f.write("                                ***EXTENDED ECONOMICS***\n")
-                f.write(NL)
+                self._print_extended_economics_header(f)
+
                 if model.economics.LCOE.value > -999.0:
                     f.write(f"      Adjusted Project LCOE (after incentives, grants, AddOns,etc):     {model.economics.LCOE.value:10.2f} " + model.economics.LCOE.PreferredUnits.value + NL)
                     addon_results.append(OutputTableItem('Adjusted Project LCOE (after incentives, grants, AddOns,etc)', '{0:10.2f}'.format(model.economics.LCOE.value), model.economics.LCOE.PreferredUnits.value))
@@ -114,7 +114,7 @@ class OutputsAddOns(Outputs):
             print(err_msg)
             model.logger.critical(str(ex))
             model.logger.critical(err_msg)
-            sys.exit()
+            raise RuntimeError(err_msg) from ex
 
         model.logger.info(f'Complete {str(__class__)}: {__name__}')
 
