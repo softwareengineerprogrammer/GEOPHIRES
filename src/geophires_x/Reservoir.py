@@ -728,9 +728,8 @@ class Reservoir:
         temperatureindex = max(loc for loc, val in enumerate(self.depth.value > totaldepth) if val)
 
         # temperatureindex = max(loc for loc, val in enumerate(self.depth.value > totaldepth) if val is True)
-        self.Trock.value = self.gradient.value[temperatureindex] * (self.depth.value - totaldepth[temperatureindex])
-        #self.Trock.value = intersecttemperature[temperatureindex] + self.gradient.value[temperatureindex] * \
-        #                   (self.depth.value - totaldepth[temperatureindex])
+        self.Trock.value = intersecttemperature[temperatureindex] + self.gradient.value[temperatureindex] * \
+            (self.depth.value - totaldepth[temperatureindex])
 
         # calculate average geothermal gradient
         if self.numseg.value == 1:
