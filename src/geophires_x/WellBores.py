@@ -432,11 +432,12 @@ def InjPressureDropsAndPumpingPowerUsingImpedenceModel(f1: float, vinj: float, r
 
     return newDPOverall, PumpingPower, DPInjWell
 
+
 def get_hydrostatic_pressure_kPa(
         Trock_degC: float,
         Tsurf_degC: float,
         depth_m: float,
-        gradient_C_per_m: float, # converted from C/km to C/m
+        gradient_C_per_m: float,  # converted from C/km to C/m
         lithostatic_pressure: PlainQuantity) -> float:
     """
     Correlation cited as being from Xie, Bloomfield, and Shook in
