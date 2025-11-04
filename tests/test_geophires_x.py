@@ -309,7 +309,7 @@ Number of Injection Wells, 0
 All-in Vertical Drilling Costs, 1000.0
 All-in Nonvertical Drilling Costs, 1000.0
 Production Flow Rate per Well, 40
-Cylindrical Reservoir Inputs Depth, 5001.0 meter
+Cylindrical Reservoir Input Depth, 5001.0 meter
 Gradient 1, 60.0
 Total Nonvertical Length, 9000
 Production Well Diameter, 8.5
@@ -936,7 +936,7 @@ Print Output to Console, 1"""
                     'Injection Temperature': 60,
                     'Gradient 1': 60,
                     'Reservoir Depth': 8,
-                    'Cylindrical Reservoir Inputs Depth': 8,
+                    'Cylindrical Reservoir Input Depth': 8,
                     'Economic Model': 3,
                 }
             )

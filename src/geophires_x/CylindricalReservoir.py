@@ -42,7 +42,7 @@ class CylindricalReservoir(Reservoir):
         super().__init__(model)  # initialize the parent parameters and variables
 
         self.InputDepth = self.ParameterDict[self.InputDepth.Name] = floatParameter(
-            "Cylindrical Reservoir Inputs Depth",
+            "Cylindrical Reservoir Input Depth",
             DefaultValue=3.0,
             Min=0.1,
             Max=15,
@@ -182,7 +182,7 @@ class CylindricalReservoir(Reservoir):
                     # Just handle special cases for this class - the call to super set all the values,
                     # including the value unique to this class.
 
-                    if ParameterToModify.Name == 'Cylindrical Reservoir Inputs Depth':
+                    if ParameterToModify.Name == 'Cylindrical Reservoir Input Depth':
                         if 'Cylindrical Reservoir Output Depth' not in model.InputParameters:
                             # If input depth is set and not output, assume output is the same as input
                             self.OutputDepth.value = self.InputDepth.value
