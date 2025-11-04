@@ -1,0 +1,21 @@
+Gradient 1, 40
+Surface Temperature, 8
+Production Flow Rate per Well, 60
+Reservoir Depth, 6.4
+Injection Temperature, 55
+Reservoir Density, 2594
+Reservoir Thermal Conductivity, 2.6
+Reservoir Heat Capacity, 774
+Fracture Height, 200
+Reservoir Model, 4
+End-Use Option, 31, -- CHP Topping Cycle
+Production Wellhead Pressure, 60 bar
+Plant Outlet Pressure, 59.75 bar
+Drawdown Parameter, 0
+Number of Injection Wells, 1
+Number of Production Wells, 1
+Power Plant Type, 4, -- Double-Flash + ORC approximated as Double-Flash
+Ambient Temperature, 10
+Starting Electricity Sale Price, .10
+Electricity Rate, 0.1
+Ending Electricity Sale Price, 0.10

@@ -1,0 +1,11 @@
+INPUT, Gradient 1, uniform, 25, 60
+INPUT, Reservoir Temperature, normal, 311, 10
+INPUT, Utilization Factor,uniform, 0.7, 0.95
+INPUT, Ambient Temperature,triangular, 15, 20, 25
+OUTPUT, Electricity breakeven price
+OUTPUT, Project NPV
+Output, Total capital costs
+Output, Average Net Electricity Production
+ITERATIONS, 1000
+MC_OUTPUT_FILE, Examples/shr/MC_GEOPHIRES_Result.txt
+PYTHON_PATH, ../../venv/bin/python
