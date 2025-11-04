@@ -1,5 +1,4 @@
 import sys
-from typing import Required
 
 import numpy as np
 from geophires_x.Parameter import intParameter
