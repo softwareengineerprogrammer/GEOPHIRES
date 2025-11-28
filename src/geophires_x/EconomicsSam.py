@@ -8,6 +8,7 @@ from math import isnan
 from pathlib import Path
 from typing import Any
 
+import math
 from decimal import Decimal
 
 import numpy as np
@@ -64,6 +65,65 @@ class SamEconomicsCalculations:
             CurrentUnits=EnergyCostUnit.CENTSSPERKWH,
         )
     )
+
+    @property
+    def lcoe_nominal_derived(self) -> float:
+        """
+        FIXME WIP...
+        """
+
+        cash_flow: list[list[Any]] = self.sam_cash_flow_profile_all_years
+
+        def _get_row(row_name__: str) -> list[Any]:
+            for r in cash_flow:
+                if r[0] == row_name__:
+                    return r[1:]
+
+            raise ValueError(f'Could not find row with name {row_name__}')
+
+        equity_amount_usd = [float(it) for it in _get_row('Issuance of equity ($)') if is_float(it)][0]
+
+        def _get_row_values(row_name_: str) -> list[float]:
+            row_values_raw = _get_row(row_name_)
+            row_values = [float(it) for it in row_values_raw if is_float(it)]
+            return row_values
+
+        def _get_pv(row_name: str, discount_initial: bool = False) -> float:
+            row_values = _get_row_values(row_name)
+            row_values_discounted = [0, *row_values]
+
+            row_values_pv = npf.npv(
+                self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                row_values_discounted if discount_initial else row_values,
+            )
+            return row_values_pv
+
+        annual_costs_raw_usd = _get_row('Annual costs ($)')
+        annual_costs_usd = [float(it) for it in annual_costs_raw_usd if is_float(it)]
+        # annual_costs_pv_usd = npf.npv(self.nominal_discount_rate.value, annual_costs_usd)
+        annual_costs_pv_usd = _get_pv('Annual costs ($)')
+
+        annual_costs_discounted_usd = []
+        for n in range(len(annual_costs_usd)):
+            discounted_annual_cost = annual_costs_usd[n] / math.pow(1 + self.nominal_discount_rate.value, n)
+            annual_costs_discounted_usd.append(discounted_annual_cost)
+
+        electricity_to_grid_kWh = [float(it) for it in _get_row('Electricity to grid (kWh)') if is_float(it)]
+        # electricity_to_grid_pv_kWh = npf.npv(self.nominal_discount_rate.value, electricity_to_grid_kWh)
+        electricity_to_grid_pv_kWh = _get_pv('Electricity to grid (kWh)')
+
+        electricity_to_grid_discounted_kWh = []
+        for n in range(len(electricity_to_grid_kWh)):
+            discounted_energy = electricity_to_grid_kWh[n] / math.pow(1 + self.nominal_discount_rate.value, n)
+            electricity_to_grid_discounted_kWh.append(discounted_energy)
+
+        ppa_revenue_usd = _get_row_values('PPA revenue ($)')
+        ppa_revenue_pv_usd = _get_pv('PPA revenue ($)')
+
+        lcoe_nominal_derived = (-1 * equity_amount_usd - sum(annual_costs_discounted_usd)) / sum(
+            electricity_to_grid_discounted_kWh
+        )
+        return lcoe_nominal_derived
 
     overnight_capital_cost: OutputParameter = field(default_factory=overnight_capital_cost_output_parameter)
 

@@ -764,13 +764,10 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertFalse(math.isnan(r_irr))
         self.assertAlmostEqual(npf_irr, r_irr, places=2)
 
-    def test_nan__irr_cash_flow_line_items_for_multiple_construction_years(self):
+    def test_nan_irr_cash_flow_line_items_for_multiple_construction_years(self):
         """
         IRR during construction years is expected to be nan - serialized as 'NaN'
         """
-
-        def _irr(_r: GeophiresXResult) -> float:
-            return _r.result['ECONOMIC PARAMETERS']['After-tax IRR']['value']
 
         construction_years = 2
 
@@ -787,6 +784,21 @@ class EconomicsSamTestCase(BaseTestCase):
             all(it == _SAM_CASH_FLOW_NAN_STR for it in after_tax_irr_cash_flow_entries[:construction_years])
         )
         self.assertTrue(all(is_float(it) for it in after_tax_irr_cash_flow_entries[construction_years:]))
+
+    def test_lcoe_nominal(self):
+        construction_years = 2
+
+        params = {
+            'Electricity Escalation Rate Per Year': 0.00348993288590604,
+            'Starting Electricity Sale Price': 0.13,
+            'Construction Years': construction_years,
+        }
+        m: Model = EconomicsSamTestCase._new_model(self._egs_test_file_path(), additional_params=params)
+
+        sam_econ: SamEconomicsCalculations = calculate_sam_economics(m)
+
+        lcoe_nominal = sam_econ.lcoe_nominal_derived
+        self.assertIsNotNone(lcoe_nominal)  # FIXME WIP
 
     def test_nan_project_payback_period(self):
         def _payback_period(_r: GeophiresXResult) -> float:
