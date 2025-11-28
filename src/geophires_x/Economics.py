@@ -9,7 +9,8 @@ from pint.facets.plain import PlainQuantity
 
 import geophires_x.Model as Model
 from geophires_x import EconomicsSam
-from geophires_x.EconomicsSam import calculate_sam_economics, SamEconomicsCalculations
+from geophires_x.EconomicsSam import calculate_sam_economics
+from geophires_x.EconomicsSamCalculations import SamEconomicsCalculations
 from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter, nominal_discount_rate_parameter, \
     real_discount_rate_parameter, after_tax_irr_parameter, moic_parameter, project_vir_parameter, \
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
