@@ -797,7 +797,7 @@ class EconomicsSamTestCase(BaseTestCase):
 
         sam_econ: SamEconomicsCalculations = calculate_sam_economics(m)
 
-        lcoe_nominal = sam_econ.lcoe_nominal_derived
+        lcoe_nominal = sam_econ.lcoe_nominal_derived_cents_per_kWh
         self.assertIsNotNone(lcoe_nominal)  # FIXME WIP
 
     def test_nan_project_payback_period(self):
