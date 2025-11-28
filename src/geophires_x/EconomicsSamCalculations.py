@@ -65,14 +65,8 @@ class SamEconomicsCalculations:
         return lcoe_nominal_derived
 
     @property
-    def lcoe_nominal_derived_cents_per_kWh(self) -> float:
-        """
-        Calculates Nominal LCOE based on the full stitched cash flow profile.
-        Ensures construction years (zeros) are included in discounting to align
-        PV(Costs) and PV(Energy) to the same start year.
-        """
-
-        cash_flow: list[list[Any]] = self.sam_cash_flow_profile_all_years
+    def _adjusted_annual_costs_and_annual_energy_pvs(self) -> tuple[float, float]:
+        cash_flow: list[list[Any]] = self.sam_cash_flow_profile
 
         def _get_row(row_name__: str) -> list[Any]:
             for r in cash_flow:
@@ -92,15 +86,70 @@ class SamEconomicsCalculations:
             rate = self.nominal_discount_rate.quantity().to('dimensionless').magnitude
             return npf.npv(rate, values)
 
+        annual_costs_row_name = 'Annual costs ($)'
+        electricity_to_grid_row_name = 'Electricity to grid (kWh)'
+
         # 1. PV of Costs
         # "Annual costs" in the profile are derived as (Returns - Revenue).
         # During construction, Returns are negative (outflows).
         # We invert the sign because LCOE numerator represents "Total Life Cycle Cost" as a positive magnitude.
-        annual_costs_pv_usd = -1.0 * _get_pv('Annual costs ($)')
+        annual_costs_pv_usd = -1.0 * _get_pv(annual_costs_row_name)
 
         # 2. PV of Energy
         # Backfilled with 0.0 during construction via _get_aligned_values
-        electricity_to_grid_pv_kWh = _get_pv('Electricity to grid (kWh)')
+        electricity_to_grid_pv_kWh = _get_pv(electricity_to_grid_row_name)
+
+        return annual_costs_pv_usd, electricity_to_grid_pv_kWh
+
+    @property
+    def lcoe_nominal_derived_cents_per_kWh(self) -> float:
+        """
+        Calculates Nominal LCOE based on the full stitched cash flow profile.
+        Ensures construction years (zeros) are included in discounting to align
+        PV(Costs) and PV(Energy) to the same start year.
+        """
+
+        # cash_flow: list[list[Any]] = self.sam_cash_flow_profile_all_years
+        #
+        # def _get_row(row_name__: str) -> list[Any]:
+        #     for r in cash_flow:
+        #         if r[0] == row_name__:
+        #             return r[1:]
+        #     raise ValueError(f'Could not find row with name {row_name__}')
+        #
+        # def _get_aligned_values(row_name_: str) -> list[float]:
+        #     # CRITICAL: Do not filter out empty strings. Replace them with 0.0.
+        #     # This preserves the timeline so Year 1 of operations is discounted
+        #     # by the correct number of construction years.
+        #     row_raw = _get_row(row_name_)
+        #     return [float(it) if is_float(it) else 0.0 for it in row_raw]
+        #
+        # def _get_pv(row_name: str) -> float:
+        #     values = _get_aligned_values(row_name)
+        #     rate = self.nominal_discount_rate.quantity().to('dimensionless').magnitude
+        #     return npf.npv(rate, values)
+        #
+        # # 1. PV of Costs
+        # # "Annual costs" in the profile are derived as (Returns - Revenue).
+        # # During construction, Returns are negative (outflows).
+        # # We invert the sign because LCOE numerator represents "Total Life Cycle Cost" as a positive magnitude.
+        # annual_costs_pv_usd = -1.0 * _get_pv('Annual costs ($)')
+        #
+        # # 2. PV of Energy
+        # # Backfilled with 0.0 during construction via _get_aligned_values
+        # electricity_to_grid_pv_kWh = _get_pv('Electricity to grid (kWh)')
+
+        # annual_costs_pv_usd, electricity_to_grid_pv_kWh =  self._adjusted_annual_costs_and_annual_energy_pvs
+
+        cash_flow: list[list[Any]] = self.sam_cash_flow_profile_all_years
+
+        def _get_row(row_name__: str) -> list[Any]:
+            for r in cash_flow:
+                if r[0] == row_name__:
+                    return r[1:][-1]
+            raise ValueError(f'Could not find row with name {row_name__}')
+
+        annual_costs_pv_usd, electricity_to_grid_pv_kWh = _get_row('Present value of annual costs ($)') , _get_row('Present value of annual energy nominal (kWh)')
 
         if electricity_to_grid_pv_kWh == 0:
             return 0.0
@@ -206,4 +255,19 @@ class SamEconomicsCalculations:
         ret[_get_row_index('After-tax cumulative NPV ($)')] = ['After-tax cumulative NPV ($)'] + npv_usd
         ret[_get_row_index('After-tax cumulative IRR (%)')] = ['After-tax cumulative IRR (%)'] + irr_pct
 
+        adjusted_costs_pv, adjusted_energy_pv = self._adjusted_annual_costs_and_annual_energy_pvs
+        annual_costs_pv_row_name = 'Present value of annual costs ($)'
+        ret[_get_row_index(annual_costs_pv_row_name)] = [
+            annual_costs_pv_row_name,
+            *(['']*pre_revenue_years_to_insert),
+            adjusted_costs_pv
+            ]
+
+        annual_energy_pv_row_name = 'Present value of annual energy nominal (kWh)'
+        # ret[_get_row_index(annual_energy_pv_row_name)] =adjusted_energy_pv
+        ret[_get_row_index(annual_energy_pv_row_name)] = [
+            annual_energy_pv_row_name,
+             * ([''] * pre_revenue_years_to_insert),
+            adjusted_energy_pv
+        ]
         return ret
