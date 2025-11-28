@@ -785,7 +785,7 @@ class EconomicsSamTestCase(BaseTestCase):
         )
         self.assertTrue(all(is_float(it) for it in after_tax_irr_cash_flow_entries[construction_years:]))
 
-    def test_lcoe_nominal(self):
+    def test_lcoe_nominal_derived(self):
         construction_years = 2
 
         params = {
@@ -797,8 +797,9 @@ class EconomicsSamTestCase(BaseTestCase):
 
         sam_econ: SamEconomicsCalculations = calculate_sam_economics(m)
 
-        lcoe_nominal = sam_econ.lcoe_nominal_derived_cents_per_kWh
-        self.assertIsNotNone(lcoe_nominal)  # FIXME WIP
+        lcoe_nominal_derived = sam_econ.lcoe_nominal_derived_cents_per_kWh
+        self.assertEqual(6.82, lcoe_nominal_derived)
+        # FIXME WIP...
 
     def test_nan_project_payback_period(self):
         def _payback_period(_r: GeophiresXResult) -> float:

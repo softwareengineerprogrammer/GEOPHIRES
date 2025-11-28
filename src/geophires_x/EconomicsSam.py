@@ -88,42 +88,19 @@ class SamEconomicsCalculations:
             row_values = [float(it) for it in row_values_raw if is_float(it)]
             return row_values
 
-        def _get_pv(row_name: str, discount_initial: bool = False) -> int:
+        def _get_pv(row_name: str) -> int:
             row_values = _get_row_values(row_name)
-            row_values_discounted = [0, *row_values]
 
             row_values_pv = npf.npv(
                 self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                row_values_discounted if discount_initial else row_values,
+                row_values,
             )
             return int(round(row_values_pv))
 
-        annual_costs_raw_usd = _get_row('Annual costs ($)')
-        annual_costs_usd = [float(it) for it in annual_costs_raw_usd if is_float(it)]
-        # annual_costs_pv_usd = npf.npv(self.nominal_discount_rate.value, annual_costs_usd)
         annual_costs_pv_usd = -1.0 * _get_pv('Annual costs ($)')
-
-        annual_costs_discounted_usd = []
-        for n in range(len(annual_costs_usd)):
-            discounted_annual_cost = annual_costs_usd[n] / math.pow(1 + self.nominal_discount_rate.value, n)
-            annual_costs_discounted_usd.append(discounted_annual_cost)
-
-        electricity_to_grid_kWh = [float(it) for it in _get_row('Electricity to grid (kWh)') if is_float(it)]
-        # electricity_to_grid_pv_kWh = npf.npv(self.nominal_discount_rate.value, electricity_to_grid_kWh)
         electricity_to_grid_pv_kWh = _get_pv('Electricity to grid (kWh)')
-
-        electricity_to_grid_discounted_kWh = []
-        for n in range(1, len(electricity_to_grid_kWh)):
-            discounted_energy = electricity_to_grid_kWh[n] / math.pow(1 + self.nominal_discount_rate.value, n)
-            electricity_to_grid_discounted_kWh.append(discounted_energy)
-
-        ppa_revenue_usd = _get_row_values('PPA revenue ($)')
-        ppa_revenue_pv_usd = _get_pv('PPA revenue ($)')
-
-        # lcoe_nominal_derived = (-1 * equity_amount_usd - sum(annual_costs_discounted_usd)) / sum(
-        #     electricity_to_grid_discounted_kWh
-        # )
         lcoe_nominal_derived = round((annual_costs_pv_usd / electricity_to_grid_pv_kWh) * 100.0, 2)
+
         return lcoe_nominal_derived
 
     overnight_capital_cost: OutputParameter = field(default_factory=overnight_capital_cost_output_parameter)
