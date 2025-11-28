@@ -67,7 +67,7 @@ class SamEconomicsCalculations:
     )
 
     @property
-    def lcoe_nominal_derived_cents_per_kWh(self) -> float:
+    def _sam_repro_lcoe_nominal_derived_cents_per_kWh(self) -> float:
         """
         FIXME WIP...
         """
@@ -102,6 +102,53 @@ class SamEconomicsCalculations:
         lcoe_nominal_derived = round((annual_costs_pv_usd / electricity_to_grid_pv_kWh) * 100.0, 2)
 
         return lcoe_nominal_derived
+
+    @property
+    def lcoe_nominal_derived_cents_per_kWh(self) -> float:
+        """
+        Calculates Nominal LCOE based on the full stitched cash flow profile.
+        Ensures construction years (zeros) are included in discounting to align
+        PV(Costs) and PV(Energy) to the same start year.
+        """
+
+        cash_flow: list[list[Any]] = self.sam_cash_flow_profile_all_years
+
+        def _get_row(row_name__: str) -> list[Any]:
+            for r in cash_flow:
+                if r[0] == row_name__:
+                    return r[1:]
+            raise ValueError(f'Could not find row with name {row_name__}')
+
+        def _get_aligned_values(row_name_: str) -> list[float]:
+            # CRITICAL: Do not filter out empty strings. Replace them with 0.0.
+            # This preserves the timeline so Year 1 of operations is discounted
+            # by the correct number of construction years.
+            row_raw = _get_row(row_name_)
+            return [float(it) if is_float(it) else 0.0 for it in row_raw]
+
+        def _get_pv(row_name: str) -> float:
+            values = _get_aligned_values(row_name)
+            rate = self.nominal_discount_rate.quantity().to('dimensionless').magnitude
+            return npf.npv(rate, values)
+
+        # 1. PV of Costs
+        # "Annual costs" in the profile are derived as (Returns - Revenue).
+        # During construction, Returns are negative (outflows).
+        # We invert the sign because LCOE numerator represents "Total Life Cycle Cost" as a positive magnitude.
+        annual_costs_pv_usd = -1.0 * _get_pv('Annual costs ($)')
+
+        # 2. PV of Energy
+        # Backfilled with 0.0 during construction via _get_aligned_values
+        electricity_to_grid_pv_kWh = _get_pv('Electricity to grid (kWh)')
+
+        if electricity_to_grid_pv_kWh == 0:
+            return 0.0
+
+        # 3. Calculate LCOE
+        # (USD / kWh) * 100 cents/USD
+        lcoe_nominal_derived = (annual_costs_pv_usd / electricity_to_grid_pv_kWh) * 100.0
+
+        return round(lcoe_nominal_derived, 2)
 
     overnight_capital_cost: OutputParameter = field(default_factory=overnight_capital_cost_output_parameter)
 

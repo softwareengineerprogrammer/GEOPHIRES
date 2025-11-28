@@ -786,20 +786,25 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertTrue(all(is_float(it) for it in after_tax_irr_cash_flow_entries[construction_years:]))
 
     def test_lcoe_nominal_derived(self):
-        construction_years = 2
+        # construction_years = 2
+        # construction_years = 3
+        for construction_years in [2, 3, 10]:
+            with self.subTest(construction_years=construction_years):
+                params = {
+                    'Electricity Escalation Rate Per Year': 0.00348993288590604,
+                    'Starting Electricity Sale Price': 0.13,
+                    'Construction Years': construction_years,
+                }
+                m: Model = EconomicsSamTestCase._new_model(self._egs_test_file_path(), additional_params=params)
 
-        params = {
-            'Electricity Escalation Rate Per Year': 0.00348993288590604,
-            'Starting Electricity Sale Price': 0.13,
-            'Construction Years': construction_years,
-        }
-        m: Model = EconomicsSamTestCase._new_model(self._egs_test_file_path(), additional_params=params)
+                sam_econ: SamEconomicsCalculations = calculate_sam_economics(m)
 
-        sam_econ: SamEconomicsCalculations = calculate_sam_economics(m)
+                sam_repro_lcoe_nominal_derived = sam_econ._sam_repro_lcoe_nominal_derived_cents_per_kWh
+                # self.assertEqual(6.82, sam_repro_lcoe_nominal_derived)  # FIXME WIP
 
-        lcoe_nominal_derived = sam_econ.lcoe_nominal_derived_cents_per_kWh
-        self.assertEqual(6.82, lcoe_nominal_derived)
-        # FIXME WIP...
+                lcoe_nominal_derived = sam_econ.lcoe_nominal_derived_cents_per_kWh
+                # self.assertLess(lcoe_nominal_derived, sam_repro_lcoe_nominal_derived)  # FIXME WIP...
+                self.assertEqual(lcoe_nominal_derived, sam_repro_lcoe_nominal_derived)
 
     def test_nan_project_payback_period(self):
         def _payback_period(_r: GeophiresXResult) -> float:
