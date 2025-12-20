@@ -77,7 +77,7 @@ Circulation Pump Efficiency, 0.80
 
 Well Geometry Configuration, 4, -- L
 Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling (which would otherwise account for approximately 118 multilateral sections) is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost, which is under $4 million.
-Nonvertical Length per Multilateral Section, 4700 feet, -- Deployment of Enhanced Geothermal System Technology Leads to Rapid Cost Reductions and Performance Improvements. p. 3. https://doi.org/10.31223/X5VH8C
+Nonvertical Length per Multilateral Section, 4800 feet, -- Fervo presentation at Payne Institute, Dec 2, 2025
 Multilaterals Cased, True
 
 # *** SIMULATION PARAMETERS ***
