@@ -39,7 +39,7 @@ Power Plant Type, 2, -- Supercritical ORC
 Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/
 
 Reservoir Model, 1, -- Multiple Parallel Fractures
-Reservoir Depth, 8500 feet, -- https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf
+Reservoir Depth, 2.5908, -- 8500 feet per https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf
 
 Gradient 1, 74, -- temperature at 8500 ft: 200 degC (https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf); 228.89 degC @ 9824 ft (https://doi.org/10.31223/X5VH8C)
 Number of Segments, 1
@@ -63,8 +63,8 @@ Injection Well Diameter, 9.625
 Ramey Production Wellbore Model, 1
 Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperature
 Injection Wellbore Temperature Gain, 3
-Ambient Temperature, 10 degC
-Surface Temperature, 10 degC
+Ambient Temperature, 10, -- degC
+Surface Temperature, 10, -- degC
 
 Maximum Drawdown, 0.0153, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
 Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
