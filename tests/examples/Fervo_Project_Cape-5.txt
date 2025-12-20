@@ -15,7 +15,7 @@ Inflated Bond Interest Rate, .056
 
 Inflation Rate, .023, -- US inflation as of April 2025
 Construction Years, 5, 2023-2028
-Construction CAPEX Schedule, 0.01,0.02,0.07,0.1,0.2,0.2,0.4
+Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 Combined Income Tax Rate, .28
 Investment Tax Credit Rate, 0.3
@@ -53,10 +53,10 @@ Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://
 Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
-Number of Fractures per Stimulated Well, 102
-Fracture Separation, 18, -- Per https://eartharxiv.org/repository/view/7665/, lateral length is 4700 ft = 1432 m. Dividing 1432 by 80 = ~18 m fracture spacing.
-Fracture Shape, 3, -- Square
-Fracture Height, 165.3, -- Based on total fracture surface area of 30 million ft^2 per well https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2025/Fercho.pdf
+Number of Fractures per Stimulated Well, 200
+Fracture Separation, 7.315
+Fracture Shape, 2, -- CIRCULAR_DIAMETER
+Fracture Height, 186.16
 Number of Doublets, 59
 
 Production Flow Rate per Well, 120, -- Tested flow rate
