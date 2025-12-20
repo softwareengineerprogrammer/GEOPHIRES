@@ -6,8 +6,8 @@ Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.10.23
  Simulation Date: 2025-12-20
- Simulation Time:  12:19
- Calculation Time:      1.751 sec
+ Simulation Time:  12:23
+ Calculation Time:      1.846 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -48,7 +48,7 @@ Simulation Metadata
       Production Wellbore heat transmission calculated with Ramey's model
       Average production well temperature drop:               0.4 degC
       Flowrate per production well:                         120.0 kg/sec
-      Injection well casing ID:                               8.535 in
+      Injection well casing ID:                               7.500 in
       Production well casing ID:                              8.535 in
       Number of times redrilling:                             2
       Power plant type:                                       Supercritical ORC
@@ -91,7 +91,7 @@ Simulation Metadata
       Average Reservoir Heat Extraction:                   4237.89 MW
       Production Wellbore Heat Transmission Model = Ramey Model
       Average Production Well Temperature Drop:               0.4 degC
-      Average Injection Well Pump Pressure Drop:          -1721.2 kPa
+      Average Injection Well Pump Pressure Drop:           -378.9 kPa
       Average Production Well Pump Pressure Drop:          6106.7 kPa
 
 
