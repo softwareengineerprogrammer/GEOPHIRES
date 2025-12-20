@@ -48,7 +48,8 @@ Reservoir Density, 2800, -- per https://doi.org/10.31223/X52X0B: phyllite + quar
 Reservoir Heat Capacity, 790
 Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118
-Reservoir Impedance, 0.001565
+Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
 Number of Fractures per Stimulated Well, 102
