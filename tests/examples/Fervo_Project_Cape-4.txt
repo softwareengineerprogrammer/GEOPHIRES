@@ -1,7 +1,4 @@
-# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
-# 500 MWe EGS Case Study Modeled on Fervo Cape Station after Fervo's April 2025 upsizing announcement:
-#   https://fervoenergy.com/fervo-energy-announces-31-mw-power-purchase-agreement-with-shell-energy/
-# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-4.html
+# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station: Multiple Construction Years
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
@@ -17,7 +14,8 @@ Fraction of Investment in Bonds, .6, -- Based on fraction of CAPEX with $1 billi
 Inflated Bond Interest Rate, .056
 
 Inflation Rate, .023, -- US inflation as of April 2025
-Construction Years, 1, -- Calibrated to a 2-6 year construction time for a 1 GW plant (Yusifov & Enriquez, 2025)
+Construction Years, 5, 2023-2028
+Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 Combined Income Tax Rate, .28
 Investment Tax Credit Rate, 0.3
@@ -29,9 +27,7 @@ Exploration Capital Cost, 30, -- Estimate significantly higher exploration costs
 Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)
 Well Drilling and Completion Capital Cost Adjustment Factor, 0.8, -- Adjust correlation-calculated value of $4.72M/well to $3.96M/well per Tim Latimer on 2025-02-12 Volts podcast: less than $4M/well
 
-Reservoir Stimulation Capital Cost per Injection Well, 4, -- Baseline stimulation cost of $4.0M, calibrated from high-intensity U.S. shale well analogue (~$39k/frac stage for 102 stages). This is a pre-contingency value and excludes EGS-specific cost premiums such as ceramic proppant and HPHT hardware.
-Reservoir Stimulation Capital Cost per Production Well, 4, -- Baseline stimulation cost of $4.0M, calibrated from high-intensity U.S. shale well analogue (~$39k/frac stage for 102 stages). This is a pre-contingency value and excludes EGS-specific cost premiums such as ceramic proppant and HPHT hardware.
-Reservoir Stimulation Indirect Capital Cost Percentage, 0, -- Baseline stimulation cost includes indirect costs
+Reservoir Stimulation Capital Cost per Injection Well, 4
 
 Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs represent 2% of facilities CAPEX per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
 
@@ -42,7 +38,7 @@ Power Plant Type, 2, -- Supercritical ORC
 Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/
 
 Reservoir Model, 1, -- Multiple Parallel Fractures
-Reservoir Depth, 8500 feet, -- https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf
+Reservoir Depth, 2.5908, -- 8500 feet per https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf
 
 Gradient 1, 74, -- temperature at 8500 ft: 200 degC (https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf); 228.89 degC @ 9824 ft (https://doi.org/10.31223/X5VH8C)
 Number of Segments, 1
@@ -51,23 +47,24 @@ Reservoir Density, 2800, -- per https://doi.org/10.31223/X52X0B: phyllite + quar
 Reservoir Heat Capacity, 790
 Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118
-Reservoir Impedance, 0.001565
+Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
-Number of Fractures, 12036, -- 102 fractures per well
-Fracture Separation, 18, -- Per https://eartharxiv.org/repository/view/7665/, lateral length is 4700 ft = 1432 m. Dividing 1432 by 80 = ~18 m fracture spacing.
-Fracture Shape, 3, -- Square
-Fracture Height, 165.3, -- Based on total fracture surface area of 30 million ft^2 per well https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2025/Fercho.pdf
+Number of Fractures per Stimulated Well, 200
+Fracture Separation, 7.315
+Fracture Shape, 2, -- CIRCULAR_DIAMETER
+Fracture Height, 186.16
 Number of Doublets, 59
 
-Production Flow Rate per Well, 107, -- Maximum flow rate achieved at Cape Station per https://www.businesswire.com/news/home/20240910997008/en/Fervo-Energys-Record-Breaking-Production-Results-Showcase-Rapid-Scale-Up-of-Enhanced-Geothermal
-Production Well Diameter, 9.625, -- Next standard size up from 7", implied by announcement of "increasing casing diameter"
-Injection Well Diameter, 9.625
+Production Flow Rate per Well, 120, -- Tested flow rate
+Production Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
+Injection Well Diameter, 7.5
 Ramey Production Wellbore Model, 1
 Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperature
 Injection Wellbore Temperature Gain, 3
-Ambient Temperature, 10 degC
-Surface Temperature, 10 degC
+Ambient Temperature, 10, -- degC
+Surface Temperature, 10, -- degC
 
 Maximum Drawdown, 0.0153, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
 Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
@@ -79,7 +76,7 @@ Circulation Pump Efficiency, 0.80
 
 Well Geometry Configuration, 4, -- L
 Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling (which would otherwise account for approximately 118 multilateral sections) is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost, which is under $4 million.
-Nonvertical Length per Multilateral Section, 4700 feet, -- Deployment of Enhanced Geothermal System Technology Leads to Rapid Cost Reductions and Performance Improvements. p. 3. https://doi.org/10.31223/X5VH8C
+Nonvertical Length per Multilateral Section, 4800 feet, -- Fervo presentation at Payne Institute, Dec 2, 2025
 Multilaterals Cased, True
 
 # *** SIMULATION PARAMETERS ***
