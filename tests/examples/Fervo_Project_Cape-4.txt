@@ -11,10 +11,11 @@ Electricity Escalation Start Year, 1
 
 Discount Rate, 0.12
 Fraction of Investment in Bonds, .6, -- Based on fraction of CAPEX with $1 billion in sponsor equity per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
-Inflated Bond Interest Rate, .056
+Inflated Bond Interest Rate, .08
+Inflated Bond Interest Rate During Construction, 0.1
 
 Inflation Rate, .023, -- US inflation as of April 2025
-Construction Years, 5, 2023-2028
+Construction Years, 5, 2023–2028
 Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 Combined Income Tax Rate, .28
@@ -48,8 +49,10 @@ Reservoir Density, 2800, -- per https://doi.org/10.31223/X52X0B: phyllite + quar
 Reservoir Heat Capacity, 790
 Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118
-Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+
 Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
 Number of Fractures per Stimulated Well, 200, -- 25 stages with 8 clusters per stage
