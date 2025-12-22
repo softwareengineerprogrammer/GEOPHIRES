@@ -28,6 +28,7 @@ Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drill
 Well Drilling and Completion Capital Cost Adjustment Factor, 0.8, -- Adjust correlation-calculated value of $4.72M/well to $3.96M/well per Tim Latimer on 2025-02-12 Volts podcast: less than $4M/well
 
 Reservoir Stimulation Capital Cost per Injection Well, 4
+Reservoir Stimulation Capital Cost per Production Well, 4
 
 Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs represent 2% of facilities CAPEX per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
 
@@ -51,18 +52,20 @@ Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://
 Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
-Number of Fractures per Stimulated Well, 200
+Number of Fractures per Stimulated Well, 200, -- 25 stages with 8 clusters per stage
 Fracture Separation, 7.315
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
-Fracture Height, 186.16
-Number of Doublets, 59
+Fracture Height, 186.16, -- Approximates ellipsoidal fracture with 228 meter height and 152 meter width
+Number of Doublets, 50
 
 Production Flow Rate per Well, 120, -- Tested flow rate
 Production Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
-Injection Well Diameter, 7.5
+Injection Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
+
 Ramey Production Wellbore Model, 1
 Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperature
 Injection Wellbore Temperature Gain, 3
+
 Ambient Temperature, 10, -- degC
 Surface Temperature, 10, -- degC
 
