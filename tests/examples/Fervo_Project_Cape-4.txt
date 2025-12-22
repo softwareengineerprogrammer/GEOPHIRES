@@ -25,7 +25,7 @@ Capital Cost for Power Plant for Electricity Generation, 1900, -- https://better
 Exploration Capital Cost, 30, -- Estimate significantly higher exploration costs than default correlation in consideration of potential risks associated with second/third/fourth-of-a-kind EGS projects
 
 Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)
-Well Drilling and Completion Capital Cost Adjustment Factor, 0.8, -- Adjust correlation-calculated value of $4.72M/well to $3.96M/well per Tim Latimer on 2025-02-12 Volts podcast: less than $4M/well
+Well Drilling and Completion Capital Cost Adjustment Factor, 0.9, -- NREL Geothermal 2024b ATB https://atb.nrel.gov/electricity/2024b/geothermal
 
 Reservoir Stimulation Capital Cost per Injection Well, 4
 Reservoir Stimulation Capital Cost per Production Well, 4
