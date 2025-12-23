@@ -1,5 +1,9 @@
 #!python
 
+# Automatically rebuilds docs locally when changes are detected.
+# Usage, from the project root:
+# ./docs/watch_docs.py
+
 import os
 import subprocess
 import time
