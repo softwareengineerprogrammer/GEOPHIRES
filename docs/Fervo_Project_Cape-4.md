@@ -184,3 +184,9 @@ Power. https://betterbuildingssolutioncenter.energy.gov/sites/default/files/atta
 
 Yusifov, M., & Enriquez, N. (2025, July). From Core to Code: Powering the Al Revolution with Geothermal Energy.
 Project InnerSpace. https://projectinnerspace.org/resources/Powering-the-AI-Revolution.pdf
+
+---
+
+Previous case study versions:
+
+1. [Fervo_Project_Cape-4_v2025-08-11](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/docs/Fervo_Project_Cape-4_v2025-08-11.md#case-study-500-mwe-egs-project-modeled-on-fervo-cape-station)
