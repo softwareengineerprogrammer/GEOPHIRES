@@ -38,6 +38,7 @@ requirements_2025-08-11.txt
 .cache
 .eggs
 .env
+*.env
 .installed.cfg
 .ve
 bin
