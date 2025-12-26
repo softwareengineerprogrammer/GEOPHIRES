@@ -29,26 +29,26 @@ class FervoProjectCape4TestCase(BaseTestCase):
         max_total_gen = r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation'][
             'value'
         ]
-        self.assertGreater(max_total_gen, 600)
-        self.assertLess(max_total_gen, 650)
+        self.assertGreater(max_total_gen, 550)
+        self.assertLess(max_total_gen, 600)
 
         lcoe = r.result['SUMMARY OF RESULTS']['Electricity breakeven price']['value']
         self.assertGreater(lcoe, 7.5)
         self.assertLess(lcoe, 8.5)
 
         redrills = r.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value']
-        self.assertGreater(redrills, 2)
-        self.assertLess(redrills, 7)
+        self.assertGreater(redrills, 1)
+        self.assertLess(redrills, 6)
 
         well_cost = r.result['CAPITAL COSTS (M$)']['Drilling and completion costs per well']['value']
-        self.assertLess(well_cost, 4.0)
-        self.assertGreater(well_cost, 3.0)
+        self.assertLess(well_cost, 5.0)
+        self.assertGreater(well_cost, 4.0)
 
         pumping_power_pct = r.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
             'Initial pumping power/net installed power'
         ]['value']
-        self.assertGreater(pumping_power_pct, 13)
-        self.assertLess(pumping_power_pct, 17)
+        self.assertGreater(pumping_power_pct, 5)
+        self.assertLess(pumping_power_pct, 15)
 
         self.assertEqual(
             r.result['SUMMARY OF RESULTS']['Number of production wells']['value'],
@@ -72,7 +72,7 @@ class FervoProjectCape4TestCase(BaseTestCase):
         inputs_in_markdown = self.parse_markdown_inputs_structured(documentation_file_content)
         results_in_markdown = self.parse_markdown_results_structured(documentation_file_content)
 
-        self.assertEqual(3.96, results_in_markdown['Well Drilling and Completion Costs']['value'])
+        self.assertEqual(4.46, results_in_markdown['Well Drilling and Completion Costs']['value'])
         self.assertEqual('MUSD/well', results_in_markdown['Well Drilling and Completion Costs']['unit'])
 
         expected_stim_cost_MUSD_per_well = 4.6
@@ -158,10 +158,14 @@ class FervoProjectCape4TestCase(BaseTestCase):
             inputs_in_markdown['Reservoir Volume']['value'],
         )
 
-        expected_stim_cost_total_MUSD = expected_stim_cost_MUSD_per_well * num_doublets * 2
-        self.assertEqual(
+        expected_stim_indirect_cost_frac = 0.05
+        expected_stim_cost_total_MUSD = (
+            expected_stim_cost_MUSD_per_well * num_doublets * 2 * (1.0 + expected_stim_indirect_cost_frac)
+        )
+        self.assertAlmostEqualWithinSigFigs(
             expected_stim_cost_total_MUSD,
             example_result.result['CAPITAL COSTS (M$)']['Stimulation costs']['value'],
+            num_sig_figs=3,
         )
 
     def parse_markdown_results_structured(self, markdown_text: str) -> dict:

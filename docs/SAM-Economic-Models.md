@@ -123,7 +123,7 @@ Output Parameters:
 
 [Web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4)
 
-See [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](Fervo_Project_Cape-4.html).
+Documentation: [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](Fervo_Project_Cape-4.html).
 
 ### SAM Single Owner PPA
 
