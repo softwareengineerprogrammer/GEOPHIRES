@@ -105,12 +105,14 @@ in source code for the complete results.
 
 ## Sensitivity Analysis
 
-Users may wish to perform their own sensitivity analysis
-using [GEOPHIRES's Monte Carlo simulation module](Monte-Carlo-User-Guide.html) or other data analysis tools.
-
-### IRR
+![](_images/fervo_project_cape-4-sensitivity-analysis-lcoe.png)
 
 ![](_images/fervo_project_cape-4-sensitivity-analysis-IRR.png)
+
+![](_images/fervo_project_cape-4-sensitivity-analysis-project_npv.png)
+
+Users may wish to perform their own sensitivity analysis
+using [GEOPHIRES's Monte Carlo simulation module](Monte-Carlo-User-Guide.html) or other data analysis tools.
 
 ## References
 
