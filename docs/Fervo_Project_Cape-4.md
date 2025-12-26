@@ -105,6 +105,8 @@ in source code for the complete results.
 
 ## Sensitivity Analysis
 
+The following charts show sensitivity of key metrics to various input parameter values.
+
 ![](_images/fervo_project_cape-4-sensitivity-analysis-lcoe.png)
 
 ![](_images/fervo_project_cape-4-sensitivity-analysis-IRR.png)
