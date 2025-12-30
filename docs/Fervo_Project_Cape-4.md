@@ -106,11 +106,18 @@ in source code for the complete results.
 
 The following charts show sensitivity of key metrics to various input parameter values.
 
-![](_images/fervo_project_cape-4-sensitivity-analysis-lcoe.png)
+.. raw:: html
 
-![](_images/fervo_project_cape-4-sensitivity-analysis-irr.png)
+    <object data="_images/fervo_project_cape-4-sensitivity-analysis-lcoe.svg" type="image/svg+xml"></object>
 
-![](_images/fervo_project_cape-4-sensitivity-analysis-project_npv.png)
+.. raw:: html
+
+    <object data="_images/fervo_project_cape-4-sensitivity-analysis-irr.svg" type="image/svg+xml"></object>
+
+.. raw:: html
+
+    <object data="_images/fervo_project_cape-4-sensitivity-analysis-irr.npv" type="image/svg+xml"></object>
+
 
 Users may wish to perform their own sensitivity analysis
 using [GEOPHIRES's Monte Carlo simulation module](Monte-Carlo-User-Guide.html) or other data analysis tools.
