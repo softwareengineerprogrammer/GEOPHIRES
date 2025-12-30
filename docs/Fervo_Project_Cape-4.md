@@ -108,7 +108,7 @@ The following charts show sensitivity of key metrics to various input parameter 
 
 ![](_images/fervo_project_cape-4-sensitivity-analysis-lcoe.png)
 
-![](_images/fervo_project_cape-4-sensitivity-analysis-IRR.png)
+![](_images/fervo_project_cape-4-sensitivity-analysis-irr.png)
 
 ![](_images/fervo_project_cape-4-sensitivity-analysis-project_npv.png)
 
