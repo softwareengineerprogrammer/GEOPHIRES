@@ -116,7 +116,16 @@ Click the bars to view the sensitivity analysis result for the input value in th
 
 .. raw:: html
 
-    <object data="_images/fervo_project_cape-4-sensitivity-analysis-lcoe.svg" type="image/svg+xml"></object>
+    <!-- For screen: interactive SVG -->
+    <object data="_images/fervo_project_cape-4-sensitivity-analysis-lcoe.svg"
+            type="image/svg+xml"
+            class="sensitivity-chart-interactive"></object>
+
+    <!-- For print: static PNG -->
+    <img src="_images/fervo_project_cape-4-sensitivity-analysis-lcoe.png"
+         alt="LCOE Sensitivity Analysis Chart"
+         class="sensitivity-chart-print">
+
 
 **Impact of PPA Price on LCOE:** The sensitivity analysis reveals a positive correlation between the Power Purchase Agreement (PPA) price and the Levelized Cost of Electricity (LCOE). While counterintuitive, this is a function of SAM Economic Models treating federal and state income taxes as operating cash outflows.
 
@@ -126,13 +135,25 @@ In SAM Economic Models, the PPA price is a fixed input that determines project r
 
 .. raw:: html
 
-    <object data="_images/fervo_project_cape-4-sensitivity-analysis-irr.svg" type="image/svg+xml"></object>
+    <object data="_images/fervo_project_cape-4-sensitivity-analysis-irr.svg"
+            type="image/svg+xml"
+            class="sensitivity-chart-interactive"></object>
+
+    <img src="_images/fervo_project_cape-4-sensitivity-analysis-irr.png"
+         alt="IRR Sensitivity Analysis Chart"
+         class="sensitivity-chart-print">
 
 ### NPV
 
 .. raw:: html
 
-    <object data="_images/fervo_project_cape-4-sensitivity-analysis-irr.npv" type="image/svg+xml"></object>
+    <object data="_images/fervo_project_cape-4-sensitivity-analysis-npv.svg"
+            type="image/svg+xml"
+            class="sensitivity-chart-interactive"></object>
+
+    <img src="_images/fervo_project_cape-4-sensitivity-analysis-npv.png"
+         alt="NPV Sensitivity Analysis Chart"
+         class="sensitivity-chart-print">
 
 
 Users may wish to perform their own sensitivity analysis
