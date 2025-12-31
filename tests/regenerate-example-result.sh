@@ -21,6 +21,11 @@ fi
 
 if [[ $1 == "Fervo_Project_Cape-4" ]]
 then
+    if [ ! -f regenerate-example-result.env ] && [ -f regenerate-example-result.env.template ]; then
+        echo "Creating regenerate-example-result.env from template..."
+        cp regenerate-example-result.env.template regenerate-example-result.env
+    fi
+
     source regenerate-example-result.env
     if [ -n "$GEOPHIRES_FPC4_SENSITIVITY_ANALYSIS_PROJECT_ROOT" ]; then
         echo "Updating sensitivity analysis..."
