@@ -29,8 +29,8 @@ Exploration Capital Cost, 30, -- Estimate significantly higher exploration costs
 Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)
 Well Drilling and Completion Capital Cost Adjustment Factor, 0.9, -- NREL Geothermal 2024b ATB https://atb.nrel.gov/electricity/2024b/geothermal
 
-Reservoir Stimulation Capital Cost per Injection Well, 4
-Reservoir Stimulation Capital Cost per Production Well, 4
+Reservoir Stimulation Capital Cost per Injection Well, 4.5
+Reservoir Stimulation Capital Cost per Production Well, 4.5
 
 Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs represent 2% of facilities CAPEX per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
 
