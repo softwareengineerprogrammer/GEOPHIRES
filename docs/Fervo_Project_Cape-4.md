@@ -105,6 +105,7 @@ in source code for the complete results.
 ## Sensitivity Analysis
 
 The following charts show sensitivity of key metrics to various input parameter values.
+Click the bars to view the sensitivity analysis result for the input value in the web interface.
 
 .. raw:: html
 
