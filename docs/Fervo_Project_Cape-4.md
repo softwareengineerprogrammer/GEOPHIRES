@@ -147,11 +147,11 @@ In SAM Economic Models, the PPA price is a fixed input that determines project r
 
 .. raw:: html
 
-    <object data="_images/fervo_project_cape-4-sensitivity-analysis-npv.svg"
+    <object data="_images/fervo_project_cape-4-sensitivity-analysis-project_npv.svg"
             type="image/svg+xml"
             class="sensitivity-chart-interactive"></object>
 
-    <img src="_images/fervo_project_cape-4-sensitivity-analysis-npv.png"
+    <img src="_images/fervo_project_cape-4-sensitivity-analysis-project_npv.png"
          alt="NPV Sensitivity Analysis Chart"
          class="sensitivity-chart-print">
 
