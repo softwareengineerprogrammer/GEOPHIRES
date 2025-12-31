@@ -112,13 +112,23 @@ Green bars indicate favorable outcomes, such as lower LCOE or higher IRR, while 
 
 Click the bars to view the sensitivity analysis result for the input value in the web interface.
 
+### LCOE
+
 .. raw:: html
 
     <object data="_images/fervo_project_cape-4-sensitivity-analysis-lcoe.svg" type="image/svg+xml"></object>
 
+**Impact of PPA Price on LCOE:** The sensitivity analysis reveals a positive correlation between the Power Purchase Agreement (PPA) price and the Levelized Cost of Electricity (LCOE). While counterintuitive, this is a function of SAM Economic Models treating federal and state income taxes as operating cash outflows.
+
+In SAM Economic Models, the PPA price is a fixed input that determines project revenue. A higher PPA price generates higher taxable income, which in turn increases the project's annual income tax liability (a negative cash flow). Because the LCOE calculation aggregates all lifetime project costs—including the tax burden—the additional tax costs incurred from higher revenues result in a higher calculated LCOE. Conversely, a lower PPA price reduces taxable income, lowers tax liability, and decreases the resulting LCOE.
+
+### IRR
+
 .. raw:: html
 
     <object data="_images/fervo_project_cape-4-sensitivity-analysis-irr.svg" type="image/svg+xml"></object>
+
+### NPV
 
 .. raw:: html
 
