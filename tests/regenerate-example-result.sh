@@ -18,3 +18,17 @@ then
     echo "Updating CSV..."
     python regenerate_example_result_csv.py example1_addons
 fi
+
+if [[ $1 == "Fervo_Project_Cape-4" ]]
+then
+    source regenerate-example-result.env
+    if [ -n "$GEOPHIRES_FPC4_SENSITIVITY_ANALYSIS_PROJECT_ROOT" ]; then
+        echo "Updating sensitivity analysis..."
+        STASH_PWD=$(pwd)
+        cd $GEOPHIRES_FPC4_SENSITIVITY_ANALYSIS_PROJECT_ROOT
+        source venv/bin/activate
+        python -m fpc4_sensitivity_analysis
+        deactivate
+        cd $STASH_PWD
+    fi
+fi
