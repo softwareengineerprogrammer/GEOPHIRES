@@ -71,6 +71,7 @@ def main():
                 except Exception as e:
                     print(f'An error occurred: {e}')
 
+                print(f"\nDocs rebuild complete at {time.strftime('%Y-%m-%d %H:%M:%S')}.")
                 print(f"\nWaiting for further changes in '{watch_dir}'...")
 
                 # Update state to the current state
