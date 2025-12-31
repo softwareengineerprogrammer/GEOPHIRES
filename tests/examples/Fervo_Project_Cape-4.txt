@@ -7,13 +7,13 @@ Economic Model, 5, -- SAM Single Owner PPA
 
 Starting Electricity Sale Price, 0.095, -- Upper end of ranges given in https://atb.nrel.gov/electricity/2024/geothermal
 Electricity Escalation Rate Per Year, 0.00057, -- calibrated to reach 10 cents/kWh at project year 11
-Ending Electricity Sale Price, 0.15, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
+Ending Electricity Sale Price, 1, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
 Electricity Escalation Start Year, 1
 
 Discount Rate, 0.12
 Fraction of Investment in Bonds, .6, -- Based on fraction of CAPEX with $1 billion in sponsor equity per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
 Inflated Bond Interest Rate, .08
-Inflated Bond Interest Rate During Construction, 0.1
+Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
 
 Inflation Rate, .023, -- US inflation as of April 2025
 Construction Years, 5, 2023–2028
