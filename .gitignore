@@ -37,8 +37,11 @@ requirements_2025-08-11.txt
 .build
 .cache
 .eggs
+
 .env
 *.env
+tests/regenerate-example-result.env
+
 .installed.cfg
 .ve
 bin
