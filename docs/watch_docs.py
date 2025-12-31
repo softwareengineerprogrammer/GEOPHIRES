@@ -62,6 +62,7 @@ def main():
 
             if current_states != last_states:
                 print('\n[Change Detected] Running docs build...')
+                time.sleep(1)
 
                 try:
                     # Run tox from the project root so it finds tox.ini
