@@ -75,7 +75,7 @@ class FervoProjectCape4TestCase(BaseTestCase):
         self.assertEqual(4.46, results_in_markdown['Well Drilling and Completion Costs']['value'])
         self.assertEqual('MUSD/well', results_in_markdown['Well Drilling and Completion Costs']['unit'])
 
-        expected_stim_cost_MUSD_per_well = 4.6
+        expected_stim_cost_MUSD_per_well = 4.83
         self.assertEqual(expected_stim_cost_MUSD_per_well, results_in_markdown['Stimulation Costs']['value'])
         self.assertEqual('MUSD/well', results_in_markdown['Stimulation Costs']['unit'])
 
@@ -158,9 +158,9 @@ class FervoProjectCape4TestCase(BaseTestCase):
             inputs_in_markdown['Reservoir Volume']['value'],
         )
 
-        expected_stim_indirect_cost_frac = 0.05
+        additional_expected_stim_indirect_cost_frac = 0.00
         expected_stim_cost_total_MUSD = (
-            expected_stim_cost_MUSD_per_well * num_doublets * 2 * (1.0 + expected_stim_indirect_cost_frac)
+            expected_stim_cost_MUSD_per_well * num_doublets * 2 * (1.0 + additional_expected_stim_indirect_cost_frac)
         )
         self.assertAlmostEqualWithinSigFigs(
             expected_stim_cost_total_MUSD,
