@@ -19,9 +19,9 @@ Inflation Rate, .027, -- US inflation as of December 2025
 Construction Years, 3, 2023–2028
 Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
-Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
 Investment Tax Credit Rate, 0.3
-Property Tax Rate, 0, -- TODO
+Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
+Property Tax Rate, 0.0022, -- Utah Inland Port Authority (UIPA) tax differential incentive
 
 Capital Cost for Power Plant for Electricity Generation, 1900, -- https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf
 Exploration Capital Cost, 30, -- Estimate significantly higher exploration costs than default correlation in consideration of potential risks associated with second/third/fourth-of-a-kind EGS projects
