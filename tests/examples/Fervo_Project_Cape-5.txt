@@ -1,0 +1,92 @@
+# Case Study: 100 MWe EGS Project Modeled on Fervo Cape Station Phase I
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-4.html
+
+# *** ECONOMIC/FINANCIAL PARAMETERS ***
+# *************************************
+Economic Model, 5, -- SAM Single Owner PPA
+
+Starting Electricity Sale Price, 0.095, -- Upper end of ranges given in https://atb.nrel.gov/electricity/2024/geothermal
+Electricity Escalation Rate Per Year, 0.00057, -- calibrated to reach 10 cents/kWh at project year 11
+Ending Electricity Sale Price, 1, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
+Electricity Escalation Start Year, 1
+
+Discount Rate, 0.12
+Fraction of Investment in Bonds, .6, -- Based on fraction of CAPEX with $1 billion in sponsor equity per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
+Inflated Bond Interest Rate, .08
+Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
+
+Inflation Rate, .027, -- US inflation as of December 2025
+Construction Years, 3, -- 2023–2028
+Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
+
+Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
+Investment Tax Credit Rate, 0.3
+Property Tax Rate, 0, -- TODO
+
+Capital Cost for Power Plant for Electricity Generation, 1900, -- https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf
+Exploration Capital Cost, 30, -- Estimate significantly higher exploration costs than default correlation in consideration of potential risks associated with second/third/fourth-of-a-kind EGS projects
+
+Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)
+Well Drilling and Completion Capital Cost Adjustment Factor, 0.9, -- NREL Geothermal 2024b ATB https://atb.nrel.gov/electricity/2024b/geothermal
+
+Reservoir Stimulation Capital Cost per Injection Well, 4.5
+Reservoir Stimulation Capital Cost per Production Well, 4.5
+
+Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs represent 2% of facilities CAPEX per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
+
+# *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
+# *************************************************
+End-Use Option, 1, -- Electricity
+Power Plant Type, 2, -- Supercritical ORC
+Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/
+
+Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
+Reservoir Depth, 2.5908, -- 8500 feet per https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf
+
+Gradient 1, 74, -- temperature at 8500 ft: 200 degC (https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf); 228.89 degC @ 9824 ft (https://doi.org/10.31223/X5VH8C)
+Number of Segments, 1
+
+Reservoir Density, 2800, -- per https://doi.org/10.31223/X52X0B: phyllite + quartzite + diorite + granodiorite
+Reservoir Heat Capacity, 790
+Reservoir Thermal Conductivity, 3.05
+Reservoir Porosity, 0.0118
+
+Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+
+
+Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
+Number of Fractures per Stimulated Well, 200, -- 25 stages with 8 clusters per stage
+Fracture Separation, 7.315
+Fracture Shape, 2, -- CIRCULAR_DIAMETER
+Fracture Height, 186.16, -- Approximates ellipsoidal fracture with 228 meter height and 152 meter width
+Number of Doublets, 10
+
+Production Flow Rate per Well, 120, -- Maximum Fervo-tested flow rate
+Production Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
+Injection Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
+
+Ramey Production Wellbore Model, 1
+Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperature
+Injection Wellbore Temperature Gain, 3
+
+Ambient Temperature, 10, -- degC
+Surface Temperature, 10, -- degC
+
+Maximum Drawdown, 0.0153, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
+Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
+
+Utilization Factor, .9
+Plant Outlet Pressure, 1000 psi, -- https://doi.org/10.31223/X5VH8C
+Production Wellhead Pressure, 325 psi, -- https://doi.org/10.31223/X5VH8C
+Circulation Pump Efficiency, 0.80
+
+Well Geometry Configuration, 4, -- L
+Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling (which would otherwise account for approximately 118 multilateral sections) is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost, which is under $4 million.
+Nonvertical Length per Multilateral Section, 4800 feet, -- Fervo presentation at Payne Institute, Dec 2, 2025
+Multilaterals Cased, True
+
+# *** SIMULATION PARAMETERS ***
+# *****************************
+Maximum Temperature, 500
+Time steps per year, 12
