@@ -165,6 +165,12 @@ tax liability, and decreases the resulting LCOE.
 Users may wish to perform their own sensitivity analysis
 using [GEOPHIRES's Monte Carlo simulation module](Monte-Carlo-User-Guide.html) or other data analysis tools.
 
+## 100 MWe Phase I Model
+
+The case study also includes a 100 MWe Phase I model, `Fervo_Project_Cape-5`.
+[Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) to view the
+Phase I model in the GEOPHIRES web interface.
+
 ## References
 
 Akindipe, D. and Witter. E. (2025). "2025 Geothermal Drilling Cost Curves
