@@ -16,7 +16,7 @@ Inflated Bond Interest Rate, .08
 Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
 
 Inflation Rate, .027, -- US inflation as of December 2025
-Construction Years, 3, -- 2023–2028
+Construction Years, 3, 2023–2028
 Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
@@ -54,7 +54,6 @@ Reservoir Porosity, 0.0118
 Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 
-
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
 Number of Fractures per Stimulated Well, 200, -- 25 stages with 8 clusters per stage
 Fracture Separation, 7.315
@@ -73,7 +72,7 @@ Injection Wellbore Temperature Gain, 3
 Ambient Temperature, 10, -- degC
 Surface Temperature, 10, -- degC
 
-Maximum Drawdown, 0.0153, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
+Maximum Drawdown, 0.0153, -- Drawdown value that prevents minimum net electricity generation from going below 100 MWe
 Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
 
 Utilization Factor, .9
