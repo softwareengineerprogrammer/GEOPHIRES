@@ -36,4 +36,7 @@ then
         deactivate
         cd $STASH_PWD
     fi
+
+    # TODO regenerate Fervo_Project_Cape-5 by copying Fervo_Project_Cape-4.txt
+    #  and substituting Construction Years = 3 and Number of Doublets = 10
 fi
