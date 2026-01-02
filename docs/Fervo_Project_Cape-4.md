@@ -1,7 +1,7 @@
 # Case Study: 500 MWe EGS modeled on Fervo Cape Station Phase II
 
 The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS project modeled
-on [Phase II of Fervo Energy's Cape Station](https://fervoenergy.com/fervo-secures-new-financing-to-accelerate-development/).
+on Phase II of [Fervo Energy's Cape Station](https://capestation.com/).
 
 Key case study results include LCOE = $81.5/MWh and CAPEX = $5300/kW.
 
@@ -21,19 +21,19 @@ applicable
 outside of Cape Station's first-of-a-kind status (such as drilling costs of initial wells which were more expensive
 at [$4.8–9.4M per well](https://houston.innovationmap.com/fervo-energy-drilling-utah-project-2667300142.html)).
 
-Exact values were used for publicly available technical and engineering parameters, such as reservoir
-density ([2800 kg/m³](https://doi.org/10.31223/X52X0B)).
-Some technical parameters were inferred with high confidence from publicly available data, such as geothermal
-gradient ([74 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf)) and well diameter.
-Other parameters were extrapolated or speculatively estimated based on plausibility and/or compatibility with known
-results, such as number of doublets.
-
 The Inputs and Results tables document key assumptions, inputs, and a comparison of results with reference
 values.
 Note that these are not the complete sets of inputs and results, which are available in source code and
 the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4).
 
 ### Inputs
+
+Exact values were used for publicly available technical and engineering parameters, such as reservoir
+density ([2800 kg/m³](https://doi.org/10.31223/X52X0B)).
+Some technical parameters were inferred with high confidence from publicly available data, such as geothermal
+gradient ([74 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf)) and well diameter.
+Other parameters were extrapolated or speculatively estimated based on plausibility and/or compatibility with known
+results, such as number of doublets.
 
 See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt)
 in source code for the full set of inputs.
@@ -201,6 +201,9 @@ Impacts. https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/
 
 Fervo Energy. (2025, April 15). Fervo Energy Announces 31 MW Power Purchase Agreement with Shell
 Energy. https://fervoenergy.com/fervo-energy-announces-31-mw-power-purchase-agreement-with-shell-energy/
+
+Fervo Energy (2025, June 11). Fervo Energy Secures $206 Million In New Financing To Accelerate Cape Station Development.
+https://fervoenergy.com/fervo-secures-new-financing-to-accelerate-development/
 
 Gradl, C. (2018). Review of Recent Unconventional Completion Innovations and their Applicability to EGS Wells. Stanford
 Geothermal Workshop.
