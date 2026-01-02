@@ -1,11 +1,7 @@
-# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station Phase II
+# Case Study: 500 MWe EGS modeled on Fervo Cape Station Phase II
 
-The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS Project modeled
+The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS project modeled
 on [Phase II of Fervo Energy's Cape Station](https://fervoenergy.com/fervo-secures-new-financing-to-accelerate-development/).
-Case study inputs are formulated using a combination of publicly available data, extrapolations, and estimates.
-Financial results are calculated
-using
-the [SAM Single Owner PPA Economic Model](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#sam-single-owner-ppa).
 
 Key case study results include LCOE = $81.5/MWh and CAPEX = $5300/kW.
 
@@ -13,6 +9,10 @@ Key case study results include LCOE = $81.5/MWh and CAPEX = $5300/kW.
 interactively explore the case study in the GEOPHIRES web interface.
 
 ## Methodology
+
+Case study inputs are formulated using a combination of publicly available data, extrapolations, and estimates.
+Financial results are calculated using
+the [SAM Single Owner PPA Economic Model](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#sam-single-owner-ppa).
 
 The case study is constructed to be representative of a 500 MWe EGS project similar to Cape Station,
 although it is not intended to be an exact facsimile.
@@ -28,7 +28,7 @@ gradient ([74 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024
 Other parameters were extrapolated or speculatively estimated based on plausibility and/or compatibility with known
 results, such as number of doublets.
 
-The Inputs and Results tables below document key assumptions, inputs, and a comparison of results with reference
+The Inputs and Results tables document key assumptions, inputs, and a comparison of results with reference
 values.
 Note that these are not the complete sets of inputs and results, which are available in source code and
 the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4).
