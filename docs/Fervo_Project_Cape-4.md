@@ -12,7 +12,7 @@ Key case study results include LCOE = $81.5/MWh and CAPEX = $5300/kW.
 [Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4) to
 interactively explore the case study in the GEOPHIRES web interface.
 
-## Approach & Methodology
+## Methodology
 
 The case study is constructed to be representative of a 500 MWe EGS project similar to Cape Station,
 although it is not intended to be an exact facsimile.
@@ -33,12 +33,12 @@ values.
 Note that these are not the complete sets of inputs and results, which are available in source code and
 the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4).
 
-## Inputs
+### Inputs
 
 See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt)
 in source code for the full set of inputs.
 
-### Economic Parameters
+#### Economic Parameters
 
 | Parameter                                                 | Input Value(s)                                                        | Source                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 |-----------------------------------------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -55,7 +55,7 @@ in source code for the full set of inputs.
 | Exploration Capital Cost                                  | $30M                                                                  | Estimate significantly higher exploration costs than default correlation in consideration of potential risks associated with second/third/fourth-of-a-kind EGS projects                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Investment Tax Credit Rate (ITC)                          | 30%                                                                   | Same as 400 MWe case study (Fervo_Project_Cape-3)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
-### Technical & Engineering Parameters
+#### Technical & Engineering Parameters
 
 | Parameter                     | Input Value(s)                  | Source                                                                                                                                                                                                                                                                                                                                         |
 |-------------------------------|---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -101,7 +101,7 @@ in source code for the complete results.
 | Average Production Temperature                  | 200℃                                 | 204℃, 190.6–198.6℃ (optimal plant operating range) | Trent, 2024; Norbeck et al, 2024.                                                                                                                                                                                           |
 | Total fracture surface area per production well | 5.4×10⁶ m² (54 million ft² per well) | Project Red: 2.787×10⁶ m² (30 million ft²)         | Greater fracture surface area expected than Project Red (Fercho et al, 2025).                                                                                                                                               |
 
-## Sensitivity Analysis
+### Sensitivity Analysis
 
 The following charts show the sensitivity of key metrics to various inputs.
 Each chart shows the sensitivity of a single metric, such as LCOE, to the set of tested input values.
