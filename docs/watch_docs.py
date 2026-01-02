@@ -1,5 +1,9 @@
 #!python
 
+# Automatically rebuilds docs locally when changes are detected.
+# Usage, from the project root:
+# ./docs/watch_docs.py
+
 import os
 import subprocess
 import time
@@ -58,6 +62,7 @@ def main():
 
             if current_states != last_states:
                 print('\n[Change Detected] Running docs build...')
+                time.sleep(1)
 
                 try:
                     # Run tox from the project root so it finds tox.ini
@@ -67,6 +72,7 @@ def main():
                 except Exception as e:
                     print(f'An error occurred: {e}')
 
+                print(f"\nDocs rebuild complete at {time.strftime('%Y-%m-%d %H:%M:%S')}.")
                 print(f"\nWaiting for further changes in '{watch_dir}'...")
 
                 # Update state to the current state

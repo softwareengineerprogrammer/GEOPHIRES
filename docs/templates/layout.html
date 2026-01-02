@@ -25,5 +25,28 @@
         /* Hide goofy-looking "Fork me on GitHub" badge */
         display: none;
     }
+
+    /* Show interactive SVG on screen, hide print version */
+    @media screen {
+      .sensitivity-chart-interactive {
+        display: block;
+        width: 100%;
+      }
+      .sensitivity-chart-print {
+        display: none;
+      }
+    }
+
+    /* Show print version when printing, hide interactive SVG */
+    @media print {
+      .sensitivity-chart-interactive {
+        display: none;
+      }
+      .sensitivity-chart-print {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+      }
+    }
 </style>
 {% endblock %}

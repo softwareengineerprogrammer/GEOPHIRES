@@ -8,8 +8,8 @@ Contents
    overview
    Theoretical-Basis-for-GEOPHIRES
    GEOPHIRES-Examples
-   Monte-Carlo-User-Guide
    SAM-Economic-Models
+   Monte-Carlo-User-Guide
    How-to-extend-GEOPHIRES-X
 
 .. toctree::
