@@ -147,7 +147,7 @@ class FervoProjectCape4TestCase(BaseTestCase):
             example_result.result['SUMMARY OF RESULTS']['Number of production wells']['value'], num_doublets
         )
 
-        num_fracs_per_well = inputs_in_markdown['Number of Fractures per well']['value']
+        num_fracs_per_well = inputs_in_markdown['Number of Fractures per Well']['value']
         expected_total_fracs = num_doublets * 2 * num_fracs_per_well
         self.assertEqual(
             expected_total_fracs, example_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value']
@@ -244,8 +244,8 @@ class FervoProjectCape4TestCase(BaseTestCase):
         """
         try:
             # Isolate the content from "## Inputs" to the next "## " header
-            sections = re.split(r'(^##\s.*)', markdown_text, flags=re.MULTILINE)
-            inputs_header_index = next(i for i, s in enumerate(sections) if s.startswith('## Inputs'))
+            sections = re.split(r'(^###\s.*)', markdown_text, flags=re.MULTILINE)
+            inputs_header_index = next(i for i, s in enumerate(sections) if s.startswith('### Inputs'))
             inputs_content = sections[inputs_header_index + 1]
         except (StopIteration, IndexError):
             print("Warning: '## Inputs' section not found or is empty.")
