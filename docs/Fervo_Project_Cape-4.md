@@ -3,7 +3,7 @@
 The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS project modeled
 on Phase II of [Fervo Energy's Cape Station](https://capestation.com/).
 
-Key case study results include LCOE = $81.6/MWh and CAPEX = $5300/kW.
+Key case study results include LCOE = $81.6/MWh and IRR = 21.3%.
 
 [Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4) to
 interactively explore the case study in the GEOPHIRES web interface.
@@ -83,12 +83,12 @@ in source code for the complete results.
 | Metric                             | Result Value                                           | Reference Value(s)                                             | Reference Source                                 |
 |------------------------------------|--------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------|
 | LCOE                               | $81.6/MWh                                              | $80/MWh                                                        | Horne et al, 2025                                |
+| After-tax IRR                      | 21.3%                                                  | 15–25%                                                         | Typical levered returns for energy projects      |
 | Project capital costs: $/kW        | $5300/kW (based on maximum net electricity generation) | $5000/kW; $4500/kW; $3000–$6000/kW                             | McClure, 2024; Horne et al, 2025; Latimer, 2025. |
 | Project capital costs: Total CAPEX | $2.85B                                                 |                                                                |                                                  |
 | Well Drilling and Completion Costs | $4.46M/well; $446M total                               | $<4M/well                                                      | Latimer, 2025.                                   |
 | Stimulation Costs                  | $4.83M/well; $483M total                               | $4.65M/well (based on 46%:54% drilling:stimulation cost ratio) | Yusifov & Enriquez, 2025.                        |
 | WACC                               | 9.49%                                                  | 8.3%                                                           | Matson, 2024.                                    |
-| After-tax IRR                      | 21.3%                                                  | 15–25%                                                         | Typical levered returns for energy projects      |
 
 ### Technical & Engineering Results
 
