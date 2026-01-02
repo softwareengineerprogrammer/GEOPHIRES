@@ -168,6 +168,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - Input file
      - Case report file
      - Link
+   * - Case Study: 500 MWe EGS  modeled on Fervo Cape Station Phase II (`documentation <https://nrel.github.io/GEOPHIRES-X/Fervo_Project_Cape-4.html>`__)
+     - `Fervo_Project_Cape-4.txt <tests/examples/Fervo_Project_Cape-4.txt>`__
+     - `.out <tests/examples/Fervo_Project_Cape-4.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-4>`__
    * - Example 1: EGS Electricity
      - `example1.txt <tests/examples/example1.txt>`__
      - `.out <tests/examples/example1.out>`__
@@ -288,10 +292,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `Fervo_Project_Cape-3.txt <tests/examples/Fervo_Project_Cape-3.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape-3.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-3>`__
-   * - Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station (`documentation <https://nrel.github.io/GEOPHIRES-X/Fervo_Project_Cape-4.html>`__)
-     - `Fervo_Project_Cape-4.txt <tests/examples/Fervo_Project_Cape-4.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-4.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-4>`__
+   * - 100 MWe EGS  modeled on Fervo Cape Station Phase I
+     - `Fervo_Project_Cape-5.txt <tests/examples/Fervo_Project_Cape-5.txt>`__
+     - `.out <tests/examples/Fervo_Project_Cape-5.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-5>`__
    * - Superhot Rock (SHR) Example 1
      - `example_SHR-1.txt <tests/examples/example_SHR-1.txt>`__
      - `.out <tests/examples/example_SHR-1.out>`__
