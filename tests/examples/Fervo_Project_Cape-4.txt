@@ -24,7 +24,7 @@ Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plu
 Property Tax Rate, 0.0022, -- Utah Inland Port Authority (UIPA) tax differential incentive
 
 Capital Cost for Power Plant for Electricity Generation, 1900, -- https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf
-Exploration Capital Cost, 30, -- Estimate significantly higher exploration costs than default correlation in consideration of potential risks associated with second/third/fourth-of-a-kind EGS projects
+Exploration Capital Cost, 30, -- Equivalent to 2024b ATB NF-EGS conservative scenario exploration assumption of 5 full-size wells (NREL, 2025), plus $1M for geophysical and field work, plus 15% contingency, plus 12% indirect costs.
 
 Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)
 Well Drilling and Completion Capital Cost Adjustment Factor, 0.9, -- NREL Geothermal 2024b ATB https://atb.nrel.gov/electricity/2024b/geothermal
