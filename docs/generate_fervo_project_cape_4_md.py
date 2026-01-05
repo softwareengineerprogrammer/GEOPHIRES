@@ -53,6 +53,7 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
     r: dict[str, dict[str, Any]] = result.result
 
     return {
+        'construction_yrs': params['Construction Years'],
         'plant_lifetime_yrs': params['Plant Lifetime'],
         'injection_temperature_degc': params['Injection Temperature'],
         'fracture_separation_m': sig_figs(float(params['Fracture Separation']), 2),
