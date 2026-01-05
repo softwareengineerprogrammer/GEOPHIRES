@@ -4,6 +4,8 @@ Script to generate Fervo_Project_Cape-4.md from its jinja template.
 This ensures the markdown documentation stays in sync with actual GEOPHIRES results.
 """
 
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 from typing import Any
