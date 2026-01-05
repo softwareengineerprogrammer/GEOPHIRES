@@ -92,6 +92,14 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'total_capex_gusd': sig_figs(total_capex_q.to('GUSD').magnitude, 3),
         'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
+        'max_total_generation_mwe': round(
+            sig_figs(r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation']['value'], 3)
+        ),
+        'number_of_times_redrilling': r['ENGINEERING PARAMETERS']['Number of times redrilling']['value'],
+        'average_production_temperature_degc': round(
+            sig_figs(r['RESERVOIR SIMULATION RESULTS']['Average Production Temperature']['value'], 3)
+        ),
+        'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
         'capex_usd_per_kw': round(
             sig_figs((total_capex_q / PlainQuantity(max_net_generation_mwe, 'MW')).to('USD / kW').magnitude, 2)
         ),
