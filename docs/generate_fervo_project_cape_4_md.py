@@ -10,6 +10,7 @@ from typing import Any
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+from pint.facets.plain import PlainQuantity
 
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x_client import GeophiresXResult
@@ -20,8 +21,15 @@ sys.path.insert(0, str(project_root / 'src'))
 
 
 def get_result_values(result: GeophiresXResult):
-    r: dict[str, Any] = result.result
+
+    def _q(d: dict[str, Any]) -> PlainQuantity:
+        return PlainQuantity(d['value'], d['unit'])
+
+    r: dict[str, dict[str, Any]] = result.result
     return {
+        'lcoe_usd_per_mwh': sig_figs(
+            _q(r['SUMMARY OF RESULTS']['Electricity breakeven price']).to('USD / MWh').magnitude, 3
+        ),
         'irr_pct': sig_figs(r['ECONOMIC PARAMETERS']['After-tax IRR']['value'], 3),
         'npv_musd': sig_figs(r['ECONOMIC PARAMETERS']['Project NPV']['value'], 3),
         # TODO port all input and result values here instead of hardcoding them in the template
@@ -53,8 +61,9 @@ def main():
 
     print(f'✓ Generated {output_file}')
     print('\nKey results:')
+    print(f"\tLCOE: {result_values['lcoe_usd_per_mwh']}")
+    print(f"\tIRR: {result_values['irr_pct']}")
     # print(f"  Total CAPEX: {result_values['capex']}")  # TODO
-    print(f"  IRR: {result_values['irr_pct']}")
 
 
 if __name__ == '__main__':

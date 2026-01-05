@@ -3,7 +3,7 @@
 The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS project modeled
 on Phase II of [Fervo Energy's Cape Station](https://capestation.com/).
 
-Key case study results include LCOE = $81.6/MWh and IRR = {{ irr_pct ~ '%' }}.
+Key case study results include LCOE = {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} and IRR = {{ irr_pct ~ '%' }}.
 
 [Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4) to
 interactively explore the case study in the GEOPHIRES web interface.
@@ -83,7 +83,7 @@ in source code for the complete results.
 {# noinspection MarkdownIncorrectTableFormatting #}
 | Metric                                        | Result Value                                              | Reference Value(s)                                             | Reference Source                                 |
 |-----------------------------------------------|-----------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------|
-| LCOE                                          | $81.6/MWh                                                 | $80/MWh                                                        | Horne et al, 2025                                |
+| LCOE                                          | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }}                                           | $80/MWh                                                        | Horne et al, 2025                                |
 | After-tax IRR                                 | {{ irr_pct ~ '%' }}                                              | 15–25%                                        | Typical levered returns for energy projects               |
 | Project NPV                                   | {{ '$' ~ npv_musd ~ 'M' }}                                       |                                               |                                                           |
 | Project capital costs: Overnight Capital Cost | $2.44B                                                    |                                                                |                                                  |
