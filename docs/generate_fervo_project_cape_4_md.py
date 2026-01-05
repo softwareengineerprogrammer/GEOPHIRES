@@ -27,7 +27,9 @@ def get_result_values(result: GeophiresXResult):
 
     r: dict[str, dict[str, Any]] = result.result
 
+    total_capex_q: PlainQuantity = _q(r['CAPITAL COSTS (M$)']['Total CAPEX'])
     min_net_generation_mwe = r['SURFACE EQUIPMENT SIMULATION RESULTS']['Minimum Net Electricity Generation']['value']
+    max_net_generation_mwe = r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Net Electricity Generation']['value']
 
     return {
         'lcoe_usd_per_mwh': sig_figs(
@@ -36,8 +38,12 @@ def get_result_values(result: GeophiresXResult):
         'irr_pct': sig_figs(r['ECONOMIC PARAMETERS']['After-tax IRR']['value'], 3),
         'npv_musd': sig_figs(r['ECONOMIC PARAMETERS']['Project NPV']['value'], 3),
         'occ_gusd': sig_figs(_q(r['CAPITAL COSTS (M$)']['Overnight Capital Cost']).to('GUSD').magnitude, 3),
-        'total_capex_gusd': sig_figs(_q(r['CAPITAL COSTS (M$)']['Total CAPEX']).to('GUSD').magnitude, 3),
+        'total_capex_gusd': sig_figs(total_capex_q.to('GUSD').magnitude, 3),
         'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
+        'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
+        'capex_usd_per_kw': round(
+            sig_figs((total_capex_q / PlainQuantity(max_net_generation_mwe, 'MW')).to('USD / kW').magnitude, 2)
+        ),
         # TODO port all input and result values here instead of hardcoding them in the template
     }
 
