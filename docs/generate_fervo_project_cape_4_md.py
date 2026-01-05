@@ -13,14 +13,27 @@ from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
 
 from geophires_x.GeoPHIRESUtils import sig_figs
+from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
+from geophires_x_client import ImmutableGeophiresInputParameters
 
 # Add project root to path to import GEOPHIRES modules
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / 'src'))
 
 
-def get_result_values(result: GeophiresXResult):
+def get_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
+    print('Extracting input parameter values...')
+
+    r: dict[str, dict[str, Any]] = result.result
+
+    return {
+        'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
+    }
+
+
+def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
+    print('Extracting result values...')
 
     def _q(d: dict[str, Any]) -> PlainQuantity:
         return PlainQuantity(d['value'], d['unit'])
@@ -53,10 +66,13 @@ def main():
     Generate Fervo_Project_Cape-4.md (markdown documentation) from the Jinja template.
     """
 
+    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+        from_file_path=project_root / 'tests/examples/Fervo_Project_Cape-4.txt'
+    )
     result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
 
-    print('Extracting result values...')
-    result_values = get_result_values(result)
+    template_values = get_input_parameter_values(input_params, result)
+    template_values = template_values | get_result_values(result)
 
     # Set up Jinja environment
     docs_dir = project_root / 'docs'
@@ -65,7 +81,7 @@ def main():
 
     # Render template
     print('Rendering template...')
-    output = template.render(**result_values)
+    output = template.render(**template_values)
 
     # Write output
     output_file = docs_dir / 'Fervo_Project_Cape-4.md'
@@ -73,8 +89,8 @@ def main():
 
     print(f'✓ Generated {output_file}')
     print('\nKey results:')
-    print(f"\tLCOE: {result_values['lcoe_usd_per_mwh']}")
-    print(f"\tIRR: {result_values['irr_pct']}")
+    print(f"\tLCOE: {template_values['lcoe_usd_per_mwh']}")
+    print(f"\tIRR: {template_values['irr_pct']}")
     # print(f"  Total CAPEX: {result_values['capex']}")  # TODO
 
 
