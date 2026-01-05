@@ -32,6 +32,8 @@ def get_result_values(result: GeophiresXResult):
         ),
         'irr_pct': sig_figs(r['ECONOMIC PARAMETERS']['After-tax IRR']['value'], 3),
         'npv_musd': sig_figs(r['ECONOMIC PARAMETERS']['Project NPV']['value'], 3),
+        'occ_gusd': sig_figs(_q(r['CAPITAL COSTS (M$)']['Overnight Capital Cost']).to('GUSD').magnitude, 3),
+        'total_capex_gusd': sig_figs(_q(r['CAPITAL COSTS (M$)']['Total CAPEX']).to('GUSD').magnitude, 3),
         # TODO port all input and result values here instead of hardcoding them in the template
     }
 
