@@ -47,6 +47,8 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     min_net_generation_mwe = r['SURFACE EQUIPMENT SIMULATION RESULTS']['Minimum Net Electricity Generation']['value']
     max_net_generation_mwe = r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Net Electricity Generation']['value']
 
+    total_fracture_surface_area_per_well_m2 = _total_fracture_surface_area_per_well_m2(result)
+
     return {
         'lcoe_usd_per_mwh': sig_figs(
             _q(r['SUMMARY OF RESULTS']['Electricity breakeven price']).to('USD / MWh').magnitude, 3
@@ -62,6 +64,12 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         ),
         'stim_costs_musd': round(sig_figs(_stim_costs_musd(result), 3)),
         'stim_costs_per_well_musd': sig_figs(_stim_costs_per_well_musd(result), 3),
+        'total_fracture_surface_area_per_well_mm2': sig_figs(total_fracture_surface_area_per_well_m2 / 1e6, 2),
+        'total_fracture_surface_area_per_well_mft2': round(
+            sig_figs(
+                PlainQuantity(total_fracture_surface_area_per_well_m2, 'm ** 2').to('foot ** 2').magnitude * 1e-6, 2
+            )
+        ),
         # TODO port all input and result values here instead of hardcoding them in the template
     }
 
@@ -73,15 +81,30 @@ def _stim_costs_musd(result: GeophiresXResult) -> float:
     return stim_costs_musd
 
 
-def _stim_costs_per_well_musd(result: GeophiresXResult) -> float:
+def _number_of_wells(result: GeophiresXResult) -> int:
     r: dict[str, dict[str, Any]] = result.result
 
     number_of_wells = (
         r['SUMMARY OF RESULTS']['Number of injection wells']['value']
         + r['SUMMARY OF RESULTS']['Number of production wells']['value']
     )
-    stim_costs_per_well_musd = _stim_costs_musd(result) / number_of_wells
+
+    return number_of_wells
+
+
+def _stim_costs_per_well_musd(result: GeophiresXResult) -> float:
+    stim_costs_per_well_musd = _stim_costs_musd(result) / _number_of_wells(result)
     return stim_costs_per_well_musd
+
+
+def _total_fracture_surface_area_per_well_m2(result: GeophiresXResult) -> float:
+    r: dict[str, dict[str, Any]] = result.result
+    res_params = r['RESERVOIR PARAMETERS']
+    return (
+        _q(res_params['Fracture area']).to('m ** 2').magnitude
+        * res_params['Number of fractures']['value']
+        / _number_of_wells(result)
+    )
 
 
 def main():
