@@ -53,6 +53,10 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
     r: dict[str, dict[str, Any]] = result.result
 
     return {
+        'injection_temperature_degc': params['Injection Temperature'],
+        'fracture_separation_m': sig_figs(float(params['Fracture Separation']), 2),
+        'fracture_height_m': params['Fracture Height'],
+        'productivity_index_kg_per_sec_per_bar': params['Productivity Index'],
         'number_of_doublets': params['Number of Doublets'],
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
     }
