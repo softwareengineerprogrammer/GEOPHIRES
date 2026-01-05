@@ -62,6 +62,8 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'capex_usd_per_kw': round(
             sig_figs((total_capex_q / PlainQuantity(max_net_generation_mwe, 'MW')).to('USD / kW').magnitude, 2)
         ),
+        'drilling_costs_musd': round(sig_figs(_drilling_costs_musd(result), 3)),
+        'drilling_costs_per_well_musd': sig_figs(_drilling_costs_per_well_musd(result), 3),
         'stim_costs_musd': round(sig_figs(_stim_costs_musd(result), 3)),
         'stim_costs_per_well_musd': sig_figs(_stim_costs_per_well_musd(result), 3),
         'total_fracture_surface_area_per_well_mm2': sig_figs(total_fracture_surface_area_per_well_m2 / 1e6, 2),
@@ -74,13 +76,6 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     }
 
 
-def _stim_costs_musd(result: GeophiresXResult) -> float:
-    r: dict[str, dict[str, Any]] = result.result
-
-    stim_costs_musd = _q(r['CAPITAL COSTS (M$)']['Stimulation costs']).to('MUSD').magnitude
-    return stim_costs_musd
-
-
 def _number_of_wells(result: GeophiresXResult) -> int:
     r: dict[str, dict[str, Any]] = result.result
 
@@ -90,6 +85,28 @@ def _number_of_wells(result: GeophiresXResult) -> int:
     )
 
     return number_of_wells
+
+
+def _drilling_costs_musd(result: GeophiresXResult) -> float:
+    r: dict[str, dict[str, Any]] = result.result
+
+    return _q(r['CAPITAL COSTS (M$)']['Drilling and completion costs']).to('MUSD').magnitude
+
+
+def _drilling_costs_per_well_musd(result: GeophiresXResult) -> float:
+    return _drilling_costs_musd(result) / _number_of_wells(result)
+
+
+def _stim_costs_per_well_musd(result: GeophiresXResult) -> float:
+    stim_costs_per_well_musd = _stim_costs_musd(result) / _number_of_wells(result)
+    return stim_costs_per_well_musd
+
+
+def _stim_costs_musd(result: GeophiresXResult) -> float:
+    r: dict[str, dict[str, Any]] = result.result
+
+    stim_costs_musd = _q(r['CAPITAL COSTS (M$)']['Stimulation costs']).to('MUSD').magnitude
+    return stim_costs_musd
 
 
 def _stim_costs_per_well_musd(result: GeophiresXResult) -> float:
