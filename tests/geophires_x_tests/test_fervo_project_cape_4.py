@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from typing import Any
 
 from base_test_case import BaseTestCase
@@ -62,9 +63,20 @@ class FervoProjectCape4TestCase(BaseTestCase):
         documentation.
 
         Note: for future case studies, generate the documentation markdown from the input/result rather than writing
-        (entirely) by hand so that they are guaranteed to be in sync and don't need to be tested like this,
+        (partially) by hand so that they are guaranteed to be in sync and don't need to be tested like this,
         which has proved messy.
         """
+
+        def generate_documentation_markdown() -> None:
+            # Generate the markdown from template to ensure it's up to date
+            sys.path.insert(0, self._get_test_file_path('../../docs'))
+
+            # noinspection PyUnresolvedReferences
+            from generate_fervo_project_cape_4_md import main as generate_documentation
+
+            generate_documentation()
+
+        generate_documentation_markdown()
 
         documentation_file_content = '\n'.join(
             self._get_test_file_content('../../docs/Fervo_Project_Cape-4.md', encoding='utf-8')
