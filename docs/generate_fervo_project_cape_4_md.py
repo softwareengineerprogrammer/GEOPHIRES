@@ -55,6 +55,9 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
     return {
         'construction_yrs': params['Construction Years'],
         'plant_lifetime_yrs': params['Plant Lifetime'],
+        'flowrate_kg_per_sec_per_well': round(
+            _q(r['SUMMARY OF RESULTS']['Flowrate per production well']).to('kg / sec').magnitude
+        ),
         'injection_temperature_degc': params['Injection Temperature'],
         'fracture_separation_m': sig_figs(float(params['Fracture Separation']), 2),
         'fracture_height_m': params['Fracture Height'],
