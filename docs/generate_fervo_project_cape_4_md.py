@@ -26,6 +26,9 @@ def get_result_values(result: GeophiresXResult):
         return PlainQuantity(d['value'], d['unit'])
 
     r: dict[str, dict[str, Any]] = result.result
+
+    min_net_generation_mwe = r['SURFACE EQUIPMENT SIMULATION RESULTS']['Minimum Net Electricity Generation']['value']
+
     return {
         'lcoe_usd_per_mwh': sig_figs(
             _q(r['SUMMARY OF RESULTS']['Electricity breakeven price']).to('USD / MWh').magnitude, 3
@@ -34,6 +37,7 @@ def get_result_values(result: GeophiresXResult):
         'npv_musd': sig_figs(r['ECONOMIC PARAMETERS']['Project NPV']['value'], 3),
         'occ_gusd': sig_figs(_q(r['CAPITAL COSTS (M$)']['Overnight Capital Cost']).to('GUSD').magnitude, 3),
         'total_capex_gusd': sig_figs(_q(r['CAPITAL COSTS (M$)']['Total CAPEX']).to('GUSD').magnitude, 3),
+        'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
         # TODO port all input and result values here instead of hardcoding them in the template
     }
 
