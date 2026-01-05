@@ -6,6 +6,7 @@ This ensures the markdown documentation stays in sync with actual GEOPHIRES resu
 
 import sys
 from pathlib import Path
+from typing import Any
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -19,8 +20,11 @@ sys.path.insert(0, str(project_root / 'src'))
 
 
 def get_result_values(result: GeophiresXResult):
+    r: dict[str, Any] = result.result
     return {
-        'irr_pct': sig_figs(result.result['ECONOMIC PARAMETERS']['After-tax IRR']['value'], 3),
+        'irr_pct': sig_figs(r['ECONOMIC PARAMETERS']['After-tax IRR']['value'], 3),
+        'npv_musd': sig_figs(r['ECONOMIC PARAMETERS']['Project NPV']['value'], 3),
+        # TODO port all input and result values here instead of hardcoding them in the template
     }
 
 
