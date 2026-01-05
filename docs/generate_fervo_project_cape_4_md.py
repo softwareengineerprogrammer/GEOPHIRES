@@ -27,9 +27,33 @@ sys.path.insert(0, str(project_root / 'src'))
 def get_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
     print('Extracting input parameter values...')
 
+    def get_input_parameters(
+        params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
+    ) -> dict[str, Any]:
+        comment_idx = 0
+        ret: dict[str, Any] = {}
+        for line in params.as_text().split('\n'):
+            parts = line.strip().split(', ')  # TODO generalize for array-type params
+            field = parts[0].strip()
+            if len(parts) >= 2 and not field.startswith('#'):
+                fieldValue = parts[1].strip()
+                if include_parameter_comments and len(parts) > 2:
+                    fieldValue += ', ' + (', '.join(parts[2:])).strip()
+                ret[field] = fieldValue.strip()
+
+            if include_line_comments and field.startswith('#'):
+                ret[f'_COMMENT-{comment_idx}'] = line.strip()
+                comment_idx += 1
+
+            # TODO preserve newlines
+
+        return ret
+
+    params = get_input_parameters(input_params)
     r: dict[str, dict[str, Any]] = result.result
 
     return {
+        'number_of_doublets': params['Number of Doublets'],
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
     }
 
