@@ -60,20 +60,27 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'capex_usd_per_kw': round(
             sig_figs((total_capex_q / PlainQuantity(max_net_generation_mwe, 'MW')).to('USD / kW').magnitude, 2)
         ),
+        'stim_costs_musd': round(sig_figs(_stim_costs_musd(result), 3)),
         'stim_costs_per_well_musd': sig_figs(_stim_costs_per_well_musd(result), 3),
         # TODO port all input and result values here instead of hardcoding them in the template
     }
 
 
+def _stim_costs_musd(result: GeophiresXResult) -> float:
+    r: dict[str, dict[str, Any]] = result.result
+
+    stim_costs_musd = _q(r['CAPITAL COSTS (M$)']['Stimulation costs']).to('MUSD').magnitude
+    return stim_costs_musd
+
+
 def _stim_costs_per_well_musd(result: GeophiresXResult) -> float:
     r: dict[str, dict[str, Any]] = result.result
 
-    number_of_doublets = (
+    number_of_wells = (
         r['SUMMARY OF RESULTS']['Number of injection wells']['value']
         + r['SUMMARY OF RESULTS']['Number of production wells']['value']
     )
-    stim_costs_musd = _q(r['CAPITAL COSTS (M$)']['Stimulation costs']).to('MUSD').magnitude
-    stim_costs_per_well_musd = stim_costs_musd / number_of_doublets
+    stim_costs_per_well_musd = _stim_costs_musd(result) / number_of_wells
     return stim_costs_per_well_musd
 
 
