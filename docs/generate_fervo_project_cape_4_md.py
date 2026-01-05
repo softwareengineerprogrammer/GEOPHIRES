@@ -118,7 +118,7 @@ def main():
     result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
 
     template_values = get_input_parameter_values(input_params, result)
-    template_values = template_values | get_result_values(result)
+    template_values = {**template_values, **get_result_values(result)}
 
     # Set up Jinja environment
     docs_dir = project_root / 'docs'
