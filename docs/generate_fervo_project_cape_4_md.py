@@ -64,6 +64,7 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
         'productivity_index_kg_per_sec_per_bar': params['Productivity Index'],
         'number_of_doublets': params['Number of Doublets'],
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
+        'ambient_temperature_degc': params['Ambient Temperature'],
     }
 
 
