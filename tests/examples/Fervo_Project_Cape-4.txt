@@ -69,10 +69,10 @@ Ramey Production Wellbore Model, 1
 Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperature
 Injection Wellbore Temperature Gain, 3
 
-Ambient Temperature, 10, -- degC
-Surface Temperature, 10, -- degC
+Ambient Temperature, 11.17, -- https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654
+Surface Temperature, 13, -- Project InnerSpace GeoMap https://geomap.projectinnerspace.org/test/
 
-Maximum Drawdown, 0.02, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
+Maximum Drawdown, 0.025, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
 Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
 
 Utilization Factor, .9
