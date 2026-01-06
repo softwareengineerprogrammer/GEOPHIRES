@@ -1,5 +1,7 @@
 # Case Study: 500 MWe EGS modeled on Fervo Cape Station Phase II
 
+## Introduction
+
 The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS project modeled
 on Phase II of [Fervo Energy's Cape Station](https://capestation.com/).
 
@@ -8,35 +10,53 @@ Key case study results include LCOE = {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} and 
 [Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4) to
 interactively explore the case study in the GEOPHIRES web interface.
 
+### Modeling Overview: A Conservative, Second-of-a-Kind Analog
+
+This case study models a 500 MWe Enhanced Geothermal System (EGS) project designed to represent a "Second-of-a-Kind" (SOAK) deployment.
+Rather than serving as an exact facsimile of Cape Station as built, this study estimates what a non-Fervo developer could achieve on a geologically identical site, relying primarily on publicly available data and standardized engineering estimates.
+The model assumes the developer is a "fast follower": benefiting from the proof-of-concept established by Cape Station Phase I but operating without access to Fervo’s private supply chain or proprietary optimization data.
+
+**Public Data Reliance:** Inputs utilize exact values for publicly available parameters, such as reservoir density ([2800 kg/m³](https://doi.org/10.31223/X52X0B)) and geothermal gradient ([72.23 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf)).
+Where data is proprietary, values are inferred from public announcements or extrapolated from standard industry correlations.
+
+**Conservative Constraints:** To ensure the model serves as a robust feasibility test, some inputs are intentionally conservative compared to Fervo’s stated targets, such as drilling costs and water loss.
+
+**Fast Follower Advantage:** By entering the market after Fervo’s initial de-risking campaigns, the modeled developer avoids the high "tuition costs" of early experimentation.
+For example, while Fervo’s initial drilling costs at Cape Station ranged from [$9.4M down to $4.8M per well](https://houston.innovationmap.com/fervo-energy-drilling-utah-project-2667300142.html) as they climbed the learning curve,
+this model assumes a developer can bypass those initial high-cost outliers,
+instead initiating their campaign at a stabilized commercial baseline (modeled here at {{ '$' ~ drilling_costs_per_well_musd ~ 'M/well' }}).
+This reflects a developer who capitalizes on established industry knowledge to skip the "First-of-a-Kind" (FOAK) premiums but has not yet achieved the fully optimized learning rates of a mature "Nth-of-a-kind" operator.
+
+### Intended Use Cases
+
+This case study is designed to function as a public utility for the geothermal sector, serving two primary roles:
+
+**Industry Benchmark:** By relying primarily on verifiable public data and independent expert consensus, this model establishes a transparent baseline for EGS viability.
+It tests the premise that Fervo’s success at Cape Station is a replicable standard for the next-generation geothermal industry.
+The results serve as reference points for what is achievable using current technology in high-grade resources.
+
+**Template for Resource Assessment & Custom Modeling:** The example input file (`Fervo_Project_Cape-4.txt`) is intended as customizable template for modeling other resources.
+Users can input local geologic data (gradient, rock properties) into this template to evaluate how a Cape Station-style design would perform in different geographies (e.g., Nevada vs. Utah vs. International).
+Different plant sizes and performance targets can be modeled by adjusting the number of doublets, fractures per well, and other technical & engineering parameters.
+The model allows users to stress-test economic assumptions, such as the PPA price or Investment Tax Credit (ITC), to see how policy changes impact the feasibility of replicating this design elsewhere.
+
 ## Methodology
-
-Case study inputs are formulated using a combination of publicly available data, extrapolations, and estimates.
-Financial results are calculated using
-the [SAM Single Owner PPA Economic Model](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#sam-single-owner-ppa).
-
-The case study is constructed to be representative of a 500 MWe EGS project similar to Cape Station,
-although it is not intended to be an exact facsimile.
-This is because not all relevant data points are publicly available (e.g. full PPA terms) while others may not be
-applicable
-outside of Cape Station's first-of-a-kind status (such as drilling costs of initial wells which were more expensive
-at [$4.8–9.4M per well](https://houston.innovationmap.com/fervo-energy-drilling-utah-project-2667300142.html)).
 
 The Inputs and Results tables document key assumptions, inputs, and a comparison of results with reference
 values.
-Note that these are not the complete sets of inputs and results, which are available in source code and
+Note that these are not the exhaustive set of inputs and results, which are available in source code and
 the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4).
 
 ### Inputs
 
 Exact values were used for publicly available technical and engineering parameters, such as reservoir
 density ([2800 kg/m³](https://doi.org/10.31223/X52X0B)).
-Some technical parameters were inferred with high confidence from publicly available data, such as geothermal
+Some technical parameters were inferred from publicly available data, such as geothermal
 gradient ([72.23 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf)).
 Other parameters were extrapolated or speculatively estimated based on plausibility and/or compatibility with known
 results, such as number of doublets (well pairs).
 
-See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt)
-in source code for the full set of inputs.
+See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt) in source code for the full set of inputs.
 
 #### Economic Parameters
 
