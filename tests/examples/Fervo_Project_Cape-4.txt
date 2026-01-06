@@ -43,7 +43,7 @@ Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-
 Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
 Reservoir Depth, 2.5908, -- 8500 feet per https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf
 
-Gradient 1, 74, -- temperature at 8500 ft: 200 degC (https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf); 228.89 degC @ 9824 ft (https://doi.org/10.31223/X5VH8C)
+Gradient 1, 72.2, -- temperature at 8500 ft: 200 degC (https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf); 228.89 degC @ 9824 ft (https://doi.org/10.31223/X5VH8C)
 Number of Segments, 1
 
 Reservoir Density, 2800, -- per https://doi.org/10.31223/X52X0B: phyllite + quartzite + diorite + granodiorite
@@ -59,7 +59,7 @@ Number of Fractures per Stimulated Well, 200, -- 25 stages with 8 clusters per s
 Fracture Separation, 7.315
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
 Fracture Height, 186.16, -- Approximates ellipsoidal fracture with 228 meter height and 152 meter width
-Number of Doublets, 50
+Number of Doublets, 53
 
 Production Flow Rate per Well, 120, -- Maximum Fervo-tested flow rate
 Production Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
@@ -72,7 +72,7 @@ Injection Wellbore Temperature Gain, 3
 Ambient Temperature, 11.17, -- https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654
 Surface Temperature, 13, -- Project InnerSpace GeoMap https://geomap.projectinnerspace.org/test/
 
-Maximum Drawdown, 0.025, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
+Maximum Drawdown, 0.02, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
 Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
 
 Utilization Factor, .9

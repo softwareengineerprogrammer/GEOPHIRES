@@ -5,6 +5,7 @@ import sys
 from typing import Any
 
 from base_test_case import BaseTestCase
+from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x.Parameter import HasQuantity
 from geophires_x_client import GeophiresInputParameters
@@ -25,7 +26,7 @@ class FervoProjectCape4TestCase(BaseTestCase):
 
         min_net_gen = r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Minimum Net Electricity Generation']['value']
         self.assertGreater(min_net_gen, 500)
-        self.assertLess(min_net_gen, 505)
+        self.assertLess(min_net_gen, 510)
 
         max_total_gen = r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation'][
             'value'
@@ -355,3 +356,18 @@ class FervoProjectCape4TestCase(BaseTestCase):
 
         # Fallback for text-only values
         return {'value': clean_str, 'unit': 'text'}
+
+    def test_fervo_project_cape_5(self) -> None:
+        """
+        Fervo_Project_Cape-5 is derived from Fervo_Project_Cape-4 - see tests/regenerate-example-result.sh
+        """
+
+        fpc5_result: GeophiresXResult = GeophiresXResult(
+            self._get_test_file_path('../examples/Fervo_Project_Cape-5.out')
+        )
+        min_net_gen_dict = fpc5_result.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
+            'Minimum Net Electricity Generation'
+        ]
+        fpc5_min_net_gen_mwe = quantity(min_net_gen_dict['value'], min_net_gen_dict['unit']).to('MW').magnitude
+        self.assertGreater(fpc5_min_net_gen_mwe, 100)
+        self.assertLess(fpc5_min_net_gen_mwe, 110)

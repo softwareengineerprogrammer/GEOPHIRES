@@ -195,9 +195,9 @@ def main():
 
     print(f'✓ Generated {output_file}')
     print('\nKey results:')
-    print(f"\tLCOE: {template_values['lcoe_usd_per_mwh']}")
-    print(f"\tIRR: {template_values['irr_pct']}")
-    # print(f"  Total CAPEX: {result_values['capex']}")  # TODO
+    print(f"\tLCOE: ${template_values['lcoe_usd_per_mwh']}/MWh")
+    print(f"\tIRR: {template_values['irr_pct']}%")
+    print(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
 
 
 if __name__ == '__main__':
