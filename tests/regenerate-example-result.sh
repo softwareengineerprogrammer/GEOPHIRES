@@ -22,7 +22,7 @@ fi
 
 if [[ $1 == "Fervo_Project_Cape-4" ]]
 then
-    python docs/generate_fervo_project_cape_4_md.py
+    python ../docs/generate_fervo_project_cape_4_md.py
 
     echo "Regenerating Fervo_Project_Cape-5..."
     sed -e 's/Construction Years, 5/Construction Years, 3/' \
