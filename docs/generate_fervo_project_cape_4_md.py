@@ -65,6 +65,7 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
         'number_of_doublets': params['Number of Doublets'],
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
         'ambient_temperature_degc': params['Ambient Temperature'],
+        'maximum_drawdown_pct': sig_figs(float(params['Maximum Drawdown']) * 100.0, 2),
     }
 
 
@@ -190,7 +191,7 @@ def main():
 
     # Write output
     output_file = docs_dir / 'Fervo_Project_Cape-4.md'
-    output_file.write_text(output)
+    output_file.write_text(output, encoding='utf-8')
 
     print(f'✓ Generated {output_file}')
     print('\nKey results:')
