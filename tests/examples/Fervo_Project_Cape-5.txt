@@ -43,7 +43,7 @@ Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-
 Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
 Reservoir Depth, 2.5908, -- 8500 feet per https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf
 
-Gradient 1, 72.2, -- temperature at 8500 ft: 200 degC (https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf); 228.89 degC @ 9824 ft (https://doi.org/10.31223/X5VH8C)
+Gradient 1, 72.23, -- temperature at 8500 ft: 200 degC (https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf); 228.89 degC @ 9824 ft (https://doi.org/10.31223/X5VH8C)
 Number of Segments, 1
 
 Reservoir Density, 2800, -- per https://doi.org/10.31223/X52X0B: phyllite + quartzite + diorite + granodiorite

@@ -26,7 +26,7 @@ class FervoProjectCape4TestCase(BaseTestCase):
 
         min_net_gen = r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Minimum Net Electricity Generation']['value']
         self.assertGreater(min_net_gen, 500)
-        self.assertLess(min_net_gen, 510)
+        self.assertLess(min_net_gen, 505)
 
         max_total_gen = r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation'][
             'value'
