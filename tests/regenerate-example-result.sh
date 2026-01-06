@@ -25,8 +25,9 @@ then
     python ../docs/generate_fervo_project_cape_4_md.py
 
     echo "Regenerating Fervo_Project_Cape-5..."
+    # TODO synchronize replacement matching with Fervo_Project_Cape-4 values
     sed -e 's/Construction Years, 5/Construction Years, 3/' \
-        -e 's/Number of Doublets, 50/Number of Doublets, 10/' \
+        -e 's/Number of Doublets, 52/Number of Doublets, 11/' \
         -e 's/500 MWe/100 MWe/' \
         -e 's/Phase II/Phase I/' \
         examples/Fervo_Project_Cape-4.txt > examples/Fervo_Project_Cape-5.txt
