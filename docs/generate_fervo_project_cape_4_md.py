@@ -59,6 +59,7 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
         'year_10_ppa_price_cents_per_kwh': 10,  # TODO read from result cash flow table
         'construction_yrs': params['Construction Years'],
         'plant_lifetime_yrs': params['Plant Lifetime'],
+        'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
         'flowrate_kg_per_sec_per_well': round(
             _q(r['SUMMARY OF RESULTS']['Flowrate per production well']).to('kg / sec').magnitude
         ),
@@ -88,14 +89,31 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
 
     total_fracture_surface_area_per_well_m2 = _total_fracture_surface_area_per_well_m2(result)
 
+    occ_q = _q(r['CAPITAL COSTS (M$)']['Overnight Capital Cost'])
+
+    field_gathering_cost_musd = _q(r['CAPITAL COSTS (M$)']['Field gathering system costs']).to('MUSD').magnitude
+    field_gathering_cost_pct_occ = field_gathering_cost_musd / occ_q.to('MUSD').magnitude * 100.0
+
     return {
+        # Economic Results
         'lcoe_usd_per_mwh': sig_figs(
             _q(r['SUMMARY OF RESULTS']['Electricity breakeven price']).to('USD / MWh').magnitude, 3
         ),
         'irr_pct': sig_figs(r['ECONOMIC PARAMETERS']['After-tax IRR']['value'], 3),
         'npv_musd': sig_figs(r['ECONOMIC PARAMETERS']['Project NPV']['value'], 3),
-        'occ_gusd': sig_figs(_q(r['CAPITAL COSTS (M$)']['Overnight Capital Cost']).to('GUSD').magnitude, 3),
+        # Capital Costs
+        'drilling_costs_musd': round(sig_figs(_drilling_costs_musd(result), 3)),
+        'drilling_costs_per_well_musd': sig_figs(_drilling_costs_per_well_musd(result), 3),
+        'stim_costs_musd': round(sig_figs(_stim_costs_musd(result), 3)),
+        'stim_costs_per_well_musd': sig_figs(_stim_costs_per_well_musd(result), 3),
+        'field_gathering_cost_musd': round(sig_figs(field_gathering_cost_musd, 3)),
+        'field_gathering_cost_pct_occ': round(sig_figs(field_gathering_cost_pct_occ, 1)),
+        'occ_gusd': sig_figs(occ_q.to('GUSD').magnitude, 3),
         'total_capex_gusd': sig_figs(total_capex_q.to('GUSD').magnitude, 3),
+        'capex_usd_per_kw': round(
+            sig_figs((total_capex_q / PlainQuantity(max_net_generation_mwe, 'MW')).to('USD / kW').magnitude, 2)
+        ),
+        # Technical & Engineering Results
         'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
         'max_total_generation_mwe': round(
@@ -105,14 +123,6 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'average_production_temperature_degc': round(
             sig_figs(r['RESERVOIR SIMULATION RESULTS']['Average Production Temperature']['value'], 3)
         ),
-        'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
-        'capex_usd_per_kw': round(
-            sig_figs((total_capex_q / PlainQuantity(max_net_generation_mwe, 'MW')).to('USD / kW').magnitude, 2)
-        ),
-        'drilling_costs_musd': round(sig_figs(_drilling_costs_musd(result), 3)),
-        'drilling_costs_per_well_musd': sig_figs(_drilling_costs_per_well_musd(result), 3),
-        'stim_costs_musd': round(sig_figs(_stim_costs_musd(result), 3)),
-        'stim_costs_per_well_musd': sig_figs(_stim_costs_per_well_musd(result), 3),
         'total_fracture_surface_area_per_well_mm2': sig_figs(total_fracture_surface_area_per_well_m2 / 1e6, 2),
         'total_fracture_surface_area_per_well_mft2': round(
             sig_figs(
