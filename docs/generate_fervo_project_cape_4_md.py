@@ -106,6 +106,9 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'drilling_costs_per_well_musd': sig_figs(_drilling_costs_per_well_musd(result), 3),
         'stim_costs_musd': round(sig_figs(_stim_costs_musd(result), 3)),
         'stim_costs_per_well_musd': sig_figs(_stim_costs_per_well_musd(result), 3),
+        'surface_power_plant_costs_gusd': sig_figs(
+            _q(r['CAPITAL COSTS (M$)']['Surface power plant costs']).to('GUSD').magnitude, 3
+        ),
         'field_gathering_cost_musd': round(sig_figs(field_gathering_cost_musd, 3)),
         'field_gathering_cost_pct_occ': round(sig_figs(field_gathering_cost_pct_occ, 1)),
         'occ_gusd': sig_figs(occ_q.to('GUSD').magnitude, 3),
