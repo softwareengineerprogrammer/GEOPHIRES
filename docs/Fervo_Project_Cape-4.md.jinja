@@ -12,33 +12,52 @@ interactively explore the case study in the GEOPHIRES web interface.
 
 ### Modeling Overview: A Conservative, Second-of-a-Kind Analog
 
-This case study models a 500 MWe Enhanced Geothermal System (EGS) project designed to represent a "Second-of-a-Kind" (SOAK) deployment.
-Rather than serving as an exact facsimile of Cape Station as built, this study estimates what a non-Fervo developer could achieve on a geologically identical site, relying primarily on publicly available data and standardized engineering estimates.
-The model assumes the developer is a "fast follower": benefiting from the proof-of-concept established by Cape Station Phase I but operating without access to Fervo’s private supply chain or proprietary optimization data.
+This case study models a 500 MWe Enhanced Geothermal System (EGS) project designed to represent a "Second-of-a-Kind" (
+SOAK) deployment.
+Rather than serving as an exact facsimile of Cape Station as built, this study estimates what a non-Fervo developer
+could achieve on a geologically identical site, relying primarily on publicly available data and standardized
+engineering estimates.
+The model assumes the developer is a "fast follower": benefiting from the proof-of-concept established by Cape Station
+Phase I but operating without access to Fervo’s private supply chain or proprietary optimization data.
 
-**Public Data Reliance:** Inputs utilize exact values for publicly available parameters, such as reservoir density ([2800 kg/m³](https://doi.org/10.31223/X52X0B)) and geothermal gradient ([72.23 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf)).
-Where data is proprietary, values are inferred from public announcements or extrapolated from standard industry correlations.
+**Public Data Reliance:** Inputs utilize exact values for publicly available parameters, such as reservoir
+density ([2800 kg/m³](https://doi.org/10.31223/X52X0B)) and geothermal
+gradient ([72.23 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2024/Fercho.pdf)).
+Where data is proprietary, values are inferred from public announcements or extrapolated from standard industry
+correlations.
 
-**Conservative Constraints:** To ensure the model serves as a robust feasibility test, some inputs are intentionally conservative compared to Fervo’s stated targets, such as drilling costs and water loss.
+**Conservative Constraints:** To ensure the model serves as a robust feasibility test, some inputs are intentionally
+conservative compared to Fervo’s stated targets, such as drilling costs and water loss.
 
-**Fast Follower Advantage:** By entering the market after Fervo’s initial de-risking campaigns, the modeled developer avoids the high "tuition costs" of early experimentation.
-For example, while Fervo’s initial drilling costs at Cape Station ranged from [$9.4M down to $4.8M per well](https://houston.innovationmap.com/fervo-energy-drilling-utah-project-2667300142.html) as they climbed the learning curve,
+**Fast Follower Advantage:** By entering the market after Fervo’s initial de-risking campaigns, the modeled developer
+avoids the high "tuition costs" of early experimentation.
+For example, while Fervo’s initial drilling costs at Cape Station ranged
+from [$9.4M down to $4.8M per well](https://houston.innovationmap.com/fervo-energy-drilling-utah-project-2667300142.html)
+as they climbed the learning curve,
 this model assumes a developer can bypass those initial high-cost outliers,
-instead initiating their campaign at a stabilized commercial baseline (modeled here at {{ '$' ~ drilling_costs_per_well_musd ~ 'M/well' }}, aligned with the NREL ATB and 2025 cost curves).
-This reflects a developer who capitalizes on established industry knowledge to skip the "First-of-a-Kind" (FOAK) premiums but has not yet achieved the fully optimized learning rates of a mature "Nth-of-a-kind" operator.
+instead initiating their campaign at a stabilized commercial baseline (modeled here
+at {{ '$' ~ drilling_costs_per_well_musd ~ 'M/well' }}, aligned with the NREL ATB and 2025 cost curves).
+This reflects a developer who capitalizes on established industry knowledge to skip the "First-of-a-Kind" (FOAK)
+premiums but has not yet achieved the fully optimized learning rates of a mature "Nth-of-a-kind" operator.
 
 ### Intended Use Cases
 
 This case study is designed to function as a public utility for the geothermal sector, serving two primary roles:
 
-**Industry Benchmark:** By relying primarily on verifiable public data and independent expert consensus, this model establishes a transparent baseline for EGS viability.
-It tests the premise that Fervo’s success at Cape Station is a replicable standard for the next-generation geothermal industry.
+**Industry Benchmark:** By relying primarily on verifiable public data and independent expert consensus, this model
+establishes a transparent baseline for EGS viability.
+It tests the premise that Fervo’s success at Cape Station is a replicable standard for the next-generation geothermal
+industry.
 The results serve as reference points for what is achievable using current technology in high-grade resources.
 
-**Template for Resource Assessment & Custom Modeling:** The example input file (`Fervo_Project_Cape-4.txt`) is intended as customizable template for modeling other resources.
-Users can input local geologic data (gradient, rock properties) into this template to evaluate how a Cape Station-style design would perform in different geographies (e.g., Nevada vs. Utah vs. International).
-Different plant sizes and performance targets can be modeled by adjusting the number of doublets, fractures per well, and other technical & engineering parameters.
-The model allows users to stress-test economic assumptions, such as the PPA price or Investment Tax Credit (ITC), to see how policy changes impact the feasibility of replicating this design elsewhere.
+**Template for Resource Assessment & Custom Modeling:** The example input file (`Fervo_Project_Cape-4.txt`) is intended
+as customizable template for modeling other resources.
+Users can input local geologic data (gradient, rock properties) into this template to evaluate how a Cape Station-style
+design would perform in different geographies (e.g., Nevada vs. Utah vs. International).
+Different plant sizes and performance targets can be modeled by adjusting the number of doublets, fractures per well,
+and other technical & engineering parameters.
+The model allows users to stress-test economic assumptions, such as the PPA price or Investment Tax Credit (ITC), to see
+how policy changes impact the feasibility of replicating this design elsewhere.
 
 ## Methodology
 
@@ -56,24 +75,26 @@ gradient ([72.23 ℃/km](https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2
 Other parameters were extrapolated or speculatively estimated based on plausibility and/or compatibility with known
 results, such as number of doublets (well pairs).
 
-See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt) in source code for the full set of inputs.
+See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt)
+in source code for the full set of inputs.
 
 #### Economic Parameters
 
-| Parameter                                                 | Input Value(s)                                                    | Source                                                                                                                                                                                                                                                                                                                                                                   |
-|-----------------------------------------------------------|-------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Economic Model                                            | SAM Single Owner PPA                                              | The SAM Single Owner PPA economic model is used to calculate financial results including LCOE, NPV, IRR, and pro-forma cash flow analysis. See [GEOPHIRES documentation of SAM Economic Models](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html) for details on how System Advisor Model financial models are integrated into GEOPHIRES. |
-| PPA Price                                                 | Starting at 9.5¢/kWh, escalating to 10¢/kWh by project year 11    | Upper end of ranges given in 2024 and 2024b NREL ATBs (NREL, 2024). Both PPAs 'firm for 10 years at less than $100/MWh' estimate given in a podcast.                                                                                                                                                                                                                     |
-| Inflation Rate                                            | 2.7%                                                              | US inflation rate as of December 2025                                                                                                                                                                                                                                                                                                                                    |
-| Investment Tax Credit Rate (ITC)                          | 30%                                                               | Geothermal Drilling & Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024).                                                                                                                                                                                                                                |
-| Discount Rate                                             | 12%                                                               | Typical discount rates for high-risk projects may be 12–15%                                                                                                                                                                                                                                                                                                              |
-| Inflated Bond Interest Rate                               | 8%                                                                | Higher than typical debt annual interest rate                                                                                                                                                                                                                                                                                                                            |
-| Inflated Bond Interest Rate During Construction           | 10%                                                               | Higher interest rate during construction to account for increased risk of default                                                                                                                                                                                                                                                                                        |
-| Fraction of Investment in Bonds (percent debt vs. equity) | 60%                                                               | Approximate remaining percentage of CAPEX with $1 billion sponsor equity per Matson, 2024. Note that this source says that Fervo ultimately wants to target "15% sponsor equity, 15% bridge loan, and 70% construction to term loans", but this case study does not attempt to model that capital structure.                                                             |
-| Exploration Capital Cost                                  | $30M                                                              | Equivalent to 2024b ATB NF-EGS conservative scenario exploration assumption of 5 full-size wells (NREL, 2025), plus $1M for geophysical and field work, plus 15% contingency, plus 12% indirect costs.                                                                                                                                                                   |
-| Well Drilling Cost Correlation & Adjustment Factor        | {Vertical large baseline correlation} × {adjustment factor = 0.9} | NREL, 2025; Akindipe & Witter, 2025.  Note: Fervo claims lower drilling costs of <$4M/well (Latimer, 2025), which would be equivalent to an adjustment factor of 0.8.                                                                                                                                                                                                    |
-| Reservoir Stimulation Capital Cost per Well               | {{ '$' ~ stim_costs_per_well_musd ~ 'M' }} (all-in cost, including 5% indirect costs and 15% contingency)  | The all-in cost is based on a $4M baseline stimulation cost, calibrated from per-stage costs of high-intensity U.S. shale wells (Baytex Energy, 2024; Quantum Proppant Technologies, 2020), which are the closest technological analogue for multi-stage EGS (Gradl, 2018). Costs are also driven by the requirement for high-strength ceramic proppant rather than standard sand, which would crush or chemically degrade (diagenesis) over a 30-year lifecycle at 200℃ (Ko et al., 2023; Shiozawa & McClure, 2014) and the premium for ultra-high-temperature (HT) downhole tools. |
-| Capital Cost for Power Plant for Electricity Generation   | $1900/kW                                                          | US DOE, 2021.                                                                                                                                                                                                                                                                                                                                                            |
+| Parameter                                                                                    | Input Value(s)                                                    | Source                                                                                                                                                                                                                                                                                                                                                                   |
+|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Economic Model                                                                               | SAM Single Owner PPA                                              | The SAM Single Owner PPA economic model is used to calculate financial results including LCOE, NPV, IRR, and pro-forma cash flow analysis. See [GEOPHIRES documentation of SAM Economic Models](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html) for details on how System Advisor Model financial models are integrated into GEOPHIRES. |
+| PPA Price                                                                                    | Starting at 9.5¢/kWh, escalating to 10¢/kWh by project year 11    | Upper end of ranges given in 2024 and 2024b NREL ATBs (NREL, 2024). Both PPAs 'firm for 10 years at less than $100/MWh' estimate given in a podcast.                                                                                                                                                                                                                     |
+| Inflation Rate                                                                               | 2.7%                                                              | US inflation rate as of December 2025                                                                                                                                                                                                                                                                                                                                    |
+| Investment Tax Credit Rate (ITC)                                                             | 30%                                                               | Geothermal Drilling & Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024).                                                                                                                                                                                                                                |
+| Discount Rate                                                                                | 12%                                                               | Typical discount rates for high-risk projects may be 12–15%                                                                                                                                                                                                                                                                                                              |
+| Inflated Bond Interest Rate                                                                  | 8%                                                                | Higher than typical debt annual interest rate                                                                                                                                                                                                                                                                                                                            |
+| Inflated Bond Interest Rate During Construction                                              | 10%                                                               | Higher interest rate during construction to account for increased risk of default                                                                                                                                                                                                                                                                                        |
+| Fraction of Investment in Bonds (percent debt vs. equity)                                    | 60%                                                               | Approximate remaining percentage of CAPEX with $1 billion sponsor equity per Matson, 2024. Note that this source says that Fervo ultimately wants to target "15% sponsor equity, 15% bridge loan, and 70% construction to term loans", but this case study does not attempt to model that capital structure.                                                             |
+| WACC                                                                                         | {{ wacc_pct ~ '%' }}                                              | Fervo's target goal is to eventually achieve a "Solar Standard" WACC of 8.3% (Matson, 2024). |
+| Exploration Capital Cost                                                                     | $30M                                                              | Equivalent to 2024b ATB NF-EGS conservative scenario exploration assumption of 5 full-size wells (NREL, 2025), plus $1M for geophysical and field work, plus 15% contingency, plus 12% indirect costs.                                                                                                                                                                   |
+| Well Drilling Cost Correlation & Adjustment Factor                                           | {Vertical large baseline correlation} × {adjustment factor = 0.9} | NREL, 2025; Akindipe & Witter, 2025.  Note: Fervo claims lower drilling costs of <$4M/well (Latimer, 2025), which would be equivalent to an adjustment factor of 0.8.                                                                                                                                                                                                    |
+| Reservoir Stimulation Capital Cost per Well                                                  | {{ '$' ~ stim_costs_per_well_musd ~ 'M' }} (all-in cost, including 5% indirect costs and 15% contingency)                               | The all-in cost is based on a $4M baseline stimulation cost, calibrated from per-stage costs of high-intensity U.S. shale wells (Baytex Energy, 2024; Quantum Proppant Technologies, 2020), which are the closest technological analogue for multi-stage EGS (Gradl, 2018). Costs are also driven by the requirement for high-strength ceramic proppant rather than standard sand, which would crush or chemically degrade (diagenesis) over a 30-year lifecycle at 200℃ (Ko et al., 2023; Shiozawa & McClure, 2014) and the premium for ultra-high-temperature (HT) downhole tools. |
+| Capital Cost for Power Plant for Electricity Generation                                      | $1900/kW                                                          | US DOE, 2021.                                                                                                                                                                                                                                                                                                                                                            |
 
 #### Technical & Engineering Parameters
 
@@ -106,13 +127,12 @@ in source code for the complete results.
 {# @formatter:off #}
 | Metric                                             | Result Value                                | Reference Value(s)                               | Reference Source |
 |----------------------------------------------------|---------------------------------------------|--------------------------------------------------|------------------|
-| LCOE                                               | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }}                                           | $80/MWh                                            | Horne et al, 2025                           |
+| LCOE                                               | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }}                                           | $80/MWh                                            | Horne et al, 2025.                          |
 | After-tax IRR                                      | {{ irr_pct ~ '%' }}                                              | 15–25%                                             | Typical levered returns for energy projects |
 | Project NPV                                        | {{ '$' ~ npv_musd ~ 'M' }}                                       |                                                    |                                             |
 | Project capital costs: Overnight Capital Cost      | {{ '$' ~ occ_gusd ~ 'B' }}                                                  |                                                    |                                             |
 | Project capital costs: Total CAPEX                 | {{ '$' ~ total_capex_gusd ~ 'B' }} (OCC + interest and inflation during construction) |                                             |                                                  |
 | Project capital costs: $/kW                        | {{ '$' ~ capex_usd_per_kw ~ '/kW' }} (based on maximum net electricity generation)      | $5000/kW; $4500/kW; $3000–$6000/kW          | McClure, 2024; Horne et al, 2025; Latimer, 2025. |
-| WACC                                               | {{ wacc_pct ~ '%' }}                                     | 8.3%                                               | Matson, 2024.                               |
 | Well Drilling and Completion Costs                 | {{ '$' ~ drilling_costs_per_well_musd ~ 'M/well' }}; {{ '$' ~ drilling_costs_musd ~ 'M' }} total                        | $<4M/well                                                      | Latimer, 2025.                                   |
 | Stimulation Costs                                  | {{ '$' ~ stim_costs_per_well_musd ~ 'M/well' }}; {{ '$' ~ stim_costs_musd ~ 'M' }} total                                          | $4.65M/well (based on 46%:54% drilling:stimulation cost ratio) | Yusifov & Enriquez, 2025.                        |
 {# @formatter:on #}
@@ -270,7 +290,8 @@ McClure, M. (2024, September 12). Digesting the Bonkers, Incredible, Off-the-Cha
 and FORGE Enhanced Geothermal Projects. ResFrac Corporation Blog.
 https://www.resfrac.com/blog/digesting-the-bonkers-incredible-off-the-charts-spectacular-results-from-the-fervo-and-forge-enhanced-geothermal-projects
 
-NCEI. US Climate Normals. https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654
+NCEI. US Climate
+Normals. https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654
 
 NREL. (2024). Annual Technology Baseline: Geothermal (2024).
 https://atb.nrel.gov/electricity/2024/geothermal
