@@ -208,7 +208,7 @@ class FervoProjectCape4TestCase(BaseTestCase):
             return {}
 
         # Consistency check
-        special_case_pattern = re.compile(r'LCOE\s*=\s*(\S+)\s*and\s*CAPEX\s*=\s*(\S+)')
+        special_case_pattern = re.compile(r'LCOE\s*=\s*(\S+)\s*and\s*IRR\s*=\s*(\S+)')
         special_case_match = special_case_pattern.search(markdown_text)
         if special_case_match:
             lcoe_text = special_case_match.group(1).rstrip('.,;')
