@@ -59,13 +59,16 @@ class FervoProjectCape4TestCase(BaseTestCase):
 
     def test_case_study_documentation(self):
         """
-        Parses result values from case study documentation markdown and checks that they match the actual result.
+        Parses result values from case study documentation Markdown and checks that they match the actual result.
         Useful for catching when minor updates are made to the case study which need to be manually synced to the
         documentation.
 
-        Note: for future case studies, generate the documentation markdown from the input/result rather than writing
+        Note: for future case studies, generate the documentation Markdown from the input/result rather than writing
         (partially) by hand so that they are guaranteed to be in sync and don't need to be tested like this,
         which has proved messy.
+
+        Update 2026-01-07: Markdown is now partially generated from input and result in
+        docs/generate_fervo_project_cape_4_md.py.
         """
 
         def generate_documentation_markdown() -> None:
@@ -106,13 +109,13 @@ class FervoProjectCape4TestCase(BaseTestCase):
 
                 self.CurrentUnits.value = vu['unit']
 
-        capex_q = _Q(results_in_markdown['Project capital costs: Total CAPEX']).quantity()
+        capex_q = _Q(results_in_markdown['Total CAPEX']).quantity()
         markdown_capex_USD_per_kW = (
             capex_q.to('USD').magnitude
             / _Q(results_in_markdown['Maximum Net Electricity Generation']).quantity().to('kW').magnitude
         )
         self.assertAlmostEqual(
-            sig_figs(markdown_capex_USD_per_kW, 2), results_in_markdown['Project capital costs: $/kW']['value']
+            sig_figs(markdown_capex_USD_per_kW, 2), results_in_markdown['Total CAPEX: $/kW']['value']
         )
 
         field_mapping = {
@@ -124,7 +127,7 @@ class FervoProjectCape4TestCase(BaseTestCase):
         }
 
         ignore_keys = [
-            'Project capital costs: $/kW',  # See https://github.com/NREL/GEOPHIRES-X/issues/391
+            'Total CAPEX: $/kW',  # See https://github.com/NREL/GEOPHIRES-X/issues/391
             'Total fracture surface area per production well',
             'Stimulation Costs',  # remapped to 'Stimulation Costs total'
         ]
@@ -227,8 +230,8 @@ class FervoProjectCape4TestCase(BaseTestCase):
                 'Minimum Net Electricity Generation',
                 'Maximum Net Electricity Generation',
                 'Number of times redrilling',
-                'Project capital costs: Total CAPEX',
-                'Project capital costs: $/kW',
+                'Total CAPEX',
+                'Total CAPEX: $/kW',
                 'WACC',
                 'Well Drilling and Completion Costs',
                 'Stimulation Costs',

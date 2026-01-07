@@ -52,12 +52,18 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
     params = get_input_parameters(input_params)
     r: dict[str, dict[str, Any]] = result.result
 
+    exploration_cost_musd = _q(r['CAPITAL COSTS (M$)']['Exploration costs']).to('MUSD').magnitude
+    assert exploration_cost_musd == float(
+        params['Exploration Capital Cost']
+    ), 'Exploration cost mismatch between parameters and result'
+
     return {
         'starting_ppa_price_cents_per_kwh': PlainQuantity(float(params['Starting Electricity Sale Price']), 'USD / kWh')
         .to('cents / kWh')
         .magnitude,
         'year_10_ppa_price_cents_per_kwh': 10,  # TODO read from result cash flow table
         'construction_yrs': params['Construction Years'],
+        'exploration_cost_musd': round(sig_figs(exploration_cost_musd, 2)),
         'plant_lifetime_yrs': params['Plant Lifetime'],
         'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
         'flowrate_kg_per_sec_per_well': round(
