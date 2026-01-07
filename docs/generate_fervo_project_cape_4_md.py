@@ -53,6 +53,10 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
     r: dict[str, dict[str, Any]] = result.result
 
     return {
+        'starting_ppa_price_cents_per_kwh': PlainQuantity(float(params['Starting Electricity Sale Price']), 'USD / kWh')
+        .to('cents / kWh')
+        .magnitude,
+        'year_10_ppa_price_cents_per_kwh': 10,  # TODO read from result cash flow table
         'construction_yrs': params['Construction Years'],
         'plant_lifetime_yrs': params['Plant Lifetime'],
         'flowrate_kg_per_sec_per_well': round(
