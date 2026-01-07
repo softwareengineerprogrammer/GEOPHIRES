@@ -90,8 +90,11 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     r: dict[str, dict[str, Any]] = result.result
 
     total_capex_q: PlainQuantity = _q(r['CAPITAL COSTS (M$)']['Total CAPEX'])
-    min_net_generation_mwe = r['SURFACE EQUIPMENT SIMULATION RESULTS']['Minimum Net Electricity Generation']['value']
-    max_net_generation_mwe = r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Net Electricity Generation']['value']
+
+    surf_equip_sim = r['SURFACE EQUIPMENT SIMULATION RESULTS']
+    min_net_generation_mwe = surf_equip_sim['Minimum Net Electricity Generation']['value']
+    avg_net_generation_mwe = surf_equip_sim['Average Net Electricity Generation']['value']
+    max_net_generation_mwe = surf_equip_sim['Maximum Net Electricity Generation']['value']
 
     total_fracture_surface_area_per_well_m2 = _total_fracture_surface_area_per_well_m2(result)
 
@@ -124,6 +127,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         ),
         # Technical & Engineering Results
         'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
+        'avg_net_generation_mwe': round(sig_figs(avg_net_generation_mwe, 3)),
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
         'max_total_generation_mwe': round(
             sig_figs(r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation']['value'], 3)
