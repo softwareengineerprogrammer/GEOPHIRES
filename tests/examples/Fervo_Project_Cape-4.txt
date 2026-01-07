@@ -58,7 +58,7 @@ Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fr
 Number of Fractures per Stimulated Well, 200, -- 25 stages with 8 clusters per stage
 Fracture Separation, 7.315
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
-Fracture Height, 186.16, -- Approximates ellipsoidal fracture with 228 meter height and 152 meter width
+Fracture Height, 186.16, -- Approximates ellipsoidal fracture with 228 meter height and 152 meter length
 Number of Doublets, 52
 
 Production Flow Rate per Well, 120, -- Maximum Fervo-tested flow rate
