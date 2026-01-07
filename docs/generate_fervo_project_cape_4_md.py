@@ -66,6 +66,7 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
         'exploration_cost_musd': round(sig_figs(exploration_cost_musd, 2)),
         'plant_lifetime_yrs': params['Plant Lifetime'],
         'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
+        'gradient_1_degc_per_km': params['Gradient 1'],
         'flowrate_kg_per_sec_per_well': round(
             _q(r['SUMMARY OF RESULTS']['Flowrate per production well']).to('kg / sec').magnitude
         ),
@@ -126,6 +127,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
             sig_figs((total_capex_q / PlainQuantity(max_net_generation_mwe, 'MW')).to('USD / kW').magnitude, 2)
         ),
         # Technical & Engineering Results
+        'bht_temp_degc': r['RESERVOIR PARAMETERS']['Bottom-hole temperature']['value'],
         'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
         'avg_net_generation_mwe': round(sig_figs(avg_net_generation_mwe, 3)),
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
