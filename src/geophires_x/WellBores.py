@@ -740,6 +740,15 @@ class WellBores:
             ToolTipText="Pass this parameter to set the Number of Production Wells and Number of Injection Wells to "
                         "same value."
         )
+        self.ninj_per_production_well = self.ParameterDict[self.ninj_per_production_well.Name] = floatParameter(
+            "Number of Injection Wells per Production Well",
+            DefaultValue=1,
+            Min=0,
+            Max=max_doublets-1,
+            UnitType=Units.NONE,
+            Required=False,
+            ToolTipText="Number of (identical) injection wells per production well"
+        )
 
         # noinspection SpellCheckingInspection
         self.prodwelldiam = self.ParameterDict[self.prodwelldiam.Name] = floatParameter(
@@ -1361,20 +1370,35 @@ class WellBores:
 
         coerce_int_params_to_enum_values(self.ParameterDict)
 
-        if self.doublets_count.Provided:
-            def _error(num_wells_param_:intParameter):
-                msg = f'{num_wells_param_.Name} may not be provided when {self.doublets_count.Name} is provided.'
-                model.logger.error(msg)
-                raise ValueError(msg)
+        self._set_well_counts_from_parameters(model)
 
+        model.logger.info(f"read parameters complete {self.__class__.__name__}: {__name__}")
+
+    def _set_well_counts_from_parameters(self, model: Model):
+        mutually_exclusive_well_count_params = [self.doublets_count, self.ninj_per_production_well]
+        provided_well_count_params = [it for it in mutually_exclusive_well_count_params if it.Provided]
+        if len(provided_well_count_params) > 1:
+            raise ValueError(f'Only one of [{", ".join([it.Name for it in mutually_exclusive_well_count_params])}] '
+                             f'may be provided.')
+
+        def _raise_incompatible_param_error(incompatible_param: intParameter, with_param: intParameter):
+            msg = f'{incompatible_param.Name} may not be provided when {with_param.Name} is provided.'
+            model.logger.error(msg)
+            raise ValueError(msg)
+
+        if self.doublets_count.Provided:
             for num_wells_param in [self.ninj, self.nprod]:
                 if num_wells_param.Provided:
-                    _error(num_wells_param)
+                    _raise_incompatible_param_error(num_wells_param, self.doublets_count)
 
             self.ninj.value = self.doublets_count.value
             self.nprod.value = self.doublets_count.value
 
-        model.logger.info(f"read parameters complete {self.__class__.__name__}: {__name__}")
+        if self.ninj_per_production_well.Provided:
+            if self.ninj.Provided:
+                _raise_incompatible_param_error(self.ninj, self.ninj_per_production_well)
+
+            self.ninj.value = int(math.ceil(self.nprod.value * self.ninj_per_production_well.value))
 
     def Calculate(self, model: Model) -> None:
         """
