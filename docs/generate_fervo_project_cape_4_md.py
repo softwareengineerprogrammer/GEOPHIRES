@@ -24,15 +24,15 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / 'src'))
 
 
-def get_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
+def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
     print('Extracting input parameter values...')
 
-    def get_input_parameters(
-        params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
+    def _get_input_parameters(  # TODO consolidate with FervoProjectCape4TestCase._get_input_parameters
+        _params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
     ) -> dict[str, Any]:
         comment_idx = 0
         ret: dict[str, Any] = {}
-        for line in params.as_text().split('\n'):
+        for line in _params.as_text().split('\n'):
             parts = line.strip().split(', ')  # TODO generalize for array-type params
             field = parts[0].strip()
             if len(parts) >= 2 and not field.startswith('#'):
@@ -49,7 +49,7 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
 
         return ret
 
-    params = get_input_parameters(input_params)
+    params = _get_input_parameters(input_params)
     r: dict[str, dict[str, Any]] = result.result
 
     exploration_cost_musd = _q(r['CAPITAL COSTS (M$)']['Exploration costs']).to('MUSD').magnitude
@@ -71,6 +71,9 @@ def get_input_parameter_values(input_params: GeophiresInputParameters, result: G
             _q(r['SUMMARY OF RESULTS']['Flowrate per production well']).to('kg / sec').magnitude
         ),
         'injection_temperature_degc': params['Injection Temperature'],
+        'number_of_fractures_per_well': params['Number of Fractures per Stimulated Well'],
+        'stim_stage_count': 26,
+        'clusters_per_stim_stage': 6,
         'fracture_separation_m': sig_figs(float(params['Fracture Separation']), 2),
         'fracture_height_m': params['Fracture Height'],
         'productivity_index_kg_per_sec_per_bar': params['Productivity Index'],
@@ -206,7 +209,7 @@ def main():
     )
     result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
 
-    template_values = get_input_parameter_values(input_params, result)
+    template_values = get_fpc4_input_parameter_values(input_params, result)
     template_values = {**template_values, **get_result_values(result)}
 
     # Set up Jinja environment

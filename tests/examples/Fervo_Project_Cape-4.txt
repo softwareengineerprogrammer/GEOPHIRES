@@ -55,8 +55,8 @@ Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https:/
 Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
-Number of Fractures per Stimulated Well, 200, -- 25 stages with 8 clusters per stage
-Fracture Separation, 7.315
+Number of Fractures per Stimulated Well, 156, -- 26 stages with 6 clusters per stage
+Fracture Separation, 9.14, -- 30 foot cluster spacing per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
 Fracture Height, 186.16, -- Approximates ellipsoidal fracture with 228 meter height and 152 meter length
 Number of Doublets, 52
@@ -81,8 +81,8 @@ Production Wellhead Pressure, 325 psi, -- https://doi.org/10.31223/X5VH8C
 Circulation Pump Efficiency, 0.80
 
 Well Geometry Configuration, 4, -- L
-Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling (which would otherwise account for approximately 118 multilateral sections) is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost, which is under $4 million.
-Nonvertical Length per Multilateral Section, 4800 feet, -- Fervo presentation at Payne Institute, Dec 2, 2025
+Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost.
+Nonvertical Length per Multilateral Section, 4700 feet, -- per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
 Multilaterals Cased, True
 
 # *** SIMULATION PARAMETERS ***
