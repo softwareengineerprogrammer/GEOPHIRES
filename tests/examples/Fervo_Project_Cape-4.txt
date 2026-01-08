@@ -58,7 +58,7 @@ Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fr
 Number of Fractures per Stimulated Well, 156, -- 26 stages with 6 clusters per stage
 Fracture Separation, 9.14, -- 30 foot cluster spacing per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
-Fracture Height, 186.16, -- Approximates ellipsoidal fracture with 228 meter height and 152 meter length
+Fracture Height, 234, -- per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
 Number of Doublets, 52
 
 Production Flow Rate per Well, 120, -- Maximum Fervo-tested flow rate
