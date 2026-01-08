@@ -740,6 +740,7 @@ class WellBores:
             ToolTipText="Pass this parameter to set the Number of Production Wells and Number of Injection Wells to "
                         "same value."
         )
+        # noinspection SpellCheckingInspection
         self.ninj_per_production_well = self.ParameterDict[self.ninj_per_production_well.Name] = floatParameter(
             "Number of Injection Wells per Production Well",
             DefaultValue=1,
