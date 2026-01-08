@@ -747,7 +747,9 @@ class WellBores:
             Max=max_doublets-1,
             UnitType=Units.NONE,
             Required=False,
-            ToolTipText="Number of (identical) injection wells per production well"
+            ToolTipText="Number of (identical) injection wells per production well. "
+                        "For example, provide 0.666 to specify a 3:2 production:injection well ratio. "
+                        "The number of injection wells will be rounded up to the nearest integer."
         )
 
         # noinspection SpellCheckingInspection
