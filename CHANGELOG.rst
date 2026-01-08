@@ -8,6 +8,8 @@ GEOPHIRES v3 (2023-2025)
 3.10
 ^^^^
 
+3.10.25: `Add Number of Injection Wells per Production Well parameter <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/119>`__
+
 3.10: `SAM Economic Models: Multiple Construction Years; Number of Fractures per Stimulated Well parameter; Royalty Rate Escalation Start Year parameter <https://github.com/NREL/GEOPHIRES-X/pull/440>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.10.24>`__
 
 3.9
