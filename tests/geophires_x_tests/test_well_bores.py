@@ -86,7 +86,7 @@ class WellBoresTestCase(BaseTestCase):
         r_ratio: GeophiresXResult = self._get_result(
             {
                 'Number of Production Wells': 63,
-                'Number of Injection Wells per Production Well': 0.6666,  # 3:2 ratio
+                'Number of Injection Wells per Production Well': 0.666,  # 3:2 ratio
             }
         )
 
