@@ -108,6 +108,9 @@ class FervoProjectCape4TestCase(BaseTestCase):
         redrills = r.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value']
         self.assertGreater(redrills, 1)
         self.assertLess(redrills, 6)
+        max_phase_2_permitted_wells = 320
+        self.assertLess(self._number_of_wells(r) * redrills, max_phase_2_permitted_wells)
+        self.assertGreater(self._number_of_wells(r) * redrills, max_phase_2_permitted_wells * 0.9375)
 
         well_cost = r.result['CAPITAL COSTS (M$)']['Drilling and completion costs per well']['value']
         self.assertLess(well_cost, 5.0)
@@ -139,9 +142,8 @@ class FervoProjectCape4TestCase(BaseTestCase):
         """
 
         def generate_documentation_markdown() -> None:
-            # Generate the markdown from template to ensure it's up to date
+            # Generate the Markdown from template to ensure it's up to date
             sys.path.insert(0, self._get_test_file_path('../../docs'))
-
             # noinspection PyUnresolvedReferences
             from generate_fervo_project_cape_4_md import main as generate_documentation
 
@@ -155,9 +157,11 @@ class FervoProjectCape4TestCase(BaseTestCase):
         inputs_in_markdown = self.parse_markdown_inputs_structured(documentation_file_content)
         results_in_markdown = self.parse_markdown_results_structured(documentation_file_content)
 
+        example_result = GeophiresXResult(self._get_test_file_path('../examples/Fervo_Project_Cape-4.out'))
+
         expected_drilling_cost_MUSD_per_well = 4.46
-        number_of_doublets = inputs_in_markdown['Number of Doublets']['value']
-        number_of_wells = number_of_doublets * 2
+        # number_of_doublets = inputs_in_markdown['Number of Doublets']['value']
+        number_of_wells = self._number_of_wells(example_result)
         self.assertAlmostEqualWithinSigFigs(
             expected_drilling_cost_MUSD_per_well * number_of_wells,
             results_in_markdown['Well Drilling and Completion Costs']['value'],
@@ -208,7 +212,6 @@ class FervoProjectCape4TestCase(BaseTestCase):
             'Stimulation Costs',  # remapped to 'Stimulation Costs total'
         ]
 
-        example_result = GeophiresXResult(self._get_test_file_path('../examples/Fervo_Project_Cape-4.out'))
         example_result_values = {}
         for key, _ in results_in_markdown.items():
             if key not in ignore_keys:
