@@ -59,7 +59,7 @@ Number of Fractures per Stimulated Well, 150, -- 25 stages with 6 clusters per s
 Fracture Separation, 9.14, -- 30 foot cluster spacing per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
 Fracture Height, 208, -- Singh et al. (2025)
-Number of Production Wells, 63
+Number of Production Wells, 42
 Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al. 2025)
 
 Production Flow Rate per Well, 120, -- Maximum Fervo-tested flow rate
@@ -73,7 +73,7 @@ Injection Wellbore Temperature Gain, 3
 Ambient Temperature, 11.17, -- https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654
 Surface Temperature, 13, -- Project InnerSpace GeoMap https://geomap.projectinnerspace.org/test/
 
-Maximum Drawdown, 0.172, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
+Maximum Drawdown, 0.035, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
 Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
 
 Utilization Factor, .9
