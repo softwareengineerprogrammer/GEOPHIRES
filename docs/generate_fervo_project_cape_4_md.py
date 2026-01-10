@@ -65,6 +65,7 @@ def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, resu
         'construction_yrs': params['Construction Years'],
         'exploration_cost_musd': round(sig_figs(exploration_cost_musd, 2)),
         'plant_lifetime_yrs': params['Plant Lifetime'],
+        'power_plant_capex_usd_per_kw': params['Capital Cost for Power Plant for Electricity Generation'],
         'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
         'gradient_1_degc_per_km': params['Gradient 1'],
         'flowrate_kg_per_sec_per_well': round(
