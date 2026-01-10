@@ -77,6 +77,8 @@ def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, resu
         'fracture_separation_m': sig_figs(float(params['Fracture Separation']), 2),
         'fracture_height_m': params['Fracture Height'],
         'productivity_index_kg_per_sec_per_bar': params['Productivity Index'],
+        'injectivity_index_kg_per_sec_per_bar': params['Injectivity Index'],
+        'pi_ii_source': '50% of ATB conservative scenario (NREL, 2025) per analyses that suggest lower productivity (Xing et al., 2025; Yearsley and Kombrink, 2024).',
         'number_of_production_wells': params['Number of Production Wells'],
         'number_of_injection_wells': r['SUMMARY OF RESULTS']['Number of injection wells']['value'],
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",

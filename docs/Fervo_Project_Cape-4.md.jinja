@@ -106,7 +106,7 @@ in source code for the full set of inputs.
 | Gradient                        | {{ gradient_1_degc_per_km ~ '℃/km' }}                | 200℃ at 8500 ft depth (Fercho et al., 2024), 228.89℃ at 9824 ft (Norbeck et al., 2024).                                                                                                                                                                                   |
 | Construction Years              | {{ construction_yrs }}                               | Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations. |
 | Plant Lifetime                  | {{ plant_lifetime_yrs }} years                       | 30-year well life per Geothermal Mythbusting: Water Use and Impacts (Fervo Energy, 2025).                                                                                                                                     |
-| Well diameter                   | 9⅝ inches (OD); 8½ inches (ID)                       | 9⅝" is the next standard size up from 7", implied by announcement of "increasing casing diameter" (Fervo Energy, 2025).    |
+| Well diameter                   | 9⅝ inches (OD); 8½ inches (ID)                       | 9⅝" is the next standard casing size up from 7", implied by announcement of "increasing casing diameter" (Fervo Energy, 2025).    |
 | Flow Rate per Production Well   | {{ flowrate_kg_per_sec_per_well }} kg/s              | Fercho et al, 2025 models reservoir performance using 100 kg/s per well. The maximum flow rate achieved at Cape Station was 107 kg/s (Fervo Energy, 2024). The announced increased casing diameter implies higher flow rates. |
 | Number of Production Wells      | {{ number_of_production_wells }}                     | Each well pair (doublet) is expected to initially produce up to 11 MWe (gross) at a 107 kg/s flow rate. A well pair producing 11 MWe gross with ~10% parasitic loss produces approximately 10 MWe net.                                                                    |
 | Number of Injection  Wells      | {{ number_of_injection_wells }}                      | 5-well benches with 3:2 producer:injector ratio (Singh et al., 2025)                                                                    |
@@ -116,7 +116,8 @@ in source code for the full set of inputs.
 | Reservoir Volume                | {{ reservoir_volume_m3 }} m³                         | Calculated from fracture area × fracture separation × number of fractures per well × number of wells                                                                                                                          |
 | Water Loss Rate                 | {{ water_loss_pct ~ '%' }}                           | Water loss rate is conservatively estimated to be between 10 and 20%. Other estimates and some simulations may suggest a significantly lower water loss rate than this conservative estimate. See [Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/) (Fervo Energy, 2025). |
 | Maximum Drawdown                | {{ maximum_drawdown_pct ~ '%' }}                     | This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.                                      |
-| Productivity Index              | {{ productivity_index_kg_per_sec_per_bar }} kg/s/bar | NREL ATB conservative scenario. Yields ~10% initial pumping power/net installed power.                                                                                                                                        |
+| Productivity Index              | {{ productivity_index_kg_per_sec_per_bar }} kg/s/bar | {{ pi_ii_source }}                                                                                                                                         |
+| Injectivity Index              | {{ injectivity_index_kg_per_sec_per_bar }} kg/s/bar | {{ pi_ii_source }}                                                                                                                                         |
 | Injection Temperature           | {{ injection_temperature_degc ~ '℃' }}               | Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers & McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck & Latimer, 2023).                                                                      |
 | Ambient Temperature             | {{ ambient_temperature_degc ~ '℃'  }}                | Average annual temperature of Milford, Utah (NCEI). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study. |
 {# @formatter:on #}
@@ -346,6 +347,15 @@ Utah. https://www.turboden.com/company/media/press/press-releases/4881/turboden-
 
 US DOE. (2021). Combined Heat and Power Technology Fact Sheet Series: Waste Heat to
 Power. https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf
+
+Xing, P., England, K., Moore, J., McLennan, J. (2025, February 10).
+Analysis of the 2024 Circulation Tests at Utah FORGE and the Response of Fiber Optic Sensing
+Data.
+https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2025/Xing2.pdf
+
+Yearsley, E., Kombrink, H. (2024, November 6).
+A critical look at Fervo dataset suggests lower output.
+https://geoexpro.com/a-critical-look-at-fervo-dataset-suggests-lower-output/
 
 Yusifov, M., & Enriquez, N. (2025, July). From Core to Code: Powering the Al Revolution with Geothermal Energy.
 Project InnerSpace. https://projectinnerspace.org/resources/Powering-the-AI-Revolution.pdf
