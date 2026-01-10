@@ -305,7 +305,7 @@
       "maximum": 10000
     },
     "Fracture Width": {
-      "description": "Width of each fracture",
+      "description": "Total horizontal length of each fracture plane (from tip to tip). Note: In some contexts this is called 'Fracture Length'; it refers to the fracture's lateral extent, not its aperture or thickness.",
       "type": "number",
       "units": "meter",
       "category": "Reservoir",
