@@ -104,6 +104,12 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     min_net_generation_mwe = surf_equip_sim['Minimum Net Electricity Generation']['value']
     avg_net_generation_mwe = surf_equip_sim['Average Net Electricity Generation']['value']
     max_net_generation_mwe = surf_equip_sim['Maximum Net Electricity Generation']['value']
+    max_total_generation_mwe = surf_equip_sim['Maximum Total Electricity Generation']['value']
+    parasitic_loss_pct = (
+        surf_equip_sim['Average Pumping Power']['value']
+        / surf_equip_sim['Average Total Electricity Generation']['value']
+        * 100.0
+    )
 
     total_fracture_surface_area_per_well_m2 = _total_fracture_surface_area_per_well_m2(result)
 
@@ -142,9 +148,8 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
         'avg_net_generation_mwe': round(sig_figs(avg_net_generation_mwe, 3)),
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
-        'max_total_generation_mwe': round(
-            sig_figs(r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation']['value'], 3)
-        ),
+        'max_total_generation_mwe': round(sig_figs(max_total_generation_mwe, 3)),
+        'parasitic_loss_pct': sig_figs(parasitic_loss_pct, 3),
         'number_of_times_redrilling': redrills,
         'total_wells_including_redrilling': total_wells_including_redrilling,
         'average_production_temperature_degc': round(
