@@ -82,6 +82,7 @@ def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, resu
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
         'ambient_temperature_degc': params['Ambient Temperature'],
         'maximum_drawdown_pct': sig_figs(float(params['Maximum Drawdown']) * 100.0, 2),
+        'water_loss_pct': PlainQuantity(float(params['Water Loss Fraction']), 'dimensionless').to('percent').magnitude,
     }
 
 
