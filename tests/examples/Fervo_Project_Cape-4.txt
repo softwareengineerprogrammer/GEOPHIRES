@@ -74,7 +74,8 @@ Ambient Temperature, 11.17, -- https://www.ncei.noaa.gov/access/us-climate-norma
 Surface Temperature, 13, -- Project InnerSpace GeoMap https://geomap.projectinnerspace.org/test/
 
 Maximum Drawdown, 0.035, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
-Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
+Water Loss Fraction, 0.01, -- Conservative estimate based on simulation values of less than 1% in Singh. et al. 2025
+Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs
 
 Utilization Factor, .9
 Plant Outlet Pressure, 2175 psi, -- https://doi.org/10.31223/X5VH8C
