@@ -51,8 +51,8 @@ Reservoir Heat Capacity, 790
 Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118
 
-Productivity Index, 2.494, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
-Injectivity Index, 3.015, -- [kg/s/bar] NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+Productivity Index, 1.247, -- 50% of NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
+Injectivity Index, 1.5075, -- 50% of NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
 Number of Fractures per Stimulated Well, 150, -- 25 stages with 6 clusters per stage
@@ -62,7 +62,7 @@ Fracture Height, 208, -- Singh et al. (2025)
 Number of Production Wells, 13
 Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al. 2025)
 
-Production Flow Rate per Well, 120, -- Maximum Fervo-tested flow rate
+Production Flow Rate per Well, 100, -- Tested sustained flow rate (ATB NF-EGS Advanced is 110 kg/s; Maximum Fervo-tested flow rate is 120 kg/s)
 Production Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
 Injection Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
 
@@ -73,8 +73,9 @@ Injection Wellbore Temperature Gain, 3
 Ambient Temperature, 11.17, -- https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654
 Surface Temperature, 13, -- Project InnerSpace GeoMap https://geomap.projectinnerspace.org/test/
 
-Maximum Drawdown, 0.035, -- Drawdown value that prevents minimum net electricity generation from going below 100 MWe
-Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
+Maximum Drawdown, 0.015, -- Drawdown value that prevents minimum net electricity generation from going below 100 MWe
+Water Loss Fraction, 0.01, -- Conservative estimate based on simulation values of less than 1% in Singh. et al. 2025
+Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs
 
 Utilization Factor, .9
 Plant Outlet Pressure, 2175 psi, -- https://doi.org/10.31223/X5VH8C
