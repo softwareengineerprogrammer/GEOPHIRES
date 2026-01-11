@@ -81,6 +81,7 @@ in source code for the full set of inputs.
 #### Reservoir Parameters
 
 {{ reservoir_parameters_table_md }}
+| Reservoir Volume                | {{ reservoir_volume_m3 }} m³                         | Calculated from fracture area × fracture separation × number of fractures per well × number of wells |
 
 #### Well Bore & Surface Plant Parameters
 
@@ -93,8 +94,6 @@ in source code for the full set of inputs.
 | Flow Rate per Production Well   | {{ flowrate_kg_per_sec_per_well }} kg/s              | Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s (Fervo Energy, 2024). Higher sustained flow rates may be possible; the maximum flow rate achieved in the pilot was 107 kg/s, and modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025). |
 | Number of Production Wells      | {{ number_of_production_wells }}                     | Each well pair (doublet) is expected to initially produce up to 11 MWe (gross) at a 107 kg/s flow rate. A well pair producing 11 MWe gross with ~10% parasitic loss produces approximately 10 MWe net.                                                                    |
 | Number of Injection Wells       | {{ number_of_injection_wells }}                      | 5-well benches with 3:2 producer:injector ratio (Singh et al., 2025)                                                                    |
-| Number of Fractures per Well    | {{ number_of_fractures_per_well }}                   | The model assumes a "High-Intensity" stimulation design utilizing                                                                                                                                                                                                         {{ stim_stage_count }} geometric stages with {{ clusters_per_stim_stage }} clusters per stage (Extreme Limited Entry) (Fervo Energy, 2023).                                                                                                                                                                                        |
-| Reservoir Volume                | {{ reservoir_volume_m3 }} m³                         | Calculated from fracture area × fracture separation × number of fractures per well × number of wells                                                                                                                          |
 | Maximum Drawdown                | {{ maximum_drawdown_pct ~ '%' }}                     | This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.                                      |
 | Productivity Index              | {{ productivity_index_kg_per_sec_per_bar }} kg/s/bar | {{ pi_ii_source }}                                                                                                                                         |
 | Injectivity Index               | {{ injectivity_index_kg_per_sec_per_bar }} kg/s/bar  | {{ pi_ii_source }}                                                                                                                                         |

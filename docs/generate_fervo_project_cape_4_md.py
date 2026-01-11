@@ -88,7 +88,9 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
 
 def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
     return get_fpc4_category_parameters_table_md(
-        input_params, 'Reservoir', parameters_to_exclude=['Maximum Temperature', 'Reservoir Porosity']
+        input_params,
+        'Reservoir',
+        parameters_to_exclude=['Maximum Temperature', 'Reservoir Porosity', 'Reservoir Volume Option'],
     )
 
 
@@ -135,7 +137,7 @@ def get_fpc4_category_parameters_table_md(
     for table_entry in table_entries:
         table_md += f'| {table_entry[0]} | {table_entry[1]} | {table_entry[2]} |\n'
 
-    return table_md
+    return table_md.strip()
 
 
 def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
