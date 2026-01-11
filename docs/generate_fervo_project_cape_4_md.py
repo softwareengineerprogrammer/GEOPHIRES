@@ -25,6 +25,17 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / 'src'))
 
 
+# noinspection MarkdownIncorrectTableFormatting
+def get_fpc4_reservoir_parameters_table_md(fpc4_input_parameter_values: dict[str, Any]) -> str:
+    p = fpc4_input_parameter_values
+    # FIXME WIP
+    return f"""
+| Parameter         | Input Value(s)                      | Source      |
+|-------------------|-------------------------------------|-------------|
+| Gradient          | {p['gradient_1_degc_per_km']}℃/km'  | 200℃ at 8500 ft depth (Fercho et al., 2024), 228.89℃ at 9824 ft (Norbeck et al., 2024). |
+"""
+
+
 def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
     print('Extracting input parameter values...')
 
@@ -235,8 +246,12 @@ def main():
     )
     result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
 
-    template_values = get_fpc4_input_parameter_values(input_params, result)
+    fpc4_input_parameter_values = get_fpc4_input_parameter_values(input_params, result)
+    template_values = {**fpc4_input_parameter_values}
     template_values = {**template_values, **get_result_values(result)}
+    template_values['reservoir_parameters_table_md'] = get_fpc4_reservoir_parameters_table_md(
+        fpc4_input_parameter_values
+    )
 
     # Set up Jinja environment
     docs_dir = project_root / 'docs'

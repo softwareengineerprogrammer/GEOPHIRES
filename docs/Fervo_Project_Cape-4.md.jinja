@@ -78,6 +78,12 @@ results, such as number of doublets (well pairs).
 See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt)
 in source code for the full set of inputs.
 
+#### Reservoir Parameters
+
+{# @formatter:off #}
+{{ reservoir_parameters_table_md }}
+{# @formatter:on #}
+
 #### Economic Parameters
 
 {# @formatter:off #}
@@ -103,7 +109,6 @@ in source code for the full set of inputs.
 {# @formatter:off #}
 | Parameter                       | Input Value(s)                                       | Source                                                                                                                     |
 |---------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Gradient                        | {{ gradient_1_degc_per_km ~ '℃/km' }}                | 200℃ at 8500 ft depth (Fercho et al., 2024), 228.89℃ at 9824 ft (Norbeck et al., 2024).                                                                                                                                                                                   |
 | Construction Years              | {{ construction_yrs }}                               | Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations. |
 | Plant Lifetime                  | {{ plant_lifetime_yrs }} years                       | 30-year well life per Geothermal Mythbusting: Water Use and Impacts (Fervo Energy, 2025).                                                                                                                                     |
 | Well diameter                   | 9⅝ inches (OD); 8½ inches (ID)                       | 9⅝" is the next standard casing size up from 7", implied by announcement of "increasing casing diameter" (Fervo Energy, 2025).    |
