@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
@@ -110,6 +111,13 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         / surf_equip_sim['Average Total Electricity Generation']['value']
         * 100.0
     )
+    net_power_idx = result.power_generation_profile[0].index('NET POWER (MW)')
+
+    def n_year_avg_net_power_mwe(years: int) -> float:
+        return np.average([it[net_power_idx] for it in result.power_generation_profile[1:]][:years])
+
+    two_year_avg_net_power_mwe = n_year_avg_net_power_mwe(2)
+    two_year_avg_net_power_mwe_per_production_well = two_year_avg_net_power_mwe / _number_of_production_wells(result)
 
     total_fracture_surface_area_per_well_m2 = _total_fracture_surface_area_per_well_m2(result)
 
@@ -149,6 +157,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'avg_net_generation_mwe': round(sig_figs(avg_net_generation_mwe, 3)),
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
         'max_total_generation_mwe': round(sig_figs(max_total_generation_mwe, 3)),
+        'two_year_avg_net_power_mwe_per_production_well': sig_figs(two_year_avg_net_power_mwe_per_production_well, 4),
         'parasitic_loss_pct': sig_figs(parasitic_loss_pct, 3),
         'number_of_times_redrilling': redrills,
         'total_wells_including_redrilling': total_wells_including_redrilling,
@@ -165,12 +174,15 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     }
 
 
+def _number_of_production_wells(result: GeophiresXResult) -> int:
+    return result.result['SUMMARY OF RESULTS']['Number of production wells']['value']
+
+
 def _number_of_wells(result: GeophiresXResult) -> int:
     r: dict[str, dict[str, Any]] = result.result
 
-    number_of_wells = (
-        r['SUMMARY OF RESULTS']['Number of injection wells']['value']
-        + r['SUMMARY OF RESULTS']['Number of production wells']['value']
+    number_of_wells = r['SUMMARY OF RESULTS']['Number of injection wells']['value'] + _number_of_production_wells(
+        result
     )
 
     return number_of_wells
