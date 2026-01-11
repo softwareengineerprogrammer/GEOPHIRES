@@ -6,6 +6,7 @@ This ensures the markdown documentation stays in sync with actual GEOPHIRES resu
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import Any
@@ -25,32 +26,122 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / 'src'))
 
 
+def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape4TestCase._get_input_parameters
+    _params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
+) -> dict[str, Any]:
+    comment_idx = 0
+    ret: dict[str, Any] = {}
+    for line in _params.as_text().split('\n'):
+        parts = line.strip().split(', ')  # TODO generalize for array-type params
+        field = parts[0].strip()
+        if len(parts) >= 2 and not field.startswith('#'):
+            fieldValue = parts[1].strip()
+            if include_parameter_comments and len(parts) > 2:
+                fieldValue += ', ' + (', '.join(parts[2:])).strip()
+            ret[field] = fieldValue.strip()
+
+        if include_line_comments and field.startswith('#'):
+            ret[f'_COMMENT-{comment_idx}'] = line.strip()
+            comment_idx += 1
+
+        # TODO preserve newlines
+
+    return ret
+
+
+def _get_schema() -> dict[str, Any]:
+    schema_file = project_root / 'src/geophires_x_schema_generator/geophires-request.json'
+    with open(schema_file, encoding='utf-8') as f:
+        return json.loads(f.read())
+
+
+def _get_parameter_category(param_name: str) -> str:
+    return _get_schema()['properties'][param_name]['category']
+
+
+def _get_parameter_units(param_name: str) -> str | None:
+    unit = _get_schema()['properties'][param_name]['units']
+
+    if unit == '':
+        return 'dimensionless'
+
+    return unit
+
+
+def _get_unit_display(parameter_units_from_schema: str) -> str:
+    if parameter_units_from_schema is None:
+        return ''
+
+    display_unit_prefix = ' ' if parameter_units_from_schema not in ['%'] else ''
+    display_unit = parameter_units_from_schema
+    for replacement in [
+        ('kilometer', 'km'),
+        ('degC', '℃'),
+        ('meter', 'm'),
+        ('m**3', 'm³'),
+        ('m**2', 'm²'),
+    ]:
+        display_unit = display_unit.replace(replacement[0], replacement[1])
+
+    return f'{display_unit_prefix}{display_unit}'
+
+
+def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    return get_fpc4_category_parameters_table_md(
+        input_params, 'Reservoir', parameters_to_exclude=['Maximum Temperature', 'Reservoir Porosity']
+    )
+
+
+def get_fpc4_category_parameters_table_md(
+    input_params: GeophiresInputParameters, category_name: str, parameters_to_exclude: list[str] | None
+) -> str:
+    if parameters_to_exclude is None:
+        parameters_to_exclude = []
+
+    input_params_dict = _get_input_parameters_dict(
+        input_params, include_parameter_comments=True, include_line_comments=True
+    )
+
+    # noinspection MarkdownIncorrectTableFormatting
+    table_md = """
+| Parameter         | Input Value(s)                            | Comment/Source      |
+|-------------------|-------------------------------------------|-------------|
+"""
+
+    table_entries = []
+    for param_name, param_val_comment in input_params_dict.items():
+        if param_name.startswith(('#', '_COMMENT-')):
+            continue
+
+        if param_name in parameters_to_exclude:
+            continue
+
+        category = _get_parameter_category(param_name)
+        if category == category_name:
+            param_val_comment_split = param_val_comment.split(',', maxsplit=1)
+            param_val = param_val_comment_split[0]
+            param_comment = (
+                param_val_comment_split[1].replace('-- ', '') if len(param_val_comment_split) > 1 else ' .. N/A '
+            )
+            param_unit = _get_parameter_units(param_name)
+            if param_unit == 'dimensionless':
+                param_unit_display = '%'
+                param_val = PlainQuantity(float(param_val), 'dimensionless').to('percent').magnitude
+            else:
+                param_unit_display = _get_unit_display(param_unit)
+            # TODO handle enums display
+            table_entries.append([param_name, f'{param_val}{param_unit_display}', param_comment])
+
+    for table_entry in table_entries:
+        table_md += f'| {table_entry[0]} | {table_entry[1]} | {table_entry[2]} |\n'
+
+    return table_md
+
+
 def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
     print('Extracting input parameter values...')
 
-    def _get_input_parameters(  # TODO consolidate with FervoProjectCape4TestCase._get_input_parameters
-        _params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
-    ) -> dict[str, Any]:
-        comment_idx = 0
-        ret: dict[str, Any] = {}
-        for line in _params.as_text().split('\n'):
-            parts = line.strip().split(', ')  # TODO generalize for array-type params
-            field = parts[0].strip()
-            if len(parts) >= 2 and not field.startswith('#'):
-                fieldValue = parts[1].strip()
-                if include_parameter_comments and len(parts) > 2:
-                    fieldValue += ', ' + (', '.join(parts[2:])).strip()
-                ret[field] = fieldValue.strip()
-
-            if include_line_comments and field.startswith('#'):
-                ret[f'_COMMENT-{comment_idx}'] = line.strip()
-                comment_idx += 1
-
-            # TODO preserve newlines
-
-        return ret
-
-    params = _get_input_parameters(input_params)
+    params = _get_input_parameters_dict(input_params)
     r: dict[str, dict[str, Any]] = result.result
 
     exploration_cost_musd = _q(r['CAPITAL COSTS (M$)']['Exploration costs']).to('MUSD').magnitude
@@ -86,7 +177,6 @@ def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, resu
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
         'ambient_temperature_degc': params['Ambient Temperature'],
         'maximum_drawdown_pct': sig_figs(float(params['Maximum Drawdown']) * 100.0, 2),
-        'water_loss_pct': PlainQuantity(float(params['Water Loss Fraction']), 'dimensionless').to('percent').magnitude,
     }
 
 
@@ -235,8 +325,13 @@ def main():
     )
     result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
 
-    template_values = get_fpc4_input_parameter_values(input_params, result)
+    fpc4_input_parameter_values = get_fpc4_input_parameter_values(input_params, result)
+
+    template_values = {**fpc4_input_parameter_values}
+    # noinspection PyDictCreation
     template_values = {**template_values, **get_result_values(result)}
+
+    template_values['reservoir_parameters_table_md'] = get_fpc4_reservoir_parameters_table_md(input_params)
 
     # Set up Jinja environment
     docs_dir = project_root / 'docs'
