@@ -58,7 +58,7 @@ Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fr
 Number of Fractures per Stimulated Well, 150, -- 25 stages with 6 clusters per stage
 Fracture Separation, 9.14, -- 30 foot cluster spacing per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
-Fracture Height, 208, -- Singh et al. (2025)
+Fracture Height, 208, -- Based on modeled gross dimensions in Singh et al., 2025 of 550 ft height × 670 ft half-length (ellipse) derated by 40% to account for flow channeling and heterogeneous proppant distribution. Diagrams of fracture geometry, proppant placement, and thermal sweep confirm that effective heat exchange occurs in multistranded fracture propagations rather than the full geometric envelope.
 Number of Production Wells, 50
 Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al. 2025)
 
