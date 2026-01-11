@@ -60,7 +60,30 @@ def _get_parameter_category(param_name: str) -> str:
 
 
 def _get_parameter_units(param_name: str) -> str | None:
-    return _get_schema()['properties'][param_name]['units']
+    unit = _get_schema()['properties'][param_name]['units']
+
+    if unit == '':
+        return 'dimensionless'
+
+    return unit
+
+
+def _get_unit_display(parameter_units_from_schema: str) -> str:
+    if parameter_units_from_schema is None:
+        return ''
+
+    display_unit_prefix = ' ' if parameter_units_from_schema not in ['%'] else ''
+    display_unit = parameter_units_from_schema
+    for replacement in [
+        ('kilometer', 'km'),
+        ('degC', '℃'),
+        ('meter', 'm'),
+        ('m**3', 'm³'),
+        ('m**2', 'm²'),
+    ]:
+        display_unit = display_unit.replace(replacement[0], replacement[1])
+
+    return f'{display_unit_prefix}{display_unit}'
 
 
 def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
@@ -87,8 +110,9 @@ def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameter
             param_comment = (
                 param_val_comment_split[1].replace('-- ', '') if len(param_val_comment_split) > 1 else ' .. N/A '
             )
-            # FIXME WIP TODO units
-            table_entries.append([param_name, param_val, param_comment])
+            param_unit = _get_parameter_units(param_name)
+            param_unit_display = _get_unit_display(param_unit)
+            table_entries.append([param_name, f'{param_val}{param_unit_display}', param_comment])
 
     for table_entry in table_entries:
         table_md += f'| {table_entry[0]} | {table_entry[1]} | {table_entry[2]} |\n'
