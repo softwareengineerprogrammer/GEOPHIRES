@@ -93,8 +93,8 @@ def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameter
 
     # noinspection MarkdownIncorrectTableFormatting
     table_md = """
-| Parameter         | Input Value(s)                      | Source      |
-|-------------------|-------------------------------------|-------------|
+| Parameter         | Input Value(s)                            | Source      |
+|-------------------|-------------------------------------------|-------------|
 """
     # | Gradient          | {p['gradient_1_degc_per_km']}℃/km'  | 200℃ at 8500 ft depth (Fercho et al., 2024), 228.89℃ at 9824 ft (Norbeck et al., 2024). |
 
@@ -111,7 +111,12 @@ def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameter
                 param_val_comment_split[1].replace('-- ', '') if len(param_val_comment_split) > 1 else ' .. N/A '
             )
             param_unit = _get_parameter_units(param_name)
-            param_unit_display = _get_unit_display(param_unit)
+            if param_unit == 'dimensionless':
+                param_unit_display = '%'
+                param_val = PlainQuantity(float(param_val), 'dimensionless').to('percent').magnitude
+            else:
+                param_unit_display = _get_unit_display(param_unit)
+            # TODO handle enums display
             table_entries.append([param_name, f'{param_val}{param_unit_display}', param_comment])
 
     for table_entry in table_entries:
@@ -159,7 +164,6 @@ def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, resu
         'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
         'ambient_temperature_degc': params['Ambient Temperature'],
         'maximum_drawdown_pct': sig_figs(float(params['Maximum Drawdown']) * 100.0, 2),
-        'water_loss_pct': PlainQuantity(float(params['Water Loss Fraction']), 'dimensionless').to('percent').magnitude,
     }
 
 
