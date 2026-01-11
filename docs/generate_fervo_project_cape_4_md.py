@@ -104,7 +104,7 @@ def get_fpc4_category_parameters_table_md(
 
     # noinspection MarkdownIncorrectTableFormatting
     table_md = """
-| Parameter         | Input Value(s)                            | Comment/Source      |
+| Parameter         | Input Value(s)                            | Comment      |
 |-------------------|-------------------------------------------|-------------|
 """
 
