@@ -43,10 +43,10 @@ Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-
 Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
 Reservoir Depth, 2.8175, -- Based on Singh et al. (2025)
 
-Gradient 1, 74, -- 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
 Number of Segments, 1
+Gradient 1, 74, -- 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
 
-Reservoir Density, 2800, -- per https://doi.org/10.31223/X52X0B: phyllite + quartzite + diorite + granodiorite
+Reservoir Density, 2800, -- phyllite + quartzite + diorite + granodiorite (https://doi.org/10.31223/X52X0B)
 Reservoir Heat Capacity, 790
 Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118

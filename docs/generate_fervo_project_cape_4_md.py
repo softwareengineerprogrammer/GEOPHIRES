@@ -87,24 +87,37 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
 
 
 def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    return get_fpc4_category_parameters_table_md(
+        input_params, 'Reservoir', parameters_to_exclude=['Maximum Temperature', 'Reservoir Porosity']
+    )
+
+
+def get_fpc4_category_parameters_table_md(
+    input_params: GeophiresInputParameters, category_name: str, parameters_to_exclude: list[str] | None
+) -> str:
+    if parameters_to_exclude is None:
+        parameters_to_exclude = []
+
     input_params_dict = _get_input_parameters_dict(
         input_params, include_parameter_comments=True, include_line_comments=True
     )
 
     # noinspection MarkdownIncorrectTableFormatting
     table_md = """
-| Parameter         | Input Value(s)                            | Source      |
+| Parameter         | Input Value(s)                            | Comment/Source      |
 |-------------------|-------------------------------------------|-------------|
 """
-    # | Gradient          | {p['gradient_1_degc_per_km']}℃/km'  | 200℃ at 8500 ft depth (Fercho et al., 2024), 228.89℃ at 9824 ft (Norbeck et al., 2024). |
 
     table_entries = []
     for param_name, param_val_comment in input_params_dict.items():
         if param_name.startswith(('#', '_COMMENT-')):
             continue
 
+        if param_name in parameters_to_exclude:
+            continue
+
         category = _get_parameter_category(param_name)
-        if category == 'Reservoir':
+        if category == category_name:
             param_val_comment_split = param_val_comment.split(',', maxsplit=1)
             param_val = param_val_comment_split[0]
             param_comment = (
