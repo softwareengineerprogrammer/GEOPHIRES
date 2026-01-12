@@ -58,8 +58,10 @@ Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fr
 
 Number of Fractures per Stimulated Well, 150, -- The model assumes a “High-Intensity” stimulation design utilizing 26 geometric stages with 6 clusters per stage (Extreme Limited Entry) (Fervo Energy, 2023).
 Fracture Separation, 9.14, -- 30 foot cluster spacing per [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
-Fracture Shape, 2,
-Fracture Height, 208, -- Based on modeled gross dimensions in Singh et al., 2025 of 550 ft height × 670 ft half-length (ellipse) derated by 40% to account for flow channeling and heterogeneous proppant distribution. Diagrams of fracture geometry, proppant placement, and thermal sweep confirm that effective heat exchange occurs in multistranded fracture propagations rather than the full geometric envelope.
+
+Fracture Shape, 4, -- Bench design in Singh et al., 2025 is given in rectangular dimensions.
+Fracture Width, 304.8, -- Matches intra-bench well spacing of 500 ft (corresponding to fracture length of 1000 ft) (Singh. et al., 2025)
+Fracture Height, 111.48, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
 
 Water Loss Fraction, 0.01, -- "Long-term modeling, calibrated to early field data, predicts circulation recapture rates exceeding 99%" ([Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/); Fervo Energy, 2025). Modeling in Singh et al., 2025 predicts fluid loss of 0.36% to 0.49%.
 Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs
@@ -94,7 +96,7 @@ Ramey Production Wellbore Model, True, -- Use Ramey's model to estimate the geof
 Injection Wellbore Temperature Gain, 3
 
 
-Maximum Drawdown, 0.0025, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
+Maximum Drawdown, 0.003, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************
