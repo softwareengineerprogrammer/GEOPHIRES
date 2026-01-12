@@ -69,7 +69,7 @@ Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement cost
 Ambient Temperature, 11.17, -- Average annual temperature of Milford, Utah ([NCEI](https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654)). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study.
 
 Utilization Factor, .9
-Plant Outlet Pressure, 2175 psi, -- McClure, 2024.
+Plant Outlet Pressure, 2000 psi, -- McClure, 2024; Singh et al., 2025.
 Circulation Pump Efficiency, 0.80
 
 # *** Well Bores Parameters ***

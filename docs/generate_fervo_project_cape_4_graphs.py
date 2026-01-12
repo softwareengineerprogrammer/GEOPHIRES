@@ -113,7 +113,7 @@ def generate_production_temperature_graph(
 
     # Set axis limits
     ax.set_xlim(years.min(), years.max())
-    ax.set_ylim(200, 450)
+    ax.set_ylim(225, 425)
 
     # Add grid for better readability
     ax.grid(True, linestyle='--', alpha=0.7)
@@ -133,20 +133,26 @@ def generate_production_temperature_graph(
 def generate_fervo_project_cape_4_graphs(
     input_params: GeophiresInputParameters, result: GeophiresXResult, output_dir: Path
 ) -> None:
-    generate_net_power_graph(result, output_dir)
-    generate_production_temperature_graph(result, output_dir)
+    # generate_net_power_graph(result, output_dir)
+    # generate_production_temperature_graph(result, output_dir)
 
+    # fmt:off
     singh_et_al_base_simulation_input_params = ImmutableGeophiresInputParameters(
         from_file_path=input_params.as_file_path(),
-        params={'Number of Production Wells': 4, 'Maximum Drawdown': 1, 'Plant Lifetime': 15},
+        params={
+            'Number of Production Wells': 4,
+            'Maximum Drawdown': 1,
+            'Plant Lifetime': 15,
+        },
     )
+    # fmt:on
 
     singh_et_al_base_simulation_result = GeophiresXClient().get_geophires_result(
         singh_et_al_base_simulation_input_params
     )
-    generate_net_power_graph(
-        singh_et_al_base_simulation_result, output_dir, filename='singh_et_al_base_simulation-net-power-production.png'
-    )
+    # generate_net_power_graph(
+    #     singh_et_al_base_simulation_result, output_dir, filename='singh_et_al_base_simulation-net-power-production.png'
+    # )
     generate_production_temperature_graph(
         singh_et_al_base_simulation_result,
         output_dir,

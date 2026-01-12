@@ -66,12 +66,6 @@ values.
 Note that these are not the exhaustive set of inputs and results, which are available in source code and
 the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4).
 
-### Reservoir Engineering Reference
-
-Reservoir engineering was based on Singh et al., 2025, which was used by Fervo to guide implementation.
-
-![](_images/singh-et-al-2025_wht-700-ft-bench-spacing.png)
-
 ### Inputs
 
 Exact values were used for publicly available technical and engineering parameters, such as reservoir
@@ -149,6 +143,14 @@ in source code for the complete results.
 | Maximum Net Electricity Generation   | {{ max_net_generation_mwe}} MW                                   |                                                                                                                                                                                                                                                                                                                                       |                                                                                                                                                           |
 | Number of times redrilling           | {{ number_of_times_redrilling }}            | 2–5                                  | Redrilling expected to be required within 5–10 years of project start                                                                                                                                                                                                                                                                 |
 | Total wells drilled over project lifetime | {{ total_wells_including_redrilling }} | 320 total wells permitted by BLM | BLM, 2024. |
+{# @formatter:on #}
+
+#### Production Temperature Comparison with Singh. et al., 2025
+
+{# @formatter:off #}
+| Reservoir Engineering Reference Base Case Simulation | Case Study Equivalent Simulation |
+|---|---|
+| <img src="_images/singh-et-al-2025_wht-700-ft-bench-spacing.png" /> | <img src="_images/singh_et_al_base_simulation-production-temperature.png" /> |
 {# @formatter:on #}
 
 ### Sensitivity Analysis
