@@ -11,7 +11,7 @@ Ending Electricity Sale Price, 1, -- Note that this value does not directly dete
 Electricity Escalation Start Year, 1
 
 Discount Rate, 0.12, -- Typical discount rates for high-risk projects may be 12–15%
-Fraction of Investment in Bonds, .6, -- Based on $1 billion sponsor equity per [Matson, 2024](https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/). Note that this source says that Fervo ultimately wants to target “15% sponsor equity, 15% bridge loan, and 70% construction to term loans”, but this case study does not attempt to model that capital structure.
+Fraction of Investment in Bonds, .65, -- Based on $1 billion sponsor equity per [Matson, 2024](https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/). Note that this source says that Fervo ultimately wants to target “15% sponsor equity, 15% bridge loan, and 70% construction to term loans”, but this case study does not attempt to model that capital structure.
 Inflated Bond Interest Rate, .08, -- Higher than typical debt annual interest rate
 Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
 
