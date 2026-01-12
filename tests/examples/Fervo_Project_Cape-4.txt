@@ -41,9 +41,9 @@ Power Plant Type, 2, -- Supercritical ORC
 Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/
 
 Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
-Reservoir Depth, 2.8175, -- Based on Singh et al. (2025)
+Reservoir Depth, 2.8175, -- Based on production temperature of deeper producers in Singh et al., 2025.
 
-Surface Temperature, 13, -- Project InnerSpace GeoMap https://geomap.projectinnerspace.org/test/
+Surface Temperature, 13, -- Surface temperature at 38.4987670, -112.9163432 ([Project InnerSpace, 2025](https://geomap.projectinnerspace.org/test/))
 
 Number of Segments, 1
 Gradient 1, 74, -- 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
@@ -62,7 +62,7 @@ Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement cost
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
 
 Number of Fractures per Stimulated Well, 150, -- The model assumes a “High-Intensity” stimulation design utilizing 26 geometric stages with 6 clusters per stage (Extreme Limited Entry) (Fervo Energy, 2023).
-Fracture Separation, 9.14, -- 30 foot cluster spacing per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
+Fracture Separation, 9.14, -- 30 foot cluster spacing per [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
 Fracture Height, 208, -- Based on modeled gross dimensions in Singh et al., 2025 of 550 ft height × 670 ft half-length (ellipse) derated by 40% to account for flow channeling and heterogeneous proppant distribution. Diagrams of fracture geometry, proppant placement, and thermal sweep confirm that effective heat exchange occurs in multistranded fracture propagations rather than the full geometric envelope.
 Number of Production Wells, 50
