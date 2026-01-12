@@ -95,22 +95,25 @@ def generate_production_temperature_graph(
 
     # Extract years and temperature values
     years = np.array([row[year_idx] for row in data])
-    temperatures = np.array([row[temp_idx] for row in data])
+    temperatures_celsius = np.array([row[temp_idx] for row in data])
 
-    # Create the figure
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Convert Celsius to Fahrenheit
+    temperatures_fahrenheit = temperatures_celsius * 9 / 5 + 32
+
+    # Create the figure (same size as net power graph)
+    fig, ax = plt.subplots(figsize=(7, 10))
 
     # Plot the data
-    ax.plot(years, temperatures, color='#e63333', linewidth=2, marker='o', markersize=4)
+    ax.plot(years, temperatures_fahrenheit, color='#e63333', linewidth=2, marker='o', markersize=4)
 
     # Set labels and title
     ax.set_xlabel('Time (Years)', fontsize=12)
-    ax.set_ylabel('Production Temperature (°C)', fontsize=12)
+    ax.set_ylabel('Production Temperature (°F)', fontsize=12)
     ax.set_title('Production Temperature Over Project Lifetime', fontsize=14)
 
     # Set axis limits
     ax.set_xlim(years.min(), years.max())
-    ax.set_ylim(100, 230)
+    ax.set_ylim(200, 450)
 
     # Add grid for better readability
     ax.grid(True, linestyle='--', alpha=0.7)
