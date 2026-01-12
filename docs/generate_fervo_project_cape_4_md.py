@@ -219,48 +219,6 @@ def get_fpc4_category_parameters_table_md(
     return table_md.strip()
 
 
-def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
-    print('Extracting input parameter values...')
-
-    params = _get_input_parameters_dict(input_params)
-    r: dict[str, dict[str, Any]] = result.result
-
-    exploration_cost_musd = _q(r['CAPITAL COSTS (M$)']['Exploration costs']).to('MUSD').magnitude
-    assert exploration_cost_musd == float(
-        params['Exploration Capital Cost']
-    ), 'Exploration cost mismatch between parameters and result'
-
-    return {
-        'starting_ppa_price_cents_per_kwh': PlainQuantity(float(params['Starting Electricity Sale Price']), 'USD / kWh')
-        .to('cents / kWh')
-        .magnitude,
-        'year_10_ppa_price_cents_per_kwh': 10,  # TODO read from result cash flow table
-        'construction_yrs': params['Construction Years'],
-        'exploration_cost_musd': round(sig_figs(exploration_cost_musd, 2)),
-        'plant_lifetime_yrs': params['Plant Lifetime'],
-        'power_plant_capex_usd_per_kw': params['Capital Cost for Power Plant for Electricity Generation'],
-        'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
-        'gradient_1_degc_per_km': params['Gradient 1'],
-        'flowrate_kg_per_sec_per_well': round(
-            _q(r['SUMMARY OF RESULTS']['Flowrate per production well']).to('kg / sec').magnitude
-        ),
-        'injection_temperature_degc': params['Injection Temperature'],
-        'number_of_fractures_per_well': params['Number of Fractures per Stimulated Well'],
-        'stim_stage_count': 26,
-        'clusters_per_stim_stage': 6,
-        'fracture_separation_m': sig_figs(float(params['Fracture Separation']), 2),
-        'fracture_height_m': params['Fracture Height'],
-        'productivity_index_kg_per_sec_per_bar': params['Productivity Index'],
-        'injectivity_index_kg_per_sec_per_bar': params['Injectivity Index'],
-        'pi_ii_source': '50% of ATB conservative scenario (NREL, 2025) per analyses that suggest lower productivity (Xing et al., 2025; Yearsley and Kombrink, 2024).',
-        'number_of_production_wells': params['Number of Production Wells'],
-        'number_of_injection_wells': r['SUMMARY OF RESULTS']['Number of injection wells']['value'],
-        'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
-        'ambient_temperature_degc': params['Ambient Temperature'],
-        'maximum_drawdown_pct': sig_figs(float(params['Maximum Drawdown']) * 100.0, 2),
-    }
-
-
 def _q(d: dict[str, Any]) -> PlainQuantity:
     return PlainQuantity(d['value'], d['unit'])
 
@@ -409,9 +367,8 @@ def main():
     )
     result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
 
-    fpc4_input_parameter_values = get_fpc4_input_parameter_values(input_params, result)
+    template_values = {}
 
-    template_values = {**fpc4_input_parameter_values}
     # noinspection PyDictCreation
     template_values = {**template_values, **get_result_values(result)}
 
