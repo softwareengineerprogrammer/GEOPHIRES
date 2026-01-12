@@ -102,10 +102,17 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
 
 
 def generate_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    params_to_exclude = [
+        'Maximum Temperature',
+        'Reservoir Porosity',
+        'Reservoir Volume Option',
+        'Number of Segments',  # TODO only exclude if value is 1
+    ]
+
     return get_fpc4_category_parameters_table_md(
         input_params,
         'Reservoir',
-        parameters_to_exclude=['Maximum Temperature', 'Reservoir Porosity', 'Reservoir Volume Option'],
+        params_to_exclude,
     )
 
 
@@ -188,12 +195,19 @@ def get_fpc4_category_parameters_table_md(
             else:
                 param_unit_display = _get_unit_display(param_unit)
 
+            param_unit_display_prefix = '$' if param_unit and 'USD' in param_unit else ''
+
             if is_int(param_val):
                 param_val = int(param_val)
 
-            param_unit_display_prefix = '$' if param_unit and 'USD' in param_unit else ''
-
-            # TODO handle enums display
+            param_schema = _get_parameter_schema(param_name)
+            if param_schema and 'enum_values' in param_schema:
+                for enum_value in param_schema['enum_values']:
+                    if enum_value['int_value'] == param_val:
+                        enum_display = enum_value['value']
+                        # param_val = f'{param_val} ({enum_display})'
+                        param_val = enum_display
+                        break
 
             table_entries.append(
                 [param_name, f'{param_unit_display_prefix}{param_val}{param_unit_display}', param_comment]
