@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from generate_fervo_project_cape_4_graphs import generate_fervo_project_cape_4_graphs
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
@@ -22,9 +23,10 @@ from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
-# Add project root to path to import GEOPHIRES modules
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root / 'src'))
+# Add project root to path to import GEOPHIRES and docs modules
+_PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(_PROJECT_ROOT / 'src'))
+sys.path.insert(0, Path(__file__).parent)
 
 
 def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape4TestCase._get_input_parameters
@@ -51,7 +53,7 @@ def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape4TestCa
 
 
 def _get_schema() -> dict[str, Any]:
-    schema_file = project_root / 'src/geophires_x_schema_generator/geophires-request.json'
+    schema_file = _PROJECT_ROOT / 'src/geophires_x_schema_generator/geophires-request.json'
     with open(schema_file, encoding='utf-8') as f:
         return json.loads(f.read())
 
@@ -363,9 +365,9 @@ def main():
     """
 
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-        from_file_path=project_root / 'tests/examples/Fervo_Project_Cape-4.txt'
+        from_file_path=_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.txt'
     )
-    result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
+    result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
 
     template_values = {}
 
@@ -377,8 +379,12 @@ def main():
     template_values['well_bores_parameters_table_md'] = generate_fpc4_well_bores_parameters_table_md(input_params)
     template_values['economics_parameters_table_md'] = generate_fpc4_economics_parameters_table_md(input_params)
 
+    # Generate the net power production graph
+    docs_dir = _PROJECT_ROOT / 'docs'
+    images_dir = docs_dir / '_images'
+    generate_fervo_project_cape_4_graphs(input_params, result, images_dir)
+
     # Set up Jinja environment
-    docs_dir = project_root / 'docs'
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
     template = env.get_template('Fervo_Project_Cape-4.md.jinja')
 

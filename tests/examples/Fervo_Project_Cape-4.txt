@@ -61,7 +61,7 @@ Fracture Separation, 9.14, -- 30 foot cluster spacing per [Singh et al., 2025](h
 
 Fracture Shape, 4, -- Bench design and fracture geometry Singh et al., 2025 are given in rectangular dimensions.
 Fracture Width, 304.8, -- Matches intra-bench well spacing of 500 ft (corresponding to fracture length of 1000 ft) (Singh. et al., 2025)
-Fracture Height, 111.48, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
+Fracture Height, 135, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
 
 Water Loss Fraction, 0.01, -- "Long-term modeling, calibrated to early field data, predicts circulation recapture rates exceeding 99%" ([Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/); Fervo Energy, 2025). Modeling in Singh et al., 2025 predicts fluid loss of 0.36% to 0.49%.
 Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs
@@ -69,7 +69,7 @@ Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement cost
 Ambient Temperature, 11.17, -- Average annual temperature of Milford, Utah ([NCEI](https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654)). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study.
 
 Utilization Factor, .9
-Plant Outlet Pressure, 2175 psi, -- McClure, 2024.
+Plant Outlet Pressure, 2000 psi, -- McClure, 2024; Singh et al., 2025.
 Circulation Pump Efficiency, 0.80
 
 # *** Well Bores Parameters ***
