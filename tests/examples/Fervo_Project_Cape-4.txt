@@ -16,7 +16,7 @@ Inflated Bond Interest Rate, .08
 Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
 
 Inflation Rate, .027, -- US inflation as of December 2025
-Construction Years, 5, 2023–2028
+Construction Years, 5, -- Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations.
 Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 Investment Tax Credit Rate, 0.3
@@ -38,7 +38,7 @@ Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs 
 # *************************************************
 End-Use Option, 1, -- Electricity
 Power Plant Type, 2, -- Supercritical ORC
-Plant Lifetime, 30, -- Per https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/
+Plant Lifetime, 30, -- 30-year well life per [Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/) (Fervo Energy, 2025).
 
 Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
 Reservoir Depth, 2.8175, -- Based on production temperature of deeper producers in Singh et al., 2025.
@@ -76,7 +76,7 @@ Ramey Production Wellbore Model, 1
 Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperature
 Injection Wellbore Temperature Gain, 3
 
-Ambient Temperature, 11.17, -- https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654
+Ambient Temperature, 11.17, -- Average annual temperature of Milford, Utah ([NCEI](https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654)). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study.
 
 Maximum Drawdown, 0.015, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
 

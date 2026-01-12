@@ -86,11 +86,19 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
     return f'{display_unit_prefix}{display_unit}'
 
 
-def get_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
     return get_fpc4_category_parameters_table_md(
         input_params,
         'Reservoir',
         parameters_to_exclude=['Maximum Temperature', 'Reservoir Porosity', 'Reservoir Volume Option'],
+    )
+
+
+def generate_fpc4_surface_plant_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    return get_fpc4_category_parameters_table_md(
+        input_params,
+        'Surface Plant',
+        parameters_to_exclude=['End-Use Option'],
     )
 
 
@@ -129,9 +137,15 @@ def get_fpc4_category_parameters_table_md(
             if param_unit == 'dimensionless':
                 param_unit_display = '%'
                 param_val = PlainQuantity(float(param_val), 'dimensionless').to('percent').magnitude
+            elif ' ' in param_val:
+                param_val_split = param_val.split(' ', maxsplit=1)
+                param_val = param_val_split[0]
+                param_unit_display = _get_unit_display(param_val_split[1])
             else:
                 param_unit_display = _get_unit_display(param_unit)
+
             # TODO handle enums display
+
             table_entries.append([param_name, f'{param_val}{param_unit_display}', param_comment])
 
     for table_entry in table_entries:
@@ -333,7 +347,8 @@ def main():
     # noinspection PyDictCreation
     template_values = {**template_values, **get_result_values(result)}
 
-    template_values['reservoir_parameters_table_md'] = get_fpc4_reservoir_parameters_table_md(input_params)
+    template_values['reservoir_parameters_table_md'] = generate_fpc4_reservoir_parameters_table_md(input_params)
+    template_values['surface_plant_parameters_table_md'] = generate_fpc4_surface_plant_parameters_table_md(input_params)
 
     # Set up Jinja environment
     docs_dir = project_root / 'docs'
