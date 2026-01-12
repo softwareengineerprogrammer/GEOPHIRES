@@ -23,7 +23,7 @@ Investment Tax Credit Rate, 0.3
 Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
 Property Tax Rate, 0.0022, -- Utah Inland Port Authority (UIPA) tax differential incentive
 
-Capital Cost for Power Plant for Electricity Generation, 1900, -- https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf
+Capital Cost for Power Plant for Electricity Generation, 1900, -- [US DOE, 2021](https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf).
 Exploration Capital Cost, 30, -- Equivalent to 2024b ATB NF-EGS conservative scenario exploration assumption of 5 full-size wells (NREL, 2025), plus $1M for geophysical and field work, plus 15% contingency, plus 12% indirect costs.
 
 Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)
@@ -66,7 +66,7 @@ Fracture Separation, 9.14, -- 30 foot cluster spacing per [Singh et al., 2025](h
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
 Fracture Height, 208, -- Based on modeled gross dimensions in Singh et al., 2025 of 550 ft height × 670 ft half-length (ellipse) derated by 40% to account for flow channeling and heterogeneous proppant distribution. Diagrams of fracture geometry, proppant placement, and thermal sweep confirm that effective heat exchange occurs in multistranded fracture propagations rather than the full geometric envelope.
 Number of Production Wells, 50
-Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al. 2025)
+Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al., 2025)
 
 Production Flow Rate per Well, 100, -- Tested sustained flow rate (ATB NF-EGS Advanced is 110 kg/s; Maximum Fervo-tested flow rate is 120 kg/s)
 Production Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
@@ -81,13 +81,13 @@ Ambient Temperature, 11.17, -- Average annual temperature of Milford, Utah ([NCE
 Maximum Drawdown, 0.015, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
 
 Utilization Factor, .9
-Plant Outlet Pressure, 2175 psi, -- https://doi.org/10.31223/X5VH8C
-Production Wellhead Pressure, 300 psi, -- https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
+Plant Outlet Pressure, 2175 psi, -- McClure, 2024.
+Production Wellhead Pressure, 300 psi, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
 Circulation Pump Efficiency, 0.80
 
 Well Geometry Configuration, 4, -- L
 Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost.
-Nonvertical Length per Multilateral Section, 4700 feet, -- per https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf
+Nonvertical Length per Multilateral Section, 4700 feet, -- per [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
 Multilaterals Cased, True
 
 # *** SIMULATION PARAMETERS ***
