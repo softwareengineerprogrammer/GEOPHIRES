@@ -94,6 +94,14 @@ def generate_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputPara
     )
 
 
+def generate_fpc4_well_bores_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    return get_fpc4_category_parameters_table_md(
+        input_params,
+        'Well Bores',
+        parameters_to_exclude=['Number of Multilateral Sections'],
+    )
+
+
 def generate_fpc4_surface_plant_parameters_table_md(input_params: GeophiresInputParameters) -> str:
     return get_fpc4_category_parameters_table_md(
         input_params,
@@ -349,6 +357,7 @@ def main():
 
     template_values['reservoir_parameters_table_md'] = generate_fpc4_reservoir_parameters_table_md(input_params)
     template_values['surface_plant_parameters_table_md'] = generate_fpc4_surface_plant_parameters_table_md(input_params)
+    template_values['well_bores_parameters_table_md'] = generate_fpc4_well_bores_parameters_table_md(input_params)
 
     # Set up Jinja environment
     docs_dir = project_root / 'docs'

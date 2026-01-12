@@ -53,9 +53,6 @@ Reservoir Heat Capacity, 790
 Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118
 
-Productivity Index, 1.247, -- 50% of NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
-Injectivity Index, 1.5075, -- 50% of NREL ATB conservative scenario (https://atb.nrel.gov/electricity/2024/geothermal)
-
 Water Loss Fraction, 0.01, -- "Long-term modeling, calibrated to early field data, predicts circulation recapture rates exceeding 99%" ([Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/); Fervo Energy, 2025). Modeling in Singh et al., 2025 predicts fluid loss of 0.36% to 0.49%.
 Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs
 
@@ -65,30 +62,40 @@ Number of Fractures per Stimulated Well, 150, -- The model assumes a “High-Int
 Fracture Separation, 9.14, -- 30 foot cluster spacing per [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
 Fracture Shape, 2, -- CIRCULAR_DIAMETER
 Fracture Height, 208, -- Based on modeled gross dimensions in Singh et al., 2025 of 550 ft height × 670 ft half-length (ellipse) derated by 40% to account for flow channeling and heterogeneous proppant distribution. Diagrams of fracture geometry, proppant placement, and thermal sweep confirm that effective heat exchange occurs in multistranded fracture propagations rather than the full geometric envelope.
-Number of Production Wells, 50
-Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al., 2025)
 
-Production Flow Rate per Well, 100, -- Tested sustained flow rate (ATB NF-EGS Advanced is 110 kg/s; Maximum Fervo-tested flow rate is 120 kg/s)
-Production Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
-Injection Well Diameter, 8.535, -- Inner diameter for 9-5/8" casing size
 
-Ramey Production Wellbore Model, 1
-Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperature
-Injection Wellbore Temperature Gain, 3
 
 Ambient Temperature, 11.17, -- Average annual temperature of Milford, Utah ([NCEI](https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654)). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study.
 
-Maximum Drawdown, 0.015, -- Drawdown value that prevents minimum net electricity generation from going below 500 MWe
-
 Utilization Factor, .9
 Plant Outlet Pressure, 2175 psi, -- McClure, 2024.
-Production Wellhead Pressure, 300 psi, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
 Circulation Pump Efficiency, 0.80
 
-Well Geometry Configuration, 4, -- L
+# *** Well Bores Parameters ***
+
+Number of Production Wells, 50, -- Number of production wells required to produce net generation greater than 500 MW (PPA minimum) and total generation less than 600 MW (Gen 2 ORCs gross capacity).
+Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al., 2025)
+
+# Well Geometry Configuration, 4, -- L
 Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost.
-Nonvertical Length per Multilateral Section, 4700 feet, -- per [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
-Multilaterals Cased, True
+Nonvertical Length per Multilateral Section, 4700 feet, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf).
+# Multilaterals Cased, True
+
+Production Flow Rate per Well, 100, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s (Fervo Energy, 2024). Higher sustained flow rates may be possible. The maximum flow rate achieved in the pilot was 107 kg/s; modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025); ATB Advanced Scenario models 110 kg/s (NREL, 2024).
+Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
+Injection Well Diameter, 8.535, -- See Production Well Diameter
+
+Production Wellhead Pressure, 300 psi, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
+
+Productivity Index, 1.247, -- 50% of ATB Conservative Scenario (NREL, 2025) per analyses that suggest lower productivity (Xing et al., 2025; Yearsley and Kombrink, 2024).
+Injectivity Index, 1.5075, -- See Productivity Index
+
+Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers & McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck & Latimer, 2023).
+Ramey Production Wellbore Model, True, -- Use Ramey's model to estimate the geofluid temperature drop in the production wells
+Injection Wellbore Temperature Gain, 3
+
+
+Maximum Drawdown, 0.015, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************
