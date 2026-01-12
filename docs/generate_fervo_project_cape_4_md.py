@@ -12,9 +12,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from generate_fervo_project_cape_4_graphs import generate_fervo_project_cape_4_graphs
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
-from matplotlib import pyplot as plt
 from pint.facets.plain import PlainQuantity
 
 from geophires_x.GeoPHIRESUtils import is_int
@@ -23,9 +23,10 @@ from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
-# Add project root to path to import GEOPHIRES modules
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root / 'src'))
+# Add project root to path to import GEOPHIRES and docs modules
+_PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(_PROJECT_ROOT / 'src'))
+sys.path.insert(0, Path(__file__).parent)
 
 
 def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape4TestCase._get_input_parameters
@@ -52,7 +53,7 @@ def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape4TestCa
 
 
 def _get_schema() -> dict[str, Any]:
-    schema_file = project_root / 'src/geophires_x_schema_generator/geophires-request.json'
+    schema_file = _PROJECT_ROOT / 'src/geophires_x_schema_generator/geophires-request.json'
     with open(schema_file, encoding='utf-8') as f:
         return json.loads(f.read())
 
@@ -358,71 +359,15 @@ def _total_fracture_surface_area_per_well_m2(result: GeophiresXResult) -> float:
     )
 
 
-def generate_net_power_graph(result: GeophiresXResult, output_dir: Path) -> str:
-    """
-    Generate a graph of time vs net power production and save it to the output directory.
-
-    Args:
-        result: The GEOPHIRES result object
-        output_dir: Directory to save the graph image
-
-    Returns:
-        The filename of the generated graph
-    """
-    print('Generating net power production graph...')
-
-    # Extract data from power generation profile
-    profile = result.power_generation_profile
-    headers = profile[0]
-    data = profile[1:]
-
-    # Find the indices for YEAR and NET POWER columns
-    year_idx = headers.index('YEAR')
-    net_power_idx = headers.index('NET POWER (MW)')
-
-    # Extract years and net power values
-    years = np.array([row[year_idx] for row in data])
-    net_power = np.array([row[net_power_idx] for row in data])
-
-    # Create the figure
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # Plot the data
-    ax.plot(years, net_power, color='#3399e6', linewidth=2, marker='o', markersize=4)
-
-    # Set labels and title
-    ax.set_xlabel('Time (Years)', fontsize=12)
-    ax.set_ylabel('Net Power Production (MW)', fontsize=12)
-    ax.set_title('Net Power Production Over Project Lifetime', fontsize=14)
-
-    # Set axis limits
-    ax.set_xlim(years.min(), years.max())
-
-    # Add grid for better readability
-    ax.grid(True, linestyle='--', alpha=0.7)
-
-    # Ensure the output directory exists
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Save the figure
-    filename = 'fervo_project_cape-4-net-power-production.png'
-    save_path = output_dir / filename
-    plt.savefig(save_path, dpi=150, bbox_inches='tight')
-    plt.close(fig)
-
-    print(f'✓ Generated {save_path}')
-    return filename
-
-
 def main():
     """
     Generate Fervo_Project_Cape-4.md (markdown documentation) from the Jinja template.
     """
 
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-        from_file_path=project_root / 'tests/examples/Fervo_Project_Cape-4.txt'
+        from_file_path=_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.txt'
     )
-    result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
+    result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
 
     template_values = {}
 
@@ -435,9 +380,9 @@ def main():
     template_values['economics_parameters_table_md'] = generate_fpc4_economics_parameters_table_md(input_params)
 
     # Generate the net power production graph
-    docs_dir = project_root / 'docs'
+    docs_dir = _PROJECT_ROOT / 'docs'
     images_dir = docs_dir / '_images'
-    generate_net_power_graph(result, images_dir)
+    generate_fervo_project_cape_4_graphs(result, images_dir)
 
     # Set up Jinja environment
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
