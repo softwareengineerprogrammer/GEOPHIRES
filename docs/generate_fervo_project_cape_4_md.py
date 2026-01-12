@@ -16,6 +16,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
 
+from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
@@ -170,7 +171,9 @@ def get_fpc4_category_parameters_table_md(
                 ',' if _get_parameter_schema_type(param_name) != 'array' else ', ',
                 maxsplit=1,
             )
+
             param_val = param_val_comment_split[0]
+
             param_comment = (
                 param_val_comment_split[1].replace('-- ', '') if len(param_val_comment_split) > 1 else ' .. N/A '
             )
@@ -184,6 +187,9 @@ def get_fpc4_category_parameters_table_md(
                 param_unit_display = _get_unit_display(param_val_split[1])
             else:
                 param_unit_display = _get_unit_display(param_unit)
+
+            if is_int(param_val):
+                param_val = int(param_val)
 
             param_unit_display_prefix = '$' if param_unit and 'USD' in param_unit else ''
 
