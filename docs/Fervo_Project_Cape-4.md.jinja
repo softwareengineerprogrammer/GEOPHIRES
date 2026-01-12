@@ -145,13 +145,22 @@ in source code for the complete results.
 | Total wells drilled over project lifetime | {{ total_wells_including_redrilling }} | 320 total wells permitted by BLM | BLM, 2024. |
 {# @formatter:on #}
 
-#### Production Temperature Comparison with Singh. et al., 2025
+#### Production Temperature Comparison with Singh et al., 2025
+
+Figure 18 of Singh et al. (2025) illustrates reservoir modeling that informed the Cape Station field implementation. The following table compares the average production temperature profile from the "700 ft bench spacing" scenario in Singh et al. (2025) with an analogous GEOPHIRES simulation using the case study’s reservoir engineering parameters.
 
 {# @formatter:off #}
 | Reservoir Engineering Reference Base Case Simulation | Case Study Equivalent Simulation |
 |---|---|
 | <img src="_images/singh-et-al-2025_wht-700-ft-bench-spacing.png" /> | <img src="_images/singh_et_al_base_simulation-production-temperature.png" /> |
 {# @formatter:on #}
+
+While the initial and final (Year 15) temperatures are consistent, the production curves exhibit distinct profiles due to the different modeling approaches:
+
+1. Reference Simulation (Left): The Singh et al. (2025) curve reflects a fully coupled numerical simulation (ResFrac) that accounts for complex fracture heterogeneity, inter-well interference, and variable flow paths. The gradual decline starting around Year 3 indicates thermal dispersion, where cold injection fluid mixes with hot reservoir fluid along faster flow paths earlier in the project life.
+1. GEOPHIRES Simulation (Right): The GEOPHIRES result utilizes the Gringarten (1975) analytical solution for flow in fractured rock. This model assumes a uniform thermal sweep across an idealized fracture surface. Consequently, it maintains a flat, maximum production temperature for a longer duration until the cold front reaches the production well (thermal breakthrough), resulting in a sharper, later decline.
+
+Despite these structural differences, the comparison validates the basis for the case study's reservoir engineering parameters, as the aggregate heat extraction and year-15 endpoint align closely with the numerical simulation baseline.
 
 ### Sensitivity Analysis
 
