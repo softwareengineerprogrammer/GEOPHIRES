@@ -72,18 +72,22 @@ def main():
             pass
 
     # Watch the directory where the script is located (docs/)
-    watch_dir = script_dir
+    watch_dirs = [script_dir, Path(project_root) / 'tests' / 'examples']
 
     command = ['tox', '-e', 'docs']
     poll_interval = 2  # Seconds
 
-    _log.info(f"Watching '{watch_dir}' for changes...")
+    _log.info(f"Watching '{watch_dirs}' for changes...")
     _log.info(f"Project root determined as: '{project_root}'")
     _log.info(f"Command to run: {' '.join(command)}")
     _log.info('Press Ctrl+C to stop.')
 
     def _get_file_states() -> dict:
-        return {**get_file_states(watch_dir), **get_file_states(Path(project_root) / 'tests' / 'examples')}
+        states = {}
+        for watch_dir in watch_dirs:
+            states = {**states, **get_file_states(watch_dir)}
+
+        return states
 
     # Initial state
     last_states = _get_file_states()
@@ -108,7 +112,7 @@ def main():
 
                 _log.info(f"\nDocs rebuild complete at {time.strftime('%Y-%m-%d %H:%M:%S')}.")
                 _say('docs rebuilt')
-                _log.info(f"\nWaiting for further changes in '{watch_dir}'...")
+                _log.info(f"\nWaiting for further changes in '{watch_dirs}'...")
 
                 # Update state to the current state
                 last_states = _get_file_states()
