@@ -109,14 +109,14 @@ def generate_production_temperature_graph(
     # Set labels and title
     ax.set_xlabel('Simulation time (Years)', fontsize=12)
     ax.set_ylabel('Wellhead temperature (°F)', fontsize=12)
-    ax.set_title('Production Temperature Over Project Lifetime', fontsize=14)
+    # ax.set_title('Production Temperature Over Project Lifetime', fontsize=14)
 
     # Set axis limits
     ax.set_xlim(years.min(), years.max())
     ax.set_ylim(200, 450)
 
-    # Set y-axis ticks every 50 degrees, ensuring 400 is included
-    ax.set_yticks([200, 250, 300, 350, 400, 450])
+    # Set y-axis ticks every 50 degrees, with 400 explicitly labeled but not 200 or 450
+    ax.set_yticks([250, 300, 350, 400])
 
     # Add grid for better readability
     ax.grid(True, linestyle='--', alpha=0.7)
