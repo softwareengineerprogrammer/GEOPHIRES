@@ -23,7 +23,7 @@ Investment Tax Credit Rate, 0.3
 Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
 Property Tax Rate, 0.0022, -- Utah Inland Port Authority (UIPA) tax differential incentive
 
-Capital Cost for Power Plant for Electricity Generation, 1900, -- [US DOE, 2021](https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf).
+Capital Cost for Power Plant for Electricity Generation, 1900, -- [US DOE, 2021](https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf). Pricing information not publicly available for Turboden or Baker Hughes Gen 2 ORC units (Turboden, 2025; Jacobs, 2025).
 Exploration Capital Cost, 30, -- Equivalent to 2024b ATB NF-EGS conservative scenario exploration assumption of 5 full-size wells (NREL, 2025), plus $1M for geophysical and field work, plus 15% contingency, plus 12% indirect costs.
 
 Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)

@@ -55,8 +55,16 @@ def _get_schema() -> dict[str, Any]:
         return json.loads(f.read())
 
 
+def _get_parameter_schema(param_name: str) -> dict[str, Any]:
+    return _get_schema()['properties'][param_name]
+
+
+def _get_parameter_schema_type(param_name: str) -> dict[str, Any]:
+    return _get_parameter_schema(param_name)['type']
+
+
 def _get_parameter_category(param_name: str) -> str:
-    return _get_schema()['properties'][param_name]['category']
+    return _get_parameter_schema(param_name)['category']
 
 
 def _get_parameter_units(param_name: str) -> str | None:
@@ -110,6 +118,17 @@ def generate_fpc4_surface_plant_parameters_table_md(input_params: GeophiresInput
     )
 
 
+def generate_fpc4_economics_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+
+    # FIXME WIP TODO: Construction CAPEX Schedule
+
+    return get_fpc4_category_parameters_table_md(
+        input_params,
+        'Economics',
+        parameters_to_exclude=['Ending Electricity Sale Price', 'Electricity Escalation Start Year'],
+    )
+
+
 def get_fpc4_category_parameters_table_md(
     input_params: GeophiresInputParameters, category_name: str, parameters_to_exclude: list[str] | None
 ) -> str:
@@ -136,7 +155,11 @@ def get_fpc4_category_parameters_table_md(
 
         category = _get_parameter_category(param_name)
         if category == category_name:
-            param_val_comment_split = param_val_comment.split(',', maxsplit=1)
+            param_val_comment_split = param_val_comment.split(
+                # ',',
+                ',' if _get_parameter_schema_type(param_name) != 'array' else ', ',
+                maxsplit=1,
+            )
             param_val = param_val_comment_split[0]
             param_comment = (
                 param_val_comment_split[1].replace('-- ', '') if len(param_val_comment_split) > 1 else ' .. N/A '
@@ -358,6 +381,7 @@ def main():
     template_values['reservoir_parameters_table_md'] = generate_fpc4_reservoir_parameters_table_md(input_params)
     template_values['surface_plant_parameters_table_md'] = generate_fpc4_surface_plant_parameters_table_md(input_params)
     template_values['well_bores_parameters_table_md'] = generate_fpc4_well_bores_parameters_table_md(input_params)
+    template_values['economics_parameters_table_md'] = generate_fpc4_economics_parameters_table_md(input_params)
 
     # Set up Jinja environment
     docs_dir = project_root / 'docs'
