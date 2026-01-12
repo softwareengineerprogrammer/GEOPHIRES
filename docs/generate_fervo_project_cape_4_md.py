@@ -80,7 +80,11 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
     if parameter_units_from_schema is None:
         return ''
 
-    display_unit_prefix = ' ' if parameter_units_from_schema not in ['%'] else ''
+    display_unit_prefix = (
+        ' '
+        if not (parameter_units_from_schema and any(it in parameter_units_from_schema for it in ['%', 'USD', 'MUSD']))
+        else ''
+    )
     display_unit = parameter_units_from_schema
     for replacement in [
         ('kilometer', 'km'),
@@ -88,6 +92,8 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
         ('meter', 'm'),
         ('m**3', 'm³'),
         ('m**2', 'm²'),
+        ('MUSD', 'M'),
+        ('USD', ''),
     ]:
         display_unit = display_unit.replace(replacement[0], replacement[1])
 
@@ -125,7 +131,11 @@ def generate_fpc4_economics_parameters_table_md(input_params: GeophiresInputPara
     return get_fpc4_category_parameters_table_md(
         input_params,
         'Economics',
-        parameters_to_exclude=['Ending Electricity Sale Price', 'Electricity Escalation Start Year'],
+        parameters_to_exclude=[
+            'Ending Electricity Sale Price',
+            'Electricity Escalation Start Year',
+            'Time steps per year',
+        ],
     )
 
 
@@ -175,9 +185,13 @@ def get_fpc4_category_parameters_table_md(
             else:
                 param_unit_display = _get_unit_display(param_unit)
 
+            param_unit_display_prefix = '$' if param_unit and 'USD' in param_unit else ''
+
             # TODO handle enums display
 
-            table_entries.append([param_name, f'{param_val}{param_unit_display}', param_comment])
+            table_entries.append(
+                [param_name, f'{param_unit_display_prefix}{param_val}{param_unit_display}', param_comment]
+            )
 
     for table_entry in table_entries:
         table_md += f'| {table_entry[0]} | {table_entry[1]} | {table_entry[2]} |\n'
