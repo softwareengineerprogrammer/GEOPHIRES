@@ -83,13 +83,11 @@ in source code for the full set of inputs.
 {{ reservoir_parameters_table_md }}
 | Reservoir Volume                | {{ reservoir_volume_m3 }} m³                         | Calculated from fracture area × fracture separation × number of fractures per well × number of wells |
 
-#### Well Bore & Surface Plant Parameters
+#### Well Bore Parameters
 
 {# @formatter:off #}
 | Parameter                       | Input Value(s)                                       | Comment                                                                                                                     |
 |---------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Construction Years              | {{ construction_yrs }}                               | Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations. |
-| Plant Lifetime                  | {{ plant_lifetime_yrs }} years                       | 30-year well life per Geothermal Mythbusting: Water Use and Impacts (Fervo Energy, 2025).                                                                                                                                     |
 | Well diameter                   | 9⅝ inches (OD); 8½ inches (ID)                       | 9⅝" is the next standard casing size up from 7", implied by announcement of "increasing casing diameter" (Fervo Energy, 2025).    |
 | Flow Rate per Production Well   | {{ flowrate_kg_per_sec_per_well }} kg/s              | Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s (Fervo Energy, 2024). Higher sustained flow rates may be possible; the maximum flow rate achieved in the pilot was 107 kg/s, and modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025). |
 | Number of Production Wells      | {{ number_of_production_wells }}                     | 5-well benches with 3:2 producer:injector ratio (Singh et al., 2025) |
@@ -98,8 +96,15 @@ in source code for the full set of inputs.
 | Productivity Index              | {{ productivity_index_kg_per_sec_per_bar }} kg/s/bar | {{ pi_ii_source }}                                                                                                                                         |
 | Injectivity Index               | {{ injectivity_index_kg_per_sec_per_bar }} kg/s/bar  | {{ pi_ii_source }}                                                                                                                                         |
 | Injection Temperature           | {{ injection_temperature_degc ~ '℃' }}               | Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers & McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck & Latimer, 2023).                                                                      |
-| Ambient Temperature             | {{ ambient_temperature_degc ~ '℃'  }}                | Average annual temperature of Milford, Utah (NCEI). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study. |
 {# @formatter:on #}
+
+#### Construction & Surface Plant Parameters
+
+| Parameter                       | Input Value(s)                                       | Comment                                                                                                                     |
+|---------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Construction Years              | {{ construction_yrs }}                               | Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations. |
+| Plant Lifetime                  | {{ plant_lifetime_yrs }} years                       | 30-year well life per Geothermal Mythbusting: Water Use and Impacts (Fervo Energy, 2025).                                                                                                                                     |
+| Ambient Temperature             | {{ ambient_temperature_degc ~ '℃'  }}                | Average annual temperature of Milford, Utah (NCEI). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study. |
 
 #### Economic Parameters
 
