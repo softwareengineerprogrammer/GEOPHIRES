@@ -100,20 +100,23 @@ def generate_production_temperature_graph(
     # Convert Celsius to Fahrenheit
     temperatures_fahrenheit = temperatures_celsius * 9 / 5 + 32
 
-    # Create the figure (same size as net power graph)
-    fig, ax = plt.subplots(figsize=(7, 10))
+    # Create the figure - taller than wide (portrait orientation)
+    fig, ax = plt.subplots(figsize=(6, 8))
 
-    # Plot the data
-    ax.plot(years, temperatures_fahrenheit, color='#e63333', linewidth=2, marker='o', markersize=4)
+    # Plot the data - just the curve, no markers
+    ax.plot(years, temperatures_fahrenheit, color='#e63333', linewidth=2)
 
     # Set labels and title
-    ax.set_xlabel('Time (Years)', fontsize=12)
-    ax.set_ylabel('Production Temperature (°F)', fontsize=12)
+    ax.set_xlabel('Simulation time (Years)', fontsize=12)
+    ax.set_ylabel('Wellhead temperature (°F)', fontsize=12)
     ax.set_title('Production Temperature Over Project Lifetime', fontsize=14)
 
     # Set axis limits
     ax.set_xlim(years.min(), years.max())
-    ax.set_ylim(225, 425)
+    ax.set_ylim(200, 450)
+
+    # Set y-axis ticks every 50 degrees, ensuring 400 is included
+    ax.set_yticks([200, 250, 300, 350, 400, 450])
 
     # Add grid for better readability
     ax.grid(True, linestyle='--', alpha=0.7)
