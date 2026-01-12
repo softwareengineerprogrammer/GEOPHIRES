@@ -41,12 +41,13 @@ Power Plant Type, 2, -- Supercritical ORC
 Plant Lifetime, 30, -- 30-year well life per [Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/) (Fervo Energy, 2025).
 
 Reservoir Model, 1
-Reservoir Depth, 2.8175, -- Based on production temperature of deeper producers in Singh et al., 2025.
 
 Surface Temperature, 13, -- Surface temperature near Milford, UT (38.4987670, -112.9163432) ([Project InnerSpace, 2025](https://geomap.projectinnerspace.org/test/)).
 
 Number of Segments, 1
 Gradient 1, 74, -- 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
+
+Reservoir Depth, 2.68, -- Extrapolated from surface temperature, gradient, and average production temperature of shallower and deeper producers in Singh et al., 2025.
 
 Reservoir Density, 2800, -- phyllite + quartzite + diorite + granodiorite ([Norbeck et al., 2023](https://doi.org/10.31223/X52X0B))
 Reservoir Heat Capacity, 790
@@ -79,7 +80,7 @@ Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for t
 Nonvertical Length per Multilateral Section, 4700 feet, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf).
 # Multilaterals Cased, True
 
-Production Flow Rate per Well, 100, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s (Fervo Energy, 2024). Higher sustained flow rates may be possible. The maximum flow rate achieved in the pilot was 107 kg/s; modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025); ATB Advanced Scenario models 110 kg/s (NREL, 2024).
+Production Flow Rate per Well, 110, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025). The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
 Injection Well Diameter, 8.535, -- See Production Well Diameter
 
@@ -93,7 +94,7 @@ Ramey Production Wellbore Model, True, -- Use Ramey's model to estimate the geof
 Injection Wellbore Temperature Gain, 3
 
 
-Maximum Drawdown, 0.015, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
+Maximum Drawdown, 0.0025, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************

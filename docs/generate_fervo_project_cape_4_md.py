@@ -332,6 +332,9 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'parasitic_loss_pct': sig_figs(parasitic_loss_pct, 3),
         'number_of_times_redrilling': redrills,
         'total_wells_including_redrilling': total_wells_including_redrilling,
+        'initial_production_temperature_degc': round(
+            sig_figs(r['RESERVOIR SIMULATION RESULTS']['Initial Production Temperature']['value'], 3)
+        ),
         'average_production_temperature_degc': round(
             sig_figs(r['RESERVOIR SIMULATION RESULTS']['Average Production Temperature']['value'], 3)
         ),
