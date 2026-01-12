@@ -382,7 +382,7 @@ def main():
     # Generate the net power production graph
     docs_dir = _PROJECT_ROOT / 'docs'
     images_dir = docs_dir / '_images'
-    generate_fervo_project_cape_4_graphs(result, images_dir)
+    generate_fervo_project_cape_4_graphs(input_params, result, images_dir)
 
     # Set up Jinja environment
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)

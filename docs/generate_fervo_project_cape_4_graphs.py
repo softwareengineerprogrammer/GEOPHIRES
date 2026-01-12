@@ -5,10 +5,15 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
+from geophires_x_client import GeophiresInputParameters
+from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
+from geophires_x_client import ImmutableGeophiresInputParameters
 
 
-def generate_net_power_graph(result: GeophiresXResult, output_dir: Path) -> str:
+def generate_net_power_graph(
+    result: GeophiresXResult, output_dir: Path, filename='fervo_project_cape-4-net-power-production.png'
+) -> str:
     """
     Generate a graph of time vs net power production and save it to the output directory.
 
@@ -55,7 +60,6 @@ def generate_net_power_graph(result: GeophiresXResult, output_dir: Path) -> str:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Save the figure
-    filename = 'fervo_project_cape-4-net-power-production.png'
     save_path = output_dir / filename
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     plt.close(fig)
@@ -64,7 +68,9 @@ def generate_net_power_graph(result: GeophiresXResult, output_dir: Path) -> str:
     return filename
 
 
-def generate_production_temperature_graph(result: GeophiresXResult, output_dir: Path) -> str:
+def generate_production_temperature_graph(
+    result: GeophiresXResult, output_dir: Path, filename='fervo_project_cape-4-production-temperature.png'
+) -> str:
     """
     Generate a graph of time vs production temperature and save it to the output directory.
 
@@ -113,7 +119,6 @@ def generate_production_temperature_graph(result: GeophiresXResult, output_dir: 
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Save the figure
-    filename = 'fervo_project_cape-4-production-temperature.png'
     save_path = output_dir / filename
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     plt.close(fig)
@@ -122,9 +127,28 @@ def generate_production_temperature_graph(result: GeophiresXResult, output_dir: 
     return filename
 
 
-def generate_fervo_project_cape_4_graphs(result: GeophiresXResult, output_dir: Path) -> None:
+def generate_fervo_project_cape_4_graphs(
+    input_params: GeophiresInputParameters, result: GeophiresXResult, output_dir: Path
+) -> None:
     generate_net_power_graph(result, output_dir)
     generate_production_temperature_graph(result, output_dir)
+
+    singh_et_al_base_simulation_input_params = ImmutableGeophiresInputParameters(
+        from_file_path=input_params.as_file_path(),
+        params={'Number of Production Wells': 4, 'Maximum Drawdown': 1, 'Plant Lifetime': 15},
+    )
+
+    singh_et_al_base_simulation_result = GeophiresXClient().get_geophires_result(
+        singh_et_al_base_simulation_input_params
+    )
+    generate_net_power_graph(
+        singh_et_al_base_simulation_result, output_dir, filename='singh_et_al_base_simulation-net-power-production.png'
+    )
+    generate_production_temperature_graph(
+        singh_et_al_base_simulation_result,
+        output_dir,
+        filename='singh_et_al_base_simulation-production-temperature.png',
+    )
 
 
 if __name__ == '__main__':
@@ -132,6 +156,10 @@ if __name__ == '__main__':
     docs_dir = project_root / 'docs'
     images_dir = docs_dir / '_images'
 
-    result = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
+    input_params_: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+        from_file_path=project_root / 'tests/examples/Fervo_Project_Cape-4.txt'
+    )
 
-    generate_fervo_project_cape_4_graphs(result, images_dir)
+    result_ = GeophiresXResult(project_root / 'tests/examples/Fervo_Project_Cape-4.out')
+
+    generate_fervo_project_cape_4_graphs(input_params_, result_, images_dir)
