@@ -225,6 +225,24 @@ def _q(d: dict[str, Any]) -> PlainQuantity:
     return PlainQuantity(d['value'], d['unit'])
 
 
+def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
+    print('Extracting input parameter values...')
+
+    params = _get_input_parameters_dict(input_params)
+    r: dict[str, dict[str, Any]] = result.result
+
+    exploration_cost_musd = _q(r['CAPITAL COSTS (M$)']['Exploration costs']).to('MUSD').magnitude
+    assert exploration_cost_musd == float(
+        params['Exploration Capital Cost']
+    ), 'Exploration cost mismatch between parameters and result'
+
+    return {
+        'exploration_cost_musd': round(sig_figs(exploration_cost_musd, 2)),
+        'wacc_pct': sig_figs(r['ECONOMIC PARAMETERS']['WACC']['value'], 3),
+        'reservoir_volume_m3': f"{r['RESERVOIR PARAMETERS']['Reservoir volume']['value']:,}",
+    }
+
+
 def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     print('Extracting result values...')
 
@@ -369,7 +387,7 @@ def main():
     )
     result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
 
-    template_values = {}
+    template_values = get_fpc4_input_parameter_values(input_params, result)
 
     # noinspection PyDictCreation
     template_values = {**template_values, **get_result_values(result)}

@@ -91,8 +91,8 @@ Production Wellhead Pressure, 300 psi, -- [Singh et al., 2025](https://www.resfr
 Productivity Index, 1.247, -- 50% of ATB Conservative Scenario (NREL, 2025) per analyses that suggest lower productivity (Xing et al., 2025; Yearsley and Kombrink, 2024).
 Injectivity Index, 1.5075, -- See Productivity Index
 
-Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers & McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck & Latimer, 2023).
-Ramey Production Wellbore Model, True, -- Use Ramey's model to estimate the geofluid temperature drop in the production wells
+Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023).
+Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
 Injection Wellbore Temperature Gain, 3
 
 
