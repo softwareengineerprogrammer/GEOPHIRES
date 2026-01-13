@@ -387,17 +387,14 @@ def main():
     )
     result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
 
-    template_values = get_fpc4_input_parameter_values(input_params, result)
-
     # noinspection PyDictCreation
-    template_values = {**template_values, **get_result_values(result)}
+    template_values = {**get_fpc4_input_parameter_values(input_params, result), **get_result_values(result)}
 
     template_values['reservoir_parameters_table_md'] = generate_fpc4_reservoir_parameters_table_md(input_params)
     template_values['surface_plant_parameters_table_md'] = generate_fpc4_surface_plant_parameters_table_md(input_params)
     template_values['well_bores_parameters_table_md'] = generate_fpc4_well_bores_parameters_table_md(input_params)
     template_values['economics_parameters_table_md'] = generate_fpc4_economics_parameters_table_md(input_params)
 
-    # Generate the net power production graph
     docs_dir = _PROJECT_ROOT / 'docs'
     images_dir = docs_dir / '_images'
     generate_fervo_project_cape_4_graphs(input_params, result, images_dir)
