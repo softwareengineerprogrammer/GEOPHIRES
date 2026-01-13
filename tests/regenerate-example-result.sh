@@ -20,20 +20,20 @@ then
     python regenerate_example_result_csv.py example1_addons
 fi
 
-if [[ $1 == "Fervo_Project_Cape-4" ]]
+if [[ $1 == "Fervo_Project_Cape-5" ]]
 then
-    python ../docs/generate_fervo_project_cape_4_md.py
+    python ../src/geophires_docs/generate_fervo_project_cape_5.py
 
-    echo "Regenerating Fervo_Project_Cape-5..."
+    echo "Regenerating Fervo_Project_Cape-6..."
 
     sed -e 's/Construction Years,.*/Construction Years, 3/' \
         -e 's/^Number of Production Wells,.*/Number of Production Wells, 13/' \
         -e 's/500 MWe/100 MWe/' \
         -e 's/Phase II/Phase I/' \
-        examples/Fervo_Project_Cape-4.txt > examples/Fervo_Project_Cape-5.txt
+        examples/Fervo_Project_Cape-5.txt > examples/Fervo_Project_Cape-6.txt
 
-    python -mgeophires_x examples/Fervo_Project_Cape-5.txt examples/Fervo_Project_Cape-5.out
-    rm examples/Fervo_Project_Cape-5.json
+    python -mgeophires_x examples/Fervo_Project_Cape-6.txt examples/Fervo_Project_Cape-6.out
+    rm examples/Fervo_Project_Cape-6.json
 
     if [ ! -f regenerate-example-result.env ] && [ -f regenerate-example-result.env.template ]; then
         echo "Creating regenerate-example-result.env from template..."
@@ -41,12 +41,12 @@ then
     fi
 
     source regenerate-example-result.env
-    if [ -n "$GEOPHIRES_FPC4_SENSITIVITY_ANALYSIS_PROJECT_ROOT" ]; then
+    if [ -n "$GEOPHIRES_FPC5_SENSITIVITY_ANALYSIS_PROJECT_ROOT" ]; then
         echo "Updating sensitivity analysis..."
         STASH_PWD=$(pwd)
-        cd $GEOPHIRES_FPC4_SENSITIVITY_ANALYSIS_PROJECT_ROOT
+        cd $GEOPHIRES_FPC5_SENSITIVITY_ANALYSIS_PROJECT_ROOT
         source venv/bin/activate
-        python -m fpc4_sensitivity_analysis
+        python -m fpc5_sensitivity_analysis
         deactivate
         cd $STASH_PWD
     fi

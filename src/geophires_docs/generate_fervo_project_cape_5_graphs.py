@@ -5,6 +5,8 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
+from geophires_docs import _FPC5_INPUT_FILE_PATH
+from geophires_docs import _FPC5_RESULT_FILE_PATH
 from geophires_docs import _PROJECT_ROOT
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
@@ -12,7 +14,7 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 
 
 def generate_net_power_graph(
-    result: GeophiresXResult, output_dir: Path, filename='fervo_project_cape-4-net-power-production.png'
+    result: GeophiresXResult, output_dir: Path, filename='fervo_project_cape-5-net-power-production.png'
 ) -> str:
     """
     Generate a graph of time vs net power production and save it to the output directory.
@@ -133,7 +135,7 @@ def generate_production_temperature_graph(
     return filename
 
 
-def generate_fervo_project_cape_4_graphs(
+def generate_fervo_project_cape_5_graphs(
     base_case: tuple[GeophiresInputParameters, GeophiresXResult],
     singh_et_al_base_simulation: tuple[GeophiresInputParameters, GeophiresXResult],
     output_dir: Path,
@@ -160,10 +162,8 @@ if __name__ == '__main__':
     docs_dir = _PROJECT_ROOT / 'docs'
     images_dir = docs_dir / '_images'
 
-    input_params_: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-        from_file_path=_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.txt'
-    )
+    input_params_: GeophiresInputParameters = ImmutableGeophiresInputParameters(from_file_path=_FPC5_INPUT_FILE_PATH)
 
-    result_ = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
+    result_ = GeophiresXResult(_FPC5_RESULT_FILE_PATH)
 
-    generate_fervo_project_cape_4_graphs(input_params_, result_, images_dir)
+    generate_fervo_project_cape_5_graphs(input_params_, result_, images_dir)
