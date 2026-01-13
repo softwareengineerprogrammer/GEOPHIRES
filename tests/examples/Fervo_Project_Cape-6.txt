@@ -1,4 +1,4 @@
-# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station Phase II
+# Case Study: 100 MWe EGS Project Modeled on Fervo Cape Station Phase I
 # See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
@@ -16,7 +16,7 @@ Inflated Bond Interest Rate, .08, -- Higher than typical debt annual interest ra
 Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
 
 Inflation Rate, .027, -- US inflation as of December 2025
-Construction Years, 5, -- Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations.
+Construction Years, 3
 Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 Investment Tax Credit Rate, 0.3, -- Geothermal Drilling and Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024).
@@ -78,7 +78,7 @@ Circulation Pump Efficiency, 0.80
 
 # *** Well Bores Parameters ***
 
-Number of Production Wells, 56, -- Number of production wells required to produce net generation greater than 500 MW (PPA minimum) and total generation less than 600 MW (Gen 2 ORCs gross capacity).
+Number of Production Wells, 13
 Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al., 2025)
 
 # Well Geometry Configuration, 4, -- L
@@ -100,7 +100,7 @@ Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid t
 Injection Wellbore Temperature Gain, 3
 
 
-Maximum Drawdown, 0.003, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
+Maximum Drawdown, 0.003, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥100 MWe.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************

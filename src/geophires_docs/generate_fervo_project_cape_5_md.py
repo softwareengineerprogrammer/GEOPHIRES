@@ -1,6 +1,6 @@
 #!python
 """
-Script to generate Fervo_Project_Cape-4.md from its jinja template.
+Script to generate Fervo_Project_Cape-5.md from its jinja template.
 This ensures the markdown documentation stays in sync with actual GEOPHIRES results.
 """
 
@@ -14,6 +14,8 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
 
+from geophires_docs import _FPC5_INPUT_FILE_PATH
+from geophires_docs import _FPC5_RESULT_FILE_PATH
 from geophires_docs import _PROJECT_ROOT
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
@@ -98,37 +100,37 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
     return f'{display_unit_prefix}{display_unit}'
 
 
-def generate_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
     params_to_exclude = [
         'Maximum Temperature',
         'Reservoir Porosity',
         'Reservoir Volume Option',
     ]
 
-    return get_fpc4_category_parameters_table_md(
+    return get_fpc_category_parameters_table_md(
         input_params,
         'Reservoir',
         params_to_exclude,
     )
 
 
-def generate_fpc4_well_bores_parameters_table_md(input_params: GeophiresInputParameters) -> str:
-    return get_fpc4_category_parameters_table_md(
+def generate_fpc_well_bores_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    return get_fpc_category_parameters_table_md(
         input_params,
         'Well Bores',
         parameters_to_exclude=['Number of Multilateral Sections'],
     )
 
 
-def generate_fpc4_surface_plant_parameters_table_md(input_params: GeophiresInputParameters) -> str:
-    return get_fpc4_category_parameters_table_md(
+def generate_fpc_surface_plant_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    return get_fpc_category_parameters_table_md(
         input_params,
         'Surface Plant',
         parameters_to_exclude=['End-Use Option', 'Construction Years'],
     )
 
 
-def generate_fpc4_construction_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc_construction_parameters_table_md(input_params: GeophiresInputParameters) -> str:
     input_params_dict = _get_input_parameters_dict(
         input_params, include_parameter_comments=True, include_line_comments=True
     )
@@ -148,13 +150,13 @@ def generate_fpc4_construction_parameters_table_md(input_params: GeophiresInputP
         f'{construction_input_params[schedule_param_name]}' f', -- {schedule_param_comment}'
     )
 
-    return get_fpc4_category_parameters_table_md(
+    return get_fpc_category_parameters_table_md(
         ImmutableGeophiresInputParameters(params=construction_input_params), None
     )
 
 
-def generate_fpc4_economics_parameters_table_md(input_params: GeophiresInputParameters) -> str:
-    return get_fpc4_category_parameters_table_md(
+def generate_fpc_economics_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    return get_fpc_category_parameters_table_md(
         input_params,
         'Economics',
         parameters_to_exclude=[
@@ -167,7 +169,7 @@ def generate_fpc4_economics_parameters_table_md(input_params: GeophiresInputPara
     )
 
 
-def get_fpc4_category_parameters_table_md(
+def get_fpc_category_parameters_table_md(
     input_params: GeophiresInputParameters, category_name: str | None, parameters_to_exclude: list[str] | None = None
 ) -> str:
     if parameters_to_exclude is None:
@@ -243,7 +245,7 @@ def _q(d: dict[str, Any]) -> PlainQuantity:
     return PlainQuantity(d['value'], d['unit'])
 
 
-def get_fpc4_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
+def get_fpc5_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
     print('Extracting input parameter values...')
 
     params = _get_input_parameters_dict(input_params)
@@ -398,7 +400,7 @@ def _total_fracture_surface_area_per_well_m2(result: GeophiresXResult) -> float:
 def generate_res_eng_reference_sim_params_table_md(
     base_case_input_params: GeophiresInputParameters, res_eng_reference_sim_params: dict[str, Any]
 ) -> str:
-    return get_fpc4_category_parameters_table_md(
+    return get_fpc_category_parameters_table_md(
         ImmutableGeophiresInputParameters(
             # from_file_path=base_case_input_params.as_file_path(),
             params=res_eng_reference_sim_params
@@ -407,7 +409,7 @@ def generate_res_eng_reference_sim_params_table_md(
     )
 
 
-def generate_fervo_project_cape_4_md(
+def generate_fervo_project_cape_5_md(
     input_params: GeophiresInputParameters,
     result: GeophiresXResult,
     res_eng_reference_sim_params: dict[str, Any] | None = None,
@@ -416,14 +418,14 @@ def generate_fervo_project_cape_4_md(
         res_eng_reference_sim_params = {}
 
     # noinspection PyDictCreation
-    template_values = {**get_fpc4_input_parameter_values(input_params, result), **get_result_values(result)}
+    template_values = {**get_fpc5_input_parameter_values(input_params, result), **get_result_values(result)}
 
     for template_key, md_method in {
-        'reservoir_parameters_table_md': generate_fpc4_reservoir_parameters_table_md,
-        'surface_plant_parameters_table_md': generate_fpc4_surface_plant_parameters_table_md,
-        'well_bores_parameters_table_md': generate_fpc4_well_bores_parameters_table_md,
-        'economics_parameters_table_md': generate_fpc4_economics_parameters_table_md,
-        'construction_parameters_table_md': generate_fpc4_construction_parameters_table_md,
+        'reservoir_parameters_table_md': generate_fpc_reservoir_parameters_table_md,
+        'surface_plant_parameters_table_md': generate_fpc_surface_plant_parameters_table_md,
+        'well_bores_parameters_table_md': generate_fpc_well_bores_parameters_table_md,
+        'economics_parameters_table_md': generate_fpc_economics_parameters_table_md,
+        'construction_parameters_table_md': generate_fpc_construction_parameters_table_md,
     }.items():
         template_values[template_key] = md_method(input_params)
 
@@ -435,14 +437,14 @@ def generate_fervo_project_cape_4_md(
 
     # Set up Jinja environment
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
-    template = env.get_template('Fervo_Project_Cape-4.md.jinja')
+    template = env.get_template('Fervo_Project_Cape-5.md.jinja')
 
     # Render template
     print('Rendering template...')
     output = template.render(**template_values)
 
     # Write output
-    output_file = docs_dir / 'Fervo_Project_Cape-4.md'
+    output_file = docs_dir / 'Fervo_Project_Cape-5.md'
     output_file.write_text(output, encoding='utf-8')
 
     print(f'✓ Generated {output_file}')
@@ -454,14 +456,12 @@ def generate_fervo_project_cape_4_md(
 
 def main():
     """
-    Generate Fervo_Project_Cape-4.md (markdown documentation) from the Jinja template.
+    Generate Fervo_Project_Cape-5.md (markdown documentation) from the Jinja template.
     """
 
-    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-        from_file_path=_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.txt'
-    )
-    result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
-    generate_fervo_project_cape_4_md(input_params, result)
+    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(from_file_path=_FPC5_INPUT_FILE_PATH)
+    result = GeophiresXResult(_FPC5_RESULT_FILE_PATH)
+    generate_fervo_project_cape_5_md(input_params, result)
 
 
 if __name__ == '__main__':

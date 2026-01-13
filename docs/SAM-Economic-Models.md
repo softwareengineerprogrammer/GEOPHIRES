@@ -121,7 +121,7 @@ Output Parameters:
 
 ### Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
 
-[Web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4)
+[Web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5)
 
 Documentation: [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](Fervo_Project_Cape-4.html).
 

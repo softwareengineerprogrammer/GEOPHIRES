@@ -1,11 +1,11 @@
-# [v2025-08-11] Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
+# [Deprecated] Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
 
 **⚠️ This is a previous version of the case study. The case study has been updated since the release of this version.**
-[Click here](https://github.com/NREL/GEOPHIRES-X/blob/main/docs/Fervo_Project_Cape-4.md#case-study-500-mwe-egs-project-modeled-on-fervo-cape-station) to find the latest version.
+[Click here](Fervo_Project_Cape-5.html) to find the latest version.
 
 ---
 
-The GEOPHIRES example `Fervo_Project_Cape-4_vv2025-08-11` is a case study of a 500 MWe EGS Project modeled
+The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS Project modeled
 on Fervo Cape Station with its April 2025-announced
 [upsizing from 400 MW to 500 MW](https://fervoenergy.com/fervo-energy-announces-31-mw-power-purchase-agreement-with-shell-energy/).
 Case study inputs are formulated using a combination of publicly available data, extrapolations, and estimates.
@@ -15,7 +15,7 @@ the [SAM Single Owner PPA Economic Model](https://softwareengineerprogrammer.git
 
 Key case study results include LCOE = $81.1/MWh and CAPEX = $5000/kW.
 
-[Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4_v2025-02-24) to
+[Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-4) to
 interactively explore the case study in the GEOPHIRES web interface.
 
 ## Approach & Methodology
@@ -41,7 +41,7 @@ the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-e
 
 ## Inputs
 
-See [Fervo_Project_Cape-4_v2025-08-11.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4_v2025-08-11.txt)
+See [Fervo_Project_Cape-4.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.txt)
 in source code for the full set of inputs.
 
 ### Economic Parameters
@@ -81,7 +81,7 @@ in source code for the full set of inputs.
 
 ## Results
 
-See [Fervo_Project_Cape-4_v2025-08-11.out](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4_v2025-08-11.out)
+See [Fervo_Project_Cape-4.out](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-4.out)
 in source code for the complete results.
 
 ### Economic Results

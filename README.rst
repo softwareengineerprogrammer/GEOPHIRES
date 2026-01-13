@@ -168,10 +168,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - Input file
      - Case report file
      - Link
-   * - Case Study: 500 MWe EGS  modeled on Fervo Cape Station Phase II (`documentation <https://nrel.github.io/GEOPHIRES-X/Fervo_Project_Cape-4.html>`__)
-     - `Fervo_Project_Cape-4.txt <tests/examples/Fervo_Project_Cape-4.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-4.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-4>`__
+   * - Case Study: 500 MWe EGS modeled on Fervo Cape Station (`documentation <https://nrel.github.io/GEOPHIRES-X/Fervo_Project_Cape-5.html>`__)
+     - `Fervo_Project_Cape-4.txt <tests/examples/Fervo_Project_Cape-5.txt>`__
+     - `.out <tests/examples/Fervo_Project_Cape-5.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-5>`__
    * - Example 1: EGS Electricity
      - `example1.txt <tests/examples/example1.txt>`__
      - `.out <tests/examples/example1.out>`__

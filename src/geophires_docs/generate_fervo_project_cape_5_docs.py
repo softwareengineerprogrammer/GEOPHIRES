@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from geophires_docs import _FPC5_INPUT_FILE_PATH
+from geophires_docs import _FPC5_RESULT_FILE_PATH
 from geophires_docs import _PROJECT_ROOT
-from geophires_docs import generate_fervo_project_cape_4_md
-from geophires_docs.generate_fervo_project_cape_4_graphs import generate_fervo_project_cape_4_graphs
+from geophires_docs import generate_fervo_project_cape_5_md
+from geophires_docs.generate_fervo_project_cape_5_graphs import generate_fervo_project_cape_5_graphs
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
@@ -15,6 +17,7 @@ _SINGH_ET_AL_BASE_SIMULATION_PARAMETERS: dict[str, Any] = {
     'Maximum Drawdown': 1,
     'Plant Lifetime': 15,
 }
+
 
 # fmt:off
 def get_singh_et_al_base_simulation_result(base_input_params: GeophiresInputParameters) \
@@ -32,21 +35,21 @@ def get_singh_et_al_base_simulation_result(base_input_params: GeophiresInputPara
     return singh_et_al_base_simulation_input_params, singh_et_al_base_simulation_result
 
 
-def generate_fervo_project_cape_4_docs():
+def generate_fervo_project_cape_5_docs():
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-        from_file_path=_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.txt'
+        from_file_path=_FPC5_INPUT_FILE_PATH
     )
-    result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
+    result = GeophiresXResult(_FPC5_RESULT_FILE_PATH)
 
     singh_et_al_base_simulation:tuple[GeophiresInputParameters,GeophiresXResult] = get_singh_et_al_base_simulation_result(input_params)
 
-    generate_fervo_project_cape_4_graphs(
+    generate_fervo_project_cape_5_graphs(
         (input_params, result),
         singh_et_al_base_simulation,
         _PROJECT_ROOT / 'docs/_images'
     )
 
-    generate_fervo_project_cape_4_md.generate_fervo_project_cape_4_md(
+    generate_fervo_project_cape_5_md.generate_fervo_project_cape_5_md(
         input_params,
         result,
         _SINGH_ET_AL_BASE_SIMULATION_PARAMETERS
@@ -54,4 +57,4 @@ def generate_fervo_project_cape_4_docs():
 
 
 if __name__ == '__main__':
-    generate_fervo_project_cape_4_docs()
+    generate_fervo_project_cape_5_docs()
