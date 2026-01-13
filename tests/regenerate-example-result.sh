@@ -22,7 +22,7 @@ fi
 
 if [[ $1 == "Fervo_Project_Cape-5" ]]
 then
-    python ../src/geophires_docs/generate_fervo_project_cape_5.py
+    python ../src/geophires_docs/generate_fervo_project_cape_5_docs.py
 
     echo "Regenerating Fervo_Project_Cape-6..."
 

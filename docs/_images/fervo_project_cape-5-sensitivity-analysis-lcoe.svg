@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="785.375625pt" height="693.89995pt" viewBox="0 0 785.375625 693.89995" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="784.835625pt" height="694.71355pt" viewBox="0 0 784.835625 694.71355" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-01-13T10:22:52.791922</dc:date>
+    <dc:date>2026-01-13T11:02:13.450689</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -21,47 +21,47 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 693.89995
-L 785.375625 693.89995
-L 785.375625 0
+   <path d="M 0 694.71355
+L 784.835625 694.71355
+L 784.835625 0
 L 0 0
 z
 " style="fill: #ffffff"/>
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 210.405625 686.69995
-L 778.175625 686.69995
-L 778.175625 97.45995
-L 210.405625 97.45995
+    <path d="M 210.405625 687.51355
+L 777.635625 687.51355
+L 777.635625 97.55355
+L 210.405625 97.55355
 z
 " style="fill: #ffffff"/>
    </g>
    <g id="line2d_1">
-    <path d="M 450.61601 686.69995
-L 450.61601 97.45995
-" clip-path="url(#p89e693d507)" style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #003c4d; stroke-width: 2"/>
+    <path d="M 450.387548 687.51355
+L 450.387548 97.55355
+" clip-path="url(#pe915f795fc)" style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #003c4d; stroke-width: 2"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_2">
-      <path d="M 240.135935 686.69995
-L 240.135935 97.45995
-" clip-path="url(#p89e693d507)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
+      <path d="M 240.107659 687.51355
+L 240.107659 97.55355
+" clip-path="url(#pe915f795fc)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
      </g>
      <g id="line2d_3">
       <defs>
-       <path id="m67b5a158bc" d="M 0 0
+       <path id="m340d1f2c06" d="M 0 0
 L 0 -3.5
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m67b5a158bc" x="240.135935" y="97.45995" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m340d1f2c06" x="240.107659" y="97.55355" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
       <!-- −2 -->
-      <g transform="translate(232.764842 88.380262) scale(0.1 -0.1)">
+      <g transform="translate(232.736566 88.473862) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-2212" d="M 678 2272
 L 4684 2272
@@ -102,18 +102,18 @@ z
     </g>
     <g id="xtick_2">
      <g id="line2d_4">
-      <path d="M 345.375973 686.69995
-L 345.375973 97.45995
-" clip-path="url(#p89e693d507)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
+      <path d="M 345.247604 687.51355
+L 345.247604 97.55355
+" clip-path="url(#pe915f795fc)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
      </g>
      <g id="line2d_5">
       <g>
-       <use xlink:href="#m67b5a158bc" x="345.375973" y="97.45995" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m340d1f2c06" x="345.247604" y="97.55355" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
       <!-- −1 -->
-      <g transform="translate(338.004879 88.380262) scale(0.1 -0.1)">
+      <g transform="translate(337.87651 88.473862) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-31" d="M 794 531
 L 1825 531
@@ -137,18 +137,18 @@ z
     </g>
     <g id="xtick_3">
      <g id="line2d_6">
-      <path d="M 450.61601 686.69995
-L 450.61601 97.45995
-" clip-path="url(#p89e693d507)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
+      <path d="M 450.387548 687.51355
+L 450.387548 97.55355
+" clip-path="url(#pe915f795fc)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
      </g>
      <g id="line2d_7">
       <g>
-       <use xlink:href="#m67b5a158bc" x="450.61601" y="97.45995" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m340d1f2c06" x="450.387548" y="97.55355" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
       <!-- 0 -->
-      <g transform="translate(447.43476 88.380262) scale(0.1 -0.1)">
+      <g transform="translate(447.206298 88.473862) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-30" d="M 2034 4250
 Q 1547 4250 1301 3770
@@ -178,54 +178,54 @@ z
     </g>
     <g id="xtick_4">
      <g id="line2d_8">
-      <path d="M 555.856047 686.69995
-L 555.856047 97.45995
-" clip-path="url(#p89e693d507)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
+      <path d="M 555.527492 687.51355
+L 555.527492 97.55355
+" clip-path="url(#pe915f795fc)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
      </g>
      <g id="line2d_9">
       <g>
-       <use xlink:href="#m67b5a158bc" x="555.856047" y="97.45995" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m340d1f2c06" x="555.527492" y="97.55355" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
       <!-- 1 -->
-      <g transform="translate(552.674797 88.380262) scale(0.1 -0.1)">
+      <g transform="translate(552.346242 88.473862) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-31"/>
       </g>
      </g>
     </g>
     <g id="xtick_5">
      <g id="line2d_10">
-      <path d="M 661.096084 686.69995
-L 661.096084 97.45995
-" clip-path="url(#p89e693d507)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
+      <path d="M 660.667437 687.51355
+L 660.667437 97.55355
+" clip-path="url(#pe915f795fc)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
      </g>
      <g id="line2d_11">
       <g>
-       <use xlink:href="#m67b5a158bc" x="661.096084" y="97.45995" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m340d1f2c06" x="660.667437" y="97.55355" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
       <!-- 2 -->
-      <g transform="translate(657.914834 88.380262) scale(0.1 -0.1)">
+      <g transform="translate(657.486187 88.473862) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-32"/>
       </g>
      </g>
     </g>
     <g id="xtick_6">
      <g id="line2d_12">
-      <path d="M 766.336121 686.69995
-L 766.336121 97.45995
-" clip-path="url(#p89e693d507)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
+      <path d="M 765.807381 687.51355
+L 765.807381 97.55355
+" clip-path="url(#pe915f795fc)" style="fill: none; stroke-dasharray: 0.8,1.32; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-opacity: 0.7; stroke-width: 0.8"/>
      </g>
      <g id="line2d_13">
       <g>
-       <use xlink:href="#m67b5a158bc" x="766.336121" y="97.45995" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m340d1f2c06" x="765.807381" y="97.55355" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
       <!-- 3 -->
-      <g transform="translate(763.154871 88.380262) scale(0.1 -0.1)">
+      <g transform="translate(762.626131 88.473862) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-33" d="M 2597 2516
 Q 3050 2419 3304 2112
@@ -266,7 +266,7 @@ z
     </g>
     <g id="text_7">
      <!-- Δ LCOE (cents/kWh) -->
-     <g style="fill: #333333" transform="translate(434.141562 70.781825) scale(0.12 -0.12)">
+     <g style="fill: #333333" transform="translate(433.871562 70.875425) scale(0.12 -0.12)">
       <defs>
        <path id="DejaVuSans-394" d="M 2188 4044
 L 906 525
@@ -573,7 +573,7 @@ z
      <g id="line2d_14"/>
      <g id="text_8">
       <!-- Construction Timeline -->
-      <g style="fill: #333333" transform="translate(39.170625 143.598571) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(39.170625 143.750073) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-6f" d="M 1959 3097
 Q 1497 3097 1228 2736
@@ -720,7 +720,7 @@ z
        <use xlink:href="#DejaVuSans-65" transform="translate(1032.128906 0)"/>
       </g>
       <!-- (3 years) -->
-      <g style="fill: #333333" transform="translate(116.56875 158.859571) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(116.56875 159.011073) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-79" d="M 2059 -325
 Q 1816 -950 1584 -1140
@@ -789,7 +789,7 @@ z
      <g id="line2d_15"/>
      <g id="text_9">
       <!-- PPA price -->
-      <g style="fill: #333333" transform="translate(114.81 226.00976) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(114.81 226.261961) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-50" d="M 1259 4147
 L 1259 2394
@@ -866,7 +866,7 @@ z
        <use xlink:href="#DejaVuSans-65" transform="translate(401.779297 0)"/>
       </g>
       <!-- ($95/MWh) -->
-      <g style="fill: #333333" transform="translate(104.270625 241.27076) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(104.270625 241.522961) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-24" d="M 2163 -941
 L 1850 -941
@@ -999,7 +999,7 @@ z
      <g id="line2d_16"/>
      <g id="text_10">
       <!-- Production Flow Rate -->
-      <g style="fill: #333333" transform="translate(44.038125 308.420949) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(44.038125 308.773849) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-64" d="M 2906 2969
 L 2906 4863
@@ -1107,7 +1107,7 @@ z
        <use xlink:href="#DejaVuSans-65" transform="translate(991.552734 0)"/>
       </g>
       <!-- (110 kg/sec/well) -->
-      <g style="fill: #333333" transform="translate(67.573125 323.681949) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(67.573125 324.034849) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-67" d="M 2906 1791
 Q 2906 2416 2648 2759
@@ -1168,7 +1168,7 @@ z
      <g id="line2d_17"/>
      <g id="text_11">
       <!-- Drilling Cost -->
-      <g style="fill: #333333" transform="translate(97.183125 390.832137) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(97.183125 391.285737) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-44" d="M 1259 4147
 L 1259 519
@@ -1205,7 +1205,7 @@ z
        <use xlink:href="#DejaVuSans-74" transform="translate(570.996094 0)"/>
       </g>
       <!-- ($4.7M/well) -->
-      <g style="fill: #333333" transform="translate(96.061875 406.093138) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(96.061875 406.546737) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-34" d="M 2419 4116
 L 825 1625
@@ -1263,7 +1263,7 @@ z
      <g id="line2d_18"/>
      <g id="text_12">
       <!-- Stimulation Cost -->
-      <g style="fill: #333333" transform="translate(71.29125 473.243326) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(71.29125 473.797626) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-53" d="M 3425 4513
 L 3425 3897
@@ -1315,7 +1315,7 @@ z
        <use xlink:href="#DejaVuSans-74" transform="translate(786.767578 0)"/>
       </g>
       <!-- ($4.8M/well) -->
-      <g style="fill: #333333" transform="translate(96.061875 488.504326) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(96.061875 489.058626) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-38" d="M 2034 2216
 Q 1584 2216 1326 1975
@@ -1376,7 +1376,7 @@ z
      <g id="line2d_19"/>
      <g id="text_13">
       <!-- Investment Tax Credit (ITC) -->
-      <g style="fill: #333333" transform="translate(7.2 555.654515) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(7.2 556.309514) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-49" d="M 628 4666
 L 1259 4666
@@ -1440,7 +1440,7 @@ z
        <use xlink:href="#DejaVuSans-29" transform="translate(1321.029297 0)"/>
       </g>
       <!-- (30%) -->
-      <g style="fill: #333333" transform="translate(134.37 570.915515) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(134.37 571.570514) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-25" d="M 4653 2053
 Q 4381 2053 4226 1822
@@ -1502,7 +1502,7 @@ z
      <g id="line2d_20"/>
      <g id="text_14">
       <!-- Bond Interest Rate -->
-      <g style="fill: #333333" transform="translate(58.23375 638.065704) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(58.23375 638.821402) scale(0.12 -0.12)">
        <defs>
         <path id="DejaVuSans-42" d="M 1259 2228
 L 1259 519
@@ -1557,7 +1557,7 @@ z
        <use xlink:href="#DejaVuSans-65" transform="translate(873.234375 0)"/>
       </g>
       <!-- (8%) -->
-      <g style="fill: #333333" transform="translate(142.005 653.326704) scale(0.12 -0.12)">
+      <g style="fill: #333333" transform="translate(142.005 654.082402) scale(0.12 -0.12)">
        <use xlink:href="#DejaVuSans-28"/>
        <use xlink:href="#DejaVuSans-38" transform="translate(39.013672 0)"/>
        <use xlink:href="#DejaVuSans-25" transform="translate(102.636719 0)"/>
@@ -1567,43 +1567,43 @@ z
     </g>
    </g>
    <g id="patch_3">
-    <path d="M 210.405625 97.45995
-L 778.175625 97.45995
+    <path d="M 210.405625 97.55355
+L 777.635625 97.55355
 " style="fill: none; stroke: #aaaaaa; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_4">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=76b55cdd-939a-4cf9-83d8-fbb6ecd229b5">
-     <path d="M 450.61601 124.243586
-L 450.61601 124.243586
-L 450.61601 165.449181
-L 450.61601 165.449181
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=97194d47-c3df-4c88-b718-703b14240a96">
+     <path d="M 450.387548 124.369914
+L 450.387548 124.369914
+L 450.387548 165.625858
+L 450.387548 165.625858
 z
-" clip-path="url(#p89e693d507)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="patch_5">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=7dfc5933-a311-44e1-8734-f84cef26cfb8">
-     <path d="M 450.61601 124.243586
-L 431.672803 124.243586
-L 431.672803 165.449181
-L 450.61601 165.449181
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0bd00808-41ba-4389-9da1-c23049bb8def">
+     <path d="M 450.387548 124.369914
+L 432.513758 124.369914
+L 432.513758 165.625858
+L 450.387548 165.625858
 z
-" clip-path="url(#p89e693d507)" style="fill: #84d1a8; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #84d1a8; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_15">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=7dfc5933-a311-44e1-8734-f84cef26cfb8">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0bd00808-41ba-4389-9da1-c23049bb8def">
      <!-- 1 yr -->
-     <g style="fill: #333333" transform="translate(409.059522 141.606946) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(409.900476 141.758448) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-31"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-79" transform="translate(95.410156 0)"/>
       <use xlink:href="#DejaVuSans-72" transform="translate(154.589844 0)"/>
      </g>
     </a>
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=7dfc5933-a311-44e1-8734-f84cef26cfb8">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0bd00808-41ba-4389-9da1-c23049bb8def">
      <!-- 7.3¢/kWh -->
-     <g style="fill: #333333" transform="translate(383.787803 153.052696) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(384.628758 153.204198) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-a2" d="M 2119 409
 L 2119 3084
@@ -1649,19 +1649,19 @@ z
     </a>
    </g>
    <g id="patch_6">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b78794af-43cc-46ea-bda4-091a94bee898">
-     <path d="M 450.61601 124.243586
-L 525.336436 124.243586
-L 525.336436 165.449181
-L 450.61601 165.449181
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6af01c34-32d8-44e3-9bf7-8f5783f02bc3">
+     <path d="M 450.387548 124.369914
+L 525.036909 124.369914
+L 525.036909 165.625858
+L 450.387548 165.625858
 z
-" clip-path="url(#p89e693d507)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_16">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b78794af-43cc-46ea-bda4-091a94bee898">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6af01c34-32d8-44e3-9bf7-8f5783f02bc3">
      <!-- 10 yr -->
-     <g style="fill: #ffffff" transform="translate(476.306457 134.968143) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(476.042463 135.10454) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-31"/>
       <use xlink:href="#DejaVuSans-30" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(127.246094 0)"/>
@@ -1671,9 +1671,9 @@ z
     </a>
    </g>
    <g id="text_17">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b78794af-43cc-46ea-bda4-091a94bee898">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6af01c34-32d8-44e3-9bf7-8f5783f02bc3">
      <!-- +0.7¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(460.299817 159.691499) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(460.035822 159.858106) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Bold-2b" d="M 3053 4013
 L 3053 2375
@@ -1834,9 +1834,9 @@ z
     </a>
    </g>
    <g id="text_18">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b78794af-43cc-46ea-bda4-091a94bee898">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6af01c34-32d8-44e3-9bf7-8f5783f02bc3">
      <!-- 8.2¢/kWh -->
-     <g style="fill: #333333" transform="translate(530.336436 147.605759) scale(0.1 -0.1)">
+     <g style="fill: #333333" transform="translate(530.036909 147.757261) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-38"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-32" transform="translate(95.410156 0)"/>
@@ -1849,29 +1849,29 @@ z
     </a>
    </g>
    <g id="patch_7">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=f9211e68-61d6-4640-92a9-20aff9fd1319">
-     <path d="M 450.61601 206.654775
-L 399.048391 206.654775
-L 399.048391 247.86037
-L 450.61601 247.86037
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=166e8c80-2fdc-4f13-b8d5-d7f3f7c51b4c">
+     <path d="M 450.387548 206.881802
+L 398.868975 206.881802
+L 398.868975 248.137746
+L 450.387548 248.137746
 z
-" clip-path="url(#p89e693d507)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="patch_8">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0548f138-86f5-462c-a579-07cf0cbc6012">
-     <path d="M 399.048391 206.654775
-L 379.052784 206.654775
-L 379.052784 247.86037
-L 399.048391 247.86037
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=2eb4cc0a-dff3-49e7-88f5-b795e9b0a4a8">
+     <path d="M 398.868975 206.881802
+L 379.943785 206.881802
+L 379.943785 248.137746
+L 398.868975 248.137746
 z
-" clip-path="url(#p89e693d507)" style="fill: #84d1a8; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #84d1a8; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_19">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0548f138-86f5-462c-a579-07cf0cbc6012">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=2eb4cc0a-dff3-49e7-88f5-b795e9b0a4a8">
      <!-- $68/MWh -->
-     <g style="fill: #333333" transform="translate(331.474347 224.018135) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(332.365348 224.270336) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-36" d="M 2113 2584
 Q 1688 2584 1439 2293
@@ -1913,9 +1913,9 @@ z
       <use xlink:href="#DejaVuSans-68" transform="translate(409.716797 0)"/>
      </g>
     </a>
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0548f138-86f5-462c-a579-07cf0cbc6012">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=2eb4cc0a-dff3-49e7-88f5-b795e9b0a4a8">
      <!-- 6.8¢/kWh -->
-     <g style="fill: #333333" transform="translate(331.167784 235.463885) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(332.058785 235.716086) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-36"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-38" transform="translate(95.410156 0)"/>
@@ -1928,29 +1928,29 @@ z
     </a>
    </g>
    <g id="patch_9">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=29379c07-7f79-43f7-b8ae-677933f783ad">
-     <path d="M 450.61601 206.654775
-L 489.554823 206.654775
-L 489.554823 247.86037
-L 450.61601 247.86037
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b0bb9964-d6b4-40a4-85fa-ef998020ecc2">
+     <path d="M 450.387548 206.881802
+L 489.289328 206.881802
+L 489.289328 248.137746
+L 450.387548 248.137746
 z
-" clip-path="url(#p89e693d507)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="patch_10">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6f3a7224-a3aa-4975-ac37-fb26589d44f6">
-     <path d="M 489.554823 206.654775
-L 528.493637 206.654775
-L 528.493637 247.86037
-L 489.554823 247.86037
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=e6a1f1ed-c55e-4f07-8e7d-dac29cca44ba">
+     <path d="M 489.289328 206.881802
+L 528.191107 206.881802
+L 528.191107 248.137746
+L 489.289328 248.137746
 z
-" clip-path="url(#p89e693d507)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_20">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6f3a7224-a3aa-4975-ac37-fb26589d44f6">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=e6a1f1ed-c55e-4f07-8e7d-dac29cca44ba">
      <!-- $125/MWh -->
-     <g style="fill: #333333" transform="translate(533.493637 224.018135) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(533.191107 224.270336) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-24"/>
       <use xlink:href="#DejaVuSans-31" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-32" transform="translate(127.246094 0)"/>
@@ -1961,9 +1961,9 @@ z
       <use xlink:href="#DejaVuSans-68" transform="translate(473.339844 0)"/>
      </g>
     </a>
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6f3a7224-a3aa-4975-ac37-fb26589d44f6">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=e6a1f1ed-c55e-4f07-8e7d-dac29cca44ba">
      <!-- 8.2¢/kWh -->
-     <g style="fill: #333333" transform="translate(533.493637 235.463885) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(533.191107 235.716086) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-38"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-32" transform="translate(95.410156 0)"/>
@@ -1976,35 +1976,29 @@ z
     </a>
    </g>
    <g id="patch_11">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=8ecd87b6-fa1c-4b06-b2e8-1c6ab1b261d9">
-     <path d="M 450.61601 289.065964
-L 520.074434 289.065964
-L 520.074434 330.271558
-L 450.61601 330.271558
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=481cf3f4-a374-462d-9609-6b9519fb2e37">
+     <path d="M 450.387548 289.39369
+L 459.850143 289.39369
+L 459.850143 330.649634
+L 450.387548 330.649634
 z
-" clip-path="url(#p89e693d507)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+    </a>
+   </g>
+   <g id="patch_12">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b2935620-41c9-4126-9b96-d91f63f4041a">
+     <path d="M 459.850143 289.39369
+L 520.831311 289.39369
+L 520.831311 330.649634
+L 459.850143 330.649634
+z
+" clip-path="url(#pe915f795fc)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_21">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=8ecd87b6-fa1c-4b06-b2e8-1c6ab1b261d9">
-     <!-- +0.7¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(457.668816 324.513877) scale(0.09 -0.09)">
-      <use xlink:href="#DejaVuSans-Bold-2b"/>
-      <use xlink:href="#DejaVuSans-Bold-30" transform="translate(83.789062 0)"/>
-      <use xlink:href="#DejaVuSans-Bold-2e" transform="translate(153.369141 0)"/>
-      <use xlink:href="#DejaVuSans-Bold-37" transform="translate(191.357422 0)"/>
-      <use xlink:href="#DejaVuSans-Bold-a2" transform="translate(260.9375 0)"/>
-      <use xlink:href="#DejaVuSans-Bold-2f" transform="translate(330.517578 0)"/>
-      <use xlink:href="#DejaVuSans-Bold-6b" transform="translate(367.041016 0)"/>
-      <use xlink:href="#DejaVuSans-Bold-57" transform="translate(433.544922 0)"/>
-      <use xlink:href="#DejaVuSans-Bold-68" transform="translate(543.847656 0)"/>
-     </g>
-    </a>
-   </g>
-   <g id="text_22">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=8ecd87b6-fa1c-4b06-b2e8-1c6ab1b261d9">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b2935620-41c9-4126-9b96-d91f63f4041a">
      <!-- 147 kg/sec/well -->
-     <g style="fill: #ffffff" transform="translate(450.294441 299.79052) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(455.289946 300.128316) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-31"/>
       <use xlink:href="#DejaVuSans-34" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-37" transform="translate(127.246094 0)"/>
@@ -2023,39 +2017,26 @@ z
      </g>
     </a>
    </g>
-   <g id="patch_12">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=c40f2392-6da6-492e-8b00-96f667c18603">
-     <path d="M 520.074434 289.065964
-L 526.388836 289.065964
-L 526.388836 330.271558
-L 520.074434 330.271558
-z
-" clip-path="url(#p89e693d507)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+   <g id="text_22">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b2935620-41c9-4126-9b96-d91f63f4041a">
+     <!-- +0.7¢/kWh -->
+     <g style="fill: #ffffff" transform="translate(462.664321 324.881883) scale(0.09 -0.09)">
+      <use xlink:href="#DejaVuSans-Bold-2b"/>
+      <use xlink:href="#DejaVuSans-Bold-30" transform="translate(83.789062 0)"/>
+      <use xlink:href="#DejaVuSans-Bold-2e" transform="translate(153.369141 0)"/>
+      <use xlink:href="#DejaVuSans-Bold-37" transform="translate(191.357422 0)"/>
+      <use xlink:href="#DejaVuSans-Bold-a2" transform="translate(260.9375 0)"/>
+      <use xlink:href="#DejaVuSans-Bold-2f" transform="translate(330.517578 0)"/>
+      <use xlink:href="#DejaVuSans-Bold-6b" transform="translate(367.041016 0)"/>
+      <use xlink:href="#DejaVuSans-Bold-57" transform="translate(433.544922 0)"/>
+      <use xlink:href="#DejaVuSans-Bold-68" transform="translate(543.847656 0)"/>
+     </g>
     </a>
    </g>
    <g id="text_23">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=c40f2392-6da6-492e-8b00-96f667c18603">
-     <!-- 80 kg/sec/well -->
-     <g style="fill: #333333" transform="translate(531.388836 306.429324) scale(0.09 -0.09)">
-      <use xlink:href="#DejaVuSans-38"/>
-      <use xlink:href="#DejaVuSans-30" transform="translate(63.623047 0)"/>
-      <use xlink:href="#DejaVuSans-20" transform="translate(127.246094 0)"/>
-      <use xlink:href="#DejaVuSans-6b" transform="translate(159.033203 0)"/>
-      <use xlink:href="#DejaVuSans-67" transform="translate(216.943359 0)"/>
-      <use xlink:href="#DejaVuSans-2f" transform="translate(280.419922 0)"/>
-      <use xlink:href="#DejaVuSans-73" transform="translate(314.111328 0)"/>
-      <use xlink:href="#DejaVuSans-65" transform="translate(366.210938 0)"/>
-      <use xlink:href="#DejaVuSans-63" transform="translate(427.734375 0)"/>
-      <use xlink:href="#DejaVuSans-2f" transform="translate(482.714844 0)"/>
-      <use xlink:href="#DejaVuSans-77" transform="translate(516.40625 0)"/>
-      <use xlink:href="#DejaVuSans-65" transform="translate(598.193359 0)"/>
-      <use xlink:href="#DejaVuSans-6c" transform="translate(659.716797 0)"/>
-      <use xlink:href="#DejaVuSans-6c" transform="translate(687.5 0)"/>
-     </g>
-    </a>
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=c40f2392-6da6-492e-8b00-96f667c18603">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b2935620-41c9-4126-9b96-d91f63f4041a">
      <!-- 8.2¢/kWh -->
-     <g style="fill: #333333" transform="translate(531.388836 317.875074) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(525.831311 312.781037) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-38"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-32" transform="translate(95.410156 0)"/>
@@ -2068,19 +2049,19 @@ z
     </a>
    </g>
    <g id="patch_13">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=098c8f31-0cc9-446b-b604-b37956cad9ad">
-     <path d="M 450.61601 371.477153
-L 424.306 371.477153
-L 424.306 412.682747
-L 450.61601 412.682747
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=1cdb1226-40d6-4f80-88e5-fbb35e854679">
+     <path d="M 450.387548 371.905578
+L 425.153961 371.905578
+L 425.153961 413.161522
+L 450.387548 413.161522
 z
-" clip-path="url(#p89e693d507)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_24">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=098c8f31-0cc9-446b-b604-b37956cad9ad">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=1cdb1226-40d6-4f80-88e5-fbb35e854679">
      <!-- $3.6M/well -->
-     <g style="fill: #333333" transform="translate(370.571 388.840512) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(371.418961 389.294112) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-24"/>
       <use xlink:href="#DejaVuSans-33" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(127.246094 0)"/>
@@ -2093,9 +2074,9 @@ z
       <use xlink:href="#DejaVuSans-6c" transform="translate(513.720703 0)"/>
      </g>
     </a>
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=098c8f31-0cc9-446b-b604-b37956cad9ad">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=1cdb1226-40d6-4f80-88e5-fbb35e854679">
      <!-- 7.2¢/kWh -->
-     <g style="fill: #333333" transform="translate(376.421 400.286263) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(377.268961 400.739862) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-37"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-32" transform="translate(95.410156 0)"/>
@@ -2108,29 +2089,29 @@ z
     </a>
    </g>
    <g id="patch_14">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6aae1767-9340-4914-adc2-48d76f161ab9">
-     <path d="M 450.61601 371.477153
-L 475.873619 371.477153
-L 475.873619 412.682747
-L 450.61601 412.682747
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6017ad4f-9ee5-40d1-bf75-7f11f3d689aa">
+     <path d="M 450.387548 371.905578
+L 476.672534 371.905578
+L 476.672534 413.161522
+L 450.387548 413.161522
 z
-" clip-path="url(#p89e693d507)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="patch_15">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4b73b8d0-5e3f-49a0-8382-e895114c39da">
-     <path d="M 475.873619 371.477153
-L 566.38005 371.477153
-L 566.38005 412.682747
-L 475.873619 412.682747
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=168bf0b7-37cb-4c58-9c27-1d536af91f56">
+     <path d="M 476.672534 371.905578
+L 567.092886 371.905578
+L 567.092886 413.161522
+L 476.672534 413.161522
 z
-" clip-path="url(#p89e693d507)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_25">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4b73b8d0-5e3f-49a0-8382-e895114c39da">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=168bf0b7-37cb-4c58-9c27-1d536af91f56">
      <!-- $9.3M/well -->
-     <g style="fill: #ffffff" transform="translate(496.759334 382.201709) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(497.51521 382.640204) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-24"/>
       <use xlink:href="#DejaVuSans-39" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(127.246094 0)"/>
@@ -2145,9 +2126,9 @@ z
     </a>
    </g>
    <g id="text_26">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4b73b8d0-5e3f-49a0-8382-e895114c39da">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=168bf0b7-37cb-4c58-9c27-1d536af91f56">
      <!-- +1.1¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(493.450428 406.925066) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(494.206304 407.393771) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Bold-31" d="M 750 831
 L 1813 831
@@ -2177,9 +2158,9 @@ z
     </a>
    </g>
    <g id="text_27">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4b73b8d0-5e3f-49a0-8382-e895114c39da">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=168bf0b7-37cb-4c58-9c27-1d536af91f56">
      <!-- 8.6¢/kWh -->
-     <g style="fill: #333333" transform="translate(571.38005 394.839325) scale(0.1 -0.1)">
+     <g style="fill: #333333" transform="translate(572.092886 395.292925) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-38"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-36" transform="translate(95.410156 0)"/>
@@ -2192,19 +2173,19 @@ z
     </a>
    </g>
    <g id="patch_16">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0f11b663-36ae-4199-a65f-dbaa33967099">
-     <path d="M 450.61601 453.888342
-L 427.463201 453.888342
-L 427.463201 495.093936
-L 450.61601 495.093936
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6b29e561-8c4d-4886-99eb-c054a31a0b1d">
+     <path d="M 450.387548 454.417466
+L 428.30816 454.417466
+L 428.30816 495.67341
+L 450.387548 495.67341
 z
-" clip-path="url(#p89e693d507)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_28">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0f11b663-36ae-4199-a65f-dbaa33967099">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6b29e561-8c4d-4886-99eb-c054a31a0b1d">
      <!-- $3.9M/well -->
-     <g style="fill: #333333" transform="translate(373.728201 471.251701) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(374.57316 471.806001) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-24"/>
       <use xlink:href="#DejaVuSans-33" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(127.246094 0)"/>
@@ -2217,9 +2198,9 @@ z
       <use xlink:href="#DejaVuSans-6c" transform="translate(513.720703 0)"/>
      </g>
     </a>
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0f11b663-36ae-4199-a65f-dbaa33967099">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6b29e561-8c4d-4886-99eb-c054a31a0b1d">
      <!-- 7.3¢/kWh -->
-     <g style="fill: #333333" transform="translate(379.578201 482.697451) scale(0.09 -0.09)">
+     <g style="fill: #333333" transform="translate(380.42316 483.251751) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-37"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-33" transform="translate(95.410156 0)"/>
@@ -2232,19 +2213,19 @@ z
     </a>
    </g>
    <g id="patch_17">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6f083eee-79cf-4cbe-8060-ec90fc46b3da">
-     <path d="M 450.61601 453.888342
-L 563.222849 453.888342
-L 563.222849 495.093936
-L 450.61601 495.093936
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=398617d2-812a-4bd1-82d3-3295e24190e8">
+     <path d="M 450.387548 454.417466
+L 562.887289 454.417466
+L 562.887289 495.67341
+L 450.387548 495.67341
 z
-" clip-path="url(#p89e693d507)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_29">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6f083eee-79cf-4cbe-8060-ec90fc46b3da">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=398617d2-812a-4bd1-82d3-3295e24190e8">
      <!-- $9.7M/well -->
-     <g style="fill: #ffffff" transform="translate(482.551929 464.612898) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(482.269918 465.152092) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-24"/>
       <use xlink:href="#DejaVuSans-39" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(127.246094 0)"/>
@@ -2259,9 +2240,9 @@ z
     </a>
    </g>
    <g id="text_30">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6f083eee-79cf-4cbe-8060-ec90fc46b3da">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=398617d2-812a-4bd1-82d3-3295e24190e8">
      <!-- +1.1¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(479.243023 489.336255) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(478.961012 489.905659) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Bold-2b"/>
       <use xlink:href="#DejaVuSans-Bold-31" transform="translate(83.789062 0)"/>
       <use xlink:href="#DejaVuSans-Bold-2e" transform="translate(153.369141 0)"/>
@@ -2275,9 +2256,9 @@ z
     </a>
    </g>
    <g id="text_31">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=6f083eee-79cf-4cbe-8060-ec90fc46b3da">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=398617d2-812a-4bd1-82d3-3295e24190e8">
      <!-- 8.6¢/kWh -->
-     <g style="fill: #333333" transform="translate(568.222849 477.250514) scale(0.1 -0.1)">
+     <g style="fill: #333333" transform="translate(567.887289 477.804813) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-38"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-36" transform="translate(95.410156 0)"/>
@@ -2290,29 +2271,29 @@ z
     </a>
    </g>
    <g id="patch_18">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=d9722cc4-4f22-41b6-8880-ea04cf1b3fd7">
-     <path d="M 450.61601 536.29953
-L 450.61601 536.29953
-L 450.61601 577.505125
-L 450.61601 577.505125
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=d0ac252b-f2ff-4ba5-afc1-9a97281f5540">
+     <path d="M 450.387548 536.929354
+L 450.387548 536.929354
+L 450.387548 578.185298
+L 450.387548 578.185298
 z
-" clip-path="url(#p89e693d507)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="patch_19">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b96d70be-1837-47d3-9e3f-6e9747661576">
-     <path d="M 450.61601 536.29953
-L 363.266779 536.29953
-L 363.266779 577.505125
-L 450.61601 577.505125
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=97df45e0-a03e-4cc6-a891-260bf0aaa77d">
+     <path d="M 450.387548 536.929354
+L 363.121394 536.929354
+L 363.121394 578.185298
+L 450.387548 578.185298
 z
-" clip-path="url(#p89e693d507)" style="fill: #84d1a8; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #84d1a8; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_32">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b96d70be-1837-47d3-9e3f-6e9747661576">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=97df45e0-a03e-4cc6-a891-260bf0aaa77d">
      <!-- -0.8¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(381.168347 571.747443) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(380.981424 572.417547) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Bold-2d" d="M 347 2297
 L 2309 2297
@@ -2374,9 +2355,9 @@ z
     </a>
    </g>
    <g id="text_33">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b96d70be-1837-47d3-9e3f-6e9747661576">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=97df45e0-a03e-4cc6-a891-260bf0aaa77d">
      <!-- ITC=40% -->
-     <g style="fill: #ffffff" transform="translate(386.214675 547.024087) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(386.027752 547.663981) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-3d" d="M 678 2906
 L 4684 2906
@@ -2403,19 +2384,19 @@ z
     </a>
    </g>
    <g id="patch_20">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3b193f02-b44b-412f-b1e4-79ca91e58207">
-     <path d="M 363.266779 536.29953
-L 275.917548 536.29953
-L 275.917548 577.505125
-L 363.266779 577.505125
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3659f080-bc4c-43e9-a55b-db4900fd4c0f">
+     <path d="M 363.121394 536.929354
+L 275.85524 536.929354
+L 275.85524 578.185298
+L 363.121394 578.185298
 z
-" clip-path="url(#p89e693d507)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_34">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3b193f02-b44b-412f-b1e4-79ca91e58207">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3659f080-bc4c-43e9-a55b-db4900fd4c0f">
      <!-- ITC=50% -->
-     <g style="fill: #ffffff" transform="translate(298.865445 547.024087) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(298.761599 547.663981) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-49"/>
       <use xlink:href="#DejaVuSans-54" transform="translate(29.492188 0)"/>
       <use xlink:href="#DejaVuSans-43" transform="translate(84.701172 0)"/>
@@ -2427,9 +2408,9 @@ z
     </a>
    </g>
    <g id="text_35">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3b193f02-b44b-412f-b1e4-79ca91e58207">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3659f080-bc4c-43e9-a55b-db4900fd4c0f">
      <!-- -1.7¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(293.819117 571.747443) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(293.71527 572.417547) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Bold-2d"/>
       <use xlink:href="#DejaVuSans-Bold-31" transform="translate(41.503906 0)"/>
       <use xlink:href="#DejaVuSans-Bold-2e" transform="translate(111.083984 0)"/>
@@ -2443,9 +2424,9 @@ z
     </a>
    </g>
    <g id="text_36">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3b193f02-b44b-412f-b1e4-79ca91e58207">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=3659f080-bc4c-43e9-a55b-db4900fd4c0f">
      <!-- 5.8¢/kWh -->
-     <g style="fill: #333333" transform="translate(223.267548 559.661703) scale(0.1 -0.1)">
+     <g style="fill: #333333" transform="translate(223.20524 560.316701) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-35"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-38" transform="translate(95.410156 0)"/>
@@ -2458,19 +2439,19 @@ z
     </a>
    </g>
    <g id="patch_21">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=d8c5e3a0-db90-4826-903a-387ec069a9fd">
-     <path d="M 450.61601 536.29953
-L 712.663702 536.29953
-L 712.663702 577.505125
-L 450.61601 577.505125
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4e0c4c01-96d1-4c54-96a9-17f2ad2c3f5d">
+     <path d="M 450.387548 536.929354
+L 712.18601 536.929354
+L 712.18601 578.185298
+L 450.387548 578.185298
 z
-" clip-path="url(#p89e693d507)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_37">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=d8c5e3a0-db90-4826-903a-387ec069a9fd">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4e0c4c01-96d1-4c54-96a9-17f2ad2c3f5d">
      <!-- ITC=0% -->
-     <g style="fill: #ffffff" transform="translate(563.776262 547.024087) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(563.423185 547.663981) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-49"/>
       <use xlink:href="#DejaVuSans-54" transform="translate(29.492188 0)"/>
       <use xlink:href="#DejaVuSans-43" transform="translate(84.701172 0)"/>
@@ -2481,9 +2462,9 @@ z
     </a>
    </g>
    <g id="text_38">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=d8c5e3a0-db90-4826-903a-387ec069a9fd">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4e0c4c01-96d1-4c54-96a9-17f2ad2c3f5d">
      <!-- +2.5¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(553.96345 571.747443) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(553.610373 572.417547) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Bold-32" d="M 1844 884
 L 3897 884
@@ -2546,9 +2527,9 @@ z
     </a>
    </g>
    <g id="text_39">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=d8c5e3a0-db90-4826-903a-387ec069a9fd">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4e0c4c01-96d1-4c54-96a9-17f2ad2c3f5d">
      <!-- 10.0¢/kWh -->
-     <g style="fill: #333333" transform="translate(717.663702 559.661703) scale(0.1 -0.1)">
+     <g style="fill: #333333" transform="translate(717.18601 560.316701) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-31"/>
       <use xlink:href="#DejaVuSans-30" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(127.246094 0)"/>
@@ -2562,28 +2543,28 @@ z
     </a>
    </g>
    <g id="patch_22">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=c1509509-f4fb-4139-a364-5c6882040089">
-     <path d="M 450.61601 618.710719
-L 375.895583 618.710719
-L 375.895583 659.916314
-L 450.61601 659.916314
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b87dacf4-a46d-4f4b-90b7-e2a6312c0f5c">
+     <path d="M 450.387548 619.441242
+L 375.738188 619.441242
+L 375.738188 660.697186
+L 450.387548 660.697186
 z
-" clip-path="url(#p89e693d507)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #4ab67d; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_40">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=c1509509-f4fb-4139-a364-5c6882040089">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b87dacf4-a46d-4f4b-90b7-e2a6312c0f5c">
      <!-- 5% -->
-     <g style="fill: #ffffff" transform="translate(406.116968 629.435276) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(405.92404 630.175869) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-35"/>
       <use xlink:href="#DejaVuSans-25" transform="translate(63.623047 0)"/>
      </g>
     </a>
    </g>
    <g id="text_41">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=c1509509-f4fb-4139-a364-5c6882040089">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b87dacf4-a46d-4f4b-90b7-e2a6312c0f5c">
      <!-- -0.7¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(387.48275 654.158632) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(387.289821 654.929435) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Bold-2d"/>
       <use xlink:href="#DejaVuSans-Bold-30" transform="translate(41.503906 0)"/>
       <use xlink:href="#DejaVuSans-Bold-2e" transform="translate(111.083984 0)"/>
@@ -2597,9 +2578,9 @@ z
     </a>
    </g>
    <g id="text_42">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=c1509509-f4fb-4139-a364-5c6882040089">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=b87dacf4-a46d-4f4b-90b7-e2a6312c0f5c">
      <!-- 6.8¢/kWh -->
-     <g style="fill: #333333" transform="translate(323.245583 642.072891) scale(0.1 -0.1)">
+     <g style="fill: #333333" transform="translate(323.088188 642.828589) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-36"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-38" transform="translate(95.410156 0)"/>
@@ -2612,19 +2593,19 @@ z
     </a>
    </g>
    <g id="patch_23">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0cb05abc-9762-483a-ac50-9a0cee568d13">
-     <path d="M 450.61601 618.710719
-L 506.393229 618.710719
-L 506.393229 659.916314
-L 450.61601 659.916314
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=bb578403-7398-4a3d-b07b-5393e315aa95">
+     <path d="M 450.387548 619.441242
+L 506.111719 619.441242
+L 506.111719 660.697186
+L 450.387548 660.697186
 z
-" clip-path="url(#p89e693d507)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #808080; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_43">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0cb05abc-9762-483a-ac50-9a0cee568d13">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=bb578403-7398-4a3d-b07b-5393e315aa95">
      <!-- +0.5¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(450.828213 654.158632) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(450.573227 654.929435) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Bold-2b"/>
       <use xlink:href="#DejaVuSans-Bold-30" transform="translate(83.789062 0)"/>
       <use xlink:href="#DejaVuSans-Bold-2e" transform="translate(153.369141 0)"/>
@@ -2638,9 +2619,9 @@ z
     </a>
    </g>
    <g id="text_44">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=0cb05abc-9762-483a-ac50-9a0cee568d13">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=bb578403-7398-4a3d-b07b-5393e315aa95">
      <!-- 10% -->
-     <g style="fill: #ffffff" transform="translate(468.502666 629.435276) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(468.24768 630.175869) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-31"/>
       <use xlink:href="#DejaVuSans-30" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-25" transform="translate(127.246094 0)"/>
@@ -2648,19 +2629,19 @@ z
     </a>
    </g>
    <g id="patch_24">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4fc8eb8e-8e1a-4f7f-97f6-7800701b027f">
-     <path d="M 506.393229 618.710719
-L 565.32765 618.710719
-L 565.32765 659.916314
-L 506.393229 659.916314
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=06a60783-3ff1-4e3d-81d6-0e21315011e7">
+     <path d="M 506.111719 619.441242
+L 564.990087 619.441242
+L 564.990087 660.697186
+L 506.111719 660.697186
 z
-" clip-path="url(#p89e693d507)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
+" clip-path="url(#pe915f795fc)" style="fill: #b0b0b0; stroke: #ffffff; stroke-width: 0.5; stroke-linejoin: miter"/>
     </a>
    </g>
    <g id="text_45">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4fc8eb8e-8e1a-4f7f-97f6-7800701b027f">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=06a60783-3ff1-4e3d-81d6-0e21315011e7">
      <!-- 12% -->
-     <g style="fill: #ffffff" transform="translate(525.858487 629.435276) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(525.54895 630.175869) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-31"/>
       <use xlink:href="#DejaVuSans-32" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-25" transform="translate(127.246094 0)"/>
@@ -2668,9 +2649,9 @@ z
     </a>
    </g>
    <g id="text_46">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4fc8eb8e-8e1a-4f7f-97f6-7800701b027f">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=06a60783-3ff1-4e3d-81d6-0e21315011e7">
      <!-- +1.1¢/kWh -->
-     <g style="fill: #ffffff" transform="translate(508.184033 654.158632) scale(0.09 -0.09)">
+     <g style="fill: #ffffff" transform="translate(507.874497 654.929435) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Bold-2b"/>
       <use xlink:href="#DejaVuSans-Bold-31" transform="translate(83.789062 0)"/>
       <use xlink:href="#DejaVuSans-Bold-2e" transform="translate(153.369141 0)"/>
@@ -2684,9 +2665,9 @@ z
     </a>
    </g>
    <g id="text_47">
-    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4fc8eb8e-8e1a-4f7f-97f6-7800701b027f">
+    <a target="_blank" xlink:href="https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=06a60783-3ff1-4e3d-81d6-0e21315011e7">
      <!-- 8.6¢/kWh -->
-     <g style="fill: #333333" transform="translate(570.32765 642.072891) scale(0.1 -0.1)">
+     <g style="fill: #333333" transform="translate(569.990087 642.828589) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-38"/>
       <use xlink:href="#DejaVuSans-2e" transform="translate(63.623047 0)"/>
       <use xlink:href="#DejaVuSans-36" transform="translate(95.410156 0)"/>
@@ -2700,7 +2681,7 @@ z
    </g>
    <g id="text_48">
     <!-- LCOE Sensitivity Results -->
-    <g style="fill: #333333" transform="translate(354.257728 17.837813) scale(0.14 -0.14)">
+    <g style="fill: #333333" transform="translate(354.029267 17.837813) scale(0.14 -0.14)">
      <defs>
       <path id="DejaVuSans-Bold-4c" d="M 588 4666
 L 1791 4666
@@ -3026,15 +3007,15 @@ z
    </g>
    <g id="text_49">
     <g id="patch_25">
-     <path d="M 378.987963 49.92835
-L 522.244056 49.92835
-L 522.244056 28.282412
-L 378.987963 28.282412
+     <path d="M 378.759501 49.95715
+L 522.015595 49.95715
+L 522.015595 28.311212
+L 378.759501 28.311212
 z
 " style="fill: #003c4d"/>
     </g>
     <!-- Base LCOE: 7.5¢/kWh -->
-    <g style="fill: #ffffff" transform="translate(384.487963 42.140694) scale(0.11 -0.11)">
+    <g style="fill: #ffffff" transform="translate(384.259501 42.169494) scale(0.11 -0.11)">
      <defs>
       <path id="DejaVuSans-Bold-42" d="M 2456 2859
 Q 2741 2859 2887 2984
@@ -3139,8 +3120,8 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="p89e693d507">
-   <rect x="210.405625" y="97.45995" width="567.77" height="589.24"/>
+  <clipPath id="pe915f795fc">
+   <rect x="210.405625" y="97.55355" width="567.23" height="589.96"/>
   </clipPath>
  </defs>
 </svg>
