@@ -1,7 +1,7 @@
 #!python
 # Automatically rebuilds docs locally when changes are detected.
 # Usage, from the project root:
-# ./docs/watch_docs.py
+# ./src/geophires_docs/watch_docs.py
 
 import os
 import subprocess
@@ -63,7 +63,7 @@ def get_file_states(directory) -> dict[str, Any]:
 def main():
     # Determine paths relative to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root: str = os.path.dirname(script_dir)
+    project_root: str = Path(__file__).parent.parent.parent
 
     def _say(msg) -> None:
         try:
@@ -72,7 +72,7 @@ def main():
             pass
 
     # Watch the directory where the script is located (docs/)
-    watch_dirs = [script_dir, Path(project_root) / 'tests' / 'examples']
+    watch_dirs = [script_dir, Path(project_root) / 'docs', Path(project_root) / 'tests' / 'examples']
 
     command = ['tox', '-e', 'docs']
     poll_interval = 2  # Seconds
