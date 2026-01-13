@@ -158,7 +158,7 @@ in source code for the complete results.
 | Average Production Temperature       | {{ average_production_temperature_degc ~ '℃' }} | 199–209℃ | Approximate range of thermally conditioned production temperatures between shallower and deeper producers (Singh et al., 2025).                                                                                                                         |
 | Maximum Total Electricity Generation | {{ max_total_generation_mwe }} MW                                   | 600 MW (10 × 60 MWe Gen 2 ORCs)   | Actual maximum total (gross) generation will be constrained by the combined nameplate capacity of modular power plants which are not individually modeled in this case study. A total of 8 60 MWe Gen 2 ORCs have been announced for Phase II; 3 from Turboden and 5 from Baker Hughes. This equates to 480 MW gross capacity for Phase II's 400 MW net capacity. An equivalent SOAK 500 MW project would therefore require 10 Gen 2 ORC units (Turboden, 2025; Jacobs, 2025). |
 | Minimum Net Electricity Generation   | {{ min_net_generation_mwe }} MW                                   | 500 MW                                                                                                                                                                                                                                                                                                                                | The announced upsizing to 500 MWe (Fervo Energy, 2025) is interpreted to mean that Cape Station's net electricity generation does not fall below 500 MWe. |
-| 2-year Average Net Power Production per Production Well | {{ two_year_avg_net_power_mwe_per_production_well }} MW. (Note that net power decline is not observed until approximately Year 10 due to thermal conditioning of the production wellbores predicted by the Ramey wellbore heat transmission model.) | 7.6–11.5 MW | Figures 4 and 12 (Singh et al., 2025). |
+| 2-year Average Net Power Production per Production Well | {{ two_year_avg_net_power_mwe_per_production_well }} MW | 7.6–11.5 MW | Figures 4 and 12 (Singh et al., 2025). |
 | Injection Pumping Parasitic Load (Average Pumping Power/Average Total Electricity Generation) | {{ parasitic_loss_pct ~ '%' }}  | Upper bound: 16.7% total on-site consumption (including injection pumping power) | Procurement of 480 MW of Gen 2 ORC units for 400 MW net capacity in Phase II allows for up to 80 MW on-site consumption (16.7%).  |
 | Average Net Electricity Generation   | {{ avg_net_generation_mwe }} MW |  |                                                                                                                                                           |
 | Maximum Net Electricity Generation   | {{ max_net_generation_mwe}} MW                                   |                                                                                                                                                                                                                                                                                                                                       |                                                                                                                                                           |
@@ -193,7 +193,9 @@ Click the bars to view the sensitivity analysis result for the input value in th
          alt="LCOE Sensitivity Analysis Chart"
          class="sensitivity-chart-print">
 
-**Impact of PPA Price on LCOE:** The sensitivity analysis reveals a positive correlation between the Power Purchase
+#### Impact of PPA Price on LCOE
+
+The sensitivity analysis reveals a positive correlation between the Power Purchase
 Agreement (PPA) price and the Levelized Cost of Electricity (LCOE). While counterintuitive, this is a function of SAM
 Economic Models treating federal and state income taxes as operating cash outflows.
 
@@ -229,6 +231,14 @@ tax liability, and decreases the resulting LCOE.
 
 Users may wish to perform their own sensitivity analysis
 using [GEOPHIRES's Monte Carlo simulation module](Monte-Carlo-User-Guide.html) or other data analysis tools.
+
+### Impact of Flow Rate on Project Economics
+
+Higher flow rate per production well does not necessarily result in improved project economics (e.g. lower LCOE or higher IRR).
+Higher flow rates result in increased generation in the short term, but also cause faster thermal decline.
+Additional make-up wells may need to be drilled to compensate for increased thermal decline and maintain a minimum net generation (redrilling),
+the cost of which may offset incremental revenue from increased generation.
+This tradeoff was considered in reservoir modeling that guided Fervo's field implementation (Singh et al., 2025).
 
 ## Phase I 100 MWe Model
 
