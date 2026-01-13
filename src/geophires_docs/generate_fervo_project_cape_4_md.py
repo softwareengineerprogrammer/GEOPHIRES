@@ -7,16 +7,15 @@ This ensures the markdown documentation stays in sync with actual GEOPHIRES resu
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-from generate_fervo_project_cape_4_graphs import generate_fervo_project_cape_4_graphs
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
 
+from geophires_docs.generate_fervo_project_cape_4_graphs import generate_fervo_project_cape_4_graphs
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x_client import GeophiresInputParameters
@@ -24,9 +23,9 @@ from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
 # Add project root to path to import GEOPHIRES and docs modules
-_PROJECT_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT / 'src'))
-sys.path.insert(0, Path(__file__).parent)
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
+# sys.path.insert(0, str(_PROJECT_ROOT / 'src'))
+# sys.path.insert(0, Path(__file__).parent)
 
 
 def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape4TestCase._get_input_parameters
