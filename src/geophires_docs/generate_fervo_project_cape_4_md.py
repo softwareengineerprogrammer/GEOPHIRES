@@ -145,7 +145,7 @@ def generate_fpc4_economics_parameters_table_md(input_params: GeophiresInputPara
 
 
 def get_fpc4_category_parameters_table_md(
-    input_params: GeophiresInputParameters, category_name: str, parameters_to_exclude: list[str] | None
+    input_params: GeophiresInputParameters, category_name: str | None, parameters_to_exclude: list[str] | None = None
 ) -> str:
     if parameters_to_exclude is None:
         parameters_to_exclude = []
@@ -169,7 +169,7 @@ def get_fpc4_category_parameters_table_md(
             continue
 
         category = _get_parameter_category(param_name)
-        if category == category_name:
+        if category_name is None or category == category_name:
             param_val_comment_split = param_val_comment.split(
                 # ',',
                 ',' if _get_parameter_schema_type(param_name) != 'array' else ', ',
@@ -372,7 +372,26 @@ def _total_fracture_surface_area_per_well_m2(result: GeophiresXResult) -> float:
     )
 
 
-def generate_fervo_project_cape_4_md(input_params: GeophiresInputParameters, result: GeophiresXResult) -> None:
+def generate_res_eng_reference_sim_params_table_md(
+    base_case_input_params: GeophiresInputParameters, res_eng_reference_sim_params: dict[str, Any]
+) -> str:
+    return get_fpc4_category_parameters_table_md(
+        ImmutableGeophiresInputParameters(
+            # from_file_path=base_case_input_params.as_file_path(),
+            params=res_eng_reference_sim_params
+        ),
+        None,
+    )
+
+
+def generate_fervo_project_cape_4_md(
+    input_params: GeophiresInputParameters,
+    result: GeophiresXResult,
+    res_eng_reference_sim_params: dict[str, Any] | None = None,
+) -> None:
+    if res_eng_reference_sim_params is None:
+        res_eng_reference_sim_params = {}
+
     # noinspection PyDictCreation
     template_values = {**get_fpc4_input_parameter_values(input_params, result), **get_result_values(result)}
 
@@ -380,6 +399,10 @@ def generate_fervo_project_cape_4_md(input_params: GeophiresInputParameters, res
     template_values['surface_plant_parameters_table_md'] = generate_fpc4_surface_plant_parameters_table_md(input_params)
     template_values['well_bores_parameters_table_md'] = generate_fpc4_well_bores_parameters_table_md(input_params)
     template_values['economics_parameters_table_md'] = generate_fpc4_economics_parameters_table_md(input_params)
+
+    template_values['reservoir_engineering_reference_simulation_params_table_md'] = (
+        generate_res_eng_reference_sim_params_table_md(input_params, res_eng_reference_sim_params)
+    )
 
     docs_dir = _PROJECT_ROOT / 'docs'
 

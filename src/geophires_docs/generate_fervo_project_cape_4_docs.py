@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from geophires_docs import _PROJECT_ROOT
 from geophires_docs import generate_fervo_project_cape_4_md
 from geophires_docs.generate_fervo_project_cape_4_graphs import generate_fervo_project_cape_4_graphs
@@ -8,17 +10,18 @@ from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
+_SINGH_ET_AL_BASE_SIMULATION_PARAMETERS: dict[str, Any] = {
+    'Number of Production Wells': 4,
+    'Maximum Drawdown': 1,
+    'Plant Lifetime': 15,
+}
 
 # fmt:off
 def get_singh_et_al_base_simulation_result(base_input_params: GeophiresInputParameters) \
         -> tuple[GeophiresInputParameters,GeophiresXResult]:
     singh_et_al_base_simulation_input_params = ImmutableGeophiresInputParameters(
         from_file_path=base_input_params.as_file_path(),
-        params={
-            'Number of Production Wells': 4,
-            'Maximum Drawdown': 1,
-            'Plant Lifetime': 15,
-        },
+        params=_SINGH_ET_AL_BASE_SIMULATION_PARAMETERS,
     )
     # fmt:on
 
@@ -43,7 +46,11 @@ def generate_fervo_project_cape_4_docs():
         _PROJECT_ROOT / 'docs/_images'
     )
 
-    generate_fervo_project_cape_4_md.generate_fervo_project_cape_4_md(input_params,result)
+    generate_fervo_project_cape_4_md.generate_fervo_project_cape_4_md(
+        input_params,
+        result,
+        _SINGH_ET_AL_BASE_SIMULATION_PARAMETERS
+    )
 
 
 if __name__ == '__main__':
