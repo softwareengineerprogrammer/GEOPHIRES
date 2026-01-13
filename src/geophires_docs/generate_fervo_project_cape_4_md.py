@@ -125,21 +125,45 @@ def generate_fpc4_surface_plant_parameters_table_md(input_params: GeophiresInput
     return get_fpc4_category_parameters_table_md(
         input_params,
         'Surface Plant',
-        parameters_to_exclude=['End-Use Option'],
+        parameters_to_exclude=['End-Use Option', 'Construction Years'],
+    )
+
+
+def generate_fpc4_construction_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+    input_params_dict = _get_input_parameters_dict(
+        input_params, include_parameter_comments=True, include_line_comments=True
+    )
+    schedule_param_name = 'Construction CAPEX Schedule'
+    construction_input_params = {}
+    for construction_param in ['Construction Years', schedule_param_name]:
+        construction_input_params[construction_param] = input_params_dict[construction_param]
+
+    # Comment hardcoded here for now because handling of array parameters with comments might be buggy in client or
+    # web interface...
+    schedule_param_comment = (
+        'Array of fractions of overnight capital cost expenditure for each year, starting with '
+        'lower costs during initial years for exploration and increasing to higher costs during '
+        'later years as buildout progresses.'
+    )
+    construction_input_params[schedule_param_name] = (
+        f'{construction_input_params[schedule_param_name]}' f', -- {schedule_param_comment}'
+    )
+
+    return get_fpc4_category_parameters_table_md(
+        ImmutableGeophiresInputParameters(params=construction_input_params), None
     )
 
 
 def generate_fpc4_economics_parameters_table_md(input_params: GeophiresInputParameters) -> str:
-
-    # FIXME WIP TODO: Construction CAPEX Schedule
-
     return get_fpc4_category_parameters_table_md(
         input_params,
         'Economics',
         parameters_to_exclude=[
             'Ending Electricity Sale Price',
             'Electricity Escalation Start Year',
+            'Construction CAPEX Schedule',
             'Time steps per year',
+            'Print Output to Console',
         ],
     )
 
@@ -395,10 +419,14 @@ def generate_fervo_project_cape_4_md(
     # noinspection PyDictCreation
     template_values = {**get_fpc4_input_parameter_values(input_params, result), **get_result_values(result)}
 
-    template_values['reservoir_parameters_table_md'] = generate_fpc4_reservoir_parameters_table_md(input_params)
-    template_values['surface_plant_parameters_table_md'] = generate_fpc4_surface_plant_parameters_table_md(input_params)
-    template_values['well_bores_parameters_table_md'] = generate_fpc4_well_bores_parameters_table_md(input_params)
-    template_values['economics_parameters_table_md'] = generate_fpc4_economics_parameters_table_md(input_params)
+    for template_key, md_method in {
+        'reservoir_parameters_table_md': generate_fpc4_reservoir_parameters_table_md,
+        'surface_plant_parameters_table_md': generate_fpc4_surface_plant_parameters_table_md,
+        'well_bores_parameters_table_md': generate_fpc4_well_bores_parameters_table_md,
+        'economics_parameters_table_md': generate_fpc4_economics_parameters_table_md,
+        'construction_parameters_table_md': generate_fpc4_construction_parameters_table_md,
+    }.items():
+        template_values[template_key] = md_method(input_params)
 
     template_values['reservoir_engineering_reference_simulation_params_table_md'] = (
         generate_res_eng_reference_sim_params_table_md(input_params, res_eng_reference_sim_params)
