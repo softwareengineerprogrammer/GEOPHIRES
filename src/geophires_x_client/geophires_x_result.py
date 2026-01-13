@@ -717,7 +717,7 @@ class GeophiresXResult:
         return None
 
     @property
-    def power_generation_profile(self):
+    def power_generation_profile(self) -> list[list[str | float]]:
         return self.result['POWER GENERATION PROFILE']
 
     def _get_power_generation_profile(self):

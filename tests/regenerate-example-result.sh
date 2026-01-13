@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 # ./tests/regenerate-example-result.sh SUTRAExample1
 # See https://github.com/NREL/GEOPHIRES-X/issues/107
 
-# Note: make sure your virtualenv is activated before running or this script will fail
+# Note: make sure your virtualenv is activated and you have run pip install -e . before running or this script will fail
 # or generate incorrect results.
 
 python -mgeophires_x examples/$1.txt examples/$1.out
@@ -25,9 +25,9 @@ then
     python ../docs/generate_fervo_project_cape_4_md.py
 
     echo "Regenerating Fervo_Project_Cape-5..."
-    # TODO synchronize replacement matching with Fervo_Project_Cape-4 values
-    sed -e 's/Construction Years, 5/Construction Years, 3/' \
-        -e 's/Number of Doublets, 52/Number of Doublets, 11/' \
+
+    sed -e 's/Construction Years,.*/Construction Years, 3/' \
+        -e 's/^Number of Production Wells,.*/Number of Production Wells, 13/' \
         -e 's/500 MWe/100 MWe/' \
         -e 's/Phase II/Phase I/' \
         examples/Fervo_Project_Cape-4.txt > examples/Fervo_Project_Cape-5.txt
