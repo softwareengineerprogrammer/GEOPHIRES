@@ -1,5 +1,5 @@
-# Case Study: 100 MWe EGS Project Modeled on Fervo Cape Station Phase I
-# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-4.html
+# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station Phase II
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
@@ -16,7 +16,7 @@ Inflated Bond Interest Rate, .08, -- Higher than typical debt annual interest ra
 Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
 
 Inflation Rate, .027, -- US inflation as of December 2025
-Construction Years, 3
+Construction Years, 5, -- Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations.
 Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 Investment Tax Credit Rate, 0.3, -- Geothermal Drilling and Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024).
@@ -44,8 +44,12 @@ Reservoir Model, 1
 
 Surface Temperature, 13, -- Surface temperature near Milford, UT (38.4987670, -112.9163432) ([Project InnerSpace, 2025](https://geomap.projectinnerspace.org/test/)).
 
-Number of Segments, 1
-Gradient 1, 74, -- 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
+Number of Segments, 3
+Gradient 1, 74, -- Sedimentary overburden. 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
+Thickness 1, 2.5
+Gradient 2, 41, -- Crystalline reservoir
+Thickness 2, 0.5
+Gradient 3, 39.1, -- Sugarloaf appraisal
 
 Reservoir Depth, 2.68, -- Extrapolated from surface temperature, gradient, and average production temperature of shallower and deeper producers in Singh et al., 2025.
 
@@ -74,7 +78,7 @@ Circulation Pump Efficiency, 0.80
 
 # *** Well Bores Parameters ***
 
-Number of Production Wells, 13
+Number of Production Wells, 56, -- Number of production wells required to produce net generation greater than 500 MW (PPA minimum) and total generation less than 600 MW (Gen 2 ORCs gross capacity).
 Number of Injection Wells per Production Well, 0.666, -- 5-well benches with 3:2 production:injection ratio (Singh et al., 2025)
 
 # Well Geometry Configuration, 4, -- L
@@ -82,7 +86,7 @@ Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for t
 Nonvertical Length per Multilateral Section, 4700 feet, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf).
 # Multilaterals Cased, True
 
-Production Flow Rate per Well, 110, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025). The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
+Production Flow Rate per Well, 106, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025). The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
 Injection Well Diameter, 8.535, -- See Production Well Diameter
 
@@ -96,7 +100,7 @@ Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid t
 Injection Wellbore Temperature Gain, 3
 
 
-Maximum Drawdown, 0.003, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥100 MWe.
+Maximum Drawdown, 0.003, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************

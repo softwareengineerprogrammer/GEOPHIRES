@@ -1,5 +1,5 @@
 # Case Study: 100 MWe EGS Project Modeled on Fervo Cape Station Phase I
-# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-4.html
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
@@ -44,8 +44,12 @@ Reservoir Model, 1
 
 Surface Temperature, 13, -- Surface temperature near Milford, UT (38.4987670, -112.9163432) ([Project InnerSpace, 2025](https://geomap.projectinnerspace.org/test/)).
 
-Number of Segments, 1
-Gradient 1, 74, -- 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
+Number of Segments, 3
+Gradient 1, 74, -- Sedimentary overburden. 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
+Thickness 1, 2.5
+Gradient 2, 41, -- Crystalline reservoir
+Thickness 2, 0.5
+Gradient 3, 39.1, -- Sugarloaf appraisal
 
 Reservoir Depth, 2.68, -- Extrapolated from surface temperature, gradient, and average production temperature of shallower and deeper producers in Singh et al., 2025.
 
@@ -82,7 +86,7 @@ Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for t
 Nonvertical Length per Multilateral Section, 4700 feet, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf).
 # Multilaterals Cased, True
 
-Production Flow Rate per Well, 110, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025). The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
+Production Flow Rate per Well, 106, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec (Singh et al., 2025). The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
 Injection Well Diameter, 8.535, -- See Production Well Diameter
 
