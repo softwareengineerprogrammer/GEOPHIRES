@@ -7,7 +7,6 @@ This ensures the markdown documentation stays in sync with actual GEOPHIRES resu
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -15,7 +14,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
 
-from geophires_docs.generate_fervo_project_cape_4_graphs import generate_fervo_project_cape_4_graphs
+from geophires_docs import _PROJECT_ROOT
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x_client import GeophiresInputParameters
@@ -23,9 +22,6 @@ from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
 # Add project root to path to import GEOPHIRES and docs modules
-_PROJECT_ROOT = Path(__file__).parent.parent.parent
-# sys.path.insert(0, str(_PROJECT_ROOT / 'src'))
-# sys.path.insert(0, Path(__file__).parent)
 
 
 def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape4TestCase._get_input_parameters
@@ -376,16 +372,7 @@ def _total_fracture_surface_area_per_well_m2(result: GeophiresXResult) -> float:
     )
 
 
-def main():
-    """
-    Generate Fervo_Project_Cape-4.md (markdown documentation) from the Jinja template.
-    """
-
-    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-        from_file_path=_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.txt'
-    )
-    result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
-
+def generate_fervo_project_cape_4_md(input_params: GeophiresInputParameters, result: GeophiresXResult) -> None:
     # noinspection PyDictCreation
     template_values = {**get_fpc4_input_parameter_values(input_params, result), **get_result_values(result)}
 
@@ -395,8 +382,6 @@ def main():
     template_values['economics_parameters_table_md'] = generate_fpc4_economics_parameters_table_md(input_params)
 
     docs_dir = _PROJECT_ROOT / 'docs'
-    images_dir = docs_dir / '_images'
-    generate_fervo_project_cape_4_graphs(input_params, result, images_dir)
 
     # Set up Jinja environment
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
@@ -415,6 +400,18 @@ def main():
     print(f"\tLCOE: ${template_values['lcoe_usd_per_mwh']}/MWh")
     print(f"\tIRR: {template_values['irr_pct']}%")
     print(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
+
+
+def main():
+    """
+    Generate Fervo_Project_Cape-4.md (markdown documentation) from the Jinja template.
+    """
+
+    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+        from_file_path=_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.txt'
+    )
+    result = GeophiresXResult(_PROJECT_ROOT / 'tests/examples/Fervo_Project_Cape-4.out')
+    generate_fervo_project_cape_4_md(input_params, result)
 
 
 if __name__ == '__main__':
