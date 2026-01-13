@@ -46,7 +46,7 @@ then
         STASH_PWD=$(pwd)
         cd $GEOPHIRES_FPC5_SENSITIVITY_ANALYSIS_PROJECT_ROOT
         source venv/bin/activate
-        python -m fpc5_sensitivity_analysis
+        python -m fpc_sensitivity_analysis.generate_geophires_fpc5_sensitivity_analysis
         deactivate
         cd $STASH_PWD
     fi

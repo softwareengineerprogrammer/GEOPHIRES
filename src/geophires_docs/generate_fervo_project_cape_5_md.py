@@ -456,7 +456,7 @@ def generate_fervo_project_cape_5_md(
 
 def main():
     """
-    Generate Fervo_Project_Cape-4.md (markdown documentation) from the Jinja template.
+    Generate Fervo_Project_Cape-5.md (markdown documentation) from the Jinja template.
     """
 
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(from_file_path=_FPC5_INPUT_FILE_PATH)

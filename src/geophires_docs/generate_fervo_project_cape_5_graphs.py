@@ -71,7 +71,7 @@ def generate_net_power_graph(
 
 
 def generate_production_temperature_graph(
-    result: GeophiresXResult, output_dir: Path, filename='fervo_project_cape-4-production-temperature.png'
+    result: GeophiresXResult, output_dir: Path, filename='fervo_project_cape-5-production-temperature.png'
 ) -> str:
     """
     Generate a graph of time vs production temperature and save it to the output directory.

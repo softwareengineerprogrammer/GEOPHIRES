@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import re
-import sys
 from typing import Any
 
 from pint.facets.plain import PlainQuantity
 
 from base_test_case import BaseTestCase
+from geophires_docs import generate_fervo_project_cape_5_md
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x.Parameter import HasQuantity
@@ -17,41 +17,45 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 
 
 class FervoProjectCape5TestCase(BaseTestCase):
+    """
+    FIXME WIP - see https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/117
+    """
 
     def test_internal_consistency(self):
 
-        fpc4_result: GeophiresXResult = GeophiresXResult(
+        fpc5_result: GeophiresXResult = GeophiresXResult(
             self._get_test_file_path('../examples/Fervo_Project_Cape-5.out')
         )
-        fpc4_input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+        fpc5_input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
             from_file_path=self._get_test_file_path('../examples/Fervo_Project_Cape-5.txt')
         )
-        fpc4_input_params_dict: dict[str, Any] = self._get_input_parameters(fpc4_input_params)
+        fpc5_input_params_dict: dict[str, Any] = self._get_input_parameters(fpc5_input_params)
 
         def _q(dict_val: str) -> PlainQuantity:
             spl = dict_val.split(' ')
             return quantity(float(spl[0]), spl[1])
 
-        lateral_length_q = _q(fpc4_input_params_dict['Nonvertical Length per Multilateral Section'])
-        frac_sep_q = quantity(float(fpc4_input_params_dict['Fracture Separation']), 'meter')
-        number_of_fracs_per_well = int(fpc4_input_params_dict['Number of Fractures per Stimulated Well'])
+        lateral_length_q = _q(fpc5_input_params_dict['Nonvertical Length per Multilateral Section'])
+        frac_sep_q = quantity(float(fpc5_input_params_dict['Fracture Separation']), 'meter')
+        number_of_fracs_per_well = int(fpc5_input_params_dict['Number of Fractures per Stimulated Well'])
 
         self.assertLess(number_of_fracs_per_well * frac_sep_q, lateral_length_q)
 
-        result_number_of_wells: int = self._number_of_wells(fpc4_result)
-        number_of_fracs = int(fpc4_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value'])
+        result_number_of_wells: int = self._number_of_wells(fpc5_result)
+        number_of_fracs = int(fpc5_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value'])
         self.assertEqual(number_of_fracs, result_number_of_wells * number_of_fracs_per_well)
-        self.assertEqual(result_number_of_wells, int(fpc4_input_params_dict['Number of Doublets']) * 2)
+        self.assertEqual(result_number_of_wells, int(fpc5_input_params_dict['Number of Doublets']) * 2)
 
     @staticmethod
     def _get_input_parameters(
         params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
     ) -> dict[str, Any]:
         """
-        TODO consolidate with docs/generate_fervo_project_cape_4_md.py:30 as a common utility function.
+        TODO consolidate with src/geophires_docs/generate_fervo_project_cape_5_md.py:30 as a common utility function.
             Note doing so is non-trivial because there would need to be a mechanism to ensure parsing exactly matches
             GEOPHIRES behavior, which may diverge from the below implementation under some circumstances.
         """
+
         comment_idx = 0
         ret: dict[str, Any] = {}
         for line in params.as_text().split('\n'):
@@ -82,7 +86,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
 
         return number_of_wells
 
-    def test_fervo_project_cape_4_results_against_reference_values(self):
+    def test_fervo_project_cape_5_results_against_reference_values(self):
         """
         Asserts that results conform to some of the key reference values claimed in docs/Fervo_Project_Cape-5.md.
         """
@@ -137,17 +141,12 @@ class FervoProjectCape5TestCase(BaseTestCase):
         (partially) by hand so that they are guaranteed to be in sync and don't need to be tested like this,
         which has proved messy.
 
-        Update 2026-01-07: Markdown is now partially generated from input and result in
-        docs/generate_fervo_project_cape_4_md.py.
+        Update 2026-01-13: Markdown is now partially generated from input and result in
+        src/geophires_docs/generate_fervo_project_cape_5_md.py.
         """
 
         def generate_documentation_markdown() -> None:
-            # Generate the Markdown from template to ensure it's up to date
-            sys.path.insert(0, self._get_test_file_path('../../docs'))
-            # noinspection PyUnresolvedReferences
-            from generate_fervo_project_cape_4_md import main as generate_documentation
-
-            generate_documentation()
+            generate_fervo_project_cape_5_md.main()
 
         generate_documentation_markdown()
 
