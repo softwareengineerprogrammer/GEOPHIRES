@@ -103,7 +103,6 @@ def generate_fpc4_reservoir_parameters_table_md(input_params: GeophiresInputPara
         'Maximum Temperature',
         'Reservoir Porosity',
         'Reservoir Volume Option',
-        'Number of Segments',  # TODO only exclude if value is 1
     ]
 
     return get_fpc4_category_parameters_table_md(
