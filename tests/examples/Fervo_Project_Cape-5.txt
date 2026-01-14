@@ -78,7 +78,7 @@ Fracture Width, 304.8, -- Matches intra-bench well spacing of 500 ft (correspond
 Fracture Height, 95, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
 
 Water Loss Fraction, 0.01, -- "Long-term modeling, calibrated to early field data, predicts circulation recapture rates exceeding 99%" ([Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/); Fervo Energy, 2025). Modeling in Singh et al., 2025 predicts fluid loss of 0.36% to 0.49%.
-Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs.
+Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs. Development near/on land with active/shut-in oil and gas wells could potentially utilize waste water to recover losses and offset costs.
 
 Ambient Temperature, 11.17, -- Average annual temperature of Milford, Utah ([NCEI](https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654)). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study.
 
