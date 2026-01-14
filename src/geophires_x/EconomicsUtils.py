@@ -83,7 +83,10 @@ def project_payback_period_parameter() -> OutputParameter:
         CurrentUnits=TimeUnit.YEAR,
         ToolTipText='The time at which cumulative cash flow reaches zero. '
         'For projects that never pay back, the calculated value will be "N/A". '
-        'For SAM Economic Models, after-tax net cash flow is used to calculate the cumulative cash flow.',
+        'For SAM Economic Models, this is Simple Payback Period (SPB): the time at which cumulative non-discounted '
+        'cash flow reaches zero, calculated using non-discounted after-tax net cash flow. '
+        'See https://samrepo.nrelcloud.org/help/mtf_payback.html for important considerations regarding the '
+        'limitations of this metric.',
     )
 
 
