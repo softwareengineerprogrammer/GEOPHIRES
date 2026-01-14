@@ -4,20 +4,30 @@
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
 Economic Model, 5, -- The SAM Single Owner PPA economic model is used to calculate financial results including LCOE, NPV, IRR, and pro-forma cash flow analysis. See [GEOPHIRES documentation of SAM Economic Models](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html) for details on how System Advisor Model financial models are integrated into GEOPHIRES.
+Inflation Rate, .027, -- US inflation as of December 2025
 
 Starting Electricity Sale Price, 0.095, -- Aligns with Geysers - Sacramento pricing in [2024b ATB](https://atb.nrel.gov/electricity/2024/geothermal) (NREL, 2025). See Sensitivity Analysis for effect of different prices on results.
 Electricity Escalation Rate Per Year, 0.00057, -- Calibrated to reach 10¢/kWh at project year 11
 Ending Electricity Sale Price, 1, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
 Electricity Escalation Start Year, 1
 
+Fraction of Investment in Bonds, .7, -- Approximate debt required to cover CAPEX after $1 billion sponsor equity per [Matson, 2024](https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/). Note that this source says that Fervo ultimately wants to target “15% sponsor equity, 15% bridge loan, and 70% construction to term loans”, but this case study does not attempt to model that capital structure precisely.
 Discount Rate, 0.12, -- Typical discount rates for high-risk projects may be 12–15%
-Fraction of Investment in Bonds, .65, -- Approximate debt required to cover CAPEX after $1 billion sponsor equity per [Matson, 2024](https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/). Note that this source says that Fervo ultimately wants to target “15% sponsor equity, 15% bridge loan, and 70% construction to term loans”, but this case study does not attempt to model that capital structure precisely.
-Inflated Bond Interest Rate, .08, -- Higher than typical debt annual interest rate
-Inflated Bond Interest Rate During Construction, 0.1, -- Higher interest rate during construction to account for increased risk of default.
+Inflated Bond Interest Rate, .07, -- ATB
 
-Inflation Rate, .027, -- US inflation as of December 2025
+Inflated Bond Interest Rate During Construction, 0.105, -- Aligns with ATB discount rate
+Bond Financing Start Year, -2, -- Equity-only for first 2 construction years (ATB)
+
 Construction Years, 5, -- Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations.
-Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
+
+# ATB advanced scenario
+# Construction CAPEX Schedule, 0.09,0.28,0.1,0.34,0.28
+
+# DOE scenario (alternative)
+# Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
+
+# DOE-ATB hybrid scenario
+Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389
 
 Investment Tax Credit Rate, 0.3, -- Geothermal Drilling and Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024).
 Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
