@@ -909,15 +909,15 @@ class Outputs:
         # number that results in a separator line at least as wide as the table (narrower would be unsightly).
         spaces_per_tab = 4
 
-        # The tabluate library has native separating line functionality (per https://pypi.org/project/tabulate/) but
+        # The tabulate library has native separating line functionality (per https://pypi.org/project/tabulate/) but
         # I wasn't able to get it to replicate the formatting as coded below.
-        separator_line = len(cfp_o.split('\n')[0].replace('\t',' ' * spaces_per_tab)) * '-'
+        separator_line = len(cfp_o.split('\n')[0].replace('\t', ' ' * spaces_per_tab)) * '-'
 
         ret += separator_line + '\n'
         ret += cfp_o
         ret += '\n' + separator_line
 
-        ret += '\n\n'
+        ret += '\n'
 
         return ret
 
