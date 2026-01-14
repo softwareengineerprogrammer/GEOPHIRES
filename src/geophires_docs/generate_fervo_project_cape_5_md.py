@@ -179,9 +179,11 @@ def get_fpc_category_parameters_table_md(
         input_params, include_parameter_comments=True, include_line_comments=True
     )
 
+    non_breaking_space = '\xa0'
+
     # noinspection MarkdownIncorrectTableFormatting
-    table_md = """
-| Parameter         | Input Value(s)                            | Comment      |
+    table_md = f"""
+| Parameter         | Input{non_breaking_space}Value    | Comment      |
 |-------------------|-------------------------------------------|-------------|
 """
 
@@ -209,7 +211,10 @@ def get_fpc_category_parameters_table_md(
             param_unit = _get_parameter_units(param_name)
             if param_unit == 'dimensionless':
                 param_unit_display = '%'
-                param_val = PlainQuantity(float(param_val), 'dimensionless').to('percent').magnitude
+                param_val = sig_figs(
+                    PlainQuantity(float(param_val), 'dimensionless').to('percent').magnitude,
+                    10,  # trim floating point errors
+                )
             elif ' ' in param_val:
                 param_val_split = param_val.split(' ', maxsplit=1)
                 param_val = param_val_split[0]
@@ -231,8 +236,9 @@ def get_fpc_category_parameters_table_md(
                         param_val = enum_display
                         break
 
+            param_name_display = param_name.replace(' ', non_breaking_space, 2)
             table_entries.append(
-                [param_name, f'{param_unit_display_prefix}{param_val}{param_unit_display}', param_comment]
+                [param_name_display, f'{param_unit_display_prefix}{param_val}{param_unit_display}', param_comment]
             )
 
     for table_entry in table_entries:

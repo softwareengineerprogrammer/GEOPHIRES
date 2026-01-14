@@ -346,15 +346,15 @@ class Outputs:
                 f.write(NL)
                 f.write('                         ***RESOURCE CHARACTERISTICS***\n')
                 f.write(NL)
-                f.write(f'      Maximum reservoir temperature:                   {model.reserv.Tmax.value:10.1f} ' + model.reserv.Tmax.CurrentUnits.value + NL)
-                f.write(f'      Number of segments:                            {model.reserv.numseg.value:10.0f} ' + NL)
+                f.write(f'      Maximum reservoir temperature:                   {model.reserv.Tmax.value:10.1f} {model.reserv.Tmax.CurrentUnits.value}\n')
+                f.write(f'      Number of segments:                            {model.reserv.numseg.value:10.0f}\n')
                 if model.reserv.numseg.value == 1:
-                    f.write(f'      Geothermal gradient:                                {model.reserv.gradient.value[0]:10.4g} ' + model.reserv.gradient.CurrentUnits.value + NL)
+                    f.write(f'      Geothermal gradient:                                {model.reserv.gradient.value[0]:10.4g} {model.reserv.gradient.CurrentUnits.value}\n')
                 else:
                     for i in range(1, model.reserv.numseg.value):
-                        f.write(f'      Segment {str(i):s}   Geothermal gradient:                    {model.reserv.gradient.value[i-1]:10.4g} ' + model.reserv.gradient.CurrentUnits.value +NL)
+                        f.write(f'      Segment {str(i):s}   Geothermal gradient:                    {model.reserv.gradient.value[i-1]:10.4g} {model.reserv.gradient.CurrentUnits.value}\n')
                         f.write(f'      Segment {str(i):s}   Thickness:                         {round(model.reserv.layerthickness.value[i-1], 10)} {model.reserv.layerthickness.CurrentUnits.value}\n')
-                    f.write(f'      Segment {str(i+1):s}   Geothermal gradient:                    {model.reserv.gradient.value[i]:10.4g} ' + model.reserv.gradient.CurrentUnits.value + NL)
+                    f.write(f'      Segment {str(i+1):s}   Geothermal gradient:                    {model.reserv.gradient.value[i]:10.4g} {model.reserv.gradient.CurrentUnits.value}\n')
 
                 f.write(NL)
                 f.write(NL)
@@ -909,15 +909,15 @@ class Outputs:
         # number that results in a separator line at least as wide as the table (narrower would be unsightly).
         spaces_per_tab = 4
 
-        # The tabluate library has native separating line functionality (per https://pypi.org/project/tabulate/) but
+        # The tabulate library has native separating line functionality (per https://pypi.org/project/tabulate/) but
         # I wasn't able to get it to replicate the formatting as coded below.
-        separator_line = len(cfp_o.split('\n')[0].replace('\t',' ' * spaces_per_tab)) * '-'
+        separator_line = len(cfp_o.split('\n')[0].replace('\t', ' ' * spaces_per_tab)) * '-'
 
         ret += separator_line + '\n'
         ret += cfp_o
         ret += '\n' + separator_line
 
-        ret += '\n\n'
+        ret += '\n'
 
         return ret
 
