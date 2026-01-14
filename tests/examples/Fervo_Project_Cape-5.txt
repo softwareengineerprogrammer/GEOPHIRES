@@ -102,8 +102,8 @@ Injection Well Diameter, 8.535, -- See Production Well Diameter
 
 Production Wellhead Pressure, 300 psi, -- [Singh et al., 2025](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf)
 
-Productivity Index, 1.8705, -- Based on ATB Conservative Scenario (NREL, 2025) derated by 25% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
-Injectivity Index, 2.26125, -- See Productivity Index
+Productivity Index, 1.7458, -- Based on ATB Conservative Scenario (NREL, 2025) derated by 30% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
+Injectivity Index, 2.1105, -- See Productivity Index
 
 Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023).
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
