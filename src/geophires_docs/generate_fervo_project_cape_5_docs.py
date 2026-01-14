@@ -17,8 +17,8 @@ _SINGH_ET_AL_BASE_SIMULATION_PARAMETERS: dict[str, Any] = {
     'Number of Injection Wells per Production Well': '1.2, -- The Singh et al. scenario has 4 producers and 6 injectors. '
     'We model one fewer injector here to account for the combined injection rate being lower for '
     'the higher bench separation cases.',
-    'Maximum Drawdown': '1, -- Redrilling not modeled in Singh et al. scenario '
-    '(GEOPHIRES simulation allows drawdown to reach up to 100% without triggering redrilling)',
+    'Maximum Drawdown': '1, -- Redrilling not modeled in Singh et al. scenario. '
+    '(The equivalent GEOPHIRES simulation allows drawdown to reach up to 100% without triggering redrilling)',
     'Plant Lifetime': 15,
 }
 
