@@ -96,7 +96,6 @@ class SamEconomicsCalculations:
     project_vir: OutputParameter = field(default_factory=project_vir_parameter)
 
     project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
-    """TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413"""
 
     @property
     def _pre_revenue_years_count(self) -> int:
@@ -522,7 +521,7 @@ def _calculate_project_vir(cash_flow: list[list[Any]], model: Model) -> float:
 
 def _calculate_project_payback_period(cash_flow: list[list[Any]], model) -> float | None:
     """
-    TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413
+    See payback period output parameter's tooltip text for details relevant to this implementation.
     """
 
     try:
