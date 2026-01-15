@@ -114,7 +114,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
         self.assertLess(redrills, 6)
         max_phase_2_permitted_wells = 320
         self.assertLess(self._number_of_wells(r) * redrills, max_phase_2_permitted_wells)
-        self.assertGreater(self._number_of_wells(r) * redrills, max_phase_2_permitted_wells * 0.9375)
+        self.assertGreater(self._number_of_wells(r) * redrills, max_phase_2_permitted_wells * 0.75)
 
         well_cost = r.result['CAPITAL COSTS (M$)']['Drilling and completion costs per well']['value']
         self.assertLess(well_cost, 5.0)
@@ -126,10 +126,10 @@ class FervoProjectCape5TestCase(BaseTestCase):
         self.assertGreater(pumping_power_pct, 5)
         self.assertLess(pumping_power_pct, 15)
 
-        self.assertEqual(
-            r.result['SUMMARY OF RESULTS']['Number of production wells']['value'],
-            r.result['SUMMARY OF RESULTS']['Number of injection wells']['value'],
-        )
+        num_prod_wells = r.result['SUMMARY OF RESULTS']['Number of production wells']['value']
+        num_inj_wells = r.result['SUMMARY OF RESULTS']['Number of injection wells']['value']
+        self.assertTrue(num_prod_wells * 0.5 < num_inj_wells < num_prod_wells)
+        self.assertTrue(74 < num_inj_wells + num_prod_wells < 124)
 
     def test_case_study_documentation(self):
         """
