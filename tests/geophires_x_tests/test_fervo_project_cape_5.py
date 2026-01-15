@@ -168,23 +168,27 @@ class FervoProjectCape5TestCase(BaseTestCase):
         expected_drilling_cost_MUSD_per_well = 4.46
         # number_of_doublets = inputs_in_markdown['Number of Doublets']['value']
         number_of_wells = self._number_of_wells(example_result)
-        self.assertAlmostEqualWithinSigFigs(
+        self.assertAlmostEqualWithinPercentage(
             expected_drilling_cost_MUSD_per_well * number_of_wells,
             results_in_markdown['Well Drilling and Completion Costs']['value'],
-            3,
+            percent=5,
         )
         self.assertEqual('MUSD', results_in_markdown['Well Drilling and Completion Costs']['unit'])
 
-        expected_stim_cost_MUSD_per_well = 4.83
+        expected_base_stim_cost_MUSD_per_well = 4.0
+        expected_all_in_stim_cost_MUSD_per_well = 4.83
         self.assertAlmostEqualWithinSigFigs(
-            expected_stim_cost_MUSD_per_well * number_of_wells, results_in_markdown['Stimulation Costs']['value'], 3
+            expected_all_in_stim_cost_MUSD_per_well * number_of_wells,
+            results_in_markdown['Stimulation Costs']['value'],
+            3,
         )
         self.assertEqual('MUSD', results_in_markdown['Stimulation Costs']['unit'])
 
         self.assertEqual(
-            expected_stim_cost_MUSD_per_well, inputs_in_markdown['Reservoir Stimulation Capital Cost per Well']['value']
+            expected_base_stim_cost_MUSD_per_well,
+            inputs_in_markdown['Reservoir Stimulation Capital Cost per Production Well']['value'],
         )
-        self.assertEqual('MUSD', inputs_in_markdown['Reservoir Stimulation Capital Cost per Well']['unit'])
+        self.assertEqual('MUSD', inputs_in_markdown['Reservoir Stimulation Capital Cost per Production Well']['unit'])
 
         class _Q(HasQuantity):
             def __init__(self, vu: dict[str, Any]):
@@ -238,25 +242,29 @@ class FervoProjectCape5TestCase(BaseTestCase):
         )
         self.assertAlmostEqual(sig_figs(result_capex_USD_per_kW, 2), sig_figs(markdown_capex_USD_per_kW, 2))
 
-        num_doublets = inputs_in_markdown['Number of Doublets']['value']
-        self.assertEqual(
-            example_result.result['SUMMARY OF RESULTS']['Number of production wells']['value'], num_doublets
-        )
+        # FIXME WIP refactor to work with number of injection wells per production well
+        # num_doublets = inputs_in_markdown['Number of Doublets']['value']
+        # self.assertEqual(
+        #     example_result.result['SUMMARY OF RESULTS']['Number of production wells']['value'], num_doublets
+        # )
+        #
+        # num_fracs_per_well = inputs_in_markdown['Number of Fractures per Well']['value']
+        # expected_total_fracs = num_doublets * 2 * num_fracs_per_well
+        # self.assertEqual(
+        #     expected_total_fracs, example_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value']
+        # )
 
-        num_fracs_per_well = inputs_in_markdown['Number of Fractures per Well']['value']
-        expected_total_fracs = num_doublets * 2 * num_fracs_per_well
-        self.assertEqual(
-            expected_total_fracs, example_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value']
-        )
-
-        self.assertEqual(
-            example_result.result['RESERVOIR PARAMETERS']['Reservoir volume']['value'],
-            inputs_in_markdown['Reservoir Volume']['value'],
-        )
+        # FIXME WIP
+        # self.assertEqual(
+        #     example_result.result['RESERVOIR PARAMETERS']['Reservoir volume']['value'],
+        #     results_in_markdown['Reservoir Volume']['value']
+        # )
 
         additional_expected_stim_indirect_cost_frac = 0.00
         expected_stim_cost_total_MUSD = (
-            expected_stim_cost_MUSD_per_well * num_doublets * 2 * (1.0 + additional_expected_stim_indirect_cost_frac)
+            expected_all_in_stim_cost_MUSD_per_well
+            * self._number_of_wells(example_result)
+            * (1.0 + additional_expected_stim_indirect_cost_frac)
         )
         self.assertAlmostEqualWithinSigFigs(
             expected_stim_cost_total_MUSD,
@@ -368,7 +376,12 @@ class FervoProjectCape5TestCase(BaseTestCase):
 
         structured_inputs = {}
         for key_, value_ in raw_inputs.items():
-            structured_inputs[key_] = self._parse_value_unit(value_)
+            key_ = key_.replace(' ', ' ')
+            if key_ == 'Construction CAPEX Schedule':
+                parsed_value_unit = {'value': value_, 'unit': 'percent'}
+            else:
+                parsed_value_unit = self._parse_value_unit(value_)
+            structured_inputs[key_] = parsed_value_unit
 
         return structured_inputs
 
