@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from typing import Any
 
@@ -44,7 +45,13 @@ class FervoProjectCape5TestCase(BaseTestCase):
         result_number_of_wells: int = self._number_of_wells(fpc5_result)
         number_of_fracs = int(fpc5_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value'])
         self.assertEqual(number_of_fracs, result_number_of_wells * number_of_fracs_per_well)
-        self.assertEqual(result_number_of_wells, int(fpc5_input_params_dict['Number of Doublets']) * 2)
+
+        input_num_production_wells: int = int(fpc5_input_params_dict['Number of Production Wells'])
+        input_num_injection_wells: int = math.ceil(
+            float(fpc5_input_params_dict['Number of Injection Wells per Production Well']) * input_num_production_wells
+        )
+        fpc5_input_params_number_of_wells = input_num_production_wells + input_num_injection_wells
+        self.assertEqual(result_number_of_wells, fpc5_input_params_number_of_wells)
 
     @staticmethod
     def _get_input_parameters(
