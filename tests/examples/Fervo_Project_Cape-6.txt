@@ -88,7 +88,7 @@ Circulation Pump Efficiency, 0.80
 
 # *** Well Bores Parameters ***
 
-Number of Production Wells, 13
+Number of Production Wells, 12
 Number of Injection Wells per Production Well, 0.666, -- Modeled on the reference case 5-well bench pattern (3 producers : 2 injectors) described in Singh et al., 2025.
 
 Nonvertical Length per Multilateral Section, 5000 feet, -- Target lateral length given in environmental assessment (BLM, 2024). Note that lateral length is assumed to be an upper bound constraining the number of fractures per well for a given cluster spacing.

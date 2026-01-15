@@ -27,7 +27,7 @@ then
     echo "Regenerating Fervo_Project_Cape-6..."
 
     sed -e 's/Construction Years,.*/Construction Years, 3/' \
-        -e 's/^Number of Production Wells,.*/Number of Production Wells, 13/' \
+        -e 's/^Number of Production Wells,.*/Number of Production Wells, 12/' \
         -e 's/500 MWe/100 MWe/' \
         -e 's/Phase II/Phase I/' \
         examples/Fervo_Project_Cape-5.txt > examples/Fervo_Project_Cape-6.txt
