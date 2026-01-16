@@ -3,6 +3,7 @@
 # Usage, from the project root:
 # ./src/geophires_docs/watch_docs.py
 
+import argparse
 import os
 import subprocess
 import time
@@ -61,13 +62,18 @@ def get_file_states(directory) -> dict[str, Any]:
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Automatically rebuilds docs locally when changes are detected.')
+    parser.add_argument('--no-say', action='store_true', help='Disable audio notifications via the say command')
+    args = parser.parse_args()
+
     # Determine paths relative to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root: str = Path(__file__).parent.parent.parent
 
     def _say(msg) -> None:
+        if args.no_say:
+            return
         try:
-            # TODO add a CLI flag to disable this
             subprocess.run(['say', msg], cwd=project_root, check=False)  # noqa: S603,S607
         except subprocess.CalledProcessError:
             pass
