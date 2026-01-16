@@ -24,6 +24,7 @@ from PySAM import Singleowner
 
 # noinspection PyPackageRequirements
 import PySAM.Utilityrate5 as UtilityRate
+from pint.facets.plain import PlainQuantity
 from tabulate import tabulate
 
 from geophires_x import Model as Model
@@ -43,6 +44,7 @@ from geophires_x.EconomicsUtils import (
     royalty_cost_output_parameter,
     overnight_capital_cost_output_parameter,
     _SAM_EM_MOIC_RETURNS_TAX_QUALIFIER,
+    investment_tax_credit_output_parameter,
 )
 from geophires_x.EconomicsSamPreRevenue import (
     _AFTER_TAX_NET_CASH_FLOW_ROW_NAME,
@@ -96,6 +98,8 @@ class SamEconomicsCalculations:
     project_vir: OutputParameter = field(default_factory=project_vir_parameter)
 
     project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
+
+    investment_tax_credit: OutputParameter = field(default_factory=investment_tax_credit_output_parameter)
 
     @property
     def _pre_revenue_years_count(self) -> int:
@@ -367,6 +371,11 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.project_payback_period.value = _calculate_project_payback_period(
         sam_economics.sam_cash_flow_profile, model
     )
+    sam_economics.investment_tax_credit.value = (
+        _calculate_investment_tax_credit_value(sam_economics.sam_cash_flow_profile)
+        .to(sam_economics.investment_tax_credit.CurrentUnits.value)
+        .magnitude
+    )
 
     return sam_economics
 
@@ -565,6 +574,19 @@ def _calculate_project_payback_period(cash_flow: list[list[Any]], model) -> floa
     except Exception as e:
         model.logger.error(f'Encountered exception calculating Project Payback Period: {e}')
         return None
+
+
+def _calculate_investment_tax_credit_value(sam_cash_flow_profile) -> PlainQuantity:
+    total_itc_sum_q: PlainQuantity = quantity(0, 'USD')
+
+    for itc_line_item in ['Federal ITC total income ($)', 'State ITC total income ($)']:
+        itc_numeric_entries = [
+            float(it) for it in _cash_flow_profile_row(sam_cash_flow_profile, itc_line_item) if is_float(it)
+        ]
+        itc_sum_q = quantity(sum(itc_numeric_entries), 'USD')
+        total_itc_sum_q += itc_sum_q
+
+    return total_itc_sum_q
 
 
 def get_sam_cash_flow_profile_tabulated_output(model: Model, **tabulate_kw_args) -> str:

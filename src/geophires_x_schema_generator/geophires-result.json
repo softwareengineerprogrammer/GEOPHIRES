@@ -439,7 +439,7 @@
         },
         "Investment Tax Credit": {
           "type": "number",
-          "description": "Investment Tax Credit Value",
+          "description": "Investment Tax Credit Value. Represents the total undiscounted ITC sum. For SAM Economic Models, this accounts for the standard Year 1 Federal ITC as well as any applicable State ITCs or multi-year credit schedules.",
           "units": "MUSD"
         },
         "Overnight Capital Cost": {

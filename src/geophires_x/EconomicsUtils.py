@@ -198,3 +198,16 @@ def royalty_cost_output_parameter() -> OutputParameter:
         ToolTipText='The annual costs paid to a royalty holder, calculated as a percentage of the '
         'project\'s gross annual revenue. This is modeled as a variable operating expense.',
     )
+
+
+def investment_tax_credit_output_parameter() -> OutputParameter:
+    return OutputParameter(
+        Name="Investment Tax Credit Value",
+        display_name='Investment Tax Credit',
+        UnitType=Units.CURRENCY,
+        PreferredUnits=CurrencyUnit.MDOLLARS,
+        CurrentUnits=CurrencyUnit.MDOLLARS,
+        ToolTipText='Represents the total undiscounted ITC sum. '
+        'For SAM Economic Models, this accounts for the standard Year 1 Federal ITC as well as any '
+        'applicable State ITCs or multi-year credit schedules.',
+    )
