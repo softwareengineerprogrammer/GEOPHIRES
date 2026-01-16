@@ -121,61 +121,69 @@ def generate_net_power_graph(
 def generate_production_temperature_and_drawdown_graph(
     input_and_result: tuple[GeophiresInputParameters, GeophiresXResult],
     output_dir: Path,
-    filename: str = 'fervo_project_cape-5-production-temperature-drawdown.png',
+    filename: str = 'fervo_project_cape-5-production-temperature.png',
 ) -> str:
     """
-    Generate a twin-axis graph of time vs production temperature and thermal drawdown.
-    Thermal drawdown is calculated as the fractional decline from the initial production temperature.
+    Generate a graph of time vs production temperature with a horizontal line
+    showing the temperature threshold at which maximum drawdown is reached.
     """
-    _log.info('Generating production temperature and drawdown graph...')
+    _log.info('Generating production temperature graph...')
 
     temp_profile = _get_full_production_temperature_profile(input_and_result)
-    time_steps_per_year = int(_get_input_parameters_dict(input_and_result[0])['Time steps per year'])
+    input_params_dict = _get_input_parameters_dict(input_and_result[0])
+    time_steps_per_year = int(input_params_dict['Time steps per year'])
+
+    # Get maximum drawdown from input parameters (as a decimal, e.g., 0.03 for 3%)
+    max_drawdown_str = str(input_params_dict.get('Maximum Drawdown'))
+    # Handle case where value might have a comment after it
+    max_drawdown = float(max_drawdown_str.split(',')[0].strip())
 
     # Convert to numpy arrays
     temperatures_celsius = np.array([p.magnitude for p in temp_profile])
-    # temperatures_fahrenheit = temperatures_celsius * 9 / 5 + 32
 
-    # Calculate thermal drawdown as fraction of initial temperature lost
-    # Drawdown = (T_initial - T_current) / T_initial * 100
+    # Calculate the temperature at maximum drawdown threshold
+    # Drawdown = (T_initial - T_threshold) / T_initial
+    # So: T_threshold = T_initial * (1 - max_drawdown)
     initial_temp = temperatures_celsius[0]
-    drawdown_pct = (initial_temp - temperatures_celsius) / initial_temp * 100
+    max_drawdown_temp = initial_temp * (1 - max_drawdown)
 
     # Generate time values
     years = np.array([(i + 1) / time_steps_per_year for i in range(len(temp_profile))])
 
     # Colors
     COLOR_TEMPERATURE = '#e63333'
-    COLOR_DRAWDOWN = '#3399e6'
+    COLOR_THRESHOLD = '#e69500'
 
-    # Create the figure with twin axes
-    fig, ax1 = plt.subplots(figsize=(10, 6))
+    # Create the figure
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    # Plot temperature on left axis
-    # ax1.plot(years, temperatures_fahrenheit, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
-    ax1.plot(years, temperatures_celsius, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
-    ax1.set_xlabel('Time (Years since COD)', fontsize=12)
-    # ax1.set_ylabel('Production Temperature (°F)', color=COLOR_TEMPERATURE, fontsize=12)
-    ax1.set_ylabel('Production Temperature (°C)', color=COLOR_TEMPERATURE, fontsize=12)
-    ax1.tick_params(axis='y', labelcolor=COLOR_TEMPERATURE)
-    ax1.set_xlim(years.min(), years.max())
+    # Plot temperature
+    ax.plot(years, temperatures_celsius, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
+    ax.set_xlabel('Time (Years since COD)', fontsize=12)
+    ax.set_ylabel('Production Temperature (°C)', fontsize=12)
+    ax.set_xlim(years.min(), years.max())
 
-    # Plot drawdown on right axis
-    ax2 = ax1.twinx()
-    ax2.plot(years, drawdown_pct, color=COLOR_DRAWDOWN, linewidth=2, linestyle='--', label='Thermal Drawdown')
-    ax2.set_ylabel('Thermal Drawdown (%)', color=COLOR_DRAWDOWN, fontsize=12)
-    ax2.tick_params(axis='y', labelcolor=COLOR_DRAWDOWN)
+    # Add horizontal line for maximum drawdown threshold
+    ax.axhline(y=max_drawdown_temp, color=COLOR_THRESHOLD, linestyle='--', linewidth=1.5, alpha=0.8)
+    max_drawdown_pct = max_drawdown * 100
+    ax.text(
+        years.max() * 0.98,
+        max_drawdown_temp - 0.5,
+        f'Redrilling Threshold ({max_drawdown_pct:.1f}% drawdown = {max_drawdown_temp:.1f}°C)',
+        ha='right',
+        va='top',
+        fontsize=9,
+        color=COLOR_THRESHOLD,
+    )
 
     # Title
-    ax1.set_title('Production Temperature and Thermal Drawdown Over Project Lifetime', fontsize=14)
+    ax.set_title('Production Temperature Over Project Lifetime', fontsize=14)
 
-    # Add grid (on primary axis only to avoid clutter)
-    ax1.grid(True, linestyle='--', alpha=0.7)
+    # Add grid
+    ax.grid(True, linestyle='--', alpha=0.7)
 
-    # Combined legend
-    lines1, labels1 = ax1.get_legend_handles_labels()
-    lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, loc='best')
+    # Legend
+    ax.legend(loc='best')
 
     # Ensure the output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
