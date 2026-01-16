@@ -73,7 +73,7 @@ Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fr
 Number of Fractures per Stimulated Well, 150, -- The model assumes an Extreme Limited Entry stimulation design (Fervo Energy, 2023) utilizing 12 stages with 15 clusters per stage (derived from Singh et al., 2025) and 81–85% stimulation success rate per 2024b ATB Moderate Scenario (NREL, 2025).
 Fracture Separation, 9.8255, -- Based on 30 foot cluster spacing (Singh et al., 2025) marginally uprated to align with long-term thermal decline behavior trend towards wider fracture spacing (Fercho et al., 2025).
 
-Fracture Shape, 4, -- Bench design and fracture geometry Singh et al., 2025 are given in rectangular dimensions.
+Fracture Shape, 4, -- Bench design and fracture geometry in Singh et al., 2025 are given in rectangular dimensions.
 Fracture Width, 305, -- Matches intra-bench well spacing of 500 ft (corresponding to fracture length of 1000 ft) (Singh. et al., 2025)
 Fracture Height, 95, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
 
