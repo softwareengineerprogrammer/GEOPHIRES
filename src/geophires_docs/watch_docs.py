@@ -67,6 +67,7 @@ def main():
 
     def _say(msg) -> None:
         try:
+            # TODO add a CLI flag to disable this
             subprocess.run(['say', msg], cwd=project_root, check=False)  # noqa: S603,S607
         except subprocess.CalledProcessError:
             pass
