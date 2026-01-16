@@ -45,7 +45,7 @@ def generate_fervo_project_cape_5_docs():
     )
     result = GeophiresXResult(_FPC5_RESULT_FILE_PATH)
 
-    singh_et_al_base_simulation:tuple[GeophiresInputParameters,GeophiresXResult] = get_singh_et_al_base_simulation_result(input_params)
+    singh_et_al_base_simulation: tuple[GeophiresInputParameters,GeophiresXResult] = get_singh_et_al_base_simulation_result(input_params)
 
     generate_fervo_project_cape_5_graphs(
         (input_params, result),

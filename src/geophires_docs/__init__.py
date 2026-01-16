@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+from geophires_x_client import GeophiresInputParameters
+
 
 def _get_file_path(file_name) -> Path:
     return Path(os.path.join(os.path.abspath(os.path.dirname(__file__)), file_name))
@@ -50,3 +52,26 @@ def _get_logger(_name_: str) -> Any:
             print(f'[ERROR] {msg}')
 
     return _PrintLogger()
+
+
+def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCase._get_input_parameters
+    _params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
+) -> dict[str, Any]:
+    comment_idx = 0
+    ret: dict[str, Any] = {}
+    for line in _params.as_text().split('\n'):
+        parts = line.strip().split(', ')  # TODO generalize for array-type params
+        field = parts[0].strip()
+        if len(parts) >= 2 and not field.startswith('#'):
+            fieldValue = parts[1].strip()
+            if include_parameter_comments and len(parts) > 2:
+                fieldValue += ', ' + (', '.join(parts[2:])).strip()
+            ret[field] = fieldValue.strip()
+
+        if include_line_comments and field.startswith('#'):
+            ret[f'_COMMENT-{comment_idx}'] = line.strip()
+            comment_idx += 1
+
+        # TODO preserve newlines
+
+    return ret

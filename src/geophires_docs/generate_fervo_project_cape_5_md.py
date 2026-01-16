@@ -18,6 +18,7 @@ from pint.facets.plain import PlainQuantity
 from geophires_docs import _PROJECT_ROOT
 from geophires_docs import _get_fpc5_input_file_path
 from geophires_docs import _get_fpc5_result_file_path
+from geophires_docs import _get_input_parameters_dict
 from geophires_docs import _get_logger
 from geophires_docs import _get_project_root
 from geophires_x.GeoPHIRESUtils import is_int
@@ -30,29 +31,6 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 _current_project_root: Path | None = None
 
 _log = _get_logger(__name__)
-
-
-def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCase._get_input_parameters
-    _params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
-) -> dict[str, Any]:
-    comment_idx = 0
-    ret: dict[str, Any] = {}
-    for line in _params.as_text().split('\n'):
-        parts = line.strip().split(', ')  # TODO generalize for array-type params
-        field = parts[0].strip()
-        if len(parts) >= 2 and not field.startswith('#'):
-            fieldValue = parts[1].strip()
-            if include_parameter_comments and len(parts) > 2:
-                fieldValue += ', ' + (', '.join(parts[2:])).strip()
-            ret[field] = fieldValue.strip()
-
-        if include_line_comments and field.startswith('#'):
-            ret[f'_COMMENT-{comment_idx}'] = line.strip()
-            comment_idx += 1
-
-        # TODO preserve newlines
-
-    return ret
 
 
 def _get_schema() -> dict[str, Any]:
