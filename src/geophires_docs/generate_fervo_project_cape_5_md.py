@@ -18,6 +18,8 @@ from pint.facets.plain import PlainQuantity
 from geophires_docs import _PROJECT_ROOT
 from geophires_docs import _get_fpc5_input_file_path
 from geophires_docs import _get_fpc5_result_file_path
+from geophires_docs import _get_input_parameters_dict
+from geophires_docs import _get_logger
 from geophires_docs import _get_project_root
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
@@ -28,28 +30,7 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 # Module-level variable to hold the current project root for schema access
 _current_project_root: Path | None = None
 
-
-def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCase._get_input_parameters
-    _params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
-) -> dict[str, Any]:
-    comment_idx = 0
-    ret: dict[str, Any] = {}
-    for line in _params.as_text().split('\n'):
-        parts = line.strip().split(', ')  # TODO generalize for array-type params
-        field = parts[0].strip()
-        if len(parts) >= 2 and not field.startswith('#'):
-            fieldValue = parts[1].strip()
-            if include_parameter_comments and len(parts) > 2:
-                fieldValue += ', ' + (', '.join(parts[2:])).strip()
-            ret[field] = fieldValue.strip()
-
-        if include_line_comments and field.startswith('#'):
-            ret[f'_COMMENT-{comment_idx}'] = line.strip()
-            comment_idx += 1
-
-        # TODO preserve newlines
-
-    return ret
+_log = _get_logger(__name__)
 
 
 def _get_schema() -> dict[str, Any]:
@@ -256,7 +237,7 @@ def _q(d: dict[str, Any]) -> PlainQuantity:
 
 
 def get_fpc5_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
-    print('Extracting input parameter values...')
+    _log.info('Extracting input parameter values...')
 
     params = _get_input_parameters_dict(input_params)
     r: dict[str, dict[str, Any]] = result.result
@@ -274,7 +255,7 @@ def get_fpc5_input_parameter_values(input_params: GeophiresInputParameters, resu
 
 
 def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
-    print('Extracting result values...')
+    _log.info('Extracting result values...')
 
     r: dict[str, dict[str, Any]] = result.result
 
@@ -455,18 +436,18 @@ def generate_fervo_project_cape_5_md(
     template = env.get_template('Fervo_Project_Cape-5.md.jinja')
 
     # Render template
-    print('Rendering template...')
+    _log.info('Rendering template...')
     output = template.render(**template_values)
 
     # Write output
     output_file = docs_dir / 'Fervo_Project_Cape-5.md'
     output_file.write_text(output, encoding='utf-8')
 
-    print(f'✓ Generated {output_file}')
-    print('\nKey results:')
-    print(f"\tLCOE: ${template_values['lcoe_usd_per_mwh']}/MWh")
-    print(f"\tIRR: {template_values['irr_pct']}%")
-    print(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
+    _log.info(f'✓ Generated {output_file}')
+    _log.info('\nKey results:')
+    _log.info(f"\tLCOE: ${template_values['lcoe_usd_per_mwh']}/MWh")
+    _log.info(f"\tIRR: {template_values['irr_pct']}%")
+    _log.info(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
 
 
 def main(project_root: Path | None = None):
