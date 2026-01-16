@@ -13,7 +13,7 @@
 </script>
 <script type="text/javascript">
 
-    // console.debug('Referrer:', document.referrer)
+    console.debug('Referrer:', document.referrer);
 
     ["python-geophires-x", "GEOPHIRES-X"].map((repositoryName) => {
         if (location.href.indexOf(`nrel.github.io/${repositoryName}`) !== -1
@@ -57,6 +57,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        background-color: #3c6e83 !important;
+    }
+
+    #sidebarbutton:hover {
+        background-color: #345e70 !important;
     }
 
     #sidebarbutton span {
