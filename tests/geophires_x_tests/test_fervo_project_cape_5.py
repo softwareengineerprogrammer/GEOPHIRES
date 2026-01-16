@@ -280,6 +280,9 @@ class FervoProjectCape5TestCase(BaseTestCase):
         raw_results = {}
         table_pattern = re.compile(r'^\s*\|\s*(?!-)([^|]+?)\s*\|\s*([^|]+?)\s*\|', re.MULTILINE)
 
+        # Pattern to strip HTML tags and extract text content
+        html_tag_pattern = re.compile(r'<[^>]+>')
+
         try:
             results_start_index = markdown_text.index('## Results')
             search_area = markdown_text[results_start_index:]
@@ -289,6 +292,8 @@ class FervoProjectCape5TestCase(BaseTestCase):
             # Use key_ and value_ to avoid shadowing
             for match in matches:
                 key_ = match[0].strip()
+                # Strip HTML tags from the key (e.g., <span title="...">LCOE</span> -> LCOE)
+                key_ = html_tag_pattern.sub('', key_).strip()
                 value_ = match[1].strip()
                 if key_.lower() not in ('metric', 'parameter'):
                     raw_results[key_] = value_
