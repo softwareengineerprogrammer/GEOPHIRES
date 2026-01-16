@@ -73,7 +73,7 @@ def generate_net_power_graph(
     # Add horizontal reference lines
     ax.axhline(y=500, color='#e69500', linestyle='--', linewidth=1.5, alpha=0.8)
     ax.text(
-        years.max() * 0.98, 498, 'PPA Minimum Generation Requirement', ha='right', va='top', fontsize=9, color='#e69500'
+        years.max() * 0.98, 498, 'PPA Minimum Production Requirement', ha='right', va='top', fontsize=9, color='#e69500'
     )
 
     ax.axhline(y=600, color='#33a02c', linestyle='--', linewidth=1.5, alpha=0.8)
