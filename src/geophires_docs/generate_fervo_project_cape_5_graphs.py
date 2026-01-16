@@ -62,13 +62,30 @@ def generate_net_power_graph(
     ax.plot(years, net_power, color='#3399e6', linewidth=2, marker='o', markersize=4)
 
     # Set labels and title
-    ax.set_xlabel('Time (Years)', fontsize=12)
+    ax.set_xlabel('Time (Years since COD)', fontsize=12)
     ax.set_ylabel('Net Power Production (MW)', fontsize=12)
     ax.set_title('Net Power Production Over Project Lifetime', fontsize=14)
 
     # Set axis limits
     ax.set_xlim(years.min(), years.max())
     ax.set_ylim(490, 610)
+
+    # Add horizontal reference lines
+    ax.axhline(y=500, color='#e69500', linestyle='--', linewidth=1.5, alpha=0.8)
+    ax.text(
+        years.max() * 0.98, 498, 'PPA Minimum Generation Requirement', ha='right', va='top', fontsize=9, color='#e69500'
+    )
+
+    ax.axhline(y=600, color='#33a02c', linestyle='--', linewidth=1.5, alpha=0.8)
+    ax.text(
+        years.max() * 0.98,
+        602,
+        'Gross Maximum (Combined nameplate capacity of individual ORCs)',
+        ha='right',
+        va='bottom',
+        fontsize=9,
+        color='#33a02c',
+    )
 
     # Add grid for better readability
     ax.grid(True, linestyle='--', alpha=0.7)
@@ -158,8 +175,10 @@ def generate_fervo_project_cape_5_graphs(
         singh_et_al_base_simulation_result: GeophiresXResult = singh_et_al_base_simulation[1]
 
         # generate_net_power_graph(
-        #     singh_et_al_base_simulation_result, output_dir, filename='singh_et_al_base_simulation-net-power-production.png'
+        #     singh_et_al_base_simulation_result, output_dir,
+        #     filename='singh_et_al_base_simulation-net-power-production.png'
         # )
+
         generate_production_temperature_graph(
             singh_et_al_base_simulation_result,
             output_dir,
