@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import re
+from pathlib import Path
 from typing import Any
 
 from pint.facets.plain import PlainQuantity
@@ -153,9 +154,9 @@ class FervoProjectCape5TestCase(BaseTestCase):
         """
 
         def generate_documentation_markdown() -> None:
-            generate_fervo_project_cape_5_md.main()
+            generate_fervo_project_cape_5_md.main(project_root=Path(self._get_test_file_path('../../')).absolute())
 
-        generate_documentation_markdown()
+        generate_documentation_markdown()  # Ensure we're testing the latest version of the generated doc
 
         documentation_file_content = '\n'.join(
             self._get_test_file_content('../../docs/Fervo_Project_Cape-5.md', encoding='utf-8')

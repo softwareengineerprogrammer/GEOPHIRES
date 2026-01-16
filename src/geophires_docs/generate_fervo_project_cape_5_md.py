@@ -7,6 +7,7 @@ This ensures the markdown documentation stays in sync with actual GEOPHIRES resu
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -419,6 +420,7 @@ def generate_fervo_project_cape_5_md(
     input_params: GeophiresInputParameters,
     result: GeophiresXResult,
     res_eng_reference_sim_params: dict[str, Any] | None = None,
+    project_root: Path = _PROJECT_ROOT,
 ) -> None:
     if res_eng_reference_sim_params is None:
         res_eng_reference_sim_params = {}
@@ -439,7 +441,7 @@ def generate_fervo_project_cape_5_md(
         generate_res_eng_reference_sim_params_table_md(input_params, res_eng_reference_sim_params)
     )
 
-    docs_dir = _PROJECT_ROOT / 'docs'
+    docs_dir = project_root / 'docs'
 
     # Set up Jinja environment
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
@@ -460,14 +462,14 @@ def generate_fervo_project_cape_5_md(
     print(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
 
 
-def main():
+def main(project_root: Path = _PROJECT_ROOT):
     """
     Generate Fervo_Project_Cape-5.md (markdown documentation) from the Jinja template.
     """
 
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(from_file_path=_FPC5_INPUT_FILE_PATH)
     result = GeophiresXResult(_FPC5_RESULT_FILE_PATH)
-    generate_fervo_project_cape_5_md(input_params, result)
+    generate_fervo_project_cape_5_md(input_params, result, project_root=project_root)
 
 
 if __name__ == '__main__':
