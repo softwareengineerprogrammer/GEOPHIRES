@@ -5,6 +5,13 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
         crossorigin="anonymous"></script>
 <script type="text/javascript">
+    // Define $u utility object expected by sidebar.js
+    window.$u = {
+        min: function(arr) { return Math.min.apply(Math, arr); },
+        max: function(arr) { return Math.max.apply(Math, arr); }
+    };
+</script>
+<script type="text/javascript">
 
     // console.debug('Referrer:', document.referrer)
 
