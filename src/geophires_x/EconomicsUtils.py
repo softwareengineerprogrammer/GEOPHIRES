@@ -207,5 +207,7 @@ def investment_tax_credit_output_parameter() -> OutputParameter:
         UnitType=Units.CURRENCY,
         PreferredUnits=CurrencyUnit.MDOLLARS,
         CurrentUnits=CurrencyUnit.MDOLLARS,
-        # TODO tooltip text
+        ToolTipText='Represents the total undiscounted ITC sum. '
+        'For SAM Economic Models, this accounts for the standard Year 1 Federal ITC as well as any '
+        'applicable State ITCs or multi-year credit schedules.',
     )
