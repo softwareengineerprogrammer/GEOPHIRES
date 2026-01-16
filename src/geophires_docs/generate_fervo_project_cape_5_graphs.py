@@ -21,14 +21,30 @@ _log = _get_logger(__name__)
 
 
 def _get_full_net_production_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
+    return _get_full_profile(input_and_result, 'Net Electricity Production')
+
+
+def _get_full_production_temperature_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
+    return _get_full_profile(
+        input_and_result,
+        #'Produced Temperature'
+        'Reservoir Temperature History',
+    )
+
+
+def _get_full_thermal_drawdown_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
+    return _get_full_profile(input_and_result, 'Thermal Drawdown')
+
+
+def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], profile_key: str):
     input_params: GeophiresInputParameters = input_and_result[0]
     result = GeophiresXClient().get_geophires_result(input_params)
 
     with open(result.json_output_file_path, encoding='utf-8') as f:
         full_result_obj = json.load(f)
 
-    net_gen_obj = full_result_obj['Net Electricity Production']
-    net_gen_obj_unit = net_gen_obj['CurrentUnits']
+    net_gen_obj = full_result_obj[profile_key]
+    net_gen_obj_unit = net_gen_obj['CurrentUnits'].replace('CELSIUS', 'degC')
     profile = [PlainQuantity(it, net_gen_obj_unit) for it in net_gen_obj['value']]
     return profile
 
@@ -89,6 +105,77 @@ def generate_net_power_graph(
 
     # Add grid for better readability
     ax.grid(True, linestyle='--', alpha=0.7)
+
+    # Ensure the output directory exists
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Save the figure
+    save_path = output_dir / filename
+    plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    plt.close(fig)
+
+    _log.info(f'✓ Generated {save_path}')
+    return filename
+
+
+def generate_production_temperature_and_drawdown_graph(
+    input_and_result: tuple[GeophiresInputParameters, GeophiresXResult],
+    output_dir: Path,
+    filename: str = 'fervo_project_cape-5-production-temperature-drawdown.png',
+) -> str:
+    """
+    Generate a twin-axis graph of time vs production temperature and thermal drawdown.
+    Thermal drawdown is calculated as the fractional decline from the initial production temperature.
+    """
+    _log.info('Generating production temperature and drawdown graph...')
+
+    temp_profile = _get_full_production_temperature_profile(input_and_result)
+    time_steps_per_year = int(_get_input_parameters_dict(input_and_result[0])['Time steps per year'])
+
+    # Convert to numpy arrays
+    temperatures_celsius = np.array([p.magnitude for p in temp_profile])
+    # temperatures_fahrenheit = temperatures_celsius * 9 / 5 + 32
+
+    # Calculate thermal drawdown as fraction of initial temperature lost
+    # Drawdown = (T_initial - T_current) / T_initial * 100
+    initial_temp = temperatures_celsius[0]
+    drawdown_pct = (initial_temp - temperatures_celsius) / initial_temp * 100
+
+    # Generate time values
+    years = np.array([(i + 1) / time_steps_per_year for i in range(len(temp_profile))])
+
+    # Colors
+    COLOR_TEMPERATURE = '#e63333'
+    COLOR_DRAWDOWN = '#3399e6'
+
+    # Create the figure with twin axes
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+
+    # Plot temperature on left axis
+    # ax1.plot(years, temperatures_fahrenheit, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
+    ax1.plot(years, temperatures_celsius, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
+    ax1.set_xlabel('Time (Years since COD)', fontsize=12)
+    # ax1.set_ylabel('Production Temperature (°F)', color=COLOR_TEMPERATURE, fontsize=12)
+    ax1.set_ylabel('Production Temperature (°C)', color=COLOR_TEMPERATURE, fontsize=12)
+    ax1.tick_params(axis='y', labelcolor=COLOR_TEMPERATURE)
+    ax1.set_xlim(years.min(), years.max())
+
+    # Plot drawdown on right axis
+    ax2 = ax1.twinx()
+    ax2.plot(years, drawdown_pct, color=COLOR_DRAWDOWN, linewidth=2, linestyle='--', label='Thermal Drawdown')
+    ax2.set_ylabel('Thermal Drawdown (%)', color=COLOR_DRAWDOWN, fontsize=12)
+    ax2.tick_params(axis='y', labelcolor=COLOR_DRAWDOWN)
+
+    # Title
+    ax1.set_title('Production Temperature and Thermal Drawdown Over Project Lifetime', fontsize=14)
+
+    # Add grid (on primary axis only to avoid clutter)
+    ax1.grid(True, linestyle='--', alpha=0.7)
+
+    # Combined legend
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(lines1 + lines2, labels1 + labels2, loc='best')
 
     # Ensure the output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -169,7 +256,7 @@ def generate_fervo_project_cape_5_graphs(
     # base_case_result: GeophiresXResult = base_case[1]
 
     generate_net_power_graph(base_case, output_dir)
-    # generate_production_temperature_graph(result, output_dir)
+    generate_production_temperature_and_drawdown_graph(base_case, output_dir)
 
     if singh_et_al_base_simulation is not None:
         singh_et_al_base_simulation_result: GeophiresXResult = singh_et_al_base_simulation[1]
