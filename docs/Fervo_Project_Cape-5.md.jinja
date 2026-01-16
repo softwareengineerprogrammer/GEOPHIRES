@@ -128,19 +128,26 @@ in source code for the complete results.
 
 ### Economic Results
 
-| Metric        | Result Value                                | Reference Value(s)                               | Reference Source |
-|---------------|---------------------------------------------|--------------------------------------------------|------------------|
-| LCOE          | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }}                                           | \$80/MWh      | Horne et al, 2025.                          |
-| After-tax IRR | {{ irr_pct ~ '%' }}                                              | 15–25%        | Typical levered returns for energy projects |
-| Project NPV   | {{ '$' ~ npv_musd ~ 'M' }}                                       |               | .. N/A                                      |
+Note that economic results are derived from the [SAM Single Owner PPA Economic Model](SAM-Economic-Models.html#sam-single-owner-ppa) pro-forma cash flow analysis.
+The case study result's cash flow analysis can be viewed in the web interface and in the `Fervo_Project_Cape-5.out` result file in source code.
+
+| Metric        | Result Value   | Reference Value(s) | Reference Source |
+|---------------|----------------|--------------------|------------------|
+| <span title="Levelized Cost of Energy" class="metric-tooltip-text">LCOE</span> | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} | \$80/MWh      | Horne et al, 2025. |
+| <span title="Internal Rate of Return" class="metric-tooltip-text">After-tax IRR</span> | {{ irr_pct ~ '%' }}  | 15–25% | Typical levered returns for energy projects |
+| <span title="Project Net Present Value" class="metric-tooltip-text">NPV</span>  | {{ '$' ~ npv_musd ~ 'M' }} | | .. N/A  |
+| <span title="Return on Investment; aka Multiple of Invested Capital (MOIC)" class="metric-tooltip-text">Project ROI</span>  | {{ project_moic }} | | .. N/A  |
+| <span title="aka Value Investment Ratio (VIR) and Profit Investment Ratio (PIR)" class="metric-tooltip-text">Profitability Index</span>  | {{ project_vir }} | | .. N/A  |
 {# Note that the '.. N/A' entry in the last row is required for the table to render in HTML (presumable m2r2/sphinx build issue) #}
+
+Hover over the metric names to view the corresponding definitions. Additional details are available in [GEOPHIRES Parameters documentation](parameters.html#economic-parameters)
 
 ### Capital Costs
 
 {# @formatter:off #}
 | Metric                                                                                                                                                                                                    | Result Value                                | Reference Value(s)                               | Reference Source |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|--------------------------------------------------|------------------|
-| WACC | {{ wacc_pct ~ '%' }} | 8.3% | Fervo's target goal is to eventually achieve a "Solar Standard" WACC of 8.3% (Matson, 2024). |
+| <span title="Weighted Average Cost of Capital" class="metric-tooltip-text">WACC</span> | {{ wacc_pct ~ '%' }} | 8.3% | Fervo's target goal is to eventually achieve a "Solar Standard" WACC of 8.3% (Matson, 2024). |
 | Exploration Costs | {{ '$' ~ exploration_cost_musd ~ 'M' }} | {{ '$' ~ drilling_costs_per_well_musd*5 ~ 'M'  }} | 2024b ATB NF-EGS conservative scenario exploration assumption of 5 full-size wells (NREL, 2025). Case study result conservatively includes additional costs for geophysical survey, indirect costs, and contingency. |
 | Well Drilling and Completion Costs                                                                                                                                                                        | {{ '$' ~ drilling_costs_musd ~ 'M' }} total ({{ '$' ~ drilling_costs_per_well_musd ~ 'M/well' }})                                                                                                                                                                                                   | $<4M/well                                                      | Latimer, 2025.                                   |
 | Stimulation Costs                                                                                                                                                                                         | {{ '$' ~ stim_costs_musd ~ 'M' }} total ({{ '$' ~ stim_costs_per_well_musd ~ 'M/well' }})                                          | $4.65M/well | Based on 46%:54% drilling:stimulation cost ratio (Yusifov & Enriquez, 2025).                        |

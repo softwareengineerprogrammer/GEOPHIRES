@@ -278,6 +278,8 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
 
     r: dict[str, dict[str, Any]] = result.result
 
+    econ = r['ECONOMIC PARAMETERS']
+
     total_capex_q: PlainQuantity = _q(r['CAPITAL COSTS (M$)']['Total CAPEX'])
 
     surf_equip_sim = r['SURFACE EQUIPMENT SIMULATION RESULTS']
@@ -313,8 +315,10 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'lcoe_usd_per_mwh': sig_figs(
             _q(r['SUMMARY OF RESULTS']['Electricity breakeven price']).to('USD / MWh').magnitude, 3
         ),
-        'irr_pct': sig_figs(r['ECONOMIC PARAMETERS']['After-tax IRR']['value'], 3),
-        'npv_musd': sig_figs(r['ECONOMIC PARAMETERS']['Project NPV']['value'], 3),
+        'irr_pct': sig_figs(econ['After-tax IRR']['value'], 3),
+        'npv_musd': sig_figs(econ['Project NPV']['value'], 3),
+        'project_moic': sig_figs(econ['Project MOIC']['value'], 3),
+        'project_vir': sig_figs(econ['Project VIR=PI=PIR']['value'], 3),
         # Capital Costs
         'drilling_costs_musd': round(sig_figs(_drilling_costs_musd(result), 3)),
         'drilling_costs_per_well_musd': sig_figs(_drilling_costs_per_well_musd(result), 3),
