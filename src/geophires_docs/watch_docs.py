@@ -10,28 +10,9 @@ import time
 from pathlib import Path
 from typing import Any
 
+from geophires_docs import _get_logger
 
-def _get_logger():
-    # sh = logging.StreamHandler(sys.stdout)
-    # sh.setLevel(logging.INFO)
-    # sh.setFormatter(logging.Formatter(fmt='[%(asctime)s][%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
-    #
-    # ret = logging.getLogger(__name__)
-    # ret.addHandler(sh)
-    # return ret
-
-    # noinspection PyMethodMayBeStatic
-    class _PrintLogger:
-        def info(self, msg):
-            print(f'[INFO] {msg}')
-
-        def error(self, msg):
-            print(f'[ERROR] {msg}')
-
-    return _PrintLogger()
-
-
-_log = _get_logger()
+_log = _get_logger(__name__)
 
 
 def get_file_states(directory) -> dict[str, Any]:

@@ -18,6 +18,7 @@ from pint.facets.plain import PlainQuantity
 from geophires_docs import _PROJECT_ROOT
 from geophires_docs import _get_fpc5_input_file_path
 from geophires_docs import _get_fpc5_result_file_path
+from geophires_docs import _get_logger
 from geophires_docs import _get_project_root
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
@@ -27,6 +28,8 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 
 # Module-level variable to hold the current project root for schema access
 _current_project_root: Path | None = None
+
+_log = _get_logger(__name__)
 
 
 def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCase._get_input_parameters
@@ -256,7 +259,7 @@ def _q(d: dict[str, Any]) -> PlainQuantity:
 
 
 def get_fpc5_input_parameter_values(input_params: GeophiresInputParameters, result: GeophiresXResult) -> dict[str, Any]:
-    print('Extracting input parameter values...')
+    _log.info('Extracting input parameter values...')
 
     params = _get_input_parameters_dict(input_params)
     r: dict[str, dict[str, Any]] = result.result
@@ -274,7 +277,7 @@ def get_fpc5_input_parameter_values(input_params: GeophiresInputParameters, resu
 
 
 def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
-    print('Extracting result values...')
+    _log.info('Extracting result values...')
 
     r: dict[str, dict[str, Any]] = result.result
 
@@ -455,18 +458,18 @@ def generate_fervo_project_cape_5_md(
     template = env.get_template('Fervo_Project_Cape-5.md.jinja')
 
     # Render template
-    print('Rendering template...')
+    _log.info('Rendering template...')
     output = template.render(**template_values)
 
     # Write output
     output_file = docs_dir / 'Fervo_Project_Cape-5.md'
     output_file.write_text(output, encoding='utf-8')
 
-    print(f'✓ Generated {output_file}')
-    print('\nKey results:')
-    print(f"\tLCOE: ${template_values['lcoe_usd_per_mwh']}/MWh")
-    print(f"\tIRR: {template_values['irr_pct']}%")
-    print(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
+    _log.info(f'✓ Generated {output_file}')
+    _log.info('\nKey results:')
+    _log.info(f"\tLCOE: ${template_values['lcoe_usd_per_mwh']}/MWh")
+    _log.info(f"\tIRR: {template_values['irr_pct']}%")
+    _log.info(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
 
 
 def main(project_root: Path | None = None):

@@ -8,9 +8,12 @@ from matplotlib import pyplot as plt
 from geophires_docs import _FPC5_INPUT_FILE_PATH
 from geophires_docs import _FPC5_RESULT_FILE_PATH
 from geophires_docs import _PROJECT_ROOT
+from geophires_docs import _get_logger
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
+
+_log = _get_logger(__name__)
 
 
 def generate_net_power_graph(
@@ -26,7 +29,7 @@ def generate_net_power_graph(
     Returns:
         The filename of the generated graph
     """
-    print('Generating net power production graph...')
+    _log.info('Generating net power production graph...')
 
     # Extract data from power generation profile
     profile = result.power_generation_profile
@@ -66,7 +69,7 @@ def generate_net_power_graph(
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     plt.close(fig)
 
-    print(f'✓ Generated {save_path}')
+    _log.info(f'✓ Generated {save_path}')
     return filename
 
 
@@ -83,7 +86,7 @@ def generate_production_temperature_graph(
     Returns:
         The filename of the generated graph
     """
-    print('Generating production temperature graph...')
+    _log.info('Generating production temperature graph...')
 
     # Extract data from power generation profile
     profile = result.power_generation_profile
@@ -131,7 +134,7 @@ def generate_production_temperature_graph(
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     plt.close(fig)
 
-    print(f'✓ Generated {save_path}')
+    _log.info(f'✓ Generated {save_path}')
     return filename
 
 
