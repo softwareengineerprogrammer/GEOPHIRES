@@ -15,16 +15,18 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
 
-from geophires_docs import _FPC5_INPUT_FILE_PATH
-from geophires_docs import _FPC5_RESULT_FILE_PATH
 from geophires_docs import _PROJECT_ROOT
+from geophires_docs import _get_fpc5_input_file_path
+from geophires_docs import _get_fpc5_result_file_path
+from geophires_docs import _get_project_root
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
-# Add project root to path to import GEOPHIRES and docs modules
+# Module-level variable to hold the current project root for schema access
+_current_project_root: Path | None = None
 
 
 def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCase._get_input_parameters
@@ -51,7 +53,8 @@ def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCa
 
 
 def _get_schema() -> dict[str, Any]:
-    schema_file = _PROJECT_ROOT / 'src/geophires_x_schema_generator/geophires-request.json'
+    project_root = _current_project_root if _current_project_root is not None else _get_project_root()
+    schema_file = project_root / 'src/geophires_x_schema_generator/geophires-request.json'
     with open(schema_file, encoding='utf-8') as f:
         return json.loads(f.read())
 
@@ -462,13 +465,21 @@ def generate_fervo_project_cape_5_md(
     print(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
 
 
-def main(project_root: Path = _PROJECT_ROOT):
+def main(project_root: Path | None = None):
     """
     Generate Fervo_Project_Cape-5.md (markdown documentation) from the Jinja template.
     """
+    global _current_project_root
 
-    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(from_file_path=_FPC5_INPUT_FILE_PATH)
-    result = GeophiresXResult(_FPC5_RESULT_FILE_PATH)
+    if project_root is None:
+        project_root = _get_project_root()
+
+    _current_project_root = project_root
+
+    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+        from_file_path=_get_fpc5_input_file_path(project_root)
+    )
+    result = GeophiresXResult(_get_fpc5_result_file_path(project_root))
     generate_fervo_project_cape_5_md(input_params, result, project_root=project_root)
 
 
