@@ -521,21 +521,43 @@ def _calculate_project_vir(cash_flow: list[list[Any]], model: Model) -> float:
 
 def _calculate_project_payback_period(cash_flow: list[list[Any]], model) -> float | None:
     """
-    See payback period output parameter's tooltip text for details relevant to this implementation.
-    """
+    Calculates the Simple Payback Period (SPB).
+    SPB is the time required for the cumulative non-discounted after-tax net cash flow to turn positive.
 
+    The calculation assumes annual cash flows. The returned value represents the number of years
+    from the start of the provided cash flow list until the investment is recovered.
+    """
     try:
+        # Get flattened annual after-tax cash flow
         after_tax_cash_flow = _after_tax_net_cash_flow_all_years(cash_flow, _pre_revenue_years_count(model))
-        cumm_cash_flow = np.zeros(len(after_tax_cash_flow))
-        cumm_cash_flow[0] = after_tax_cash_flow[0]
-        for year in range(1, len(after_tax_cash_flow)):
-            cumm_cash_flow[year] = cumm_cash_flow[year - 1] + after_tax_cash_flow[year]
-            if cumm_cash_flow[year] >= 0:
-                year_before_full_recovery = year - 1
-                payback_period = (
-                    year_before_full_recovery
-                    + abs(cumm_cash_flow[year_before_full_recovery]) / after_tax_cash_flow[year]
-                )
+
+        cumulative_cash_flow = np.zeros(len(after_tax_cash_flow))
+        cumulative_cash_flow[0] = after_tax_cash_flow[0]
+
+        # Handle edge case where the first year is already positive
+        if cumulative_cash_flow[0] >= 0:
+            # If the project is profitable immediately (rare for SPB), return 0 or fraction.
+            # For standard SPB logic where Index 0 is an investment year, this is an edge case.
+            pass
+
+        for year_index in range(1, len(after_tax_cash_flow)):
+            cumulative_cash_flow[year_index] = cumulative_cash_flow[year_index - 1] + after_tax_cash_flow[year_index]
+
+            if cumulative_cash_flow[year_index] >= 0:
+                # Payback occurred in this year (year_index).
+                # We need to calculate how far into this year the break-even point occurred.
+
+                previous_year_index = year_index - 1
+                unrecovered_cost_at_start_of_year = abs(cumulative_cash_flow[previous_year_index])
+                cash_flow_in_current_year = after_tax_cash_flow[year_index]
+
+                # Fraction of the current year required to recover the remaining cost
+                fraction_of_year = unrecovered_cost_at_start_of_year / cash_flow_in_current_year
+
+                # Total years elapsed = Full years prior to this one + fraction of this one.
+                # If we are at year_index, the number of full years passed is equal to year_index.
+                # Example: If year_index is 5 (6th year), 5 full years (Indices 0..4) have passed.
+                payback_period = year_index + fraction_of_year
 
                 return float(payback_period)
 

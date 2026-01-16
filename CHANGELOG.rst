@@ -4,6 +4,11 @@ Changelog
 
 GEOPHIRES v3 (2023-2025)
 ------------------------
+3.11
+^^^^
+
+3.11: `SAM Economic Models Project Payback Period fix <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/123>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.1>`__
+
 
 3.10
 ^^^^
