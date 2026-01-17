@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -51,7 +52,7 @@ def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, Geophire
 
 def _get_redrilling_event_indexes(
     input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], threshold_degc: float = 1.0
-) -> list[int]:
+) -> list[float]:
     """
     Detect redrilling events from a production temperature profile.
 
@@ -63,23 +64,27 @@ def _get_redrilling_event_indexes(
 
     :param threshold_degc: Temperature increase threshold to detect redrilling (default 1.0°C)
 
-    :return: List of cash flow year indexes where redrilling events occur (COD = Year 1)
+    :return: List of fractional year positions where redrilling events occur (COD = Year 1)
     """
     temperatures_celsius: list[float] = [
         it.to('degC').magnitude for it in _get_full_production_temperature_profile(input_and_result)
     ]
-    time_steps_per_year: int = int(_get_input_parameters_dict(input_and_result[0])['Time steps per year'])
 
-    redrilling_indexes = []
+    input_params_dict: dict[str, Any] = _get_input_parameters_dict(input_and_result[0])
+    time_steps_per_year: int = int(input_params_dict['Time steps per year'])
+
+    redrilling_positions = []
 
     for i in range(1, len(temperatures_celsius)):
         temp_increase = temperatures_celsius[i] - temperatures_celsius[i - 1]
-        if temp_increase > threshold_degc:
-            # Convert datapoint index to cash flow year index (COD = Year 1)
-            year_index = (i // time_steps_per_year) + 1
-            redrilling_indexes.append(year_index)
+        if temp_increase >= threshold_degc:
+            # The temperature jump is detected at index i, but the redrilling event
+            # occurred at the previous datapoint (i-1) when the minimum was reached.
+            # Convert to fractional year position (COD = Year 1)
+            year_position = 1 + (i - 1) / time_steps_per_year
+            redrilling_positions.append(year_position)
 
-    return redrilling_indexes
+    return redrilling_positions
 
 
 def generate_power_production_graph(
@@ -186,9 +191,13 @@ def generate_production_temperature_and_drawdown_graph(
     # Generate time values: Cash flow year convention: COD = Year 1
     years = np.array([1 + i / time_steps_per_year for i in range(len(temp_profile))])
 
+    # Get redrilling event years
+    redrilling_years = _get_redrilling_event_indexes(input_and_result)
+
     # Colors
     COLOR_TEMPERATURE = '#e63333'
     COLOR_THRESHOLD = '#e69500'
+    COLOR_REDRILLING = '#3366cc'
 
     # Create the figure
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -199,6 +208,11 @@ def generate_production_temperature_and_drawdown_graph(
     ax.set_ylabel('Production Temperature (°C)', fontsize=12)
     ax.set_xlim(years.min(), years.max())
     ax.set_ylim(195, 205)
+
+    # Enable minor ticks on x-axis
+    ax.minorticks_on()
+    ax.tick_params(axis='x', which='minor', bottom=True)
+    ax.tick_params(axis='y', which='minor', left=False)
 
     # Add horizontal line for maximum drawdown threshold
     ax.axhline(y=max_drawdown_temp, color=COLOR_THRESHOLD, linestyle='--', linewidth=1.5, alpha=0.8)
@@ -212,6 +226,21 @@ def generate_production_temperature_and_drawdown_graph(
         fontsize=9,
         color=COLOR_THRESHOLD,
     )
+
+    # Add vertical lines for redrilling events
+    for i, redrill_year in enumerate(redrilling_years):
+        ax.axvline(x=redrill_year, color=COLOR_REDRILLING, linestyle=':', linewidth=1.5, alpha=0.7)
+        # Only add label for the first redrilling event to avoid legend clutter
+        if i == 0:
+            ax.text(
+                redrill_year + 0.3,
+                ax.get_ylim()[1] - 0.5,
+                f'Redrilling Events (n={len(redrilling_years)})',
+                ha='left',
+                va='top',
+                fontsize=9,
+                color=COLOR_REDRILLING,
+            )
 
     # Title
     ax.set_title('Production Temperature Over Project Lifetime', fontsize=14)
