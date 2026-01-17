@@ -270,7 +270,7 @@ class Outputs:
                     # Non-SAM-EMs (inaccurately) treat ITC as a capital cost and thus are displayed in the capital
                     # costs category rather than here.
                     f.write(
-                        f'      {econ.RITCValue.display_name}:                          {abs(econ.RITCValue.value):10.2f} {econ.RITCValue.CurrentUnits.value}\n')
+                        f'      {econ.RITCValue.display_name}:                           {abs(econ.RITCValue.value):10.2f} {econ.RITCValue.CurrentUnits.value}\n')
 
                 if not is_sam_econ_model:  # (parameter is ambiguous to the point of meaninglessness for SAM-EM)
                     acf: OutputParameter = econ.accrued_financing_during_construction_percentage
