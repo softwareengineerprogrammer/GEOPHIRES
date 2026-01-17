@@ -1240,7 +1240,7 @@ class WellBores:
             PreferredUnits=PressureUnit.KPASCAL,
             CurrentUnits=PressureUnit.KPASCAL
         )
-        self.NonverticalProducedTemperature = self.OutputParameterDict[self.ProducedTemperature.Name] = OutputParameter(
+        self.NonverticalProducedTemperature = self.OutputParameterDict[self.NonverticalProducedTemperature.Name] = OutputParameter(
             Name="Nonvertical Produced Temperature",
             value=[0.0],
             UnitType=Units.TEMPERATURE,

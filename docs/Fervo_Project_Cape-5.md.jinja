@@ -9,8 +9,14 @@ on Phases I and II of [Fervo Energy's Cape Station](https://capestation.com/).
 
 Key case study results include LCOE = {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} and IRR = {{ irr_pct ~ '%' }}. ([Jump to Results section](#results)).
 
+.. raw:: html
+
+    <img src="_images/fervo_project_cape-5-power-production.png" class="no-active" style="max-width: 50%"
+        title="See the Results section for details."
+        alt="Power Production Profile graph" />
+
 [Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) to
-interactively explore the case study in the GEOPHIRES web interface.
+interactively explore the case study example in the GEOPHIRES web interface.
 
 ### Modeling Overview: A Conservative, Second-of-a-Kind Analog
 
@@ -120,6 +126,9 @@ While the initial and final (Year 15) temperatures are consistent, the productio
 
 Despite these structural differences, the comparison validates the basis for the case study's reservoir engineering parameters, as the aggregate heat extraction and year-15 endpoint align closely with the numerical simulation baseline.
 
+The calibration simulation above represents a 15-year unmitigated thermal decline without redrilling.
+In the full case study results, the model includes redrilling events that restore production temperature when drawdown thresholds are reached,
+resulting in the cyclical profile shown in the [Production Temperature section](#production-temperature-profile) below.
 
 ## Results
 
@@ -180,18 +189,23 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 | Total wells drilled over project lifetime | {{ total_wells_including_redrilling }} | 320 | Total wells permitted by environmental assessment (BLM, 2024). |
 {# @formatter:on #}
 
+#### Production Temperature Profile
 
-#### Power Production Curve
-{# TODO #}
-{#![caption](_images/fervo_project_cape-5-production-temperature.png)#}
+<img src="_images/fervo_project_cape-5-production-temperature.png" class="no-active" style="max-width: 66%" />
 
-![caption](_images/fervo_project_cape-5-net-power-production.png)
+The production temperature profile exhibits distinctive cyclical behavior driven by the interaction between wellbore physics and reservoir thermal evolution:
 
-The project's generation profile (as seen in the graph above) exhibits distinctive cyclical behavior driven by the interaction between wellbore physics, reservoir thermal evolution, and economic constraints:
+1. **Thermal Conditioning (Years 1–6)**: The initial rise in production temperature, peaking at approximately 203°C, is driven by the thermal conditioning of the production wellbores. As hot geofluid continuously flows through the wells, the wellbore casing and surrounding rock heat up, reducing conductive heat loss as predicted by the Ramey wellbore model.
+2. **Reservoir Drawdown (Years 6–8)**: Following the conditioning peak, temperature declines as the cold front from injection wells reaches the production zone (thermal breakthrough), reducing the produced fluid enthalpy.
+3. **Redrilling (End of Years 8, 16, 24)**: The model triggers a redrilling event when the *next* time step's temperature would fall below the threshold defined by the `Maximum Drawdown` parameter (shown as the dashed orange line). As visible in the graph, the production temperature never actually reaches the threshold; redrilling preemptively restores the wellfield before that occurs. The cost of these events is amortized as an operational expense over the project lifetime.
 
-1. Thermal Conditioning (Years 1-5): The initial rise in net power production, peaking at approximately 540 MW, is driven by the thermal conditioning of the production wellbores. As hot geofluid continuously flows through the wells, the wellbore casing and surrounding rock heat up, reducing conductive heat loss as predicted by the Ramey wellbore model.
-1. Reservoir Drawdown (Years 5-8): Following the conditioning peak, power output declines as the cold front from injection wells reaches the production zone (thermal breakthrough), reducing the produced fluid enthalpy.
-1. Redrilling (Years 8, 16, 24): To ensure the facility meets its 500 MW net PPA obligation, the model triggers redrilling events when production drops near the contractual minimum (corresponding to production temperature declining below the threshold defined by the `Maximum Drawdown` parameter value, as a percentage of the initial production temperature). These events simulate the redrilling of the entire wellfield to restore temperature and output. Their cost is amortized as an operational cost over the project lifetime.
+#### Power Generation Profile
+
+<img src="_images/fervo_project_cape-5-power-production.png" class="no-active" style="max-width: 66%" />
+
+Power generation is a direct function of production temperature, so the power production profile mirrors the thermal behavior described above. The graph shows both total (gross) electricity generation and net electricity generation after parasitic losses. The gap between the two curves represents the energy consumed by the circulation pumps.
+
+The horizontal reference lines indicate the 500 MW net PPA minimum production requirement and the 600 MW nameplate capacity (combined capacity of the individual ORC units).
 
 ### Sensitivity Analysis
 
