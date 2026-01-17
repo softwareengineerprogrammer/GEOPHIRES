@@ -182,22 +182,21 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 
 #### Production Temperature
 
-{# WIP #}
-{#![](_images/fervo_project_cape-5-production-temperature.png)#}
-
 <img src="_images/fervo_project_cape-5-production-temperature.png" class="no-active" style="max-width: 66%" />
+
+The production temperature profile exhibits distinctive cyclical behavior driven by the interaction between wellbore physics and reservoir thermal evolution:
+
+1. **Thermal Conditioning (Years 1–6)**: The initial rise in production temperature, peaking at approximately 203°C, is driven by the thermal conditioning of the production wellbores. As hot geofluid continuously flows through the wells, the wellbore casing and surrounding rock heat up, reducing conductive heat loss as predicted by the Ramey wellbore model.
+2. **Reservoir Drawdown (Years 6–8)**: Following the conditioning peak, temperature declines as the cold front from injection wells reaches the production zone (thermal breakthrough), reducing the produced fluid enthalpy.
+3. **Redrilling (End of Years 8, 16, 24)**: The model triggers a redrilling event when the *next* time step's temperature would fall below the threshold defined by the `Maximum Drawdown` parameter (shown as the dashed orange line). As visible in the graph, the production temperature never actually reaches the threshold; redrilling preemptively restores the wellfield before that occurs. The cost of these events is amortized as an operational expense over the project lifetime.
 
 #### Power Generation Curve
 
-{#![](_images/fervo_project_cape-5-power-production.png)#}
-
 <img src="_images/fervo_project_cape-5-power-production.png" class="no-active" style="max-width: 66%" />
 
-The project's generation profile (as seen in the graph above) exhibits distinctive cyclical behavior driven by the interaction between wellbore physics, reservoir thermal evolution, and economic constraints:
+Power generation is a direct function of production temperature, so the power production profile mirrors the thermal behavior described above. The graph shows both total (gross) electricity generation and net electricity generation after parasitic losses. The gap between the two curves represents the energy consumed by the circulation pumps.
 
-1. Thermal Conditioning (Years 1-5): The initial rise in net power production, peaking at approximately 540 MW, is driven by the thermal conditioning of the production wellbores. As hot geofluid continuously flows through the wells, the wellbore casing and surrounding rock heat up, reducing conductive heat loss as predicted by the Ramey wellbore model.
-1. Reservoir Drawdown (Years 5-8): Following the conditioning peak, power output declines as the cold front from injection wells reaches the production zone (thermal breakthrough), reducing the produced fluid enthalpy.
-1. Redrilling (Years 8, 16, 24): To ensure the facility meets its 500 MW net PPA obligation, the model triggers redrilling events when production drops near the contractual minimum (corresponding to production temperature declining below the threshold defined by the `Maximum Drawdown` parameter value, as a percentage of the initial production temperature). These events simulate the redrilling of the entire wellfield to restore temperature and output. Their cost is amortized as an operational cost over the project lifetime.
+The horizontal reference lines indicate the 500 MW net PPA minimum production requirement and the 600 MW nameplate capacity (combined capacity of the individual ORC units).
 
 ### Sensitivity Analysis
 
@@ -400,23 +399,4 @@ Utah. https://www.turboden.com/company/media/press/press-releases/4881/turboden-
 
 U.S. Department of the Interior Bureau of Land Management. (2024, October).
 Finding of No Significant Impact and Decision Record DOI-BLM-UT-C010-2024-0018-EA.
-https://eplanning.blm.gov/public_projects/2033002/200625761/20120795/251020775/DOI-BLM-UT-C010-2024-0018-EA_FONSI_DR_%20Fervo%20EA_signed.pdf
-
-US DOE. (2021). Combined Heat and Power Technology Fact Sheet Series: Waste Heat to
-Power. https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf
-
-Xing, P., England, K., Moore, J., McLennan, J. (2025, February 10).
-Analysis of the 2024 Circulation Tests at Utah FORGE and the Response of Fiber Optic Sensing
-Data.
-https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2025/Xing2.pdf
-
-Yearsley, E., Kombrink, H. (2024, November 6).
-A critical look at Fervo dataset suggests lower output.
-https://geoexpro.com/a-critical-look-at-fervo-dataset-suggests-lower-output/
-
-Yusifov, M., & Enriquez, N. (2025, July). From Core to Code: Powering the Al Revolution with Geothermal Energy.
-Project InnerSpace. https://projectinnerspace.org/resources/Powering-the-AI-Revolution.pdf
-
----
-
-## Footnotes
+https://eplanning.blm.gov/public_projects/2033002/200625761/20120795/251020775/DOI-BL
