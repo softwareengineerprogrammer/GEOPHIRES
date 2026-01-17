@@ -63,7 +63,7 @@ def _get_redrilling_event_indexes(
 
     :param threshold_degc: Temperature increase threshold to detect redrilling (default 1.0°C)
 
-    :return: List of year indexes (0-based, from COD) where redrilling events occur
+    :return: List of cash flow year indexes where redrilling events occur (COD = Year 1)
     """
     temperatures_celsius: list[float] = [
         it.to('degC').magnitude for it in _get_full_production_temperature_profile(input_and_result)
@@ -75,8 +75,8 @@ def _get_redrilling_event_indexes(
     for i in range(1, len(temperatures_celsius)):
         temp_increase = temperatures_celsius[i] - temperatures_celsius[i - 1]
         if temp_increase > threshold_degc:
-            # Convert datapoint index to year index
-            year_index = i // time_steps_per_year
+            # Convert datapoint index to cash flow year index (COD = Year 1)
+            year_index = (i // time_steps_per_year) + 1
             redrilling_indexes.append(year_index)
 
     return redrilling_indexes
@@ -103,8 +103,8 @@ def generate_power_production_graph(
     total_power = np.array([p.magnitude for p in total_generation_profile])
 
     # Generate time values: each datapoint represents 1/time_steps_per_year of a year
-    # Starting from year 1 (first operational year)
-    years = np.array([(i + 1) / time_steps_per_year for i in range(len(profile))])
+    # Cash flow year convention: COD = Year 1, so first datapoint is at year 1
+    years = np.array([1 + i / time_steps_per_year for i in range(len(profile))])
 
     # Create the figure
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -114,7 +114,7 @@ def generate_power_production_graph(
     ax.plot(years, net_power, color='#3399e6', linewidth=2, label='Net Electricity Production (after parasitic losses)')
 
     # Set labels and title
-    ax.set_xlabel('Time (Years since COD)', fontsize=12)
+    ax.set_xlabel('Year', fontsize=12)
     ax.set_ylabel('Power Production (MW)', fontsize=12)
     ax.set_title('Power Production Over Project Lifetime', fontsize=14)
 
@@ -123,8 +123,7 @@ def generate_power_production_graph(
     ax.set_ylim(480, 630)
 
     # Add horizontal reference lines
-    # hline_x = years.max() * 0.98
-    hline_x = 0.5
+    hline_x = 1.5
     ax.axhline(y=500, color='#e69500', linestyle='--', linewidth=1.5, alpha=0.8)
     ax.text(hline_x, 498, 'PPA Minimum Production Requirement', ha='left', va='top', fontsize=9, color='#e69500')
 
@@ -184,8 +183,8 @@ def generate_production_temperature_and_drawdown_graph(
     initial_temp = temperatures_celsius[0]
     max_drawdown_temp = initial_temp * (1 - max_drawdown)
 
-    # Generate time values
-    years = np.array([(i + 1) / time_steps_per_year for i in range(len(temp_profile))])
+    # Generate time values: Cash flow year convention: COD = Year 1
+    years = np.array([1 + i / time_steps_per_year for i in range(len(temp_profile))])
 
     # Colors
     COLOR_TEMPERATURE = '#e63333'
@@ -196,7 +195,7 @@ def generate_production_temperature_and_drawdown_graph(
 
     # Plot temperature
     ax.plot(years, temperatures_celsius, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
-    ax.set_xlabel('Time (Years since COD)', fontsize=12)
+    ax.set_xlabel('Year', fontsize=12)
     ax.set_ylabel('Production Temperature (°C)', fontsize=12)
     ax.set_xlim(years.min(), years.max())
     ax.set_ylim(195, 205)
