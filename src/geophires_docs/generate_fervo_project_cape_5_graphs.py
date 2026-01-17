@@ -202,8 +202,6 @@ def generate_production_temperature_and_drawdown_graph(
     # Create the figure
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    # Plot temperature
-    ax.plot(years, temperatures_celsius, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
     ax.set_xlabel('Year', fontsize=12)
     ax.set_ylabel('Production Temperature (°C)', fontsize=12)
     ax.set_xlim(years.min(), years.max())
@@ -214,19 +212,6 @@ def generate_production_temperature_and_drawdown_graph(
     ax.tick_params(axis='x', which='minor', bottom=True)
     ax.tick_params(axis='y', which='minor', left=False)
 
-    # Add horizontal line for maximum drawdown threshold
-    ax.axhline(y=max_drawdown_temp, color=COLOR_THRESHOLD, linestyle='--', linewidth=1.5, alpha=0.8)
-    max_drawdown_pct = max_drawdown * 100
-    ax.text(
-        years.max() * 0.98,
-        max_drawdown_temp - 0.5,
-        f'Redrilling Threshold ({max_drawdown_pct:.1f}% drawdown = {max_drawdown_temp:.1f}°C)',
-        ha='right',
-        va='top',
-        fontsize=9,
-        color=COLOR_THRESHOLD,
-    )
-
     # Add vertical lines for redrilling events
     for i, redrill_year in enumerate(redrilling_years):
         ax.axvline(x=redrill_year, color=COLOR_REDRILLING, linestyle=':', linewidth=1.5, alpha=0.7)
@@ -234,13 +219,29 @@ def generate_production_temperature_and_drawdown_graph(
         if i == 0:
             ax.text(
                 redrill_year + 0.3,
-                ax.get_ylim()[1] - 0.5,
+                ax.get_ylim()[0] + 0.75,
                 f'Redrilling Events (n={len(redrilling_years)})',
                 ha='left',
                 va='top',
                 fontsize=9,
                 color=COLOR_REDRILLING,
             )
+
+    # Add horizontal line for maximum drawdown threshold
+    ax.axhline(y=max_drawdown_temp, color=COLOR_THRESHOLD, linestyle='--', linewidth=1.5, alpha=0.8)
+    max_drawdown_pct = max_drawdown * 100
+    ax.text(
+        years.max() * 0.98,
+        max_drawdown_temp - 0.25,
+        f'Redrilling Threshold ({max_drawdown_pct:.1f}% drawdown = {max_drawdown_temp:.1f}°C)',
+        ha='right',
+        va='top',
+        fontsize=9,
+        color=COLOR_THRESHOLD,
+    )
+
+    # Plot temperature last so it renders over threshold and redrilling lines
+    ax.plot(years, temperatures_celsius, color=COLOR_TEMPERATURE, linewidth=2, label='Production Temperature')
 
     # Title
     ax.set_title('Production Temperature Over Project Lifetime', fontsize=14)
