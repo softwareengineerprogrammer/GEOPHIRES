@@ -7,7 +7,7 @@ Economic Model, 5, -- The SAM Single Owner PPA economic model is used to calcula
 Inflation Rate, .027, -- US inflation as of December 2025
 
 Starting Electricity Sale Price, 0.095, -- Aligns with Geysers - Sacramento pricing in [2024b ATB](https://atb.nrel.gov/electricity/2024/geothermal) (NREL, 2025). See Sensitivity Analysis for effect of different prices on results.
-Electricity Escalation Rate Per Year, 0.00057, -- Calibrated to reach 10¢/kWh at project year 11
+Electricity Escalation Rate Per Year, 0.00057, -- Calibrated to reach $100/MWh at project year 11
 Ending Electricity Sale Price, 1, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
 Electricity Escalation Start Year, 1
 

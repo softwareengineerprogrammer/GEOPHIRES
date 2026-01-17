@@ -200,6 +200,13 @@ def get_fpc_category_parameters_table_md(
                     PlainQuantity(float(param_val), 'dimensionless').to('percent').magnitude,
                     10,  # trim floating point errors
                 )
+            elif param_unit == 'USD/kWh':
+                price_unit = 'USD/MWh'
+                param_unit_display = _get_unit_display(price_unit)
+                param_val = sig_figs(
+                    PlainQuantity(float(param_val), 'USD/kWh').to(price_unit).magnitude,
+                    10,  # trim floating point errors
+                )
             elif ' ' in param_val:
                 param_val_split = param_val.split(' ', maxsplit=1)
                 param_val = param_val_split[0]
