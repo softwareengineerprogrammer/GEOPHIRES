@@ -45,16 +45,16 @@ def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, Geophire
     return profile
 
 
-def generate_net_power_graph(
+def generate_power_production_graph(
     # result: GeophiresXResult,
     input_and_result: tuple[GeophiresInputParameters, GeophiresXResult],
     output_dir: Path,
-    filename: str = 'fervo_project_cape-5-net-power-production.png',
+    filename: str = 'fervo_project_cape-5-power-production.png',
 ) -> str:
     """
     Generate a graph of time vs net power production and save it to the output directory.
     """
-    _log.info('Generating net power production graph...')
+    _log.info('Generating power production graph...')
 
     profile = _get_full_net_production_profile(input_and_result)
     time_steps_per_year = int(_get_input_parameters_dict(input_and_result[0])['Time steps per year'])
@@ -75,8 +75,8 @@ def generate_net_power_graph(
 
     # Set labels and title
     ax.set_xlabel('Time (Years since COD)', fontsize=12)
-    ax.set_ylabel('Net Power Production (MW)', fontsize=12)
-    ax.set_title('Net Power Production Over Project Lifetime', fontsize=14)
+    ax.set_ylabel('Power Production (MW)', fontsize=12)
+    ax.set_title('Power Production Over Project Lifetime', fontsize=14)
 
     # Set axis limits
     ax.set_xlim(years.min(), years.max())
@@ -92,7 +92,7 @@ def generate_net_power_graph(
     ax.text(
         years.max() * 0.98,
         602,
-        'Gross Maximum (Combined nameplate capacity of individual ORCs)',
+        'Nameplate capacity (combined capacity of individual ORCs)',
         ha='right',
         va='bottom',
         fontsize=9,
@@ -258,7 +258,7 @@ def generate_fervo_project_cape_5_graphs(
     # base_case_input_params: GeophiresInputParameters = base_case[0]
     # base_case_result: GeophiresXResult = base_case[1]
 
-    generate_net_power_graph(base_case, output_dir)
+    generate_power_production_graph(base_case, output_dir)
     generate_production_temperature_and_drawdown_graph(base_case, output_dir)
 
     if singh_et_al_base_simulation is not None:
