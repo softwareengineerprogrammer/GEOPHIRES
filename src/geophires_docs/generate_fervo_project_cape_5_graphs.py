@@ -24,6 +24,10 @@ def _get_full_net_production_profile(input_and_result: tuple[GeophiresInputParam
     return _get_full_profile(input_and_result, 'Net Electricity Production')
 
 
+def _get_full_total_electricity_generation_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
+    return _get_full_profile(input_and_result, 'Total Electricity Production')
+
+
 def _get_full_production_temperature_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
     return _get_full_profile(input_and_result, 'Produced Temperature')
 
@@ -57,11 +61,13 @@ def generate_power_production_graph(
     _log.info('Generating power production graph...')
 
     profile = _get_full_net_production_profile(input_and_result)
+    total_generation_profile = _get_full_total_electricity_generation_profile(input_and_result)
     time_steps_per_year = int(_get_input_parameters_dict(input_and_result[0])['Time steps per year'])
 
     # profile is a list of PlainQuantity values with time_steps_per_year datapoints per year
     # Convert to numpy arrays for plotting
     net_power = np.array([p.magnitude for p in profile])
+    total_power = np.array([p.magnitude for p in total_generation_profile])
 
     # Generate time values: each datapoint represents 1/time_steps_per_year of a year
     # Starting from year 1 (first operational year)
@@ -71,7 +77,8 @@ def generate_power_production_graph(
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # Plot the data
-    ax.plot(years, net_power, color='#3399e6', linewidth=2, marker='o', markersize=4)
+    ax.plot(years, total_power, color='#9933e6', linewidth=2, label='Total Electricity Production (gross generation)')
+    ax.plot(years, net_power, color='#3399e6', linewidth=2, label='Net Electricity Production (after parasitic losses)')
 
     # Set labels and title
     ax.set_xlabel('Time (Years since COD)', fontsize=12)
@@ -80,20 +87,20 @@ def generate_power_production_graph(
 
     # Set axis limits
     ax.set_xlim(years.min(), years.max())
-    ax.set_ylim(490, 610)
+    ax.set_ylim(480, 630)
 
     # Add horizontal reference lines
+    # hline_x = years.max() * 0.98
+    hline_x = 0.5
     ax.axhline(y=500, color='#e69500', linestyle='--', linewidth=1.5, alpha=0.8)
-    ax.text(
-        years.max() * 0.98, 498, 'PPA Minimum Production Requirement', ha='right', va='top', fontsize=9, color='#e69500'
-    )
+    ax.text(hline_x, 498, 'PPA Minimum Production Requirement', ha='left', va='top', fontsize=9, color='#e69500')
 
     ax.axhline(y=600, color='#33a02c', linestyle='--', linewidth=1.5, alpha=0.8)
     ax.text(
-        years.max() * 0.98,
+        hline_x,
         602,
         'Nameplate capacity (combined capacity of individual ORCs)',
-        ha='right',
+        ha='left',
         va='bottom',
         fontsize=9,
         color='#33a02c',
@@ -101,6 +108,9 @@ def generate_power_production_graph(
 
     # Add grid for better readability
     ax.grid(True, linestyle='--', alpha=0.7)
+
+    # Add legend
+    ax.legend(loc='best')
 
     # Ensure the output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
