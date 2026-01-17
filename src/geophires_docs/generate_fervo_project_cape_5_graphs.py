@@ -49,6 +49,39 @@ def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, Geophire
     return profile
 
 
+def _get_redrilling_event_indexes(
+    input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], threshold_degc: float = 1.0
+) -> list[int]:
+    """
+    Detect redrilling events from a production temperature profile.
+
+    A redrilling event is identified when a datapoint's temperature is more than
+    `threshold_degc` higher than the previous datapoint (indicating a sudden temperature
+    recovery from drilling new wells).
+
+    TODO include redrilling events in GEOPHIRES results so they don't need to be calculated here
+
+    :param threshold_degc: Temperature increase threshold to detect redrilling (default 1.0°C)
+
+    :return: List of year indexes (0-based, from COD) where redrilling events occur
+    """
+    temperatures_celsius: list[float] = [
+        it.to('degC').magnitude for it in _get_full_production_temperature_profile(input_and_result)
+    ]
+    time_steps_per_year: int = int(_get_input_parameters_dict(input_and_result[0])['Time steps per year'])
+
+    redrilling_indexes = []
+
+    for i in range(1, len(temperatures_celsius)):
+        temp_increase = temperatures_celsius[i] - temperatures_celsius[i - 1]
+        if temp_increase > threshold_degc:
+            # Convert datapoint index to year index
+            year_index = i // time_steps_per_year
+            redrilling_indexes.append(year_index)
+
+    return redrilling_indexes
+
+
 def generate_power_production_graph(
     # result: GeophiresXResult,
     input_and_result: tuple[GeophiresInputParameters, GeophiresXResult],
