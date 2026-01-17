@@ -130,9 +130,7 @@ def generate_production_temperature_and_drawdown_graph(
     time_steps_per_year = int(input_params_dict['Time steps per year'])
 
     # Get maximum drawdown from input parameters (as a decimal, e.g., 0.03 for 3%)
-    max_drawdown_str = str(input_params_dict.get('Maximum Drawdown'))
-    # Handle case where value might have a comment after it
-    max_drawdown = float(max_drawdown_str.split(',')[0].strip())
+    max_drawdown = float(input_params_dict.get('Maximum Drawdown'))
 
     # Convert to numpy arrays
     temperatures_celsius = np.array([p.magnitude for p in temp_profile])
@@ -158,6 +156,7 @@ def generate_production_temperature_and_drawdown_graph(
     ax.set_xlabel('Time (Years since COD)', fontsize=12)
     ax.set_ylabel('Production Temperature (°C)', fontsize=12)
     ax.set_xlim(years.min(), years.max())
+    ax.set_ylim(195, 205)
 
     # Add horizontal line for maximum drawdown threshold
     ax.axhline(y=max_drawdown_temp, color=COLOR_THRESHOLD, linestyle='--', linewidth=1.5, alpha=0.8)
