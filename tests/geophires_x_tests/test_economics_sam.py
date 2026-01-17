@@ -74,6 +74,8 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertEqual(rdr['value'], 7.0)
         self.assertEqual(rdr['unit'], '%')
 
+        self.assertIsNotNone(base_result.result['ECONOMIC PARAMETERS']['Investment Tax Credit'])
+
     def test_drawdown(self):
         r = self._get_result(
             {'Plant Lifetime': 20, 'End-Use Option': 1}, file_path=self._get_test_file_path('../examples/example13.txt')

@@ -81,6 +81,8 @@ class GeophiresXResult:
                 'Accrued financing during construction',
                 # Displayed for economic models that don't treat inflation costs as capital costs (non-SAM-EM)
                 'Inflation costs during construction',
+                # Displayed as economic parameter for SAM-EM (non-SAM-EMs treat as capital cost)
+                'Investment Tax Credit',
                 'Project lifetime',
                 'Capacity factor',
                 'Project NPV',
