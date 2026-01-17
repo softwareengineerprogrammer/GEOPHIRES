@@ -183,7 +183,7 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 | Total wells drilled over project lifetime | {{ total_wells_including_redrilling }} | 320 | Total wells permitted by environmental assessment (BLM, 2024). |
 {# @formatter:on #}
 
-#### Production Temperature
+#### Production Temperature Profile
 
 <img src="_images/fervo_project_cape-5-production-temperature.png" class="no-active" style="max-width: 66%" />
 
@@ -193,7 +193,7 @@ The production temperature profile exhibits distinctive cyclical behavior driven
 2. **Reservoir Drawdown (Years 6–8)**: Following the conditioning peak, temperature declines as the cold front from injection wells reaches the production zone (thermal breakthrough), reducing the produced fluid enthalpy.
 3. **Redrilling (End of Years 8, 16, 24)**: The model triggers a redrilling event when the *next* time step's temperature would fall below the threshold defined by the `Maximum Drawdown` parameter (shown as the dashed orange line). As visible in the graph, the production temperature never actually reaches the threshold; redrilling preemptively restores the wellfield before that occurs. The cost of these events is amortized as an operational expense over the project lifetime.
 
-#### Power Generation Curve
+#### Power Generation Profile
 
 <img src="_images/fervo_project_cape-5-power-production.png" class="no-active" style="max-width: 66%" />
 
