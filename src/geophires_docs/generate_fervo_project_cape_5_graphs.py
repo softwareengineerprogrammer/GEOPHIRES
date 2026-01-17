@@ -25,11 +25,7 @@ def _get_full_net_production_profile(input_and_result: tuple[GeophiresInputParam
 
 
 def _get_full_production_temperature_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
-    return _get_full_profile(
-        input_and_result,
-        #'Produced Temperature'
-        'Reservoir Temperature History',
-    )
+    return _get_full_profile(input_and_result, 'Produced Temperature')
 
 
 def _get_full_thermal_drawdown_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
