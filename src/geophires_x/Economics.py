@@ -1011,9 +1011,9 @@ class Economics:
             'Royalty Rate Escalation Start Year',
             DefaultValue=1,
             AllowableRange=list(range(1, model.surfaceplant.plant_lifetime.AllowableRange[-1], 1)),
-            UnitType=Units.PERCENT,
-            PreferredUnits=PercentUnit.TENTH,
-            CurrentUnits=PercentUnit.TENTH,
+            UnitType=Units.NONE,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
             ToolTipText=f'The first year that the {self.royalty_escalation_rate.Name} is applied. '
                         f'{_YEAR_INDEX_VALUE_EXPLANATION_SNIPPET}.'
         )

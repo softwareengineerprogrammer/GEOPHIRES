@@ -1677,7 +1677,7 @@
     "Royalty Rate Escalation Start Year": {
       "description": "The first year that the Royalty Rate Escalation is applied. The value is specified as a project year index corresponding to the Year row in the cash flow profile.",
       "type": "integer",
-      "units": "",
+      "units": "yr",
       "category": "Economics",
       "default": 1,
       "minimum": 1,
