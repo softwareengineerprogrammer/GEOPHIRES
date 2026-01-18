@@ -71,7 +71,15 @@ def project_vir_parameter() -> OutputParameter:
         UnitType=Units.PERCENT,
         PreferredUnits=PercentUnit.TENTH,
         CurrentUnits=PercentUnit.TENTH,
-        ToolTipText='For SAM Economic Models, VIR = PV(Returns) / abs(PV(Investment)).',
+        ToolTipText="Value Investment Ratio (VIR). "
+        "VIR is frequently referred to interchangeably as Profitability Index (PI) or "
+        "Profit Investment Ratio (PIR) in financial literature. "
+        "All three terms describe the same fundamental ratio: the present value of future cash flows "
+        "divided by the initial investment. "
+        "For SAM Economic Models, this metric is calculated as the Levered Equity Profitability Index. "
+        "It is calculated as the Present Value of After-Tax Equity Cash Flows (Returns) divided by the "
+        "Present Value of Equity Invested. It measures the efficiency of the sponsor's specific capital "
+        "contribution, accounting for leverage.",
     )
 
 

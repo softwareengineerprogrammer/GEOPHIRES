@@ -181,7 +181,7 @@ The case study result's cash flow analysis can be viewed in the web interface an
 | <span title="Internal Rate of Return" class="metric-tooltip-text">After-tax IRR</span> | {{ irr_pct ~ '%' }}  | 15–25% | Typical levered returns for energy projects |
 | <span title="Project Net Present Value" class="metric-tooltip-text">NPV</span>  | {{ '$' ~ npv_musd ~ 'M' }} | >$0 | Positive NPVs result in profit  |
 | <span title="Return on Investment; aka Multiple of Invested Capital (MOIC)" class="metric-tooltip-text">Project ROI</span>  | {{ project_moic }} | | .. N/A  |
-| <span title="aka Value Investment Ratio (VIR) and Profit Investment Ratio (PIR)" class="metric-tooltip-text">Profitability Index</span>  | {{ project_vir }} | >1.0 | Calculations greater than 1.0 indicate the future anticipated discounted cash inflows are greater than the anticipated discounted cash outflows.  |
+| <span title="aka PI aka Value Investment Ratio (VIR) and Profit Investment Ratio (PIR)" class="metric-tooltip-text">Levered Equity Profitability Index</span>  | {{ project_vir }} | >1.0 | Calculations greater than 1.0 indicate the future anticipated discounted cash inflows are greater than the anticipated discounted cash outflows.  |
 {# Note that the '.. N/A' entry in the last row is required for the table to render in HTML (presumable m2r2/sphinx build issue) #}
 
 Hover over the metric names to view the corresponding definitions.
