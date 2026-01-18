@@ -20,6 +20,8 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 
 _log = _get_logger(__name__)
 
+_YOE_LABEL = 'Years of Operation'
+
 
 def _get_full_net_production_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
     return _get_full_profile(input_and_result, 'Net Electricity Production')
@@ -119,7 +121,7 @@ def generate_power_production_graph(
     ax.plot(years, net_power, color='#3399e6', linewidth=2, label='Net Electricity Production (after parasitic losses)')
 
     # Set labels and title
-    ax.set_xlabel('Year', fontsize=12)
+    ax.set_xlabel(_YOE_LABEL, fontsize=12)
     ax.set_ylabel('Power Production (MW)', fontsize=12)
     ax.set_title('Power Production Over Project Lifetime', fontsize=14)
 
@@ -202,7 +204,7 @@ def generate_production_temperature_and_drawdown_graph(
     # Create the figure
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax.set_xlabel('Year', fontsize=12)
+    ax.set_xlabel(_YOE_LABEL, fontsize=12)
     ax.set_ylabel('Production Temperature (°C)', fontsize=12)
     ax.set_xlim(years.min(), years.max())
     ax.set_ylim(195, 205)
