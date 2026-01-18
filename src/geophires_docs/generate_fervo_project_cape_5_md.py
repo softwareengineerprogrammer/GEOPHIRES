@@ -31,6 +31,7 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 _current_project_root: Path | None = None
 
 _log = _get_logger(__name__)
+_NON_BREAKING_SPACE = '\xa0'
 
 
 def _get_schema() -> dict[str, Any]:
@@ -145,6 +146,15 @@ def generate_fpc_construction_parameters_table_md(
 def generate_fpc_economics_parameters_table_md(input_params: GeophiresInputParameters, result: GeophiresXResult) -> str:
     stim_cost_per_well_additional_display_data = f' baseline cost; ${_stim_costs_per_well_musd(result)}M all-in cost'
 
+    drilling_cost_per_well_additional_display_data = (
+        f' (Yields all-in cost of ' f'${sig_figs(_drilling_costs_per_well_musd(result),3)}M/well)'
+    )
+
+    # Doesn't seem to work as intended...
+    drilling_cost_per_well_additional_display_data = drilling_cost_per_well_additional_display_data.replace(
+        ' ', _NON_BREAKING_SPACE
+    )
+
     return get_fpc_category_parameters_table_md(
         input_params,
         'Economics',
@@ -158,7 +168,7 @@ def generate_fpc_economics_parameters_table_md(input_params: GeophiresInputParam
         additional_display_data_by_param_name={
             'Reservoir Stimulation Capital Cost per Production Well': stim_cost_per_well_additional_display_data,
             'Reservoir Stimulation Capital Cost per Injection Well': stim_cost_per_well_additional_display_data,
-            # FIXME TODO drilling costs (per well)
+            'Well Drilling and Completion Capital Cost Adjustment Factor': drilling_cost_per_well_additional_display_data,
         },
     )
 
@@ -179,11 +189,9 @@ def get_fpc_category_parameters_table_md(
         input_params, include_parameter_comments=True, include_line_comments=True
     )
 
-    non_breaking_space = '\xa0'
-
     # noinspection MarkdownIncorrectTableFormatting
     table_md = f"""
-| Parameter         | Input{non_breaking_space}Value    | Comment      |
+| Parameter         | Input{_NON_BREAKING_SPACE}Value    | Comment      |
 |-------------------|-------------------------------------------|-------------|
 """
 
@@ -243,7 +251,7 @@ def get_fpc_category_parameters_table_md(
                         param_val = enum_display
                         break
 
-            param_name_display = param_name.replace(' ', non_breaking_space, 2)
+            param_name_display = param_name.replace(' ', _NON_BREAKING_SPACE, 2)
 
             additional_display_data = additional_display_data_by_param_name.get(param_name, '')
 
