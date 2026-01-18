@@ -479,9 +479,17 @@ class FervoProjectCape5TestCase(BaseTestCase):
         fpc5_result: GeophiresXResult = GeophiresXResult(
             self._get_test_file_path('../examples/Fervo_Project_Cape-6.out')
         )
+
         min_net_gen_dict = fpc5_result.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
             'Minimum Net Electricity Generation'
         ]
         fpc5_min_net_gen_mwe = quantity(min_net_gen_dict['value'], min_net_gen_dict['unit']).to('MW').magnitude
         self.assertGreater(fpc5_min_net_gen_mwe, 100)
-        self.assertLess(fpc5_min_net_gen_mwe, 110)
+
+        max_total_gen_dict = fpc5_result.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
+            'Maximum Total Electricity Generation'
+        ]
+        fpc5_max_total_net_gen_mwe = (
+            quantity(max_total_gen_dict['value'], max_total_gen_dict['unit']).to('MW').magnitude
+        )
+        self.assertLess(fpc5_max_total_net_gen_mwe, 120)
