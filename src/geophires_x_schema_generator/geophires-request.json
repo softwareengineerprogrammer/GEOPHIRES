@@ -430,6 +430,15 @@
       "minimum": 8,
       "maximum": 15
     },
+    "Reservoir Output File Name": {
+      "description": "File name of reservoir output in case reservoir model 5 is selected",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": null,
+      "minimum": null,
+      "maximum": null
+    },
     "Cylindrical Reservoir Input Depth": {
       "description": "Depth of the inflow end of a cylindrical reservoir",
       "type": "number",
