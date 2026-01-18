@@ -399,8 +399,8 @@ class FervoProjectCape5TestCase(BaseTestCase):
         """
         clean_str = re.split(r'\s*\(|,(?!\s*\d)', raw_string)[0].strip()
 
-        if clean_str.startswith('$') and 'M total' in clean_str:
-            return {'value': float(clean_str.split('M total')[0][1:]), 'unit': 'MUSD'}
+        if clean_str.startswith('$') and ('M total' in clean_str or 'M baseline cost' in clean_str):
+            return {'value': float(clean_str.split('M ')[0][1:]), 'unit': 'MUSD'}
 
         # LCOE format ($X.X/MWh -> cents/kWh)
         match = re.match(r'^\$(\d+\.?\d*)/MWh$', clean_str)
