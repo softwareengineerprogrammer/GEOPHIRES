@@ -85,21 +85,19 @@ def _get_unit_display(parameter_units_from_schema: str) -> str:
     return f'{display_unit_prefix}{display_unit}'
 
 
-def generate_fpc_reservoir_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc_reservoir_parameters_table_md(input_params: GeophiresInputParameters, result: GeophiresXResult) -> str:
     params_to_exclude = [
         'Maximum Temperature',
         'Reservoir Porosity',
         'Reservoir Volume Option',
     ]
 
-    return get_fpc_category_parameters_table_md(
-        input_params,
-        'Reservoir',
-        params_to_exclude,
-    )
+    return get_fpc_category_parameters_table_md(input_params, 'Reservoir', params_to_exclude)
 
 
-def generate_fpc_well_bores_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc_well_bores_parameters_table_md(
+    input_params: GeophiresInputParameters, result: GeophiresXResult
+) -> str:
     return get_fpc_category_parameters_table_md(
         input_params,
         'Well Bores',
@@ -107,7 +105,9 @@ def generate_fpc_well_bores_parameters_table_md(input_params: GeophiresInputPara
     )
 
 
-def generate_fpc_surface_plant_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc_surface_plant_parameters_table_md(
+    input_params: GeophiresInputParameters, result: GeophiresXResult
+) -> str:
     return get_fpc_category_parameters_table_md(
         input_params,
         'Surface Plant',
@@ -115,7 +115,9 @@ def generate_fpc_surface_plant_parameters_table_md(input_params: GeophiresInputP
     )
 
 
-def generate_fpc_construction_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc_construction_parameters_table_md(
+    input_params: GeophiresInputParameters, result: GeophiresXResult
+) -> str:
     input_params_dict = _get_input_parameters_dict(
         input_params, include_parameter_comments=True, include_line_comments=True
     )
@@ -140,7 +142,9 @@ def generate_fpc_construction_parameters_table_md(input_params: GeophiresInputPa
     )
 
 
-def generate_fpc_economics_parameters_table_md(input_params: GeophiresInputParameters) -> str:
+def generate_fpc_economics_parameters_table_md(input_params: GeophiresInputParameters, result: GeophiresXResult) -> str:
+    stim_cost_per_well_additional_display_data = f' baseline cost; ${_stim_costs_per_well_musd(result)}M all-in cost'
+
     return get_fpc_category_parameters_table_md(
         input_params,
         'Economics',
@@ -151,14 +155,25 @@ def generate_fpc_economics_parameters_table_md(input_params: GeophiresInputParam
             'Time steps per year',
             'Print Output to Console',
         ],
+        additional_display_data_by_param_name={
+            'Reservoir Stimulation Capital Cost per Production Well': stim_cost_per_well_additional_display_data,
+            'Reservoir Stimulation Capital Cost per Injection Well': stim_cost_per_well_additional_display_data,
+            # FIXME TODO drilling costs (per well)
+        },
     )
 
 
 def get_fpc_category_parameters_table_md(
-    input_params: GeophiresInputParameters, category_name: str | None, parameters_to_exclude: list[str] | None = None
+    input_params: GeophiresInputParameters,
+    category_name: str | None,
+    parameters_to_exclude: list[str] | None = None,
+    additional_display_data_by_param_name: dict[str, str] | None = None,
 ) -> str:
     if parameters_to_exclude is None:
         parameters_to_exclude = []
+
+    if additional_display_data_by_param_name is None:
+        additional_display_data_by_param_name = {}
 
     input_params_dict = _get_input_parameters_dict(
         input_params, include_parameter_comments=True, include_line_comments=True
@@ -229,8 +244,15 @@ def get_fpc_category_parameters_table_md(
                         break
 
             param_name_display = param_name.replace(' ', non_breaking_space, 2)
+
+            additional_display_data = additional_display_data_by_param_name.get(param_name, '')
+
             table_entries.append(
-                [param_name_display, f'{param_unit_display_prefix}{param_val}{param_unit_display}', param_comment]
+                [
+                    param_name_display,
+                    f'{param_unit_display_prefix}{param_val}{param_unit_display}{additional_display_data}',
+                    param_comment,
+                ]
             )
 
     for table_entry in table_entries:
@@ -384,11 +406,6 @@ def _stim_costs_musd(result: GeophiresXResult) -> float:
     return stim_costs_musd
 
 
-def _stim_costs_per_well_musd(result: GeophiresXResult) -> float:
-    stim_costs_per_well_musd = _stim_costs_musd(result) / _number_of_wells(result)
-    return stim_costs_per_well_musd
-
-
 def _total_fracture_surface_area_per_well_m2(result: GeophiresXResult) -> float:
     r: dict[str, dict[str, Any]] = result.result
     res_params = r['RESERVOIR PARAMETERS']
@@ -420,8 +437,10 @@ def generate_fervo_project_cape_5_md(
     if res_eng_reference_sim_params is None:
         res_eng_reference_sim_params = {}
 
+    result_values: dict[str, Any] = get_result_values(result)
+
     # noinspection PyDictCreation
-    template_values = {**get_fpc5_input_parameter_values(input_params, result), **get_result_values(result)}
+    template_values = {**get_fpc5_input_parameter_values(input_params, result), **result_values}
 
     for template_key, md_method in {
         'reservoir_parameters_table_md': generate_fpc_reservoir_parameters_table_md,
@@ -430,7 +449,7 @@ def generate_fervo_project_cape_5_md(
         'economics_parameters_table_md': generate_fpc_economics_parameters_table_md,
         'construction_parameters_table_md': generate_fpc_construction_parameters_table_md,
     }.items():
-        template_values[template_key] = md_method(input_params)
+        template_values[template_key] = md_method(input_params, result)
 
     template_values['reservoir_engineering_reference_simulation_params_table_md'] = (
         generate_res_eng_reference_sim_params_table_md(input_params, res_eng_reference_sim_params)
