@@ -1,6 +1,9 @@
 #!/bin/zsh
 
 set -e
+
+STASH_PWD=$(pwd)
+
 cd "$(dirname "$0")"
 
 # Use this script to regenerate example results in cases where changes in GEOPHIRES
@@ -43,11 +46,13 @@ then
     source regenerate-example-result.env
     if [ -n "$GEOPHIRES_FPC5_SENSITIVITY_ANALYSIS_PROJECT_ROOT" ]; then
         echo "Updating sensitivity analysis..."
-        STASH_PWD=$(pwd)
+        STASH_PWD_2=$(pwd)
         cd $GEOPHIRES_FPC5_SENSITIVITY_ANALYSIS_PROJECT_ROOT
         source venv/bin/activate
         python -m fpc_sensitivity_analysis.generate_geophires_fpc5_sensitivity_analysis
         deactivate
-        cd $STASH_PWD
+        cd $STASH_PWD_2
     fi
 fi
+
+cd $STASH_PWD
