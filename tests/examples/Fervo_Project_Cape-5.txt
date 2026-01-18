@@ -44,6 +44,12 @@ Reservoir Stimulation Capital Cost per Production Well, 4, -- See Reservoir Stim
 
 Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs represent 2% of facilities CAPEX per [Matson, 2024](https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/).
 
+Royalty Rate, 0.0175, -- The BLM royalty structure is 1.75% of gross proceeds from electricity sales for the first 10 years of production (Code of Federal Regulations, 2024).
+Royalty Rate Escalation Start Year, 11, -- After the first 10 years of production, the royalty rate escalates to 3.5%.
+Royalty Rate Escalation, 0.0175, -- Escalation at Year 11 from 1.75% to 3.5%.
+Royalty Rate Maximum, 0.035, -- No further escalation beyond 3.5%.
+
+
 # *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
 # *************************************************
 End-Use Option, 1, -- Electricity
