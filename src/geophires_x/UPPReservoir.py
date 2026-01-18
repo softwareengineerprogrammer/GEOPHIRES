@@ -83,23 +83,19 @@ class UPPReservoir(Reservoir):
             with open(model.reserv.filenamereservoiroutput.value, encoding='UTF-8') as f:
                 contentprodtemp = f.readlines()
         except:
-            model.logger.critical('Error: GEOPHIRES could not read reservoir output file ('
-                                  + model.reserv.filenamereservoiroutput.value+') and will abort simulation.')
-            print('Error: GEOPHIRES could not read reservoir output file ('
+            msg = ('Error: GEOPHIRES could not read reservoir output file ('
                   + model.reserv.filenamereservoiroutput.value+') and will abort simulation.')
-            sys.exit()
+            model.logger.critical(msg)
+            raise RuntimeError(msg)
         numlines = len(contentprodtemp)
         if numlines != model.surfaceplant.plant_lifetime.value*model.economics.timestepsperyear.value+1:
-            model.logging.critical('Error: Reservoir output file ('
+            msg = ('Error: Reservoir output file ('
                                    + model.reserv.filenamereservoiroutput.value +
                                    ') does not have required ' +
                                    str(model.surfaceplant.plant_lifetime.value * model.economics.timestepsperyear.value + 1) +
                                    ' lines. GEOPHIRES will abort simulation.')
-            print('Error: Reservoir output file (' +
-                  model.reserv.filenamereservoiroutput.value +') does not have required ' +
-                  str(model.surfaceplant.plant_lifetime.value * model.economics.timestepsperyear.value + 1) +
-                  ' lines. GEOPHIRES will abort simulation.')
-            sys.exit()
+            model.logger.critical(msg)
+            raise RuntimeError(msg)
         for i in range(0, numlines-1):
             model.reserv.Tresoutput.value[i] = float(contentprodtemp[i].split(',')[1].strip('\n'))
 
