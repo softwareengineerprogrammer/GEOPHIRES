@@ -1,5 +1,8 @@
 import sys
-from .Parameter import strParameter
+import numpy as np
+from scipy.interpolate import interp1d
+
+from .Parameter import strParameter, listParameter
 from .Units import *
 import geophires_x.Model as Model
 from .Reservoir import Reservoir
@@ -43,27 +46,31 @@ class UPPReservoir(Reservoir):
             ToolTipText="File name of reservoir output in case reservoir model 5 is selected"
         )
 
+        self.reservoir_output_data = self.ParameterDict[self.reservoir_output_data.Name] = listParameter(
+            "Reservoir Output Profile",
+            DefaultValue=[],
+            UnitType=Units.NONE,
+            ToolTipText="Temperature profile data as a comma-separated list of values in Celsius. "
+                        "Values will be interpolated to match the simulation time steps. "
+                        "Example: 200,195,190,185 for a 4-point temperature decline profile."
+        )
+
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
 
     def __str__(self):
         return "UPPReservoir"
 
-    def read_parameters(self, model:Model) -> None:
-        """
-        The read_parameters function reads in the parameters from a dictionary created by reading the user-provided file
-        and updates the parameter values for this object.
-        The function reads in all the parameters that relate to this object, including those that are inherited from
-        other objects. It then updates any of these parameter values that have been changed by the user.
-        It also handles any special cases.
-        :param model: The container class of the application, giving access to everything else, including the logger
-        :return: None
-        """
+    def read_parameters(self, model: Model) -> None:
         model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
         super().read_parameters(model)    # read the parameters for the parent.
-        # if we call super, we don't need to deal with setting the parameters here, just deal with the special cases
-        # for the variables in this class
-        # because the call to the super.readparameters will set all the variables, including the ones that are specific
-        # to this class
+
+        # Validate mutual exclusivity: user should provide either file or inline data, not both
+        if self.reservoir_output_data.Provided and self.filenamereservoiroutput.Provided:
+            # If both are provided, prefer inline data and log a warning
+            msg = ("Both 'Reservoir Output Profile' and 'Reservoir Output File Name' were provided. "
+                   "Using 'Reservoir Output Profile' data.")
+            print(f"Warning: {msg}")
+            model.logger.warning(msg)
 
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
 
@@ -79,24 +86,69 @@ class UPPReservoir(Reservoir):
         super().Calculate(model)    # run calculations for the parent.
 
         model.reserv.Tresoutput.value[0] = model.reserv.Trock.value
+
+        # Determine the number of required time steps
+        # num_timesteps = int(model.surfaceplant.plant_lifetime.value * model.economics.timestepsperyear.value + 1)
+        # Use the actual size of the Tresoutput array (set by parent Calculate)
+        num_timesteps = len(model.reserv.Tresoutput.value)
+
+        if self.reservoir_output_data.Provided and len(self.reservoir_output_data.value) > 0:
+            # Use inline temperature profile data
+            self._load_from_inline_data(model, num_timesteps)
+        else:
+            # Fall back to file-based input
+            self._load_from_file(model, num_timesteps)
+
+        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+
+    def _load_from_inline_data(self, model: Model, num_timesteps: int) -> None:
+        """
+        Load reservoir temperature profile from inline data and interpolate to match time steps.
+        """
+        temp_data = self.reservoir_output_data.value
+
+        if len(temp_data) < 2:
+            msg = ("Error: 'Reservoir Output Profile' must contain at least 2 temperature values "
+                   f"for interpolation. Got {len(temp_data)} value(s).")
+            model.logger.critical(msg)
+            raise RuntimeError(msg)
+
+        # Create time points for the input data (evenly spaced over the plant lifetime)
+        input_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, len(temp_data))
+
+        # Create target time points for the simulation
+        target_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, num_timesteps)
+
+        # Interpolate temperature values to match simulation time steps
+        interpolator = interp1d(input_time_points, temp_data, kind='linear', fill_value='extrapolate')
+        interpolated_temps = interpolator(target_time_points)
+
+        # Assign interpolated values to reservoir output
+        for i in range(num_timesteps):
+            model.reserv.Tresoutput.value[i] = float(interpolated_temps[i])
+
+    def _load_from_file(self, model: Model, num_timesteps: int) -> None:
+        """
+        Load reservoir temperature profile from file (original behavior).
+        """
         try:
             with open(model.reserv.filenamereservoiroutput.value, encoding='UTF-8') as f:
                 contentprodtemp = f.readlines()
-        except:
+        except Exception:
             msg = ('Error: GEOPHIRES could not read reservoir output file ('
-                  + model.reserv.filenamereservoiroutput.value+') and will abort simulation.')
+                   + model.reserv.filenamereservoiroutput.value + ') and will abort simulation.')
             model.logger.critical(msg)
             raise RuntimeError(msg)
-        numlines = len(contentprodtemp)
-        if numlines != model.surfaceplant.plant_lifetime.value*model.economics.timestepsperyear.value+1:
-            msg = ('Error: Reservoir output file ('
-                                   + model.reserv.filenamereservoiroutput.value +
-                                   ') does not have required ' +
-                                   str(model.surfaceplant.plant_lifetime.value * model.economics.timestepsperyear.value + 1) +
-                                   ' lines. GEOPHIRES will abort simulation.')
-            model.logger.critical(msg)
-            raise RuntimeError(msg)
-        for i in range(0, numlines-1):
-            model.reserv.Tresoutput.value[i] = float(contentprodtemp[i].split(',')[1].strip('\n'))
 
-        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        numlines = len(contentprodtemp)
+        if numlines != num_timesteps:
+            msg = ('Error: Reservoir output file ('
+                   + model.reserv.filenamereservoiroutput.value +
+                   ') does not have required ' +
+                   str(num_timesteps) +
+                   ' lines. GEOPHIRES will abort simulation.')
+            model.logger.critical(msg)
+            raise RuntimeError(msg)
+
+        for i in range(0, numlines - 1):
+            model.reserv.Tresoutput.value[i] = float(contentprodtemp[i].split(',')[1].strip('\n'))

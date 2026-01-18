@@ -303,3 +303,14 @@ class ReservoirTestCase(BaseTestCase):
 
         exception_message = str(re.exception)
         self.assertIn('GEOPHIRES could not read reservoir output file', exception_message)
+
+    def test_user_provided_profile_reservoir_output_profile(self) -> None:
+        def _del_metadata(r: GeophiresXResult) -> GeophiresXResult:
+            del r.result['metadata']
+            del r.result['Simulation Metadata']
+            return r
+
+        example_5_result = _del_metadata(GeophiresXResult(self._get_test_file_path('../examples/example5.out')))
+        example_5b_result = _del_metadata(GeophiresXResult(self._get_test_file_path('../examples/example5b.out')))
+
+        self.assertDictAlmostEqual(example_5_result.result, example_5b_result.result, percent=5)
