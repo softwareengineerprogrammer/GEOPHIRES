@@ -86,7 +86,7 @@ def main():
             current_states = _get_file_states()
 
             if current_states != last_states:
-                _log.info('\n[Change Detected] Running docs build...')
+                _log.info('[Change Detected] Running docs build...')
                 time.sleep(1)
 
                 try:
@@ -98,15 +98,16 @@ def main():
                     _log.error(f'An error occurred: {e}')
                     _say('error rebuilding docs')
 
-                _log.info(f"\nDocs rebuild complete at {time.strftime('%Y-%m-%d %H:%M:%S')}.")
+                print('\n')
+                _log.info(f"Docs rebuild complete at {time.strftime('%Y-%m-%d %H:%M:%S')}.")
                 _say('docs rebuilt')
-                _log.info(f"\nWaiting for further changes in '{watch_dirs}'...")
+                _log.info(f"Waiting for further changes in '{watch_dirs}'...")
 
                 # Update state to the current state
                 last_states = _get_file_states()
 
     except KeyboardInterrupt:
-        _log.info('\nWatcher stopped.')
+        _log.info('Watcher stopped.')
 
 
 if __name__ == '__main__':

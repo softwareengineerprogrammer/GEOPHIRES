@@ -113,7 +113,7 @@ Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinj
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
 Injection Wellbore Temperature Gain, 3
 
-Maximum Drawdown, 0.0025, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥500 MWe.
+Maximum Drawdown, 0.0025, -- This value represents the fractional drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is calibrated to maintain the PPA minimum net electricity generation requirement of 500 MWe. It is a very small percentage because it is relative to the initial production temperature; the temperature quickly rises higher from the initial value due to thermal conditioning and plateaus until breakthrough.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************
