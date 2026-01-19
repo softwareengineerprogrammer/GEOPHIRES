@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from math import ceil
 from pathlib import Path
 from typing import Any
 
@@ -53,7 +54,7 @@ def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, Geophire
 
 
 def _get_redrilling_event_indexes(
-    input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], threshold_degc: float = 1.0
+    input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], threshold_degc: float = 0.5
 ) -> list[float]:
     """
     Detect redrilling events from a production temperature profile.
@@ -77,13 +78,21 @@ def _get_redrilling_event_indexes(
 
     redrilling_positions = []
 
-    for i in range(1, len(temperatures_celsius)):
-        temp_increase = temperatures_celsius[i] - temperatures_celsius[i - 1]
+    step_size = 6
+    for i in range(ceil(time_steps_per_year * 0.25), len(temperatures_celsius) - (step_size - 1), step_size):
+        temp_increase = temperatures_celsius[i] - temperatures_celsius[i - step_size]
         if temp_increase >= threshold_degc:
             # The temperature jump is detected at index i, but the redrilling event
-            # occurred at the previous datapoint (i-1) when the minimum was reached.
+            # occurred somewhere in the step range when the minimum was reached.
+            # Find the actual local minimum within the step range.
+            search_start = max(0, i - (2 * step_size - 1))
+            search_end = i + 1  # exclusive
+            local_min_idx = search_start + min(
+                range(search_end - search_start), key=lambda offset: temperatures_celsius[search_start + offset]
+            )
+
             # Convert to fractional year position (COD = Year 1)
-            year_position = 1 + (i - 1) / time_steps_per_year
+            year_position = 1 + local_min_idx / time_steps_per_year
             redrilling_positions.append(year_position)
 
     return redrilling_positions
@@ -207,7 +216,7 @@ def generate_production_temperature_and_drawdown_graph(
     ax.set_xlabel(_YOE_LABEL, fontsize=12)
     ax.set_ylabel('Production Temperature (°C)', fontsize=12)
     ax.set_xlim(years.min(), years.max())
-    ax.set_ylim(195, 205)
+    ax.set_ylim(200, 205)
 
     # Enable minor ticks on x-axis
     ax.minorticks_on()
@@ -235,7 +244,7 @@ def generate_production_temperature_and_drawdown_graph(
     ax.text(
         years.max() * 0.98,
         max_drawdown_temp - 0.25,
-        f'Redrilling Threshold ({max_drawdown_pct:.1f}% drawdown = {max_drawdown_temp:.1f}°C)',
+        f'Redrilling Threshold ({max_drawdown_pct:.2f}% drawdown = {max_drawdown_temp:.1f}°C)',
         ha='right',
         va='top',
         fontsize=9,
