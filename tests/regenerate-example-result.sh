@@ -14,20 +14,11 @@ cd "$(dirname "$0")"
 # Note: make sure your virtualenv is activated and you have run pip install -e . before running or this script will fail
 # or generate incorrect results.
 
-python -mgeophires_x examples/$1.txt examples/$1.out
-rm examples/$1.json
+echo "Regenerating example: $1..."
 
-if [[ $1 == "example1_addons" ]]
+if [[ $1 == "Fervo_Project_Cape-6" ]]
 then
-    echo "Updating CSV..."
-    python regenerate_example_result_csv.py example1_addons
-fi
-
-if [[ $1 == "Fervo_Project_Cape-5" ]]
-then
-    python ../src/geophires_docs/generate_fervo_project_cape_5_docs.py
-
-    echo "Regenerating Fervo_Project_Cape-6..."
+    echo "Syncing Fervo_Project_Cape-6.txt from Fervo_Project_Cape-5.txt..."
 
     sed -e 's/Construction Years,.*/Construction Years, 3/' \
         -e 's/^Number of Production Wells,.*/Number of Production Wells, 12/' \
@@ -35,9 +26,22 @@ then
         -e 's/500 MWe/100 MWe/' \
         -e 's/Phase II/Phase I/' \
         examples/Fervo_Project_Cape-5.txt > examples/Fervo_Project_Cape-6.txt
+fi
 
-    python -mgeophires_x examples/Fervo_Project_Cape-6.txt examples/Fervo_Project_Cape-6.out
-    rm examples/Fervo_Project_Cape-6.json
+python -mgeophires_x examples/$1.txt examples/$1.out
+rm examples/$1.json
+
+if [[ $1 == "example1_addons" ]]
+then
+    echo "Updating example1_addons CSV..."
+    python regenerate_example_result_csv.py example1_addons
+fi
+
+if [[ $1 == "Fervo_Project_Cape-5" ]]
+then
+    python ../src/geophires_docs/generate_fervo_project_cape_5_docs.py
+
+    ./regenerate-example-result.sh Fervo_Project_Cape-6
 
     if [ ! -f regenerate-example-result.env ] && [ -f regenerate-example-result.env.template ]; then
         echo "Creating regenerate-example-result.env from template..."
@@ -57,3 +61,5 @@ then
 fi
 
 cd $STASH_PWD
+
+echo "Regenerated example $1."
