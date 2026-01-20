@@ -253,7 +253,7 @@
         },
         "Number of times redrilling": {
           "type": "number",
-          "description": "redrill",
+          "description": "redrill. The total number of redrilling events triggered when production temperature drops below the 'Maximum Drawdown' threshold. In the reservoir simulation, this resets the thermal decline curve by repeating the initial production temperature profile. Economically, each event incurs the full cost of drilling and stimulating the wellfield. The cost of all redrilling events is summed and amortized over the project lifetime as an operational expense. ",
           "units": null
         },
         "Power plant type": {},

@@ -1152,8 +1152,20 @@ class WellBores:
         )
         self.redrill = self.OutputParameterDict[self.redrill.Name] = OutputParameter(
             Name="redrill",
+            # TODO pivot Name to more user-friendly display name in all contexts if feasible (such as output parameters
+            #  documentation, where Name is prepended to ToolTipText, resulting in the documentation entry beginning
+            #  clumsily and confusingly with "redrill. The total number of redrilling events [...]")
             display_name='Number of times redrilling',
-            UnitType=Units.NONE
+            UnitType=Units.NONE,
+            ToolTipText="The total number of redrilling events triggered when production temperature drops below "
+                        "the 'Maximum Drawdown' threshold. In the reservoir simulation, this resets the thermal "
+                        "decline curve by repeating the initial production temperature profile. Economically, each "
+                        "event incurs the full cost of drilling and stimulating the wellfield. "
+                        "The cost of all redrilling events is summed and amortized over the project lifetime as an "
+                        "operational expense. "
+                        # "This accounts for the heavy capital expenditure (e.g., sidetracking and stimulating "
+                        # "laterals into fresh rock) required to access undepleted reservoir volume and sustain "
+                        # "target power output."
         )
         self.PumpingPowerProd = self.OutputParameterDict[self.PumpingPowerProd.Name] = OutputParameter(
             Name="PumpingPowerProd",
