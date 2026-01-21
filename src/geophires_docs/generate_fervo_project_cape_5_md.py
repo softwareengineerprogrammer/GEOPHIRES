@@ -313,6 +313,11 @@ def get_fpc5_input_parameter_values(input_params: GeophiresInputParameters, resu
     }
 
 
+def get_max_net_generation_mwe(result: GeophiresXResult) -> float:
+    r: dict[str, dict[str, Any]] = result.result
+    return _q(r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Net Electricity Generation']).to('MW').magnitude
+
+
 def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     _log.info('Extracting result values...')
 
@@ -325,7 +330,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     surf_equip_sim = r['SURFACE EQUIPMENT SIMULATION RESULTS']
     min_net_generation_mwe = surf_equip_sim['Minimum Net Electricity Generation']['value']
     avg_net_generation_mwe = surf_equip_sim['Average Net Electricity Generation']['value']
-    max_net_generation_mwe = surf_equip_sim['Maximum Net Electricity Generation']['value']
+    max_net_generation_mwe = get_max_net_generation_mwe(result)
     max_total_generation_mwe = surf_equip_sim['Maximum Total Electricity Generation']['value']
     parasitic_loss_pct = (
         surf_equip_sim['Average Pumping Power']['value']
@@ -473,7 +478,7 @@ def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, re
             else f'{result_value_unit_dict["value"]} {unit}'
         )
 
-        reference_value_display = '.. N/A'  # TODO/WIP
+        reference_value_display = '.. N/A'
 
         if output_param_name == 'Total operating and maintenance costs':
             reference_source_display = '.. N/A '
@@ -508,6 +513,16 @@ def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, re
         table_md += (
             f'| {output_param_name} | {value_unit_display} | {reference_value_display} | {reference_source_display} |\n'
         )
+
+        if output_param_name == 'Total operating and maintenance costs':
+            opex_usd_per_kw_per_year = (
+                _q(result_value_unit_dict) / PlainQuantity(get_max_net_generation_mwe(result), 'MW')
+            ).to('USD / year / kilowatt')
+
+            reference_source = '2024b ATB: 2028 Deep EGS Binary Conservative Scenario (NREL, 2025). '
+            # TODO explain why we're higher than ATB (e.g. redrilling not modeled by ATB)
+
+            table_md += f'| {output_param_name}: $/kW-yr | ${opex_usd_per_kw_per_year.magnitude:.2f}/kW-yr | $226.31/kW-yr | {reference_source} |\n'
 
     return table_md
 
