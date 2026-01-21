@@ -520,10 +520,11 @@ def ProdPressureDropAndPumpingPowerUsingIndexes(
         else:
             Pprodwellhead = ppwellhead_kPa
             if Pprodwellhead < Pminimum_kPa:
-                Pprodwellhead = Pminimum_kPa
-                msg = (f'Provided production wellhead pressure ({Pprodwellhead:.2f} kPa) '
-                       f'under minimum pressure ({Pminimum_kPa:.2f} kPa). '
+                msg = (f'Provided production wellhead pressure ({Pprodwellhead:.3f} kPa) '
+                       f'under minimum pressure ({Pminimum_kPa:.3f} kPa). '
                        f'GEOPHIRES will assume minimum wellhead pressure.')
+
+                Pprodwellhead = Pminimum_kPa
 
                 print(f'Warning: {msg}')
                 model.logger.warning(msg)
