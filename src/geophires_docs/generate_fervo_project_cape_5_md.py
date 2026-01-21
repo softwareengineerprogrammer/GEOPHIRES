@@ -34,32 +34,54 @@ _log = _get_logger(__name__)
 _NON_BREAKING_SPACE = '\xa0'
 
 
-def _get_schema() -> dict[str, Any]:
+def _get_schema(schema_file_name: str) -> dict[str, Any]:
     project_root = _current_project_root if _current_project_root is not None else _get_project_root()
-    schema_file = project_root / 'src/geophires_x_schema_generator/geophires-request.json'
+    schema_file = project_root / 'src/geophires_x_schema_generator' / schema_file_name
     with open(schema_file, encoding='utf-8') as f:
         return json.loads(f.read())
 
 
-def _get_parameter_schema(param_name: str) -> dict[str, Any]:
-    return _get_schema()['properties'][param_name]
+def _get_geophires_request_schema() -> dict[str, Any]:
+    return _get_schema('geophires-request.json')
 
 
-def _get_parameter_schema_type(param_name: str) -> dict[str, Any]:
-    return _get_parameter_schema(param_name)['type']
+def _get_input_parameter_schema(param_name: str) -> dict[str, Any]:
+    return _get_geophires_request_schema()['properties'][param_name]
 
 
-def _get_parameter_category(param_name: str) -> str:
-    return _get_parameter_schema(param_name)['category']
+def _get_input_parameter_schema_type(param_name: str) -> dict[str, Any]:
+    return _get_input_parameter_schema(param_name)['type']
 
 
-def _get_parameter_units(param_name: str) -> str | None:
-    unit = _get_schema()['properties'][param_name]['units']
+def _get_input_parameter_category(param_name: str) -> str:
+    return _get_input_parameter_schema(param_name)['category']
+
+
+def _get_input_parameter_units(param_name: str) -> str | None:
+    unit = _get_geophires_request_schema()['properties'][param_name]['units']
 
     if unit == '':
         return 'dimensionless'
 
     return unit
+
+
+def _get_geophires_result_schema() -> dict[str, Any]:
+    return _get_schema('geophires-result.json')
+
+
+def _get_output_parameter_schema(param_name: str) -> dict[str, Any]:
+    categorized_schema: dict[str, dict[str, Any]] = _get_geophires_result_schema()['properties']
+
+    for _category, category_data in categorized_schema.items():
+        if param_name in category_data['properties']:
+            return category_data['properties'][param_name]
+
+    raise ValueError(f'Parameter "{param_name}" not found in GEOPHIRES result schema.')
+
+
+def _get_output_parameter_description(param_name: str) -> str:
+    return _get_output_parameter_schema(param_name)['description']
 
 
 def _get_unit_display(parameter_units_from_schema: str) -> str:
@@ -203,11 +225,11 @@ def get_fpc_category_parameters_table_md(
         if param_name in parameters_to_exclude:
             continue
 
-        category = _get_parameter_category(param_name)
+        category = _get_input_parameter_category(param_name)
         if category_name is None or category == category_name:
             param_val_comment_split = param_val_comment.split(
                 # ',',
-                ',' if _get_parameter_schema_type(param_name) != 'array' else ', ',
+                ',' if _get_input_parameter_schema_type(param_name) != 'array' else ', ',
                 maxsplit=1,
             )
 
@@ -216,7 +238,7 @@ def get_fpc_category_parameters_table_md(
             param_comment = (
                 param_val_comment_split[1].replace('-- ', '') if len(param_val_comment_split) > 1 else ' .. N/A '
             )
-            param_unit = _get_parameter_units(param_name)
+            param_unit = _get_input_parameter_units(param_name)
             if param_unit == 'dimensionless':
                 param_unit_display = '%'
                 param_val = sig_figs(
@@ -242,7 +264,7 @@ def get_fpc_category_parameters_table_md(
             if is_int(param_val):
                 param_val = int(param_val)
 
-            param_schema = _get_parameter_schema(param_name)
+            param_schema = _get_input_parameter_schema(param_name)
             if param_schema and 'enum_values' in param_schema:
                 for enum_value in param_schema['enum_values']:
                     if enum_value['int_value'] == param_val:
@@ -291,6 +313,11 @@ def get_fpc5_input_parameter_values(input_params: GeophiresInputParameters, resu
     }
 
 
+def get_max_net_generation_mwe(result: GeophiresXResult) -> float:
+    r: dict[str, dict[str, Any]] = result.result
+    return _q(r['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Net Electricity Generation']).to('MW').magnitude
+
+
 def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     _log.info('Extracting result values...')
 
@@ -303,7 +330,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     surf_equip_sim = r['SURFACE EQUIPMENT SIMULATION RESULTS']
     min_net_generation_mwe = surf_equip_sim['Minimum Net Electricity Generation']['value']
     avg_net_generation_mwe = surf_equip_sim['Average Net Electricity Generation']['value']
-    max_net_generation_mwe = surf_equip_sim['Maximum Net Electricity Generation']['value']
+    max_net_generation_mwe = get_max_net_generation_mwe(result)
     max_total_generation_mwe = surf_equip_sim['Maximum Total Electricity Generation']['value']
     parasitic_loss_pct = (
         surf_equip_sim['Average Pumping Power']['value']
@@ -436,6 +463,70 @@ def generate_res_eng_reference_sim_params_table_md(
     )
 
 
+def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, result: GeophiresXResult) -> str:
+    table_md = """| Metric | Result Value | Reference Value(s) | Reference Source |
+|-----|-----|-----|-----|\n"""
+
+    for output_param_name, result_value_unit_dict in result.result['OPERATING AND MAINTENANCE COSTS (M$/yr)'].items():
+        if result_value_unit_dict is None:
+            continue
+
+        unit = result_value_unit_dict['unit']
+        value_unit_display = (
+            f'${result_value_unit_dict["value"]}M/yr'
+            if unit == 'MUSD/yr'
+            else f'{result_value_unit_dict["value"]} {unit}'
+        )
+
+        reference_value_display = '.. N/A'
+
+        if output_param_name == 'Total operating and maintenance costs':
+            reference_source_display = '.. N/A '
+        else:
+            reference_source_display = _get_output_parameter_description(output_param_name)
+
+            if output_param_name == 'Water costs':
+                water_cost_adjustment_param_name = 'Water Cost Adjustment Factor'
+                reference_source_display = reference_source_display.split(
+                    f'. Provide {water_cost_adjustment_param_name}', maxsplit=1
+                )[0]
+                water_cost_adjustment_percent = (
+                    PlainQuantity(
+                        float(_get_input_parameters_dict(input_params)[water_cost_adjustment_param_name]),
+                        'dimensionless',
+                    )
+                    .to('percent')
+                    .magnitude
+                )
+                reference_source_display = (
+                    f'{reference_source_display}. '
+                    f'The default correlation is adjusted by the {water_cost_adjustment_param_name} parameter value '
+                    f'of {water_cost_adjustment_percent:.0f}%.'
+                )
+
+            if reference_source_display.startswith(('O&M', 'Total O&M')):
+                reference_source_display = reference_source_display.split('. ', maxsplit=1)[1]
+
+            for suffix in ('s', ''):
+                reference_source_display = reference_source_display.replace(f'O&M cost{suffix}', 'OPEX')
+
+        table_md += (
+            f'| {output_param_name} | {value_unit_display} | {reference_value_display} | {reference_source_display} |\n'
+        )
+
+        if output_param_name == 'Total operating and maintenance costs':
+            opex_usd_per_kw_per_year = (
+                _q(result_value_unit_dict) / PlainQuantity(get_max_net_generation_mwe(result), 'MW')
+            ).to('USD / year / kilowatt')
+
+            reference_source = '2024b ATB: 2028 Deep EGS Binary Conservative Scenario (NREL, 2025). '
+            # TODO explain why we're higher than ATB (e.g. redrilling not modeled by ATB)
+
+            table_md += f'| {output_param_name}: $/kW-yr | ${opex_usd_per_kw_per_year.magnitude:.2f}/kW-yr | $226.31/kW-yr | {reference_source} |\n'
+
+    return table_md
+
+
 def generate_fervo_project_cape_5_md(
     input_params: GeophiresInputParameters,
     result: GeophiresXResult,
@@ -451,6 +542,7 @@ def generate_fervo_project_cape_5_md(
     template_values = {**get_fpc5_input_parameter_values(input_params, result), **result_values}
 
     for template_key, md_method in {
+        'opex_result_outputs_table_md': generate_fpc_opex_output_table_md,
         'reservoir_parameters_table_md': generate_fpc_reservoir_parameters_table_md,
         'surface_plant_parameters_table_md': generate_fpc_surface_plant_parameters_table_md,
         'well_bores_parameters_table_md': generate_fpc_well_bores_parameters_table_md,
