@@ -34,32 +34,54 @@ _log = _get_logger(__name__)
 _NON_BREAKING_SPACE = '\xa0'
 
 
-def _get_schema() -> dict[str, Any]:
+def _get_schema(schema_file_name: str) -> dict[str, Any]:
     project_root = _current_project_root if _current_project_root is not None else _get_project_root()
-    schema_file = project_root / 'src/geophires_x_schema_generator/geophires-request.json'
+    schema_file = project_root / 'src/geophires_x_schema_generator' / schema_file_name
     with open(schema_file, encoding='utf-8') as f:
         return json.loads(f.read())
 
 
-def _get_parameter_schema(param_name: str) -> dict[str, Any]:
-    return _get_schema()['properties'][param_name]
+def _get_geophires_request_schema() -> dict[str, Any]:
+    return _get_schema('geophires-request.json')
 
 
-def _get_parameter_schema_type(param_name: str) -> dict[str, Any]:
-    return _get_parameter_schema(param_name)['type']
+def _get_input_parameter_schema(param_name: str) -> dict[str, Any]:
+    return _get_geophires_request_schema()['properties'][param_name]
 
 
-def _get_parameter_category(param_name: str) -> str:
-    return _get_parameter_schema(param_name)['category']
+def _get_input_parameter_schema_type(param_name: str) -> dict[str, Any]:
+    return _get_input_parameter_schema(param_name)['type']
 
 
-def _get_parameter_units(param_name: str) -> str | None:
-    unit = _get_schema()['properties'][param_name]['units']
+def _get_input_parameter_category(param_name: str) -> str:
+    return _get_input_parameter_schema(param_name)['category']
+
+
+def _get_input_parameter_units(param_name: str) -> str | None:
+    unit = _get_geophires_request_schema()['properties'][param_name]['units']
 
     if unit == '':
         return 'dimensionless'
 
     return unit
+
+
+def _get_geophires_result_schema() -> dict[str, Any]:
+    return _get_schema('geophires-result.json')
+
+
+def _get_output_parameter_schema(param_name: str) -> dict[str, Any]:
+    categorized_schema: dict[str, dict[str, Any]] = _get_geophires_result_schema()['properties']
+
+    for _category, category_data in categorized_schema.items():
+        if param_name in category_data['properties']:
+            return category_data['properties'][param_name]
+
+    raise ValueError(f'Parameter "{param_name}" not found in GEOPHIRES result schema.')
+
+
+def _get_output_parameter_description(param_name: str) -> str:
+    return _get_output_parameter_schema(param_name)['description']
 
 
 def _get_unit_display(parameter_units_from_schema: str) -> str:
@@ -203,11 +225,11 @@ def get_fpc_category_parameters_table_md(
         if param_name in parameters_to_exclude:
             continue
 
-        category = _get_parameter_category(param_name)
+        category = _get_input_parameter_category(param_name)
         if category_name is None or category == category_name:
             param_val_comment_split = param_val_comment.split(
                 # ',',
-                ',' if _get_parameter_schema_type(param_name) != 'array' else ', ',
+                ',' if _get_input_parameter_schema_type(param_name) != 'array' else ', ',
                 maxsplit=1,
             )
 
@@ -216,7 +238,7 @@ def get_fpc_category_parameters_table_md(
             param_comment = (
                 param_val_comment_split[1].replace('-- ', '') if len(param_val_comment_split) > 1 else ' .. N/A '
             )
-            param_unit = _get_parameter_units(param_name)
+            param_unit = _get_input_parameter_units(param_name)
             if param_unit == 'dimensionless':
                 param_unit_display = '%'
                 param_val = sig_figs(
@@ -242,7 +264,7 @@ def get_fpc_category_parameters_table_md(
             if is_int(param_val):
                 param_val = int(param_val)
 
-            param_schema = _get_parameter_schema(param_name)
+            param_schema = _get_input_parameter_schema(param_name)
             if param_schema and 'enum_values' in param_schema:
                 for enum_value in param_schema['enum_values']:
                     if enum_value['int_value'] == param_val:
@@ -440,11 +462,18 @@ def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, re
     table_md = """| Metric | Result Value | Reference Value(s) | Reference Source |
 |-----|-----|-----|-----|\n"""
 
-    for k, v in result.result['OPERATING AND MAINTENANCE COSTS (M$/yr)'].items():
-        if v is None:
+    for output_param_name, result_value_unit_dict in result.result['OPERATING AND MAINTENANCE COSTS (M$/yr)'].items():
+        if result_value_unit_dict is None:
             continue
-        # FIXME WIP: unit displays, reference values/sources
-        table_md += f'| {k} | {v["value"]} {v["unit"]} | .. N/A | .. N/A |\n'
+
+        # FIXME WIP: reference values/sources
+        unit = result_value_unit_dict['unit']
+        value_unit_display = (
+            f'${result_value_unit_dict["value"]}M/yr'
+            if unit == 'MUSD/yr'
+            else f'{result_value_unit_dict["value"]} {unit}'
+        )
+        table_md += f'| {output_param_name} | {value_unit_display} | {_get_output_parameter_description(output_param_name)} | .. N/A |\n'
 
     return table_md
 
