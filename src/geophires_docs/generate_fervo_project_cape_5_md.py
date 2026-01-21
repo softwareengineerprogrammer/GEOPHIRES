@@ -361,6 +361,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
             _q(r['SUMMARY OF RESULTS']['Electricity breakeven price']).to('USD / MWh').magnitude, 3
         ),
         'irr_pct': sig_figs(econ['After-tax IRR']['value'], 3),
+        'operations_year_of_irr': econ['Project lifetime']['value'],
         'npv_musd': sig_figs(econ['Project NPV']['value'], 3),
         'project_moic': sig_figs(econ['Project MOIC']['value'], 3),
         'project_vir': sig_figs(econ['Project VIR=PI=PIR']['value'], 3),
