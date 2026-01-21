@@ -54,6 +54,10 @@ class FervoProjectCape5TestCase(BaseTestCase):
         fpc5_input_params_number_of_wells = input_num_production_wells + input_num_injection_wells
         self.assertEqual(result_number_of_wells, fpc5_input_params_number_of_wells)
 
+        num_redrills = fpc5_result.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value']
+        total_wells_over_project_lifetime = (1 + num_redrills) * fpc5_input_params_number_of_wells
+        self.assertLess(total_wells_over_project_lifetime, 320)  # BLM-permitted number of wells
+
     @staticmethod
     def _get_input_parameters(
         params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
