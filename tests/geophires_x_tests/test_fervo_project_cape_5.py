@@ -227,6 +227,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
             'Well Drilling and Completion Costs': 'Drilling and completion costs per well',
             'Well Drilling and Completion Costs total': 'Drilling and completion costs',
             'Stimulation Costs total': 'Stimulation costs',
+            'Reservoir Volume': 'Reservoir volume',
         }
 
         ignore_keys = [
@@ -255,23 +256,28 @@ class FervoProjectCape5TestCase(BaseTestCase):
         )
         self.assertAlmostEqual(sig_figs(result_capex_USD_per_kW, 2), sig_figs(markdown_capex_USD_per_kW, 2))
 
-        # FIXME WIP refactor to work with number of injection wells per production well
-        # num_doublets = inputs_in_markdown['Number of Doublets']['value']
-        # self.assertEqual(
-        #     example_result.result['SUMMARY OF RESULTS']['Number of production wells']['value'], num_doublets
-        # )
-        #
-        # num_fracs_per_well = inputs_in_markdown['Number of Fractures per Well']['value']
-        # expected_total_fracs = num_doublets * 2 * num_fracs_per_well
-        # self.assertEqual(
-        #     expected_total_fracs, example_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value']
-        # )
+        num_prod_wells = inputs_in_markdown['Number of Production Wells']['value']
+        self.assertEqual(
+            example_result.result['SUMMARY OF RESULTS']['Number of production wells']['value'], num_prod_wells
+        )
 
-        # FIXME WIP
-        # self.assertEqual(
-        #     example_result.result['RESERVOIR PARAMETERS']['Reservoir volume']['value'],
-        #     results_in_markdown['Reservoir Volume']['value']
-        # )
+        # Calculate expected total fractures based on input configuration
+        num_inj_per_prod = inputs_in_markdown['Number of Injection Wells per Production Well']['value']
+        num_inj_wells = math.ceil(num_prod_wells * num_inj_per_prod)
+        total_wells = num_prod_wells + num_inj_wells
+        num_fracs_per_well = inputs_in_markdown['Number of Fractures per Stimulated Well']['value']
+
+        # Assuming all wells are stimulated
+        expected_total_fracs = total_wells * num_fracs_per_well
+        self.assertEqual(
+            expected_total_fracs, example_result.result['RESERVOIR PARAMETERS']['Number of fractures']['value']
+        )
+
+        self.assertAlmostEqual(
+            example_result.result['RESERVOIR PARAMETERS']['Reservoir volume']['value'],
+            results_in_markdown['Reservoir Volume']['value'],
+            delta=1,  # Tolerance for potential formatting/float parsing differences
+        )
 
         additional_expected_stim_indirect_cost_frac = 0.00
         expected_stim_cost_total_MUSD = (
@@ -336,6 +342,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
                 'Minimum Net Electricity Generation',
                 'Maximum Net Electricity Generation',
                 'Number of times redrilling',
+                'Reservoir Volume',
                 'Total CAPEX',
                 'Total CAPEX: $/kW',
                 'WACC',
