@@ -353,7 +353,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
     field_gathering_cost_pct_occ = field_gathering_cost_musd / occ_q.to('MUSD').magnitude * 100.0
 
     redrills = r['ENGINEERING PARAMETERS']['Number of times redrilling']['value']
-    total_wells_including_redrilling = redrills * _number_of_wells(result)
+    total_wells_including_redrilling = (1 + redrills) * _number_of_wells(result)
 
     return {
         # Economic Results
