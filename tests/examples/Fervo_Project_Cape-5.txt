@@ -104,7 +104,7 @@ Production Flow Rate per Well, 103, -- Cape Station pilot testing reported a sus
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
 Injection Well Diameter, 8.535, -- See Production Well Diameter
 
-Production Wellhead Pressure, 300 psi, -- Set constant in Singh et al., 2025. Actual production WHP may gradually increase over time if flow rates are kept constant.
+Production Wellhead Pressure, 303 psi, -- Set to a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
 
 Injectivity Index, 1.809, -- Based on ATB Conservative Scenario (NREL, 2025) derated by 40% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
 Productivity Index, 1.4964, -- See Injectivity Index

@@ -53,8 +53,8 @@ Royalty Rate Maximum, 0.035, -- No further escalation beyond 3.5%.
 # *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
 # *************************************************
 End-Use Option, 1, -- Electricity
-Power Plant Type, 2, -- Supercritical ORC
-Plant Lifetime, 30, -- 30-year well life per [Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/) (Fervo Energy, 2025).
+Power Plant Type, 2, -- Gen 2 ORC units (Turboden, 2025).
+Plant Lifetime, 30, -- Sets the project economic horizon, aligned with Fervo's anticipated 30-year well life (Fervo Energy, 2025). Modeling Distinction: While Fervo projects physical wellbore integrity for 30 years, GEOPHIRES simulates "redrilling events" to model thermal management of the reservoir volume. This treats the 30-year lifespan as an aggregate of shorter-lived thermal cycles delineated by discrete redrilling events occurring at intervals dictated by the Maximum Drawdown parameter. The modeled cost of each redrilling event is equivalent to the drilling and stimulation cost of the entire wellfield, serving as a conservative cost proxy for the major interventions (e.g., sidetracking and stimulating laterals into fresh rock, or drilling new wells if necessary) required to sustain the 500 MW PPA target against thermal depletion.
 
 Reservoir Model, 1
 
@@ -104,7 +104,7 @@ Production Flow Rate per Well, 100
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
 Injection Well Diameter, 8.535, -- See Production Well Diameter
 
-Production Wellhead Pressure, 300 psi, -- Set constant in Singh et al., 2025. Actual production WHP may gradually increase over time if flow rates are kept constant.
+Production Wellhead Pressure, 303 psi, -- Set to a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
 
 Injectivity Index, 1.809, -- Based on ATB Conservative Scenario (NREL, 2025) derated by 40% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
 Productivity Index, 1.4964, -- See Injectivity Index
@@ -113,7 +113,7 @@ Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinj
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
 Injection Wellbore Temperature Gain, 3
 
-Maximum Drawdown, 0.0025, -- This value represents the drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is tuned to keep minimum net electricity generation over the project lifetime ≥100 MWe.
+Maximum Drawdown, 0.0025, -- This value represents the fractional drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is calibrated to maintain the PPA minimum net electricity generation requirement of 100 MWe. It is a very small percentage because it is relative to the initial production temperature; the temperature quickly rises higher due to thermal conditioning and plateaus until breakthrough, so any drawdown relative to the initial value signals that the temperature has already declined from its stabilized peak.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************
