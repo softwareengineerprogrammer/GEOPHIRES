@@ -409,7 +409,8 @@ class FervoProjectCape5TestCase(BaseTestCase):
         A helper function to parse a string and extract a numerical value and its unit.
         It handles various formats like currency, percentages, text, and scientific notation.
         """
-        clean_str = re.split(r'\s*\(|,(?!\s*\d)', raw_string)[0].strip()
+        # Split on open parenthesis '(', comma ',' (if not followed by digit), or HTML break tag '<br'
+        clean_str = re.split(r'\s*\(|,(?!\s*\d)|<br', raw_string, flags=re.IGNORECASE)[0].strip()
 
         if clean_str.startswith('$') and ('M total' in clean_str or 'M baseline cost' in clean_str):
             return {'value': float(clean_str.split('M ')[0][1:]), 'unit': 'MUSD'}
