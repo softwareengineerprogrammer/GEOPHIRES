@@ -104,14 +104,14 @@ Production Flow Rate per Well, 103, -- Cape Station pilot testing reported a sus
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
 Injection Well Diameter, 8.535, -- See Production Well Diameter
 
-Production Wellhead Pressure, 303 psi, -- Set to a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
+Production Wellhead Pressure, 303 psi, -- Modeled at a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
 
 Injectivity Index, 1.809, -- Based on ATB Conservative Scenario (NREL, 2025) derated by 40% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
 Productivity Index, 1.4964, -- See Injectivity Index
 
-Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023).
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
-Injection Wellbore Temperature Gain, 3
+Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023). Note: GEOPHIRES enforces a thermodynamic optimum that overrides higher values, such as Fervo's considered operational target of 80°C (intended for silica scaling mitigation), resulting in a "maximum theoretical power" scenario. Support for higher reinjection temperatures may be added in future GEOPHIRES versions.
+Injection Wellbore Temperature Gain, 3, -- Empirical estimate for high-flow rate wells where rapid fluid velocity minimizes heat uptake during descent (Ramey, 1962).
 
 Maximum Drawdown, 0.0025, -- This value represents the fractional drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is calibrated to maintain the PPA minimum net electricity generation requirement of 500 MWe. It is a very small percentage because it is relative to the initial production temperature; the temperature quickly rises higher due to thermal conditioning and plateaus until breakthrough, so any drawdown relative to the initial value signals that the temperature has already declined from its stabilized peak.
 
