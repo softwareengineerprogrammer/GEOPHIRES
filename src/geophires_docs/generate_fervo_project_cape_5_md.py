@@ -466,14 +466,25 @@ def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, re
         if result_value_unit_dict is None:
             continue
 
-        # FIXME WIP: reference values/sources
         unit = result_value_unit_dict['unit']
         value_unit_display = (
             f'${result_value_unit_dict["value"]}M/yr'
             if unit == 'MUSD/yr'
             else f'{result_value_unit_dict["value"]} {unit}'
         )
-        table_md += f'| {output_param_name} | {value_unit_display} | {_get_output_parameter_description(output_param_name)} | .. N/A |\n'
+
+        # FIXME WIP: reference values/sources
+        if output_param_name == 'Total operating and maintenance costs':
+            reference_source_display = '.. N/A '
+        else:
+            reference_source_display = _get_output_parameter_description(output_param_name)
+            if reference_source_display.startswith(('O&M', 'Total O&M')):
+                reference_source_display = reference_source_display.split('. ', maxsplit=1)[1]
+
+            for suffix in ('s', ''):
+                reference_source_display = reference_source_display.replace(f'O&M cost{suffix}', 'OPEX')
+
+        table_md += f'| {output_param_name} | {value_unit_display} | .. N/A | {reference_source_display} |\n'
 
     return table_md
 
