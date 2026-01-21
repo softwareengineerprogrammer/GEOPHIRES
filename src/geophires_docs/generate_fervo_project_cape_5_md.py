@@ -436,6 +436,19 @@ def generate_res_eng_reference_sim_params_table_md(
     )
 
 
+def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, result: GeophiresXResult) -> str:
+    table_md = """| Metric | Result Value | Reference Value(s) | Reference Source |
+|-----|-----|-----|-----|\n"""
+
+    for k, v in result.result['OPERATING AND MAINTENANCE COSTS (M$/yr)'].items():
+        if v is None:
+            continue
+        # FIXME WIP: unit displays, reference values/sources
+        table_md += f'| {k} | {v["value"]} {v["unit"]} | .. N/A | .. N/A |\n'
+
+    return table_md
+
+
 def generate_fervo_project_cape_5_md(
     input_params: GeophiresInputParameters,
     result: GeophiresXResult,
@@ -451,6 +464,7 @@ def generate_fervo_project_cape_5_md(
     template_values = {**get_fpc5_input_parameter_values(input_params, result), **result_values}
 
     for template_key, md_method in {
+        'opex_result_outputs_table_md': generate_fpc_opex_output_table_md,
         'reservoir_parameters_table_md': generate_fpc_reservoir_parameters_table_md,
         'surface_plant_parameters_table_md': generate_fpc_surface_plant_parameters_table_md,
         'well_bores_parameters_table_md': generate_fpc_well_bores_parameters_table_md,

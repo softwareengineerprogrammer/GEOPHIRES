@@ -187,7 +187,7 @@ The case study result's cash flow analysis can be viewed in the web interface an
 Hover over the metric names to view the corresponding definitions.
 See [GEOPHIRES output parameters documentation](parameters.html#economic-parameters) for more information.
 
-### Capital Costs
+### Capital Costs (CAPEX)
 
 {# @formatter:off #}
 | Metric                                                                                                                                                                                                    | Result Value                                | Reference Value(s)                               | Reference Source |
@@ -203,6 +203,9 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 | Total CAPEX: $/kW                                   | {{ '$' ~ capex_usd_per_kw ~ '/kW' }} (based on maximum net electricity generation)      | $5000/kW; $4500/kW; $3000–$6000/kW          | McClure, 2024; Horne et al, 2025; Latimer, 2025. |
 {# @formatter:on #}
 
+### Operating Expenses (OPEX)
+
+{{ opex_result_outputs_table_md }}
 
 ### Technical & Engineering Results
 
