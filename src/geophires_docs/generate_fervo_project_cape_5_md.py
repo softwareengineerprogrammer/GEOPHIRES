@@ -473,18 +473,41 @@ def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, re
             else f'{result_value_unit_dict["value"]} {unit}'
         )
 
-        # FIXME WIP: reference values/sources
+        reference_value_display = '.. N/A'  # TODO/WIP
+
         if output_param_name == 'Total operating and maintenance costs':
             reference_source_display = '.. N/A '
         else:
             reference_source_display = _get_output_parameter_description(output_param_name)
+
+            if output_param_name == 'Water costs':
+                water_cost_adjustment_param_name = 'Water Cost Adjustment Factor'
+                reference_source_display = reference_source_display.split(
+                    f'. Provide {water_cost_adjustment_param_name}', maxsplit=1
+                )[0]
+                water_cost_adjustment_percent = (
+                    PlainQuantity(
+                        float(_get_input_parameters_dict(input_params)[water_cost_adjustment_param_name]),
+                        'dimensionless',
+                    )
+                    .to('percent')
+                    .magnitude
+                )
+                reference_source_display = (
+                    f'{reference_source_display}. '
+                    f'The default correlation is adjusted by the {water_cost_adjustment_param_name} parameter value '
+                    f'of {water_cost_adjustment_percent:.0f}%.'
+                )
+
             if reference_source_display.startswith(('O&M', 'Total O&M')):
                 reference_source_display = reference_source_display.split('. ', maxsplit=1)[1]
 
             for suffix in ('s', ''):
                 reference_source_display = reference_source_display.replace(f'O&M cost{suffix}', 'OPEX')
 
-        table_md += f'| {output_param_name} | {value_unit_display} | .. N/A | {reference_source_display} |\n'
+        table_md += (
+            f'| {output_param_name} | {value_unit_display} | {reference_value_display} | {reference_source_display} |\n'
+        )
 
     return table_md
 
