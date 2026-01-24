@@ -4,8 +4,8 @@ import sys
 import numpy as np
 from scipy.interpolate import interp1d
 
-from .Parameter import strParameter, listParameter
-from .Units import Units
+from .Parameter import strParameter, listParameter, floatParameter
+from .Units import Units, TimeUnit
 import geophires_x.Model as Model
 from .Reservoir import Reservoir
 
@@ -44,6 +44,19 @@ class UPPReservoir(Reservoir):
             ToolTipText="Temperature profile data as a comma-separated list of values in Celsius. "
             "Values will be interpolated to match the simulation time steps. "
             "Example: 200,195,190,185 for a 4-point temperature decline profile.",
+        )
+
+        self.reservoir_output_time_step = self.ParameterDict[self.reservoir_output_time_step.Name] = floatParameter(
+            "Reservoir Output Profile Time Step",
+            DefaultValue=1.0,
+            Min=0.01,
+            Max=100.0,
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
+            ErrMessage="assume default reservoir output profile time step (1 year)",
+            ToolTipText="Time interval between temperature values in the Reservoir Output Profile. "
+            "For example, if set to 0.25, the profile values represent temperatures at 0, 0.25, 0.5, 0.75, 1.0 years, etc.",
         )
 
         model.logger.info(f'Complete {__class__!s}: {sys._getframe().f_code.co_name}')
@@ -99,30 +112,96 @@ class UPPReservoir(Reservoir):
 
     def _get_reservoir_output_temperatures(self, model: Model, num_timesteps: int):
         if self.reservoir_output_data.Provided and len(self.reservoir_output_data.value) > 0:
-            reservoir_output_data = self._get_reservoir_output_data_from_profile_parameter(model)
+            input_times, reservoir_output_data = self._get_reservoir_output_data_from_profile_parameter(model)
         else:
-            reservoir_output_data = self._get_reservoir_output_data_from_text_file(model, num_timesteps)
-
-        # Create time points for the input data (evenly spaced over the plant lifetime)
-        input_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, len(reservoir_output_data))
+            input_times, reservoir_output_data = self._get_reservoir_output_data_from_text_file(model)
 
         # Create target time points for the simulation
-        target_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, num_timesteps)
+        plant_lifetime = model.surfaceplant.plant_lifetime.value
+        target_time_points = np.linspace(0, plant_lifetime, num_timesteps)
 
-        # Interpolate temperature values to match simulation time steps
-        interpolator = interp1d(input_time_points, reservoir_output_data, kind='linear', fill_value='extrapolate')
-        interpolated_temps = interpolator(target_time_points)
+        # Determine interpolation/extrapolation strategy based on input data coverage
+        input_max_time = input_times[-1]
+
+        if input_max_time >= plant_lifetime:
+            # Input data covers the full simulation period - just interpolate
+            interpolator = interp1d(
+                input_times,
+                reservoir_output_data,
+                kind='linear',
+                bounds_error=False,
+                fill_value=(reservoir_output_data[0], reservoir_output_data[-1]),
+            )
+            interpolated_temps = interpolator(target_time_points)
+        else:
+            # Input data is shorter than plant lifetime - need to extrapolate
+            msg = (
+                f'Reservoir output profile data ends at year {input_max_time:.2f}, '
+                f'but plant lifetime is {plant_lifetime} years. '
+                f'Extrapolating temperature trend for remaining years.'
+            )
+            model.logger.warning(msg)
+            print(f"Warning: {msg}")
+
+            interpolated_temps = self._interpolate_and_extrapolate(
+                input_times, reservoir_output_data, target_time_points, model
+            )
 
         ret = [float(it) for it in interpolated_temps]
 
-        if len(ret) != len(reservoir_output_data):
-            model.logger.info(f'Reservoir Output Profile interpolation result: {ret}')
-
         return ret
 
-    def _get_reservoir_output_data_from_profile_parameter(self, model: Model) -> list[float]:
+    def _interpolate_and_extrapolate(
+        self,
+        input_times: np.ndarray,
+        input_temps: list[float],
+        target_times: np.ndarray,
+        model: Model,
+    ) -> np.ndarray:
         """
-        Load reservoir temperature profile from inline data and interpolate to match time steps.
+        Interpolate within the input data range and extrapolate beyond it using the trend
+        from the last portion of the data.
+        """
+        input_max_time = input_times[-1]
+        result = np.zeros(len(target_times))
+
+        # Interpolate for times within the input data range
+        interpolator = interp1d(
+            input_times, input_temps, kind='linear', bounds_error=False, fill_value=(input_temps[0], input_temps[-1])
+        )
+
+        for i, t in enumerate(target_times):
+            if t <= input_max_time:
+                result[i] = interpolator(t)
+            else:
+                # Extrapolate using linear trend from the last ~20% of input data (or at least last 2 points)
+                trend_start_idx = max(0, int(len(input_times) * 0.8))
+                if trend_start_idx >= len(input_times) - 1:
+                    trend_start_idx = max(0, len(input_times) - 2)
+
+                trend_times = input_times[trend_start_idx:]
+                trend_temps = input_temps[trend_start_idx:]
+
+                # Calculate linear trend (slope) from the trend portion
+                if len(trend_times) >= 2:
+                    slope = (trend_temps[-1] - trend_temps[0]) / (trend_times[-1] - trend_times[0])
+                else:
+                    slope = 0.0
+
+                # Extrapolate from the last known point
+                time_beyond = t - input_max_time
+                extrapolated_temp = input_temps[-1] + slope * time_beyond
+
+                # Don't let temperature go below injection temperature
+                min_temp = model.wellbores.Tinj.value
+                result[i] = max(extrapolated_temp, min_temp)
+
+        return result
+
+    def _get_reservoir_output_data_from_profile_parameter(self, model: Model) -> tuple[np.ndarray, list[float]]:
+        """
+        Load reservoir temperature profile from inline data.
+        Returns tuple of (time_points, temperatures).
         """
         temp_data = self.reservoir_output_data.value
 
@@ -134,12 +213,17 @@ class UPPReservoir(Reservoir):
             model.logger.critical(msg)
             raise RuntimeError(msg)
 
-        return [float(it) for it in temp_data]
+        # Generate time points based on the time step parameter
+        time_step = self.reservoir_output_time_step.value
+        time_points = np.array([i * time_step for i in range(len(temp_data))])
+
+        return time_points, [float(it) for it in temp_data]
 
     # noinspection PyMethodMayBeStatic
-    def _get_reservoir_output_data_from_text_file(self, model: Model, num_timesteps: int) -> list[float]:
+    def _get_reservoir_output_data_from_text_file(self, model: Model) -> tuple[np.ndarray, list[float]]:
         """
-        Load reservoir temperature profile from file (original behavior).
+        Load reservoir temperature profile from file.
+        Returns tuple of (time_points, temperatures).
         """
         try:
             with open(model.reserv.filenamereservoiroutput.value, encoding='UTF-8') as f:
@@ -152,19 +236,29 @@ class UPPReservoir(Reservoir):
             model.logger.critical(msg)
             raise RuntimeError(msg)
 
-        num_lines = len(content_prod_temp)
-        if num_lines != num_timesteps:
+        times: list[float] = []
+        temps: list[float] = []
+
+        for line in content_prod_temp:
+            line = line.strip()
+            if line:
+                parts = line.split(',')
+                if len(parts) >= 2:
+                    try:
+                        time_val = float(parts[0].strip())
+                        temp_val = float(parts[1].strip())
+                        times.append(time_val)
+                        temps.append(temp_val)
+                    except ValueError:
+                        # Skip lines that can't be parsed (e.g., headers)
+                        continue
+
+        if len(times) < 2:
             msg = (
-                f'The number of reservoir output data points ({num_lines}; in '
-                f'{model.reserv.filenamereservoiroutput.Name}: {model.reserv.filenamereservoiroutput.value}) '
-                f'does not match the number of simulation time steps ({num_timesteps}). '
-                f'Reservoir output data data will be interpolated to match the number of simulation time steps.'
+                f"Error: Reservoir output file ({model.reserv.filenamereservoiroutput.value}) "
+                f"must contain at least 2 valid data points. Found {len(times)}."
             )
-            model.logger.warning(msg)
+            model.logger.critical(msg)
+            raise RuntimeError(msg)
 
-        ret: list[float] = []
-        for i in range(0, num_lines):
-            entry = float(content_prod_temp[i].split(',')[1].strip('\n'))
-            ret.append(entry)
-
-        return ret
+        return np.array(times), temps
