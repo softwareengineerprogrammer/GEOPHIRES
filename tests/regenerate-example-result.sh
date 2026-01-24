@@ -31,7 +31,7 @@ fi
 
 if [[ $1 == "example5b" ]]
 then
-    python regenerate_example_5b_input_txt.py
+    python regenerate_example_input_reservoir_output_profile.py example5b src/geophires_x/Examples/ReservoirOutput.txt
 fi
 
 python -mgeophires_x examples/$1.txt examples/$1.out
