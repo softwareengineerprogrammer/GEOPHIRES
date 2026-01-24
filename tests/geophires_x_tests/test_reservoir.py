@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import os
 import sys
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -283,3 +284,22 @@ class ReservoirTestCase(BaseTestCase):
         with self.assertRaises(RuntimeError) as e:
             _get_result(_MAX_ALLOWED_FRACTURES, 59)
         self.assertIn(f'({_MAX_ALLOWED_FRACTURES*59*2}) must not exceed {_MAX_ALLOWED_FRACTURES}', str(e.exception))
+
+    def test_user_provided_profile_file_not_found(self) -> None:
+        non_existent_file_path: Path | None = None
+        while non_existent_file_path is None or non_existent_file_path.exists():
+            non_existent_file_path = Path(f'non-existent-file_{uuid.uuid4()!s}.txt')
+
+        with self.assertRaises(RuntimeError) as re:
+            GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('generic-egs-case.txt'),
+                    params={
+                        'Reservoir Model': '5, -- USER_PROVIDED_PROFILE',
+                        'Reservoir Output File Name': non_existent_file_path,
+                    },
+                )
+            )
+
+        exception_message = str(re.exception)
+        self.assertIn('GEOPHIRES could not read reservoir output file', exception_message)

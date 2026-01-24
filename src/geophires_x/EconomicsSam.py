@@ -24,6 +24,7 @@ from PySAM import Singleowner
 
 # noinspection PyPackageRequirements
 import PySAM.Utilityrate5 as UtilityRate
+from pint.facets.plain import PlainQuantity
 from tabulate import tabulate
 
 from geophires_x import Model as Model
@@ -43,6 +44,7 @@ from geophires_x.EconomicsUtils import (
     royalty_cost_output_parameter,
     overnight_capital_cost_output_parameter,
     _SAM_EM_MOIC_RETURNS_TAX_QUALIFIER,
+    investment_tax_credit_output_parameter,
 )
 from geophires_x.EconomicsSamPreRevenue import (
     _AFTER_TAX_NET_CASH_FLOW_ROW_NAME,
@@ -96,7 +98,8 @@ class SamEconomicsCalculations:
     project_vir: OutputParameter = field(default_factory=project_vir_parameter)
 
     project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
-    """TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413"""
+
+    investment_tax_credit: OutputParameter = field(default_factory=investment_tax_credit_output_parameter)
 
     @property
     def _pre_revenue_years_count(self) -> int:
@@ -368,6 +371,11 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.project_payback_period.value = _calculate_project_payback_period(
         sam_economics.sam_cash_flow_profile, model
     )
+    sam_economics.investment_tax_credit.value = (
+        _calculate_investment_tax_credit_value(sam_economics.sam_cash_flow_profile)
+        .to(sam_economics.investment_tax_credit.CurrentUnits.value)
+        .magnitude
+    )
 
     return sam_economics
 
@@ -530,21 +538,43 @@ def _calculate_project_vir(cash_flow: list[list[Any]], model: Model) -> float:
 
 def _calculate_project_payback_period(cash_flow: list[list[Any]], model) -> float | None:
     """
-    TODO remove or clarify project payback period: https://github.com/NREL/GEOPHIRES-X/issues/413
-    """
+    Calculates the Simple Payback Period (SPB).
+    SPB is the time required for the cumulative non-discounted after-tax net cash flow to turn positive.
 
+    The calculation assumes annual cash flows. The returned value represents the number of years
+    from the start of the provided cash flow list until the investment is recovered.
+    """
     try:
+        # Get flattened annual after-tax cash flow
         after_tax_cash_flow = _after_tax_net_cash_flow_all_years(cash_flow, _pre_revenue_years_count(model))
-        cumm_cash_flow = np.zeros(len(after_tax_cash_flow))
-        cumm_cash_flow[0] = after_tax_cash_flow[0]
-        for year in range(1, len(after_tax_cash_flow)):
-            cumm_cash_flow[year] = cumm_cash_flow[year - 1] + after_tax_cash_flow[year]
-            if cumm_cash_flow[year] >= 0:
-                year_before_full_recovery = year - 1
-                payback_period = (
-                    year_before_full_recovery
-                    + abs(cumm_cash_flow[year_before_full_recovery]) / after_tax_cash_flow[year]
-                )
+
+        cumulative_cash_flow = np.zeros(len(after_tax_cash_flow))
+        cumulative_cash_flow[0] = after_tax_cash_flow[0]
+
+        # Handle edge case where the first year is already positive
+        if cumulative_cash_flow[0] >= 0:
+            # If the project is profitable immediately (rare for SPB), return 0 or fraction.
+            # For standard SPB logic where Index 0 is an investment year, this is an edge case.
+            pass
+
+        for year_index in range(1, len(after_tax_cash_flow)):
+            cumulative_cash_flow[year_index] = cumulative_cash_flow[year_index - 1] + after_tax_cash_flow[year_index]
+
+            if cumulative_cash_flow[year_index] >= 0:
+                # Payback occurred in this year (year_index).
+                # We need to calculate how far into this year the break-even point occurred.
+
+                previous_year_index = year_index - 1
+                unrecovered_cost_at_start_of_year = abs(cumulative_cash_flow[previous_year_index])
+                cash_flow_in_current_year = after_tax_cash_flow[year_index]
+
+                # Fraction of the current year required to recover the remaining cost
+                fraction_of_year = unrecovered_cost_at_start_of_year / cash_flow_in_current_year
+
+                # Total years elapsed = Full years prior to this one + fraction of this one.
+                # If we are at year_index, the number of full years passed is equal to year_index.
+                # Example: If year_index is 5 (6th year), 5 full years (Indices 0..4) have passed.
+                payback_period = year_index + fraction_of_year
 
                 return float(payback_period)
 
@@ -552,6 +582,19 @@ def _calculate_project_payback_period(cash_flow: list[list[Any]], model) -> floa
     except Exception as e:
         model.logger.error(f'Encountered exception calculating Project Payback Period: {e}')
         return None
+
+
+def _calculate_investment_tax_credit_value(sam_cash_flow_profile) -> PlainQuantity:
+    total_itc_sum_q: PlainQuantity = quantity(0, 'USD')
+
+    for itc_line_item in ['Federal ITC total income ($)', 'State ITC total income ($)']:
+        itc_numeric_entries = [
+            float(it) for it in _cash_flow_profile_row(sam_cash_flow_profile, itc_line_item) if is_float(it)
+        ]
+        itc_sum_q = quantity(sum(itc_numeric_entries), 'USD')
+        total_itc_sum_q += itc_sum_q
+
+    return total_itc_sum_q
 
 
 def get_sam_cash_flow_profile_tabulated_output(model: Model, **tabulate_kw_args) -> str:
