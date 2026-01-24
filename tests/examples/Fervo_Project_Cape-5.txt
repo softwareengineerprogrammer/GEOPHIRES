@@ -54,7 +54,7 @@ Royalty Rate Maximum, 0.035, -- No further escalation beyond 3.5%.
 # *************************************************
 End-Use Option, 1, -- Electricity
 Power Plant Type, 2, -- Gen 2 ORC units (Turboden, 2025).
-Plant Lifetime, 30, -- Sets the project economic horizon, aligned with Fervo's anticipated 30-year well life (Fervo Energy, 2025). Modeling Distinction: While Fervo projects physical wellbore integrity for 30 years, GEOPHIRES simulates "redrilling events" to model thermal management of the reservoir volume. This treats the 30-year lifespan as an aggregate of shorter-lived thermal cycles delineated by discrete redrilling events occurring at intervals dictated by the Maximum Drawdown parameter. The modeled cost of each redrilling event is equivalent to the drilling and stimulation cost of the entire wellfield, serving as a conservative cost proxy for the major interventions (e.g., sidetracking and stimulating laterals into fresh rock, or drilling new wells if necessary) required to sustain the 500 MW PPA target against thermal depletion.
+Plant Lifetime, 30, -- Sets the project economic horizon, aligned with Fervo's anticipated 30-year well life (Fervo Energy, 2025). Modeling Distinction: While Fervo projects physical wellbore integrity for 30 years, GEOPHIRES simulates "redrilling events" to model thermal management of the reservoir volume. This treats the 30-year lifespan as an aggregate of shorter-lived thermal cycles delineated by discrete redrilling events occurring at intervals dictated by the Maximum Drawdown parameter. The modeled cost of each redrilling event is equivalent to the drilling and stimulation cost of the entire wellfield, serving as a conservative cost proxy for the major interventions (e.g., sidetracking and stimulating laterals into fresh rock, or drilling new wells if necessary) required to sustain the PPA target against thermal depletion.
 
 Reservoir Model, 1
 
@@ -94,7 +94,7 @@ Circulation Pump Efficiency, 0.80
 
 # *** Well Bores Parameters ***
 
-Number of Production Wells, 56, -- Number of production wells required to produce net generation greater than 500 MW (PPA minimum) and total generation less than 600 MW (Gen 2 ORCs gross capacity).
+Number of Production Wells, 56, -- Number of production wells required to produce net generation greater than the PPA minimum and total generation less than nameplate capacity (Gen 2 ORCs gross capacity).
 Number of Injection Wells per Production Well, 0.666, -- Modeled on the reference case 5-well bench pattern (3 producers : 2 injectors) described in Singh et al., 2025.
 
 Nonvertical Length per Multilateral Section, 5000 feet, -- Target lateral length given in environmental assessment (BLM, 2024). Note that lateral length is assumed to be an upper bound constraining the number of fractures per well for a given cluster spacing.
@@ -115,7 +115,7 @@ Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid t
 Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023). Note: GEOPHIRES enforces a thermodynamic optimum that overrides higher values, such as Fervo's considered operational target of 80°C (intended for silica scaling mitigation), resulting in a "maximum theoretical power" scenario. Support for higher reinjection temperatures may be added in future GEOPHIRES versions.
 Injection Wellbore Temperature Gain, 3, -- Empirical estimate for high-flow rate wells where rapid fluid velocity minimizes heat uptake during descent (Ramey, 1962).
 
-Maximum Drawdown, 0.0025, -- This value represents the fractional drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is calibrated to maintain the PPA minimum net electricity generation requirement of 500 MWe. It is a very small percentage because it is relative to the initial production temperature; the temperature quickly rises higher due to thermal conditioning and plateaus until breakthrough, so any drawdown relative to the initial value signals that the temperature has already declined from its stabilized peak.
+Maximum Drawdown, 0.0025, -- This value represents the fractional drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is calibrated to maintain the PPA minimum net electricity generation requirement. It is a very small percentage because it is relative to the initial production temperature; the temperature quickly rises higher due to thermal conditioning and plateaus until breakthrough, so any drawdown relative to the initial value signals that the temperature has already declined from its stabilized peak.
 
 # *** SIMULATION PARAMETERS ***
 # *****************************
