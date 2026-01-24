@@ -12,18 +12,24 @@
     };
 </script>
 <script type="text/javascript">
-
-    console.debug('Referrer:', document.referrer);
-
-    ["python-geophires-x", "GEOPHIRES-X"].map((repositoryName) => {
-        if (location.href.indexOf(`nrel.github.io/${repositoryName}`) !== -1
-            && document.referrer.indexOf(`https://github.com/softwareengineerprogrammer/${repositoryName}`) !== -1) {
-            /* Redirect links from fork's GitHub docs to fork's docs deployment */
-            location.href = location.href.replace(
-                `nrel.github.io/${repositoryName}`,
-                `softwareengineerprogrammer.github.io/${repositoryName}`
-            )
-        }
+    /*
+    The README (and other docs files) contain links to sphinx documentation hosted on GitHub Pages.
+    Those links, by necessity, must have absolute github.io URLs whose subdomain is the same in both the fork's
+    README and the main repo's README. However, if the user came from the forked repo, we should redirect to the
+    forked repo's docs instead, since they may differ from the main repo's (e.g. when there is a pending PR to merge).
+    */
+    const locationHref = location?.href?.toLowerCase();
+    ["nrel", "natlabrockies"].map((organizationName) => {
+        ["python-geophires-x", "GEOPHIRES-X"].map((repositoryName) => {
+            if (locationHref.indexOf(`${organizationName}.github.io/${repositoryName}`) !== -1
+                && document.referrer.indexOf(`https://github.com/softwareengineerprogrammer/${repositoryName}`) !== -1) {
+                console.debug('Redirecting to fork docs based on referrer:', document.referrer);
+                location.href = locationHref.replace(
+                    `${organizationName}.github.io/${repositoryName}`,
+                    `softwareengineerprogrammer.github.io/${repositoryName}`
+                )
+            }
+        })
     })
 
     setTimeout(function() {
