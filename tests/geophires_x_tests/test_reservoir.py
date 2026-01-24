@@ -313,4 +313,5 @@ class ReservoirTestCase(BaseTestCase):
         example_5_result = _del_metadata(GeophiresXResult(self._get_test_file_path('../examples/example5.out')))
         example_5b_result = _del_metadata(GeophiresXResult(self._get_test_file_path('../examples/example5b.out')))
 
-        self.assertDictAlmostEqual(example_5_result.result, example_5b_result.result, percent=5)
+        # self.assertDictAlmostEqual(example_5_result.result, example_5b_result.result, percent=5)
+        self.assertDictEqual(example_5_result.result, example_5b_result.result)

@@ -379,6 +379,7 @@ class Outputs:
                         f.write('      Warning: the reservoir dimensions and thermo-physical properties \n')
                         f.write('               listed below are default values if not provided by the user.   \n')
                         f.write('               They are only used for calculating remaining heat content.  \n')
+                        # TODO parse this note in GeophiresXResult
 
                     if model.reserv.resoption.value in [ReservoirModel.MULTIPLE_PARALLEL_FRACTURES, ReservoirModel.LINEAR_HEAT_SWEEP]:
                         f.write(f'      Fracture model = {model.reserv.fracshape.value.value}\n')

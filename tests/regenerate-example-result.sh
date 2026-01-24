@@ -29,6 +29,11 @@ then
         examples/Fervo_Project_Cape-5.txt > examples/Fervo_Project_Cape-6.txt
 fi
 
+if [[ $1 == "example5b" ]]
+then
+    python regenerate_example_5b_input_txt.py
+fi
+
 python -mgeophires_x examples/$1.txt examples/$1.out
 rm examples/$1.json
 
@@ -59,6 +64,11 @@ then
         deactivate
         cd $STASH_PWD_2
     fi
+fi
+
+if [[ $1 == "example5" ]]
+then
+    ./regenerate-example-result.sh example5b
 fi
 
 cd $STASH_PWD
