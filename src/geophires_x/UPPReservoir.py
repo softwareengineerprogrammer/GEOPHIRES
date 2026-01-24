@@ -155,9 +155,10 @@ class UPPReservoir(Reservoir):
         num_lines = len(content_prod_temp)
         if num_lines != num_timesteps:
             msg = (
-                f'Reservoir output file ({model.reserv.filenamereservoiroutput.value}; {num_lines} lines) does not '
-                f'have required {num_timesteps} lines. '
-                f'Profile data will be interpolated to match simulation time steps.'
+                f'The number of reservoir output data points ({num_lines}; in '
+                f'{model.reserv.filenamereservoiroutput.Name}: {model.reserv.filenamereservoiroutput.value}) '
+                f'does not match the number of simulation time steps ({num_timesteps}). '
+                f'Reservoir output data data will be interpolated to match the number of simulation time steps.'
             )
             model.logger.warning(msg)
 
