@@ -92,16 +92,29 @@ class UPPReservoir(Reservoir):
         # Use the actual size of the Tresoutput array (set by parent Calculate)
         num_timesteps = len(model.reserv.Tresoutput.value)
 
-        if self.reservoir_output_data.Provided and len(self.reservoir_output_data.value) > 0:
-            # Use inline temperature profile data
-            self._load_from_inline_data(model, num_timesteps)
-        else:
-            # Fall back to file-based input
-            self._load_from_file(model, num_timesteps)
+        # if self.reservoir_output_data.Provided and len(self.reservoir_output_data.value) > 0:
+        #     # Use inline temperature profile data
+        #     self._load_from_inline_data(model, num_timesteps)
+        # else:
+        #     # Fall back to file-based input
+        #     self._load_from_file(model, num_timesteps)
+        reservoir_temperatures:list[float] = self._get_reservoir_output_data(model, num_timesteps)
+        assert len(reservoir_temperatures) == num_timesteps, "Unexpected number of reservoir temperatures" # FIXME WIP...
+        for i in range(num_timesteps):
+            model.reserv.Tresoutput.value[i] = float(reservoir_temperatures[i])
 
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
 
-    def _load_from_inline_data(self, model: Model, num_timesteps: int) -> None:
+    def _get_reservoir_output_data(self, model: Model, num_timesteps: int):
+        if self.reservoir_output_data.Provided and len(self.reservoir_output_data.value) > 0:
+            # Use inline temperature profile data
+            #self._load_from_inline_data(model, num_timesteps)
+            return self._get_reservoir_output_data_from_profile_parameter(model, num_timesteps)
+        else:
+            # self._load_from_file(model, num_timesteps)
+            return self._get_reservoir_output_data_from_text_file(model, num_timesteps)
+
+    def _get_reservoir_output_data_from_profile_parameter(self, model: Model, num_timesteps: int) -> list[float]:
         """
         Load reservoir temperature profile from inline data and interpolate to match time steps.
         """
@@ -123,11 +136,14 @@ class UPPReservoir(Reservoir):
         interpolator = interp1d(input_time_points, temp_data, kind='linear', fill_value='extrapolate')
         interpolated_temps = interpolator(target_time_points)
 
-        # Assign interpolated values to reservoir output
-        for i in range(num_timesteps):
-            model.reserv.Tresoutput.value[i] = float(interpolated_temps[i])
+        return [float(it) for it in interpolated_temps]
 
-    def _load_from_file(self, model: Model, num_timesteps: int) -> None:
+        # # Assign interpolated values to reservoir output
+        # for i in range(num_timesteps):
+        #     model.reserv.Tresoutput.value[i] = float(interpolated_temps[i])
+
+
+    def _get_reservoir_output_data_from_text_file(self, model: Model, num_timesteps: int) -> list[float]:
         """
         Load reservoir temperature profile from file (original behavior).
         """
@@ -150,5 +166,63 @@ class UPPReservoir(Reservoir):
             model.logger.critical(msg)
             raise RuntimeError(msg)
 
+        ret:list[float] = []
         for i in range(0, numlines - 1):
-            model.reserv.Tresoutput.value[i] = float(contentprodtemp[i].split(',')[1].strip('\n'))
+            entry = float(contentprodtemp[i].split(',')[1].strip('\n'))
+            # model.reserv.Tresoutput.value[i] = entry
+            ret.append(entry)
+
+        return entry
+
+
+    # def _load_from_inline_data(self, model: Model, num_timesteps: int) -> None:
+    #     """
+    #     Load reservoir temperature profile from inline data and interpolate to match time steps.
+    #     """
+    #     temp_data = self.reservoir_output_data.value
+    #
+    #     if len(temp_data) < 2:
+    #         msg = ("Error: 'Reservoir Output Profile' must contain at least 2 temperature values "
+    #                f"for interpolation. Got {len(temp_data)} value(s).")
+    #         model.logger.critical(msg)
+    #         raise RuntimeError(msg)
+    #
+    #     # Create time points for the input data (evenly spaced over the plant lifetime)
+    #     input_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, len(temp_data))
+    #
+    #     # Create target time points for the simulation
+    #     target_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, num_timesteps)
+    #
+    #     # Interpolate temperature values to match simulation time steps
+    #     interpolator = interp1d(input_time_points, temp_data, kind='linear', fill_value='extrapolate')
+    #     interpolated_temps = interpolator(target_time_points)
+    #
+    #     # Assign interpolated values to reservoir output
+    #     for i in range(num_timesteps):
+    #         model.reserv.Tresoutput.value[i] = float(interpolated_temps[i])
+
+    # def _load_from_file(self, model: Model, num_timesteps: int) -> None:
+    #     """
+    #     Load reservoir temperature profile from file (original behavior).
+    #     """
+    #     try:
+    #         with open(model.reserv.filenamereservoiroutput.value, encoding='UTF-8') as f:
+    #             contentprodtemp = f.readlines()
+    #     except Exception:
+    #         msg = ('Error: GEOPHIRES could not read reservoir output file ('
+    #                + model.reserv.filenamereservoiroutput.value + ') and will abort simulation.')
+    #         model.logger.critical(msg)
+    #         raise RuntimeError(msg)
+    #
+    #     numlines = len(contentprodtemp)
+    #     if numlines != num_timesteps:
+    #         msg = ('Error: Reservoir output file ('
+    #                + model.reserv.filenamereservoiroutput.value +
+    #                ') does not have required ' +
+    #                str(num_timesteps) +
+    #                ' lines. GEOPHIRES will abort simulation.')
+    #         model.logger.critical(msg)
+    #         raise RuntimeError(msg)
+    #
+    #     for i in range(0, numlines - 1):
+    #         model.reserv.Tresoutput.value[i] = float(contentprodtemp[i].split(',')[1].strip('\n'))
