@@ -2,10 +2,20 @@ import argparse
 import os
 
 RESERVOIR_OUTPUT_PROFILE_PARAM_NAME = 'Reservoir Output Profile'
+RESERVOIR_MODEL_PARAM_NAME = 'Reservoir Model'
 
 
 def _get_file_path(file_name: str) -> str:
     return os.path.join(os.path.abspath(os.path.dirname(__file__)), str(file_name))
+
+
+def _is_numeric(value: str) -> bool:
+    """Check if a string value can be converted to a float."""
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
 
 
 if __name__ == '__main__':
@@ -41,20 +51,31 @@ if __name__ == '__main__':
                 parts = line.split(',')
                 if len(parts) >= 2:
                     temp = parts[1].strip()
-                    temperatures.append(temp)
+                    # Skip header rows by checking if the value is numeric
+                    if _is_numeric(temp):
+                        temperatures.append(temp)
 
-    # 2. Update examples/example5b.txt with the new Reservoir Output Profile
-    example5b_path = _get_file_path(f'examples/{example_file_name}')
+    # 2. Update example file with the new Reservoir Output Profile
+    example_path = _get_file_path(f'examples/{example_file_name}')
     reservoir_output_profile_value = ','.join(temperatures)
+    reservoir_output_profile_line = f'{RESERVOIR_OUTPUT_PROFILE_PARAM_NAME}, {reservoir_output_profile_value}\n'
 
-    with open(example5b_path) as f:
+    with open(example_path) as f:
         lines = f.readlines()
 
-    with open(example5b_path, 'w') as f:
+    # Check if RESERVOIR_OUTPUT_PROFILE_PARAM_NAME already exists in the file
+    profile_exists = any(line.startswith(f'{RESERVOIR_OUTPUT_PROFILE_PARAM_NAME},') for line in lines)
+
+    with open(example_path, 'w') as f:
         for line in lines:
             if line.startswith(f'{RESERVOIR_OUTPUT_PROFILE_PARAM_NAME},'):
-                # Replace the line with updated temperature profile
-                f.write(f'{RESERVOIR_OUTPUT_PROFILE_PARAM_NAME}, {reservoir_output_profile_value}\n')
+                # Replace the existing line with updated temperature profile
+                f.write(reservoir_output_profile_line)
+            elif not profile_exists and line.startswith(f'{RESERVOIR_MODEL_PARAM_NAME},'):
+                # Write the Reservoir Model line first
+                f.write(line)
+                # Insert the Reservoir Output Profile line after Reservoir Model
+                f.write(reservoir_output_profile_line)
             else:
                 f.write(line)
 
