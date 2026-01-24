@@ -24,22 +24,10 @@ class UPPReservoir(Reservoir):
         :type model: :class:`~geophires_x.Model.Model`
         :return: None
         """
-        model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Init {str(__class__)}: {sys._getframe().f_code.co_name}')
         super().__init__(model)  # initialize the parent parameters and variables
         sclass = str(__class__).replace("<class \'", "")
         self.MyClass = sclass.replace("\'>", "")
-
-        # Set up all the Parameters that will be predefined by this class using the different types of parameter classes.
-        # Setting up includes giving it a name, a default value, The Unit Type (length, volume, temperature, etc.) and
-        # Unit Name of that value, sets it as required (or not), sets allowable range, the error message if that range
-        # is exceeded, the ToolTip Text, and the name of teh class that created it.
-        # This includes setting up temporary variables that will be available to all the class but noy read in by user,
-        # or used for Output
-        # This also includes all Parameters that are calculated and then published using the Printouts function.
-        # If you choose to subclass this master class, you can do so before or after you create your own parameters.
-        # If you do, you can also choose to call this method from you class, which will effectively add and set all
-        # these parameters to your class.
-        # specific to this class:
 
         self.filenamereservoiroutput = self.ParameterDict[self.filenamereservoiroutput.Name] = strParameter(
             "Reservoir Output File Name",
@@ -58,13 +46,13 @@ class UPPReservoir(Reservoir):
             "Example: 200,195,190,185 for a 4-point temperature decline profile.",
         )
 
-        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Complete {__class__!s}: {sys._getframe().f_code.co_name}')
 
     def __str__(self):
         return "UPPReservoir"
 
     def read_parameters(self, model: Model) -> None:
-        model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Init {str(__class__)}: {sys._getframe().f_code.co_name}')
         super().read_parameters(model)  # read the parameters for the parent.
 
         # Validate mutual exclusivity: user should provide either file or inline data, not both
@@ -77,7 +65,7 @@ class UPPReservoir(Reservoir):
             print(f"Warning: {msg}")
             model.logger.warning(msg)
 
-        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Complete {str(__class__)}: {sys._getframe().f_code.co_name}')
 
     def Calculate(self, model: Model):
         """
@@ -87,7 +75,7 @@ class UPPReservoir(Reservoir):
         :type model: :class:`~geophires_x.Model.Model`
         :return: None
         """
-        model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Init {str(__class__)}: {sys._getframe().f_code.co_name}')
         super().Calculate(model)  # run calculations for the parent.
 
         model.reserv.Tresoutput.value[0] = model.reserv.Trock.value
@@ -107,7 +95,7 @@ class UPPReservoir(Reservoir):
         for i in range(num_timesteps):
             model.reserv.Tresoutput.value[i] = reservoir_temperatures[i]
 
-        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Complete {str(__class__)}: {sys._getframe().f_code.co_name}')
 
     def _get_reservoir_output_temperatures(self, model: Model, num_timesteps: int):
         if self.reservoir_output_data.Provided and len(self.reservoir_output_data.value) > 0:
@@ -155,28 +143,27 @@ class UPPReservoir(Reservoir):
         """
         try:
             with open(model.reserv.filenamereservoiroutput.value, encoding='UTF-8') as f:
-                contentprodtemp = f.readlines()
+                content_prod_temp = f.readlines()
         except Exception:
             msg = (
-                'Error: GEOPHIRES could not read reservoir output file ('
-                + model.reserv.filenamereservoiroutput.value
-                + ') and will abort simulation.'
+                f'Error: GEOPHIRES could not read reservoir output file '
+                f'({model.reserv.filenamereservoiroutput.value}) and will abort simulation.'
             )
             model.logger.critical(msg)
             raise RuntimeError(msg)
 
-        num_lines = len(contentprodtemp)
+        num_lines = len(content_prod_temp)
         if num_lines != num_timesteps:
             msg = (
-                f'Reservoir output file ({model.reserv.filenamereservoiroutput.value}; {num_lines} lines) does not have '
-                f'required {num_timesteps} lines. '
+                f'Reservoir output file ({model.reserv.filenamereservoiroutput.value}; {num_lines} lines) does not '
+                f'have required {num_timesteps} lines. '
                 f'Profile data will be interpolated to match simulation time steps.'
             )
             model.logger.warning(msg)
 
         ret: list[float] = []
         for i in range(0, num_lines - 1):
-            entry = float(contentprodtemp[i].split(',')[1].strip('\n'))
+            entry = float(content_prod_temp[i].split(',')[1].strip('\n'))
             ret.append(entry)
 
         return ret
