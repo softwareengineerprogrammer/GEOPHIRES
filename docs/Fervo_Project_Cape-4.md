@@ -1,9 +1,4 @@
-# [Deprecated] Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
-
-**⚠️ This is a previous version of the case study. The case study has been updated since the release of this version.**
-[Click here](Fervo_Project_Cape-5.html) to find the latest version.
-
----
+# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
 
 The GEOPHIRES example `Fervo_Project_Cape-4` is a case study of a 500 MWe EGS Project modeled
 on Fervo Cape Station with its April 2025-announced
