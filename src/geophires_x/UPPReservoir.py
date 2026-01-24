@@ -162,7 +162,7 @@ class UPPReservoir(Reservoir):
             model.logger.warning(msg)
 
         ret: list[float] = []
-        for i in range(0, num_lines - 1):
+        for i in range(0, num_lines):
             entry = float(content_prod_temp[i].split(',')[1].strip('\n'))
             ret.append(entry)
 
