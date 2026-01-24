@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 import numpy as np
 from scipy.interpolate import interp1d
@@ -12,6 +14,7 @@ class UPPReservoir(Reservoir):
     """
     This class models the User Provided Profile Reservoir.
     """
+
     def __init__(self, model: Model):
         """
         The __init__ function is called automatically when a class is instantiated.
@@ -22,9 +25,9 @@ class UPPReservoir(Reservoir):
         :return: None
         """
         model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
-        super().__init__(model)   # initialize the parent parameters and variables
+        super().__init__(model)  # initialize the parent parameters and variables
         sclass = str(__class__).replace("<class \'", "")
-        self.MyClass = sclass.replace("\'>","")
+        self.MyClass = sclass.replace("\'>", "")
 
         # Set up all the Parameters that will be predefined by this class using the different types of parameter classes.
         # Setting up includes giving it a name, a default value, The Unit Type (length, volume, temperature, etc.) and
@@ -43,7 +46,7 @@ class UPPReservoir(Reservoir):
             value='ReservoirOutput.txt',
             UnitType=Units.NONE,
             ErrMessage="assume default reservoir output file name (ReservoirOutput.txt)",
-            ToolTipText="File name of reservoir output in case reservoir model 5 is selected"
+            ToolTipText="File name of reservoir output in case reservoir model 5 is selected",
         )
 
         self.reservoir_output_data = self.ParameterDict[self.reservoir_output_data.Name] = listParameter(
@@ -51,8 +54,8 @@ class UPPReservoir(Reservoir):
             DefaultValue=[],
             UnitType=Units.NONE,
             ToolTipText="Temperature profile data as a comma-separated list of values in Celsius. "
-                        "Values will be interpolated to match the simulation time steps. "
-                        "Example: 200,195,190,185 for a 4-point temperature decline profile."
+            "Values will be interpolated to match the simulation time steps. "
+            "Example: 200,195,190,185 for a 4-point temperature decline profile.",
         )
 
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
@@ -62,13 +65,15 @@ class UPPReservoir(Reservoir):
 
     def read_parameters(self, model: Model) -> None:
         model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
-        super().read_parameters(model)    # read the parameters for the parent.
+        super().read_parameters(model)  # read the parameters for the parent.
 
         # Validate mutual exclusivity: user should provide either file or inline data, not both
         if self.reservoir_output_data.Provided and self.filenamereservoiroutput.Provided:
             # If both are provided, prefer inline data and log a warning
-            msg = ("Both 'Reservoir Output Profile' and 'Reservoir Output File Name' were provided. "
-                   "Using 'Reservoir Output Profile' data.")
+            msg = (
+                "Both 'Reservoir Output Profile' and 'Reservoir Output File Name' were provided. "
+                "Using 'Reservoir Output Profile' data."
+            )
             print(f"Warning: {msg}")
             model.logger.warning(msg)
 
@@ -83,7 +88,7 @@ class UPPReservoir(Reservoir):
         :return: None
         """
         model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
-        super().Calculate(model)    # run calculations for the parent.
+        super().Calculate(model)  # run calculations for the parent.
 
         model.reserv.Tresoutput.value[0] = model.reserv.Trock.value
 
@@ -98,21 +103,40 @@ class UPPReservoir(Reservoir):
         # else:
         #     # Fall back to file-based input
         #     self._load_from_file(model, num_timesteps)
-        reservoir_temperatures:list[float] = self._get_reservoir_output_data(model, num_timesteps)
-        assert len(reservoir_temperatures) == num_timesteps, "Unexpected number of reservoir temperatures" # FIXME WIP...
+        reservoir_temperatures: list[float] = self._get_reservoir_output_temperatures(model, num_timesteps)
+        assert (
+            len(reservoir_temperatures) == num_timesteps
+        ), "Unexpected number of reservoir temperatures"  # FIXME WIP...
         for i in range(num_timesteps):
             model.reserv.Tresoutput.value[i] = float(reservoir_temperatures[i])
 
         model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
 
-    def _get_reservoir_output_data(self, model: Model, num_timesteps: int):
+    def _get_reservoir_output_temperatures(self, model: Model, num_timesteps: int):
         if self.reservoir_output_data.Provided and len(self.reservoir_output_data.value) > 0:
             # Use inline temperature profile data
-            #self._load_from_inline_data(model, num_timesteps)
-            return self._get_reservoir_output_data_from_profile_parameter(model, num_timesteps)
+            # self._load_from_inline_data(model, num_timesteps)
+            reservoir_output_data = self._get_reservoir_output_data_from_profile_parameter(model, num_timesteps)
         else:
             # self._load_from_file(model, num_timesteps)
-            return self._get_reservoir_output_data_from_text_file(model, num_timesteps)
+            reservoir_output_data = self._get_reservoir_output_data_from_text_file(model, num_timesteps)
+
+        # Create time points for the input data (evenly spaced over the plant lifetime)
+        input_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, len(reservoir_output_data))
+
+        # Create target time points for the simulation
+        target_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, num_timesteps)
+
+        # Interpolate temperature values to match simulation time steps
+        interpolator = interp1d(input_time_points, reservoir_output_data, kind='linear', fill_value='extrapolate')
+        interpolated_temps = interpolator(target_time_points)
+
+        ret = [float(it) for it in interpolated_temps]
+
+        if len(ret) != len(reservoir_output_data):
+            model.logger.info(f'Reservoir Output Profile interpolation result: {ret}')
+
+        return ret
 
     def _get_reservoir_output_data_from_profile_parameter(self, model: Model, num_timesteps: int) -> list[float]:
         """
@@ -121,27 +145,30 @@ class UPPReservoir(Reservoir):
         temp_data = self.reservoir_output_data.value
 
         if len(temp_data) < 2:
-            msg = ("Error: 'Reservoir Output Profile' must contain at least 2 temperature values "
-                   f"for interpolation. Got {len(temp_data)} value(s).")
+            msg = (
+                "Error: 'Reservoir Output Profile' must contain at least 2 temperature values "
+                f"for interpolation. Got {len(temp_data)} value(s)."
+            )
             model.logger.critical(msg)
             raise RuntimeError(msg)
 
-        # Create time points for the input data (evenly spaced over the plant lifetime)
-        input_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, len(temp_data))
+        return [float(it) for it in temp_data]
 
-        # Create target time points for the simulation
-        target_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, num_timesteps)
-
-        # Interpolate temperature values to match simulation time steps
-        interpolator = interp1d(input_time_points, temp_data, kind='linear', fill_value='extrapolate')
-        interpolated_temps = interpolator(target_time_points)
-
-        return [float(it) for it in interpolated_temps]
-
-        # # Assign interpolated values to reservoir output
-        # for i in range(num_timesteps):
-        #     model.reserv.Tresoutput.value[i] = float(interpolated_temps[i])
-
+        # # Create time points for the input data (evenly spaced over the plant lifetime)
+        # input_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, len(temp_data))
+        #
+        # # Create target time points for the simulation
+        # target_time_points = np.linspace(0, model.surfaceplant.plant_lifetime.value, num_timesteps)
+        #
+        # # Interpolate temperature values to match simulation time steps
+        # interpolator = interp1d(input_time_points, temp_data, kind='linear', fill_value='extrapolate')
+        # interpolated_temps = interpolator(target_time_points)
+        #
+        # return [float(it) for it in interpolated_temps]
+        #
+        # # # Assign interpolated values to reservoir output
+        # # for i in range(num_timesteps):
+        # #     model.reserv.Tresoutput.value[i] = float(interpolated_temps[i])
 
     def _get_reservoir_output_data_from_text_file(self, model: Model, num_timesteps: int) -> list[float]:
         """
@@ -151,29 +178,34 @@ class UPPReservoir(Reservoir):
             with open(model.reserv.filenamereservoiroutput.value, encoding='UTF-8') as f:
                 contentprodtemp = f.readlines()
         except Exception:
-            msg = ('Error: GEOPHIRES could not read reservoir output file ('
-                   + model.reserv.filenamereservoiroutput.value + ') and will abort simulation.')
+            msg = (
+                'Error: GEOPHIRES could not read reservoir output file ('
+                + model.reserv.filenamereservoiroutput.value
+                + ') and will abort simulation.'
+            )
             model.logger.critical(msg)
             raise RuntimeError(msg)
 
         numlines = len(contentprodtemp)
         if numlines != num_timesteps:
-            msg = ('Error: Reservoir output file ('
-                   + model.reserv.filenamereservoiroutput.value +
-                   ') does not have required ' +
-                   str(num_timesteps) +
-                   ' lines. GEOPHIRES will abort simulation.')
-            model.logger.critical(msg)
-            raise RuntimeError(msg)
+            msg = (
+                # f'Error: '
+                f'Reservoir output file ({model.reserv.filenamereservoiroutput.value}; {numlines} lines) does not have '
+                f'required {num_timesteps} lines. '
+                f'Profile data will be interpolated to match simulation time steps.'
+                # f'GEOPHIRES will abort simulation.'
+            )
+            # model.logger.critical(msg)
+            # raise RuntimeError(msg)
+            model.logger.warning(msg)
 
-        ret:list[float] = []
+        ret: list[float] = []
         for i in range(0, numlines - 1):
             entry = float(contentprodtemp[i].split(',')[1].strip('\n'))
             # model.reserv.Tresoutput.value[i] = entry
             ret.append(entry)
 
-        return entry
-
+        return ret
 
     # def _load_from_inline_data(self, model: Model, num_timesteps: int) -> None:
     #     """
