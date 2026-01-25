@@ -3,6 +3,7 @@
 set -e
 
 STASH_PWD=$(pwd)
+trap 'cd "$STASH_PWD"' EXIT
 
 cd "$(dirname "$0")"
 
@@ -70,7 +71,5 @@ if [[ $1 == "example5" ]]
 then
     ./regenerate-example-result.sh example5b
 fi
-
-cd $STASH_PWD
 
 echo "Regenerated example $1."
