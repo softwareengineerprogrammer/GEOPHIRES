@@ -1521,21 +1521,7 @@ class WellBores:
 
         self.ProducedTemperature.value = model.reserv.Tresoutput.value - self.ProdTempDrop.value
 
-        # redrilling
-        # only applies to the built-in analytical reservoir models
-        if model.reserv.resoption.value in \
-            [ReservoirModel.MULTIPLE_PARALLEL_FRACTURES, ReservoirModel.LINEAR_HEAT_SWEEP,
-             ReservoirModel.SINGLE_FRACTURE, ReservoirModel.ANNUAL_PERCENTAGE]:
-            indexfirstmaxdrawdown = np.argmax(self.ProducedTemperature.value < (1 - model.wellbores.maxdrawdown.value) *
-                                              self.ProducedTemperature.value[0])
-            if indexfirstmaxdrawdown > 0:  # redrilling necessary
-                self.redrill.value = int(np.floor(len(self.ProducedTemperature.value) / indexfirstmaxdrawdown))
-                ProducedTemperatureRepeatead = np.tile(self.ProducedTemperature.value[0:indexfirstmaxdrawdown],
-                                                       self.redrill.value + 1)
-                self.ProducedTemperature.value = ProducedTemperatureRepeatead[0:len(self.ProducedTemperature.value)]
-                TResOutputRepeated = np.tile(model.reserv.Tresoutput.value[0:indexfirstmaxdrawdown],
-                                             self.redrill.value + 1)
-                model.reserv.Tresoutput.value = TResOutputRepeated[0:len(self.ProducedTemperature.value)]
+        self.calculate_redrilling(model)
 
         # calculate pressure drops and pumping power
         self.DPProdWell.value, f3, vprod, self.rhowaterprod = WellPressureDrop(
@@ -1600,6 +1586,24 @@ class WellBores:
         self._sync_output_params_from_input_params()
 
         model.logger.info(f'complete {self.__class__.__name__}: {__name__}')
+
+    def calculate_redrilling(self, model: Model) -> None:
+        # Redrilling applies to the built-in analytical reservoir models and user-provided profile.
+        if model.reserv.resoption.value in \
+            [ReservoirModel.MULTIPLE_PARALLEL_FRACTURES, ReservoirModel.LINEAR_HEAT_SWEEP,
+             ReservoirModel.SINGLE_FRACTURE, ReservoirModel.ANNUAL_PERCENTAGE, ReservoirModel.USER_PROVIDED_PROFILE]:
+            index_first_max_drawdown = np.argmax(
+                self.ProducedTemperature.value < (1 - model.wellbores.maxdrawdown.value) *
+                self.ProducedTemperature.value[0])
+
+            if index_first_max_drawdown > 0:  # redrilling necessary
+                self.redrill.value = int(np.floor(len(self.ProducedTemperature.value) / index_first_max_drawdown))
+                ProducedTemperatureRepeated = np.tile(self.ProducedTemperature.value[0:index_first_max_drawdown],
+                                                      self.redrill.value + 1)
+                self.ProducedTemperature.value = ProducedTemperatureRepeated[0:len(self.ProducedTemperature.value)]
+                TResOutputRepeated = np.tile(model.reserv.Tresoutput.value[0:index_first_max_drawdown],
+                                             self.redrill.value + 1)
+                model.reserv.Tresoutput.value = TResOutputRepeated[0:len(self.ProducedTemperature.value)]
 
     def _sync_output_params_from_input_params(self) -> None:
         """
