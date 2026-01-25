@@ -29,6 +29,7 @@ validFilenameChars = "-_.() %s%s" % (string.ascii_letters, string.digits)
 # Duplicative of Outputs.VERTICAL_WELL_DEPTH_OUTPUT_NAME to avoid circular import
 VERTICAL_WELL_DEPTH_OUTPUT_NAME = 'Well depth'
 
+_GRAPH_FIGSIZE = (12, 6)
 
 def print_outputs_rich(
         text_output_file: strParameter,
@@ -1216,6 +1217,10 @@ def Write_HTML_Output(html_path: str, simulation_metadata: list, summary: list, 
     console.save_html(html_path)
 
 
+def profile_title_adjusted_for_figure(title:str) -> str:
+    return title.replace('PROFILE: ', 'PROFILE:\n').replace('PROFILES: ', 'PROFILES:\n')
+
+
 def Plot_Twin_Graph(title: str, html_path: str, x: pd.array, y1: pd.array, y2: pd.array,
                     x_label: str, y1_label: str, y2_label:str) -> None:
     """
@@ -1240,7 +1245,7 @@ def Plot_Twin_Graph(title: str, html_path: str, x: pd.array, y1: pd.array, y2: p
     COLOR_TEMPERATURE = "#69b3a2"
     COLOR_PRICE = "#3399e6"
 
-    fig, ax1 = plt_subplots(figsize=(40, 4))
+    fig, ax1 = plt_subplots(figsize=_GRAPH_FIGSIZE)
 
     ax1.plot(x, y1, label=UpgradeSymbologyOfUnits(y1_label), color=COLOR_PRICE, lw=3)
     ax1.set_xlabel(UpgradeSymbologyOfUnits(x_label), color = COLOR_PRICE, fontsize=14)
@@ -1255,7 +1260,7 @@ def Plot_Twin_Graph(title: str, html_path: str, x: pd.array, y1: pd.array, y2: p
     ax2.tick_params(axis="y", labelcolor=COLOR_TEMPERATURE)
     ax2.legend(loc='best')
 
-    fig.suptitle(title, fontsize=20)
+    fig.suptitle(profile_title_adjusted_for_figure(title), fontsize=20)
 
     full_names: set = set()
     short_names: set = set()
@@ -1287,7 +1292,7 @@ def Plot_Single_Graph(title: str, html_path: str, x: pd.array, y: pd.array, x_la
     COLOR_PRICE = "#3399e6"
 
 #    plt.plot(x, y, color=COLOR_PRICE)
-    fig, ax = plt_subplots(figsize=(40, 4))
+    fig, ax = plt_subplots(figsize=_GRAPH_FIGSIZE)
     ax.plot(x, y, label=UpgradeSymbologyOfUnits(y_label), color=COLOR_PRICE)
     ax.set_xlabel(UpgradeSymbologyOfUnits(x_label), color = COLOR_PRICE, fontsize=14)
     ax.set_ylabel(UpgradeSymbologyOfUnits(y_label), color=COLOR_PRICE, fontsize=14)
@@ -1296,7 +1301,7 @@ def Plot_Single_Graph(title: str, html_path: str, x: pd.array, y: pd.array, x_la
     ax.legend(loc='best')
     #plt.ylim(y.min(), y.max())
     #plt.gca().legend((UpgradeSymbologyOfUnits(x_label), UpgradeSymbologyOfUnits(y_label)), loc='best')
-    fig.suptitle(title, fontsize=20)
+    fig.suptitle(profile_title_adjusted_for_figure(title), fontsize=20)
 
     full_names: set = set()
     short_names: set = set()
