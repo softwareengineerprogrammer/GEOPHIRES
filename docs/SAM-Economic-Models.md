@@ -51,6 +51,7 @@ The following table describes how GEOPHIRES parameters are transformed into SAM 
 
 1. Only Electricity end-use is supported
 2. Add-ons with electricity and heat are not currently supported. (Add-ons CAPEX, OPEX, and profit are supported.)
+3. Carbon Revenue is not currently supported, but will be in future releases. See [tracking issue](https://github.com/NatLabRockies/GEOPHIRES-X/issues/458?title=SAM+Economic+Models+do+not+calculate+carbon+revenue) for details.
 
 ## Multiple Construction Years
 
