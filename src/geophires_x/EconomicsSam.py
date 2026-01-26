@@ -250,6 +250,8 @@ class SamEconomicsCalculations:
             ],
         )
 
+        pv_of_annual_costs_backfilled_row_name = 'Present value of annual costs [backfilled] ($)'
+
         def backfill_pv_of_annual_costs() -> None:
             annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
             pv_of_annual_costs_backfilled = []
@@ -271,12 +273,14 @@ class SamEconomicsCalculations:
             ret.insert(
                 _get_row_index('Present value of annual costs ($)') + 1,
                 [
-                    *['Present value of annual costs [backfilled] ($)'],
+                    *[pv_of_annual_costs_backfilled_row_name],
                     *pv_of_annual_costs_backfilled,
                 ],
             )
 
         backfill_pv_of_annual_costs()
+
+        pv_of_electricity_to_grid_backfilled_row_name = 'Present value of annual energy nominal [backfilled] (kWh)'
 
         def backfill_pv_of_annual_energy() -> None:
             electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
@@ -301,12 +305,34 @@ class SamEconomicsCalculations:
             ret.insert(
                 _get_row_index('Present value of annual energy nominal (kWh)') + 1,
                 [
-                    *['Present value of annual energy nominal [backfilled] (kWh)'],
+                    *[pv_of_electricity_to_grid_backfilled_row_name],
                     *pv_of_electricity_to_grid_backfilled,
                 ],
             )
 
         backfill_pv_of_annual_energy()
+
+        def backfill_lcoe_nominal() -> None:
+            pv_of_annual_costs_backfilled_row = ret[_get_row_index(pv_of_annual_costs_backfilled_row_name)][1:]
+            pv_of_electricity_to_grid_backfilled_row = ret[
+                _get_row_index(pv_of_electricity_to_grid_backfilled_row_name)
+            ][1:]
+
+            lcoe_nominal_backfilled = []
+            for year in range(len(pv_of_annual_costs_backfilled_row)):
+                lcoe_nominal_backfilled.append(
+                    pv_of_annual_costs_backfilled_row[year] * 100 / pv_of_electricity_to_grid_backfilled_row[year]
+                )
+
+            ret.insert(
+                _get_row_index('LCOE Levelized cost of energy nominal (cents/kWh)') + 1,
+                [
+                    *['LCOE Levelized cost of energy nominal [backfilled] (cents/kWh)'],
+                    *lcoe_nominal_backfilled,
+                ],
+            )
+
+        backfill_lcoe_nominal()
 
         return ret
 
