@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import numpy as np
 from scipy.interpolate import interp1d
@@ -47,12 +48,11 @@ class UPPReservoir(Reservoir):
             CurrentUnits=TemperatureUnit.CELSIUS,
             PreferredUnits=TemperatureUnit.CELSIUS,
             ToolTipText=f'Temperature profile data as a comma-separated list of values in Celsius. '
-            f'Values are interpolated within the provided data range, '
-            f'as determined by the number of profile data points and '
-            f'{reservoir_output_profile_time_step_param_name}. '
+            f'Example: 200,195,190,185 for a 4-point temperature decline profile. '
+            f'Values are interpolated over the time range determined by the number of profile data points '
+            f'and {reservoir_output_profile_time_step_param_name}. '
             f'If the profile is shorter than the plant lifetime, the temperature trend is extrapolated '
-            f'based on the last ~20% of the data. '
-            f'Example: 200,195,190,185 for a 4-point temperature decline profile.',
+            f'based on the last ~20% of the data, with the injection temperature used as a minimum. ',
         )
 
         self.reservoir_output_time_step = self.ParameterDict[self.reservoir_output_time_step.Name] = floatParameter(
@@ -150,7 +150,7 @@ class UPPReservoir(Reservoir):
                 f'Extrapolating temperature trend for remaining years.'
             )
             model.logger.warning(msg)
-            print(f"Warning: {msg}")
+            print(f'Warning: {msg}')
 
             interpolated_temps = self._interpolate_and_extrapolate(
                 input_times, reservoir_output_data, target_time_points, model
@@ -160,6 +160,7 @@ class UPPReservoir(Reservoir):
 
         return ret
 
+    # noinspection PyMethodMayBeStatic
     def _interpolate_and_extrapolate(
         self,
         input_times: np.ndarray,
@@ -178,6 +179,8 @@ class UPPReservoir(Reservoir):
         interpolator = interp1d(
             input_times, input_temps, kind='linear', bounds_error=False, fill_value=(input_temps[0], input_temps[-1])
         )
+
+        first_extrapolated_index: int | None = None
 
         for i, t in enumerate(target_times):
             if t <= input_max_time:
@@ -204,6 +207,16 @@ class UPPReservoir(Reservoir):
                 # Don't let temperature go below injection temperature
                 min_temp = model.wellbores.Tinj.value
                 result[i] = max(extrapolated_temp, min_temp)
+
+                if first_extrapolated_index is None:
+                    first_extrapolated_index = i
+
+        if first_extrapolated_index is not None:
+            model.logger.info(
+                f'Reservoir temperature extrapolation result from trend in last ~20% of input data, starting '
+                f'at time step {first_extrapolated_index}: '
+                f'{json.dumps([round(it,2) for it in list(result[first_extrapolated_index:])])}.'
+            )
 
         return result
 

@@ -440,7 +440,7 @@
       "maximum": null
     },
     "Reservoir Output Profile": {
-      "description": "Temperature profile data as a comma-separated list of values in Celsius. Values are interpolated within the provided data range, as determined by the number of profile data points and Reservoir Output Profile Time Step. If the profile is shorter than the plant lifetime, the temperature trend is extrapolated based on the last ~20% of the data. Example: 200,195,190,185 for a 4-point temperature decline profile.",
+      "description": "Temperature profile data as a comma-separated list of values in Celsius. Example: 200,195,190,185 for a 4-point temperature decline profile. Values are interpolated over the time range determined by the number of profile data points and Reservoir Output Profile Time Step. If the profile is shorter than the plant lifetime, the temperature trend is extrapolated based on the last ~20% of the data, with the injection temperature used as a minimum. ",
       "type": "array",
       "units": "degC",
       "category": "Reservoir",
