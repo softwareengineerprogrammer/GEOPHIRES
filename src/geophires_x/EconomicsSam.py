@@ -237,21 +237,18 @@ class SamEconomicsCalculations:
             ],
         )
 
-        def backfill_electricity_to_grid() -> None:
-            electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
-            electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
-            electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
+        electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
+        electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
+        electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
 
-            ret.insert(
-                # _get_row_index(electricity_to_grid_kwh_row_name),  # there are multiple rows with this name
-                _get_row_index(annual_costs_usd_row_name) + 4,
-                [
-                    *['Electricity to grid [backfilled] (kWh)'],
-                    *electricity_to_grid_backfilled,
-                ],
-            )
-
-        backfill_electricity_to_grid()
+        ret.insert(
+            # _get_row_index(electricity_to_grid_kwh_row_name),  # there are multiple rows with this name
+            _get_row_index(annual_costs_usd_row_name) + 4,
+            [
+                *['Electricity to grid [backfilled] (kWh)'],
+                *electricity_to_grid_backfilled,
+            ],
+        )
 
         def backfill_pv_of_annual_costs() -> None:
             annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
@@ -280,6 +277,36 @@ class SamEconomicsCalculations:
             )
 
         backfill_pv_of_annual_costs()
+
+        def backfill_pv_of_annual_energy() -> None:
+            electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
+            pv_of_electricity_to_grid_backfilled = []
+            for year in range(self._pre_revenue_years_count):
+                pv_at_year = abs(
+                    round(
+                        npf.npv(
+                            self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                            electricity_to_grid_backfilled_pv_processed,
+                        )
+                    )
+                )
+
+                pv_of_electricity_to_grid_backfilled.append(pv_at_year)
+
+                electricity_to_grid_at_year = electricity_to_grid_backfilled_pv_processed.pop(0)
+                electricity_to_grid_backfilled_pv_processed[0] = (
+                    electricity_to_grid_backfilled_pv_processed[0] + electricity_to_grid_at_year
+                )
+
+            ret.insert(
+                _get_row_index('Present value of annual energy nominal (kWh)') + 1,
+                [
+                    *['Present value of annual energy nominal [backfilled] (kWh)'],
+                    *pv_of_electricity_to_grid_backfilled,
+                ],
+            )
+
+        backfill_pv_of_annual_energy()
 
         return ret
 
