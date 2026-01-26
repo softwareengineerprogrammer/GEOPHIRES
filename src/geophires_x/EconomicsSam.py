@@ -184,6 +184,9 @@ class SamEconomicsCalculations:
         if self._royalties_rate_schedule is not None:
             ret = self._insert_royalties_rate_schedule(ret)
 
+        # FIXME WIP
+        ret = self._insert_calculated_levelized_metrics_line_items(ret)
+
         return ret
 
     def _insert_royalties_rate_schedule(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
@@ -203,6 +206,61 @@ class SamEconomicsCalculations:
                 ],
             ],
         )
+
+        return ret
+
+    # noinspection DuplicatedCode
+    def _insert_calculated_levelized_metrics_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
+        """
+        FIXME WIP re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/444#issuecomment-3730443078
+        """
+
+        ret = cf_ret.copy()
+
+        def _get_row_index(row_name_: str) -> list[Any]:
+            return [it[0] for it in ret].index(row_name_)
+
+        annual_costs_usd_row_name = 'Annual costs ($)'
+        annual_costs = cf_ret[_get_row_index(annual_costs_usd_row_name)].copy()
+        after_tax_net_cash_flow_usd = cf_ret[_get_row_index('After-tax net cash flow ($)')]
+
+        annual_costs_backfilled = [
+            *after_tax_net_cash_flow_usd[1 : (self._pre_revenue_years_count + 1)],
+            *annual_costs[(self._pre_revenue_years_count + 1) :],
+        ]
+
+        ret.insert(
+            _get_row_index(annual_costs_usd_row_name) + 1,
+            [
+                *['Annual costs [backfilled] ($)'],
+                *annual_costs_backfilled,
+            ],
+        )
+
+        electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
+        electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
+        electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
+
+        ret.insert(
+            # _get_row_index(electricity_to_grid_kwh_row_name),
+            _get_row_index(annual_costs_usd_row_name) + 4,
+            [
+                *['Electricity to grid [backfilled] (kWh)'],
+                *electricity_to_grid_backfilled,
+            ],
+        )
+
+        # ret.insert(
+        #     _get_row_index('Present value of annual costs ($)'),
+        #     [
+        #         *['Present value of annual costs [backfilled] ($)'],
+        #         *([''] * (self._pre_revenue_years_count)),
+        #         *[
+        #             quantity(it, 'dimensionless').to(convertible_unit('percent')).magnitude
+        #             for it in self._royalties_rate_schedule
+        #         ],
+        #     ],
+        # )
 
         return ret
 
