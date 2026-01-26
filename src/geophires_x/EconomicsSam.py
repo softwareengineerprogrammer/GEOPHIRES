@@ -215,11 +215,14 @@ class SamEconomicsCalculations:
         FIXME WIP re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/444#issuecomment-3730443078
         """
 
+        insert_backfilled_rows: bool = False
+
         ret = cf_ret.copy()
 
         def _get_row_index(row_name_: str) -> list[Any]:
             return [it[0] for it in ret].index(row_name_)
 
+        # Backfill annual costs
         annual_costs_usd_row_name = 'Annual costs ($)'
         annual_costs = cf_ret[_get_row_index(annual_costs_usd_row_name)].copy()
         after_tax_net_cash_flow_usd = cf_ret[_get_row_index('After-tax net cash flow ($)')]
@@ -229,108 +232,125 @@ class SamEconomicsCalculations:
             *annual_costs[(self._pre_revenue_years_count + 1) :],
         ]
 
-        ret.insert(
-            _get_row_index(annual_costs_usd_row_name) + 1,
-            [
-                *['Annual costs [backfilled] ($)'],
-                *annual_costs_backfilled,
-            ],
-        )
+        if insert_backfilled_rows:
+            ret.insert(
+                _get_row_index(annual_costs_usd_row_name) + 1,
+                [
+                    *['Annual costs [backfilled] ($)'],
+                    *annual_costs_backfilled,
+                ],
+            )
 
         electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
         electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
         electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
 
-        ret.insert(
-            # _get_row_index(electricity_to_grid_kwh_row_name),  # there are multiple rows with this name
-            _get_row_index(annual_costs_usd_row_name) + 4,
-            [
-                *['Electricity to grid [backfilled] (kWh)'],
-                *electricity_to_grid_backfilled,
-            ],
-        )
+        if insert_backfilled_rows:
+            ret.insert(
+                # _get_row_index(electricity_to_grid_kwh_row_name),  # there are multiple rows with this name
+                _get_row_index(annual_costs_usd_row_name) + 4,
+                [
+                    *['Electricity to grid [backfilled] (kWh)'],
+                    *electricity_to_grid_backfilled,
+                ],
+            )
+        else:
+            pass  # TODO: update existing row (requires finding the right row among duplicates)
 
         pv_of_annual_costs_backfilled_row_name = 'Present value of annual costs [backfilled] ($)'
 
-        def backfill_pv_of_annual_costs() -> None:
-            annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
-            pv_of_annual_costs_backfilled = []
-            for year in range(self._pre_revenue_years_count):
-                pv_at_year = abs(
-                    round(
-                        npf.npv(
-                            self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                            annual_costs_backfilled_pv_processed,
-                        )
+        # Backfill PV of annual costs
+        annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
+        pv_of_annual_costs_backfilled = []
+        for year in range(self._pre_revenue_years_count):
+            pv_at_year = abs(
+                round(
+                    npf.npv(
+                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                        annual_costs_backfilled_pv_processed,
                     )
                 )
-
-                pv_of_annual_costs_backfilled.append(pv_at_year)
-
-                cost_at_year = annual_costs_backfilled_pv_processed.pop(0)
-                annual_costs_backfilled_pv_processed[0] = annual_costs_backfilled_pv_processed[0] + cost_at_year
-
-            ret.insert(
-                _get_row_index('Present value of annual costs ($)') + 1,
-                [
-                    *[pv_of_annual_costs_backfilled_row_name],
-                    *pv_of_annual_costs_backfilled,
-                ],
             )
 
-        backfill_pv_of_annual_costs()
+            pv_of_annual_costs_backfilled.append(pv_at_year)
 
+            cost_at_year = annual_costs_backfilled_pv_processed.pop(0)
+            annual_costs_backfilled_pv_processed[0] = annual_costs_backfilled_pv_processed[0] + cost_at_year
+
+        pv_of_annual_costs_backfilled_row = [
+            *[pv_of_annual_costs_backfilled_row_name],
+            *pv_of_annual_costs_backfilled,
+        ]
+
+        pv_of_annual_costs_row_index = _get_row_index('Present value of annual costs ($)')
+        if insert_backfilled_rows:
+            ret.insert(
+                pv_of_annual_costs_row_index + 1,
+                pv_of_annual_costs_backfilled_row,
+            )
+        else:
+            ret[pv_of_annual_costs_row_index][1:] = pv_of_annual_costs_backfilled
+
+        # Backfill PV of electricity to grid
         pv_of_electricity_to_grid_backfilled_row_name = 'Present value of annual energy nominal [backfilled] (kWh)'
 
-        def backfill_pv_of_annual_energy() -> None:
-            electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
-            pv_of_electricity_to_grid_backfilled = []
-            for year in range(self._pre_revenue_years_count):
-                pv_at_year = abs(
-                    round(
-                        npf.npv(
-                            self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                            electricity_to_grid_backfilled_pv_processed,
-                        )
+        electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
+        pv_of_electricity_to_grid_backfilled = []
+        for year in range(self._pre_revenue_years_count):
+            pv_at_year = abs(
+                round(
+                    npf.npv(
+                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                        electricity_to_grid_backfilled_pv_processed,
                     )
                 )
+            )
 
-                pv_of_electricity_to_grid_backfilled.append(pv_at_year)
+            pv_of_electricity_to_grid_backfilled.append(pv_at_year)
 
-                electricity_to_grid_at_year = electricity_to_grid_backfilled_pv_processed.pop(0)
-                electricity_to_grid_backfilled_pv_processed[0] = (
-                    electricity_to_grid_backfilled_pv_processed[0] + electricity_to_grid_at_year
-                )
+            electricity_to_grid_at_year = electricity_to_grid_backfilled_pv_processed.pop(0)
+            electricity_to_grid_backfilled_pv_processed[0] = (
+                electricity_to_grid_backfilled_pv_processed[0] + electricity_to_grid_at_year
+            )
 
+        pv_of_annual_energy_row_index = _get_row_index('Present value of annual energy nominal (kWh)')
+        if insert_backfilled_rows:
             ret.insert(
-                _get_row_index('Present value of annual energy nominal (kWh)') + 1,
+                pv_of_annual_energy_row_index + 1,
                 [
                     *[pv_of_electricity_to_grid_backfilled_row_name],
                     *pv_of_electricity_to_grid_backfilled,
                 ],
             )
-
-        backfill_pv_of_annual_energy()
+        else:
+            ret[pv_of_annual_energy_row_index][1:] = pv_of_electricity_to_grid_backfilled
 
         def backfill_lcoe_nominal() -> None:
-            pv_of_annual_costs_backfilled_row = ret[_get_row_index(pv_of_annual_costs_backfilled_row_name)][1:]
-            pv_of_electricity_to_grid_backfilled_row = ret[
-                _get_row_index(pv_of_electricity_to_grid_backfilled_row_name)
-            ][1:]
+            # pv_of_annual_costs_backfilled_row = ret[_get_row_index(pv_of_annual_costs_backfilled_row_name)][1:]
+            pv_of_electricity_to_grid_backfilled_row = pv_of_electricity_to_grid_backfilled
+            pv_of_annual_costs_backfilled_row_values = pv_of_annual_costs_backfilled_row[
+                1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
+            ]
 
             lcoe_nominal_backfilled = []
-            for year in range(len(pv_of_annual_costs_backfilled_row)):
+            for _year in range(len(pv_of_annual_costs_backfilled_row_values)):
                 lcoe_nominal_backfilled.append(
-                    pv_of_annual_costs_backfilled_row[year] * 100 / pv_of_electricity_to_grid_backfilled_row[year]
+                    pv_of_annual_costs_backfilled_row_values[_year]
+                    * 100
+                    / pv_of_electricity_to_grid_backfilled_row[_year]
                 )
 
-            ret.insert(
-                _get_row_index('LCOE Levelized cost of energy nominal (cents/kWh)') + 1,
-                [
-                    *['LCOE Levelized cost of energy nominal [backfilled] (cents/kWh)'],
-                    *lcoe_nominal_backfilled,
-                ],
-            )
+            lcoe_nominal_row_index = _get_row_index('LCOE Levelized cost of energy nominal (cents/kWh)')
+            if insert_backfilled_rows:
+                ret.insert(
+                    lcoe_nominal_row_index + 1,
+                    [
+                        *['LCOE Levelized cost of energy nominal [backfilled] (cents/kWh)'],
+                        *lcoe_nominal_backfilled,
+                    ],
+                )
+            else:
+                ret[lcoe_nominal_row_index][1:] = lcoe_nominal_backfilled
 
         backfill_lcoe_nominal()
 
