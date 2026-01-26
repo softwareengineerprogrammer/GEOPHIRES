@@ -5,7 +5,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from .Parameter import strParameter, listParameter, floatParameter
-from .Units import Units, TimeUnit
+from .Units import Units, TimeUnit, TemperatureUnit
 import geophires_x.Model as Model
 from .Reservoir import Reservoir
 
@@ -37,26 +37,35 @@ class UPPReservoir(Reservoir):
             ToolTipText="File name of reservoir output in case reservoir model 5 is selected",
         )
 
+        reservoir_output_profile_param_name = 'Reservoir Output Profile'
+        reservoir_output_profile_time_step_param_name = 'Reservoir Output Profile Time Step'
+
         self.reservoir_output_data = self.ParameterDict[self.reservoir_output_data.Name] = listParameter(
-            "Reservoir Output Profile",
+            reservoir_output_profile_param_name,
             DefaultValue=[],
-            UnitType=Units.NONE,
-            ToolTipText="Temperature profile data as a comma-separated list of values in Celsius. "
-            "Values will be interpolated to match the simulation time steps. "
-            "Example: 200,195,190,185 for a 4-point temperature decline profile.",
+            UnitType=Units.TEMPERATURE,
+            CurrentUnits=TemperatureUnit.CELSIUS,
+            PreferredUnits=TemperatureUnit.CELSIUS,
+            ToolTipText=f'Temperature profile data as a comma-separated list of values in Celsius. '
+            f'Values are interpolated within the provided data range, '
+            f'as determined by the number of profile data points and '
+            f'{reservoir_output_profile_time_step_param_name}. '
+            f'If the profile is shorter than the plant lifetime, the temperature trend is extrapolated '
+            f'based on the last ~20% of the data. '
+            f'Example: 200,195,190,185 for a 4-point temperature decline profile.',
         )
 
         self.reservoir_output_time_step = self.ParameterDict[self.reservoir_output_time_step.Name] = floatParameter(
-            "Reservoir Output Profile Time Step",
+            reservoir_output_profile_time_step_param_name,
             DefaultValue=1.0,
             Min=0.01,
             Max=100.0,
             UnitType=Units.TIME,
             PreferredUnits=TimeUnit.YEAR,
             CurrentUnits=TimeUnit.YEAR,
-            ErrMessage="assume default reservoir output profile time step (1 year)",
-            ToolTipText="Time interval between temperature values in the Reservoir Output Profile. "
-            "For example, if set to 0.25, the profile values represent temperatures at 0, 0.25, 0.5, 0.75, 1.0 years, etc.",
+            ToolTipText=f'Time interval between temperature values in the {reservoir_output_profile_param_name}. '
+            f'For example, if set to 0.25, the profile values represent temperatures at '
+            f'0, 0.25, 0.5, 0.75, 1.0 years, etc.',
         )
 
         model.logger.info(f'Complete {__class__!s}: {sys._getframe().f_code.co_name}')
