@@ -323,34 +323,37 @@ class ReservoirTestCase(BaseTestCase):
             del r.result['Simulation Metadata']
             return r
 
-        with self.assertLogs(level='INFO') as logs:
-            _del_metadata(
-                GeophiresXClient().get_geophires_result(
-                    GeophiresInputParameters(
-                        from_file_path=self._get_test_file_path('../examples/example5b.txt'),
-                        params={
-                            'Reservoir Output Profile': ','.join(
-                                [str(it) for it in [30 * v for v in [*([10] * 7), 9, 8, 7]]]
-                            )
-                        },
+        try:
+            with self.assertLogs(level='INFO') as logs:
+                _del_metadata(
+                    GeophiresXClient().get_geophires_result(
+                        GeophiresInputParameters(
+                            from_file_path=self._get_test_file_path('../examples/example5b.txt'),
+                            params={
+                                'Reservoir Output Profile': ','.join(
+                                    [str(it) for it in [30 * v for v in [*([10] * 7), 9, 8, 7]]]
+                                )
+                            },
+                        )
                     )
                 )
-            )
 
-            self.assertHasLogRecordWithMessage(
-                logs, 'Reservoir temperature extrapolation result', treat_substring_match_as_match=True
-            )
+                self.assertHasLogRecordWithMessage(
+                    logs, 'Reservoir temperature extrapolation result', treat_substring_match_as_match=True
+                )
 
-            self.assertHasLogRecordWithMessage(
-                logs,
-                # TODO make this less hard-coded
-                '[207.73, 177.48, 147.23, 116.97, 86.72, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
-                '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
-                '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
-                '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
-                '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
-                '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
-                '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
-                '80.0, 80.0]',
-                treat_substring_match_as_match=True,
-            )
+                self.assertHasLogRecordWithMessage(
+                    logs,
+                    # TODO make this less hard-coded
+                    '[207.73, 177.48, 147.23, 116.97, 86.72, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0]',
+                    treat_substring_match_as_match=True,
+                )
+        except AssertionError as ae:
+            self._handle_assert_logs_failure(ae)
