@@ -7,7 +7,7 @@ GEOPHIRES v3 (2023-2025)
 3.11
 ^^^^
 
-3.11.8: `User-Provided Reservoir Output Profile Fix & Reservoir Output Profile Parameter <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/129>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.8>`__
+3.11.8: `User-Provided Reservoir Output File Fix, Reservoir Output Profile Parameter, and Redrilling Support <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/129>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.8>`__
 
 3.11.3: `SAM Economic Models ITC result output <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/124>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.3>`__
 
