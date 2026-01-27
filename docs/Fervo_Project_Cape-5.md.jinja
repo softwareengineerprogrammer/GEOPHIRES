@@ -127,9 +127,13 @@ for a detailed explanation of how key case study reservoir engineering input par
 See [Fervo_Project_Cape-5.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-5.txt)
 in source code for the full set of inputs.
 
+<a id="reservoir-parameters-section"></a>
+
 #### Reservoir Parameters
 
 {{ reservoir_parameters_table_md }}
+
+<a id="well-bores-parameters-section"></a>
 
 #### Well Bores Parameters
 
@@ -161,7 +165,7 @@ describes reservoir modeling (ResFrac) that informed the Cape Station field impl
 
 Figure 7 in Singh et al., 2025 (below) shows the well and bench spacing for the Cape Station field design.[^fig-7-note]
 Each bench consists of 5 wells, with 2 injectors and 3 producers.
-This ratio is encoded by the case study's `Number of Injection Wells per Production Well` parameter.
+This ratio is encoded by the case study's `Number of Injection Wells per Production Well` parameter (see [Well Bores Parameters](#well-bores-parameters-section)).
 
 The Singh et al. paper models separate upper and lower benches.
 GEOPHIRES v3.11 does not support wells with different depths, so the case study's `Reservoir Depth` parameter is
@@ -174,9 +178,23 @@ See the [Technical & Engineering Results section](#technical-and-engineering-res
 
 #### Fracture Geometry
 
-{# FIXME WIP #}
+Figure 2 in Singh et al., 2025 (below) shows the ResFrac simulated fracture geometry. This figure, along with the bench design in Figure 7,
+informed the case study's `Fracture Shape`, `Fracture Width`, `Fracture Height`, and `Number of Fractures per Stimulated Well` parameters (see [Reservoir Parameters](#reservoir-parameters-section)).
 
-Figure 2 in Singh et al. (2025) shows the simulated fracture geometry.
+Note that the case study does not attempt to strictly replicate the paper's fracture geometry;
+rather, the paper specifications were used to derive approximations and/or constraints on parameters whose final values
+were ultimately refined based on holistic techno-economic considerations. For example, the intra-bench horizontal well spacing
+of 500 ft dictates that fracture half-lengths must be at least 500 ft in order to achieve flow between injectors and producers.
+Thus, a minimum fracture length of 1000 ft (305 m) is required (assuming that fractures propagate approximately symmetrically in the horizontal axis),
+reflected in the case study's `Fracture Width` parameter value.
+
+Similarly, the intra-bench vertical spacing of 200 ft (61 m) dictates that the fracture height must be at least 200 ft[^intra-bench-vertical-spacing-note].
+The case study's `Fracture Height` value was formulated by starting with 61 m and then iteratively uprating until a total effective fracture surface area per well was achieved
+that produces results consistent with the paper simulation and other reference values.
+The uprated value is also supported by Figure 2's fracture geometry visualization indicating fracture height exceeding intra-bench vertical spacing.
+
+[^intra-bench-vertical-spacing-note]: Note: unlike horizontal propagation, vertical fracture propagation is assumed to be asymmetrical in the upwards direction per "fracture propagation model with uniform frac gradient and no layering will tend to predict fracture growth directly upwards." (p. 3) and fracture geometry shown in Figures 1 and 2.
+
 
 ![Singh et al. (2025), Figure 2](_images/singh-et-al-2025_fig-2_fracture-geometry.png)
 
@@ -252,7 +270,7 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 
 {{ opex_result_outputs_table_md }}
 
-<a id="technical-and-engineering-results-section"></a>>
+<a id="technical-and-engineering-results-section"></a>
 
 ### Technical & Engineering Results
 
