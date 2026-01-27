@@ -27,6 +27,7 @@ then
         -e 's/^Production Flow Rate per Well.*/Production Flow Rate per Well, 100/' \
         -e 's/500 MWe/100 MWe/' \
         -e 's/Phase II/Phase I/' \
+        -e 's/\/Fervo_Project_Cape-5.html/\/Fervo_Project_Cape-5.html#Fervo_Project_Cape-6-section/' \
         examples/Fervo_Project_Cape-5.txt > examples/Fervo_Project_Cape-6.txt
 fi
 

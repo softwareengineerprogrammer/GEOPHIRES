@@ -1,10 +1,10 @@
 # Case Study: 100 MWe EGS Project Modeled on Fervo Cape Station Phase I
-# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html#Fervo_Project_Cape-6-section
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
 Economic Model, 5, -- The SAM Single Owner PPA economic model is used to calculate financial results including LCOE, NPV, IRR, and pro-forma cash flow analysis. See [GEOPHIRES documentation of SAM Economic Models](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html) for details on how System Advisor Model financial models are integrated into GEOPHIRES.
-Inflation Rate, .027, -- US inflation as of December 2025
+Inflation Rate, .027, -- US inflation as of December 2025. Note: [2024b ATB models lower inflation](https://atb.nrel.gov/electricity/2024b/definitions#inflation).
 
 Starting Electricity Sale Price, 0.095, -- Aligns with Geysers - Sacramento pricing in [2024b ATB](https://atb.nrel.gov/electricity/2024/geothermal) (NREL, 2025). See Sensitivity Analysis for effect of different prices on results.
 Electricity Escalation Rate Per Year, 0.00057, -- Calibrated to reach $100/MWh at project year 11
