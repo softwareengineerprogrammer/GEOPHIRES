@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import inspect
-import logging
 import numbers
 import os.path
 import sys
@@ -12,8 +11,6 @@ from geophires_x_client import GeophiresInputParameters
 
 # noinspection PyProtectedMember
 from geophires_x_client import _get_logger
-
-_log = logging.getLogger(__name__)
 
 
 class BaseTestCase(unittest.TestCase):
@@ -131,7 +128,7 @@ class BaseTestCase(unittest.TestCase):
         if sys.version_info[:2] == (3, 8) and self._is_github_actions():
             # FIXME - see
             #  https://github.com/softwareengineerprogrammer/GEOPHIRES/actions/runs/19646240874/job/56262028512#step:5:344
-            _log.warning(
+            print(
                 f'WARNING: Skipping logs assertion in GitHub Actions '
                 f'for Python {sys.version_info.major}.{sys.version_info.minor}'
             )
