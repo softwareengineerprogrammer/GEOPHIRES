@@ -159,14 +159,22 @@ describes reservoir modeling (ResFrac) that informed the Cape Station field impl
 
 #### Bench Design and Well Spacing
 
-Figure 7 in Singh et al. (2025) shows the well and bench spacing for the Cape Station field design.[^fig-7-note]
+Figure 7 in Singh et al., 2025 (below) shows the well and bench spacing for the Cape Station field design.[^fig-7-note]
+Each bench consists of 5 wells, with 2 injectors and 3 producers.
+This ratio is encoded by the case study's `Number of Injection Wells per Production Well` parameter.
 
-[^fig-7-note]: The original figure has been modified to display "500 ft horizontal" instead of "700 ft horizontal" per the Conclusions section of the paper: "Based on the results from the study and additional risk analysis, the 500 ft x 200 ft well spacing with a bench spacing of 700 ft was implemented in the field development." (p. 19).
+The Singh et al. paper models separate upper and lower benches.
+GEOPHIRES v3.11 does not support wells with different depths, so the case study's `Reservoir Depth` parameter is
+set to a value nominally representing an approximate average depth between the upper and lower benches.
+See the [Technical & Engineering Results section](#technical-and-engineering-results-section) for relevant temperature results.
 
 ![Singh et al. (2025), Figure 7](_images/singh-et-al-2025_fig-7_well-and-bench-spacing.png)
 
+[^fig-7-note]: The original figure has been cropped and modified to display: "500 ft horizontal" instead of "700 ft horizontal" and "Inter-bench spacing: Vertical spacing between injectors: 700 ft"; per the Conclusions section of the paper: "Based on the results from the study and additional risk analysis, the 500 ft x 200 ft well spacing with a bench spacing of 700 ft was implemented in the field development." (p. 19).
 
 #### Fracture Geometry
+
+{# FIXME WIP #}
 
 Figure 2 in Singh et al. (2025) shows the simulated fracture geometry.
 
@@ -243,6 +251,8 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 ### Operating Costs (OPEX)
 
 {{ opex_result_outputs_table_md }}
+
+<a id="technical-and-engineering-results-section"></a>>
 
 ### Technical & Engineering Results
 
