@@ -46,7 +46,7 @@ Key results include LCOE = {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} and IRR = {{ ir
         }
     </style>
     <div id="intro-result-images">
-        <a href="#production-temperature-profile"
+        <a href="#production-temperature-profile-section"
             title="Jump to the Production Temperature Profile section">
             <img src="_images/fervo_project_cape-5-power-production.png"
                 class="no-active"
@@ -119,6 +119,9 @@ values.
 Note that these are not the exhaustive sets of inputs and results, which are available in source code and
 the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5).
 
+See the [Calibration with Fervo-implemented Field Design section](#res-eng-params-calibration-section)
+for a detailed explanation of how key case study reservoir engineering input parameters were derived.
+
 ### Inputs
 
 See [Fervo_Project_Cape-5.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-5.txt)
@@ -144,6 +147,8 @@ in source code for the full set of inputs.
 #### Economic Parameters
 
 {{ economics_parameters_table_md }}
+
+<a id="res-eng-params-calibration-section"></a>
 
 ### Calibration with Fervo-implemented Field Design
 
@@ -185,7 +190,7 @@ Despite these structural differences, the comparison validates the basis for the
 
 The calibration simulation above represents a 15-year unmitigated thermal decline without redrilling.
 In the full case study results, the model includes redrilling events that restore production temperature when drawdown thresholds are reached,
-resulting in the cyclical profile shown in the [Production Temperature section](#production-temperature-profile) below.
+resulting in the cyclical profile shown in the [Production Temperature section](#production-temperature-profile-section) below.
 
 
 ## Results
@@ -252,6 +257,8 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 | Total wells drilled over project lifetime | {{ total_wells_including_redrilling }} | Permitted Limit: 320 | The BLM Environmental Assessment (DOI-BLM-UT-C010-2024-0018-EA) authorizes an estimated development of 320 production and injection wells (BLM, 2024). As modeled, the project remains within this regulatory envelope for the first three drilling campaigns (Initial, Year 8, and Year 16), reaching a cumulative total of approximately 282 wells. <br/><br/> The model exceeds the current authorization only during the final redrilling event in Year 24. It is a standard industry assumption that brownfield capacity maintenance activities (e.g. sidetracking existing wells on existing pads) occurring two decades into operations would be authorized through subsequent regulatory actions, such as a Determination of NEPA Adequacy (DNA) or a Categorical Exclusion, given the established baseline of environmental impact. |
 {# @formatter:on #}
 
+<a id="production-temperature-profile-section"></a>
+
 #### Production Temperature Profile
 
 <img src="_images/fervo_project_cape-5-production-temperature.png" class="no-active" style="max-width: 66%" />
@@ -287,7 +294,7 @@ For example, scenarios for Bond Interest Rate have different weighted average co
 This is particularly relevant for technical parameters pertaining to reservoir engineering.
 In a real-world design, these variables are physically coupled; for instance, targeting a higher production flow rate
 would typically necessitate a larger fracture surface area to mitigate the resulting acceleration in thermal drawdown.
-See the [discussion of flow rate below](#impact-of-flow-rate-on-project-economics).
+See the [discussion of flow rate below](#impact-of-flow-rate-on-project-economics-section).
 
 ### LCOE
 
@@ -341,6 +348,8 @@ tax liability, and decreases the resulting LCOE.
 
 Users may wish to perform their own sensitivity analysis
 using [GEOPHIRES's Monte Carlo simulation module](Monte-Carlo-User-Guide.html) or other data analysis tools.
+
+<a id="impact-of-flow-rate-on-project-economics-section"></a>
 
 ### Impact of Flow Rate on Project Economics
 
