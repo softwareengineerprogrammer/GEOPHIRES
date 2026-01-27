@@ -439,6 +439,24 @@
       "minimum": null,
       "maximum": null
     },
+    "Reservoir Output Profile": {
+      "description": "Temperature profile data as a comma-separated list of values in Celsius. Example: 200,195,190,185 for a 4-point temperature decline profile. Values are interpolated over the time range determined by the number of profile data points and Reservoir Output Profile Time Step. If the profile is shorter than the plant lifetime, the temperature trend is extrapolated based on the last ~20% of the data, with the injection temperature used as a minimum. ",
+      "type": "array",
+      "units": "degC",
+      "category": "Reservoir",
+      "default": [],
+      "minimum": -Infinity,
+      "maximum": Infinity
+    },
+    "Reservoir Output Profile Time Step": {
+      "description": "Time interval between temperature values in the Reservoir Output Profile. For example, if set to 0.25, the profile values represent temperatures at 0, 0.25, 0.5, 0.75, 1.0 years, etc.",
+      "type": "number",
+      "units": "yr",
+      "category": "Reservoir",
+      "default": 1.0,
+      "minimum": 0.01,
+      "maximum": 100.0
+    },
     "Cylindrical Reservoir Input Depth": {
       "description": "Depth of the inflow end of a cylindrical reservoir",
       "type": "number",

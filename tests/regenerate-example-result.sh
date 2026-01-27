@@ -3,6 +3,7 @@
 set -e
 
 STASH_PWD=$(pwd)
+trap 'cd "$STASH_PWD"' EXIT
 
 cd "$(dirname "$0")"
 
@@ -27,6 +28,11 @@ then
         -e 's/500 MWe/100 MWe/' \
         -e 's/Phase II/Phase I/' \
         examples/Fervo_Project_Cape-5.txt > examples/Fervo_Project_Cape-6.txt
+fi
+
+if [[ $1 == "example5b" ]]
+then
+    python regenerate_example_input_reservoir_output_profile.py example5b src/geophires_x/Examples/ReservoirOutput.txt
 fi
 
 python -mgeophires_x examples/$1.txt examples/$1.out
@@ -61,6 +67,9 @@ then
     fi
 fi
 
-cd $STASH_PWD
+if [[ $1 == "example5" ]]
+then
+    ./regenerate-example-result.sh example5b
+fi
 
 echo "Regenerated example $1."

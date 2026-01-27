@@ -283,7 +283,7 @@ class ReservoirTestCase(BaseTestCase):
 
         with self.assertRaises(RuntimeError) as e:
             _get_result(_MAX_ALLOWED_FRACTURES, 59)
-        self.assertIn(f'({_MAX_ALLOWED_FRACTURES*59*2}) must not exceed {_MAX_ALLOWED_FRACTURES}', str(e.exception))
+        self.assertIn(f'({_MAX_ALLOWED_FRACTURES * 59 * 2}) must not exceed {_MAX_ALLOWED_FRACTURES}', str(e.exception))
 
     def test_user_provided_profile_file_not_found(self) -> None:
         non_existent_file_path: Path | None = None
@@ -303,3 +303,57 @@ class ReservoirTestCase(BaseTestCase):
 
         exception_message = str(re.exception)
         self.assertIn('GEOPHIRES could not read reservoir output file', exception_message)
+
+    def test_user_provided_profile_reservoir_output_profile(self) -> None:
+        def _del_metadata(r: GeophiresXResult) -> GeophiresXResult:
+            del r.result['metadata']
+            del r.result['Simulation Metadata']
+            return r
+
+        example_5_result = _del_metadata(GeophiresXResult(self._get_test_file_path('../examples/example5.out')))
+        example_5b_result = _del_metadata(GeophiresXResult(self._get_test_file_path('../examples/example5b.out')))
+
+        self.assertDictEqual(example_5_result.result, example_5b_result.result)
+        # Expected to match exactly because example5b's Reservoir Output Profile parameter value is synced from
+        # Examples/ReservoirOutput.txt when tests/regenerate-example-result.sh example5 is run.
+
+    def test_user_provided_profile_reservoir_output_profile_extrapolation(self) -> None:
+        def _del_metadata(r: GeophiresXResult) -> GeophiresXResult:
+            del r.result['metadata']
+            del r.result['Simulation Metadata']
+            return r
+
+        try:
+            with self.assertLogs(level='INFO') as logs:
+                _del_metadata(
+                    GeophiresXClient().get_geophires_result(
+                        GeophiresInputParameters(
+                            from_file_path=self._get_test_file_path('../examples/example5b.txt'),
+                            params={
+                                'Reservoir Output Profile': ','.join(
+                                    [str(it) for it in [30 * v for v in [*([10] * 7), 9, 8, 7]]]
+                                )
+                            },
+                        )
+                    )
+                )
+
+                self.assertHasLogRecordWithMessage(
+                    logs, 'Reservoir temperature extrapolation result', treat_substring_match_as_match=True
+                )
+
+                self.assertHasLogRecordWithMessage(
+                    logs,
+                    # TODO make this less hard-coded
+                    '[207.73, 177.48, 147.23, 116.97, 86.72, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, 80.0, '
+                    '80.0, 80.0]',
+                    treat_substring_match_as_match=True,
+                )
+        except AssertionError as ae:
+            self._handle_assert_logs_failure(ae)
