@@ -46,7 +46,7 @@ Key results include LCOE = {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} and IRR = {{ ir
         }
     </style>
     <div id="intro-result-images">
-        <a href="#production-temperature-profile"
+        <a href="#production-temperature-profile-section"
             title="Jump to the Production Temperature Profile section">
             <img src="_images/fervo_project_cape-5-power-production.png"
                 class="no-active"
@@ -119,14 +119,21 @@ values.
 Note that these are not the exhaustive sets of inputs and results, which are available in source code and
 the [web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5).
 
+See the [Calibration with Fervo-implemented Field Design section](#res-eng-params-calibration-section)
+for a detailed explanation of how key case study reservoir engineering input parameters were derived.
+
 ### Inputs
 
 See [Fervo_Project_Cape-5.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-5.txt)
 in source code for the full set of inputs.
 
+<a id="reservoir-parameters-section"></a>
+
 #### Reservoir Parameters
 
 {{ reservoir_parameters_table_md }}
+
+<a id="well-bores-parameters-section"></a>
 
 #### Well Bores Parameters
 
@@ -145,12 +152,54 @@ in source code for the full set of inputs.
 
 {{ economics_parameters_table_md }}
 
+<a id="res-eng-params-calibration-section"></a>
+
 ### Calibration with Fervo-implemented Field Design
 
 [Designing the Record-Breaking Enhanced Geothermal System at Project Cape](https://www.resfrac.com/wp-content/uploads/2025/06/Singh-2025-Fervo-Project-Cape.pdf) (Singh et al., 2025)
 describes reservoir modeling (ResFrac) that informed the Cape Station field implementation[^field-implementation-configuration-note].
 
 [^field-implementation-configuration-note]: Note on Configuration: While the specific Bearskin and Gold pads (Phase II) utilize an inverted 2:3 ratio (3 injectors for 2 producers), this case study assumes the 3:2 ratio identified in the paper's optimization studies ("Study 1") represents the standard repeating module for the full-scale 400+ MWe system. The higher injector count in Phase II is interpreted as a transient requirement for field delineation and initial pressure support (boundary conditions) rather than the long-term commercial standard.
+
+#### Bench Design and Well Spacing
+
+Figure 7 in Singh et al., 2025 (below) shows the well and bench spacing for the Cape Station field design.[^fig-7-note]
+Each bench consists of 5 wells, with 2 injectors and 3 producers.
+This ratio is encoded by the case study's `Number of Injection Wells per Production Well` parameter (see [Well Bores Parameters](#well-bores-parameters-section)).
+
+The Singh et al. paper models separate upper and lower benches.
+GEOPHIRES v3.11 does not support wells with different depths, so the case study's `Reservoir Depth` parameter is
+set to a value nominally representing an approximate average depth between the upper and lower benches.
+See the [Technical & Engineering Results section](#technical-and-engineering-results-section) for relevant temperature results.
+
+![Singh et al. (2025), Figure 7](_images/singh-et-al-2025_fig-7_well-and-bench-spacing.png)
+
+[^fig-7-note]: The original figure has been cropped and modified to display: "500 ft horizontal" instead of "700 ft horizontal" and "Inter-bench spacing: Vertical spacing between injectors: 700 ft"; per the Conclusions section of the paper: "Based on the results from the study and additional risk analysis, the 500 ft x 200 ft well spacing with a bench spacing of 700 ft was implemented in the field development." (p. 19).
+
+#### Fracture Geometry
+
+Figure 2 in Singh et al., 2025 (below) shows the ResFrac simulated fracture geometry. This figure, along with the bench design in Figure 7,
+informed the case study's `Fracture Shape`, `Fracture Width`, `Fracture Height`, and `Number of Fractures per Stimulated Well` parameters (see [Reservoir Parameters](#reservoir-parameters-section)).
+
+Note that the case study does not attempt to strictly replicate the paper's fracture geometry;
+rather, the paper specifications were used to derive approximations and/or constraints on parameters whose final values
+were ultimately refined based on holistic techno-economic considerations. For example, the intra-bench horizontal well spacing
+of 500 ft dictates that fracture half-lengths must be at least 500 ft in order to achieve flow between injectors and producers.
+Thus, a minimum fracture length of 1000 ft (305 m) is required (assuming that fractures propagate approximately symmetrically in the horizontal axis),
+reflected in the case study's `Fracture Width` parameter value.
+
+Similarly, the intra-bench vertical spacing of 200 ft (61 m) dictates that the fracture height must be at least 200 ft[^intra-bench-vertical-spacing-note].
+The case study's `Fracture Height` value was formulated by starting with 61 m and then iteratively uprating until a total effective fracture surface area per well was achieved
+that produces results consistent with the paper simulation and other reference values.
+The uprated value is also supported by Figure 2's fracture geometry visualization indicating fracture height exceeding intra-bench vertical spacing.
+
+[^intra-bench-vertical-spacing-note]: Note: unlike horizontal propagation, vertical fracture propagation is assumed to be asymmetrical in the upwards direction per "fracture propagation model with uniform frac gradient and no layering will tend to predict fracture growth directly upwards." (p. 3) and fracture geometry shown in Figures 1 and 2.
+
+
+![Singh et al. (2025), Figure 2](_images/singh-et-al-2025_fig-2_fracture-geometry.png)
+
+
+#### Simulation Comparison
 
 An equivalent GEOPHIRES simulation was run using the case study's reservoir engineering parameters, with the following modifications to align with Singh et al.'s modeling scenario:
 
@@ -174,7 +223,8 @@ Despite these structural differences, the comparison validates the basis for the
 
 The calibration simulation above represents a 15-year unmitigated thermal decline without redrilling.
 In the full case study results, the model includes redrilling events that restore production temperature when drawdown thresholds are reached,
-resulting in the cyclical profile shown in the [Production Temperature section](#production-temperature-profile) below.
+resulting in the cyclical profile shown in the [Production Temperature section](#production-temperature-profile-section) below.
+
 
 ## Results
 
@@ -220,6 +270,8 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 
 {{ opex_result_outputs_table_md }}
 
+<a id="technical-and-engineering-results-section"></a>
+
 ### Technical & Engineering Results
 
 {# @formatter:off #}
@@ -239,6 +291,8 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 | Number of times redrilling           | {{ number_of_times_redrilling }} | 2–5  | Redrilling expected to be required within 5–10 years of project start  |
 | Total wells drilled over project lifetime | {{ total_wells_including_redrilling }} | Permitted Limit: 320 | The BLM Environmental Assessment (DOI-BLM-UT-C010-2024-0018-EA) authorizes an estimated development of 320 production and injection wells (BLM, 2024). As modeled, the project remains within this regulatory envelope for the first three drilling campaigns (Initial, Year 8, and Year 16), reaching a cumulative total of approximately 282 wells. <br/><br/> The model exceeds the current authorization only during the final redrilling event in Year 24. It is a standard industry assumption that brownfield capacity maintenance activities (e.g. sidetracking existing wells on existing pads) occurring two decades into operations would be authorized through subsequent regulatory actions, such as a Determination of NEPA Adequacy (DNA) or a Categorical Exclusion, given the established baseline of environmental impact. |
 {# @formatter:on #}
+
+<a id="production-temperature-profile-section"></a>
 
 #### Production Temperature Profile
 
@@ -275,7 +329,7 @@ For example, scenarios for Bond Interest Rate have different weighted average co
 This is particularly relevant for technical parameters pertaining to reservoir engineering.
 In a real-world design, these variables are physically coupled; for instance, targeting a higher production flow rate
 would typically necessitate a larger fracture surface area to mitigate the resulting acceleration in thermal drawdown.
-See the [discussion of flow rate below](#impact-of-flow-rate-on-project-economics).
+See the [discussion of flow rate below](#impact-of-flow-rate-on-project-economics-section).
 
 ### LCOE
 
@@ -329,6 +383,8 @@ tax liability, and decreases the resulting LCOE.
 
 Users may wish to perform their own sensitivity analysis
 using [GEOPHIRES's Monte Carlo simulation module](Monte-Carlo-User-Guide.html) or other data analysis tools.
+
+<a id="impact-of-flow-rate-on-project-economics-section"></a>
 
 ### Impact of Flow Rate on Project Economics
 
