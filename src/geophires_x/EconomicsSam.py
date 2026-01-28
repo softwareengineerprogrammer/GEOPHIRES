@@ -289,7 +289,9 @@ class SamEconomicsCalculations:
 
         electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
         electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
-        electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
+        electricity_to_grid_backfilled = [
+            0 if it == '' else (int(it) if is_int(it) else it) for it in electricity_to_grid[1:]
+        ]
 
         electricity_to_grid_kwh_row_index = _get_row_index_after(
             electricity_to_grid_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
