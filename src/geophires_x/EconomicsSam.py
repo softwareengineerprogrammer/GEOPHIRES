@@ -62,6 +62,7 @@ _log = logging.getLogger(__name__)
 
 ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
 
+# TODO get rid of this (temporary flag for debugging during implementation)
 _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS: bool = False
 
 
@@ -411,6 +412,8 @@ class SamEconomicsCalculations:
                 ]
 
         backfill_lcoe_nominal()
+
+        # TODO LPPA
 
         return ret
 
