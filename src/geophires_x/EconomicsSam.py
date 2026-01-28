@@ -364,21 +364,21 @@ class SamEconomicsCalculations:
             )
 
         pv_of_annual_energy_row_name = 'Present value of annual energy nominal (kWh)'
-        pv_of_annual_energy_row_index = _get_row_index(pv_of_annual_energy_row_name)
         if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             pv_of_electricity_to_grid_backfilled_row_name = _get_backfilled_row_name(pv_of_annual_energy_row_name)
             ret.insert(
-                pv_of_annual_energy_row_index + 1,
+                _get_row_index(pv_of_annual_energy_row_name) + 1,
                 [
                     *[pv_of_electricity_to_grid_backfilled_row_name],
                     *pv_of_electricity_to_grid_backfilled,
                 ],
             )
         else:
-            ret[pv_of_annual_energy_row_index][1:] = [
-                pv_of_electricity_to_grid_backfilled[0],
-                *([''] * (self._pre_revenue_years_count - 1)),
-            ]
+            for pv_of_annual_energy_row_index in _get_row_indexes(pv_of_annual_energy_row_name):
+                ret[pv_of_annual_energy_row_index][1:] = [
+                    pv_of_electricity_to_grid_backfilled[0],
+                    *([''] * (self._pre_revenue_years_count - 1)),
+                ]
 
         def backfill_lcoe_nominal() -> None:
             # pv_of_annual_costs_backfilled_row = ret[_get_row_index(pv_of_annual_costs_backfilled_row_name)][1:]
