@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -57,6 +58,7 @@ from geophires_x.OptionList import EconomicModel, EndUseOptions
 from geophires_x.Parameter import Parameter, OutputParameter, floatParameter, listParameter
 from geophires_x.Units import convertible_unit, EnergyCostUnit, CurrencyUnit, Units
 
+_log = logging.getLogger(__name__)
 
 ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
 
@@ -219,8 +221,21 @@ class SamEconomicsCalculations:
 
         ret = cf_ret.copy()
 
-        def _get_row_index(row_name_: str) -> list[Any]:
-            return [it[0] for it in ret].index(row_name_)
+        __row_names: list[str] = [it[0] for it in ret]
+
+        def _get_row_index(row_name_: str) -> int:
+            # if __row_names.count(row_name_) > 1:
+            #     _log.debug(f'Duplicate row name {row_name_} found in cash flow table.')
+
+            return __row_names.index(row_name_)
+
+        def _get_row_indexes(row_name_: str) -> list[int]:
+            indexes = []
+            for idx, _row_name_ in enumerate(__row_names):
+                if _row_name_ == row_name_:
+                    indexes.append(idx)
+
+            return indexes
 
         # Backfill annual costs
         annual_costs_usd_row_name = 'Annual costs ($)'
@@ -240,22 +255,24 @@ class SamEconomicsCalculations:
                     *annual_costs_backfilled,
                 ],
             )
+        else:
+            ret[_get_row_index(annual_costs_usd_row_name)][1:] = annual_costs_backfilled
 
         electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
         electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
         electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
 
+        electricity_to_grid_kwh_row_index = _get_row_indexes(electricity_to_grid_kwh_row_name)[1]
         if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             ret.insert(
-                # _get_row_index(electricity_to_grid_kwh_row_name),  # there are multiple rows with this name
-                _get_row_index(annual_costs_usd_row_name) + 4,
+                electricity_to_grid_kwh_row_index,
                 [
                     *['Electricity to grid [backfilled] (kWh)'],
                     *electricity_to_grid_backfilled,
                 ],
             )
         else:
-            pass  # TODO: update existing row (requires finding the right row among duplicates)
+            ret[electricity_to_grid_kwh_row_index][1:] = electricity_to_grid_backfilled
 
         pv_of_annual_costs_backfilled_row_name = 'Present value of annual costs [backfilled] ($)'
 
