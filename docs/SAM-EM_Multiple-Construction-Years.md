@@ -80,9 +80,9 @@ as do other relevant case report metrics including `Project VIR=PI=PIR` and `Pro
 
 Line items in the `AFTER-TAX LCOE AND PPA PRICE` category are post-processed to yield timeline-adjusted LCOE and LPPA.
 
-.. FIXME WIP TODO screenshot
+![](_images/sam-em-mcy-after-tax-lcoe-and-ppa-price-cash-flow-screenshot.png)
 
-The result case report LCOE metric (`Electricity breakeven price`) reflects the post-processed value.
+The result case report LCOE metric (`Electricity breakeven price`) reflects the post-processed `LCOE Levelized cost of energy nominal (cents/kWh)` value.
 
 ---
 
