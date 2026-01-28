@@ -413,7 +413,24 @@ class SamEconomicsCalculations:
 
         backfill_lcoe_nominal()
 
-        # TODO LPPA
+        def backfill_lppa_metrics() -> None:
+            pv_of_ppa_revenue_row_index = _get_row_index_after(
+                'Present value of PPA revenue ($)', after_tax_lcoe_and_ppa_price_header_row_title
+            )
+            first_year_pv_of_ppa_revenue = round(
+                npf.npv(
+                    self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                    ret[ppa_revenue_row_index][1:],
+                )
+            )
+            ret[pv_of_ppa_revenue_row_index][1:] = [
+                first_year_pv_of_ppa_revenue,
+                *([None] * (self._pre_revenue_years_count - 1)),
+            ]
+
+            # TODO backfill 'LPPA Levelized PPA price nominal (cents/kWh)'
+
+        backfill_lppa_metrics()
 
         return ret
 
