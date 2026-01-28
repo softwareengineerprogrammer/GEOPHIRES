@@ -229,13 +229,22 @@ class SamEconomicsCalculations:
 
             return __row_names.index(row_name_)
 
-        def _get_row_indexes(row_name_: str) -> list[int]:
+        def _get_row_indexes(row_name_: str, after_row_name: str | None = None) -> list[int]:
+            after_criteria_met: bool = True if after_row_name is None else False
             indexes = []
             for idx, _row_name_ in enumerate(__row_names):
-                if _row_name_ == row_name_:
+                if _row_name_ == after_row_name:
+                    after_criteria_met = True
+
+                if _row_name_ == row_name_ and after_criteria_met:
                     indexes.append(idx)
 
             return indexes
+
+        def _get_row_index_after(row_name_: str, after_row_name: str) -> int:
+            return _get_row_indexes(row_name_, after_row_name=after_row_name)[0]
+
+        after_tax_lcoe_and_ppa_price_header_row_title = 'AFTER-TAX LCOE AND PPA PRICE'
 
         # Backfill annual costs
         annual_costs_usd_row_name = 'Annual costs ($)'
@@ -262,7 +271,9 @@ class SamEconomicsCalculations:
         electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
         electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
 
-        electricity_to_grid_kwh_row_index = _get_row_indexes(electricity_to_grid_kwh_row_name)[1]
+        electricity_to_grid_kwh_row_index = _get_row_index_after(
+            electricity_to_grid_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
+        )
         if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             ret.insert(
                 electricity_to_grid_kwh_row_index,
