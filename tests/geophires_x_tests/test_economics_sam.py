@@ -1116,6 +1116,23 @@ class EconomicsSamTestCase(BaseTestCase):
             sam_econ.sam_after_tax_net_cash_flow_all_years,
         )
 
+    def test_post_processed_levelized_metrics(self):
+        r: GeophiresXResult = GeophiresXResult(
+            self._get_test_file_path('../examples/example_SAM-single-owner-PPA-5.out')
+        )
+
+        def _row(row_name: str) -> list[float]:
+            return EconomicsSamTestCase._get_cash_flow_row(r.result['SAM CASH FLOW PROFILE'], row_name)
+
+        lcoe_row = _row('LCOE Levelized cost of energy nominal (cents/kWh)')
+        pv_annual_costs_row = _row('Present value of annual costs ($)')
+        pv_annual_energy_row = _row('Present value of annual energy nominal (kWh)')
+
+        for row in [lcoe_row, pv_annual_costs_row, pv_annual_energy_row]:
+            self.assertEqual(1, len(row))
+
+        self.assertEqual(lcoe_row[0], round(pv_annual_costs_row[0] * 100 / pv_annual_energy_row[0], 2))
+
     @staticmethod
     def _new_model(input_file: Path, additional_params: dict[str, Any] | None = None, read_and_calculate=True) -> Model:
         if additional_params is not None:
