@@ -60,7 +60,9 @@ ratio that is passed to SAM (`debt_percent`).
 ## Post-Processing (Timeline-adjusted Metrics)
 
 After SAM computes the operational cash flows, GEOPHIRES merges the construction phase and
-operational phase net cash flows together to report accurate project-level metrics including IRR and NPV.
+operational phase net cash flows together to report accurate project-level metrics.
+
+### IRR and NPV
 The merged `After-tax net cash flow ($)` row represents the complete project lifecycle:
 
 - Years -N to 0: Contains `After-tax net cash flow [construction] ($)` (equity outflows).
@@ -74,6 +76,13 @@ stream to account for the time value of money during the construction delay.
 The corresponding result case report metrics (`After-tax IRR` and `Project NPV`) reflect this adjustment,
 as do other relevant case report metrics including `Project VIR=PI=PIR` and `Project MOIC`.
 
+### After-tax LCOE and PPA Price
+
+Line items in the `AFTER-TAX LCOE AND PPA PRICE` category are post-processed to yield timeline-adjusted LCOE and LPPA.
+
+.. FIXME WIP TODO screenshot
+
+The result case report LCOE metric (`Electricity breakeven price`) reflects the post-processed value.
 
 ---
 
