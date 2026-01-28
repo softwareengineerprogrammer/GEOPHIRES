@@ -246,6 +246,10 @@ class SamEconomicsCalculations:
 
         after_tax_lcoe_and_ppa_price_header_row_title = 'AFTER-TAX LCOE AND PPA PRICE'
 
+        def _get_backfilled_row_name(native_row_name: str) -> str:
+            split = native_row_name.split(' (', maxsplit=1)
+            return f'{split[0]} [backfilled] ({split[1]}'
+
         # Backfill annual costs
         annual_costs_usd_row_name = 'Annual costs ($)'
         annual_costs = cf_ret[_get_row_index(annual_costs_usd_row_name)].copy()
@@ -260,7 +264,7 @@ class SamEconomicsCalculations:
             ret.insert(
                 _get_row_index(annual_costs_usd_row_name) + 1,
                 [
-                    *['Annual costs [backfilled] ($)'],
+                    *[_get_backfilled_row_name(annual_costs_usd_row_name)],
                     *annual_costs_backfilled,
                 ],
             )
@@ -293,14 +297,14 @@ class SamEconomicsCalculations:
             ret.insert(
                 electricity_to_grid_kwh_row_index,
                 [
-                    *['Electricity to grid [backfilled] (kWh)'],
+                    *[_get_backfilled_row_name(electricity_to_grid_kwh_row_name)],
                     *electricity_to_grid_backfilled,
                 ],
             )
         else:
             ret[electricity_to_grid_kwh_row_index][1:] = electricity_to_grid_backfilled
 
-        pv_of_annual_costs_backfilled_row_name = 'Present value of annual costs [backfilled] ($)'
+        pv_of_annual_costs_backfilled_row_name = _get_backfilled_row_name('Present value of annual costs ($)')
 
         # Backfill PV of annual costs
         annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
@@ -325,17 +329,22 @@ class SamEconomicsCalculations:
             *pv_of_annual_costs_backfilled,
         ]
 
-        pv_of_annual_costs_row_index = _get_row_index('Present value of annual costs ($)')
+        pv_of_annual_costs_row_name = 'Present value of annual costs ($)'
+        pv_of_annual_costs_row_index = _get_row_index(pv_of_annual_costs_row_name)
         if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             ret.insert(
                 pv_of_annual_costs_row_index + 1,
                 pv_of_annual_costs_backfilled_row,
             )
         else:
-            ret[pv_of_annual_costs_row_index][1:] = pv_of_annual_costs_backfilled
+            # ret[pv_of_annual_costs_row_index][1:] = pv_of_annual_costs_backfilled
+            ret[pv_of_annual_costs_row_index][1:] = [
+                pv_of_annual_costs_backfilled[0],
+                *([''] * (self._pre_revenue_years_count - 1)),
+            ]
 
         # Backfill PV of electricity to grid
-        pv_of_electricity_to_grid_backfilled_row_name = 'Present value of annual energy nominal [backfilled] (kWh)'
+        pv_of_electricity_to_grid_backfilled_row_name = _get_backfilled_row_name(pv_of_annual_costs_row_name)
 
         electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
         pv_of_electricity_to_grid_backfilled = []
@@ -383,12 +392,13 @@ class SamEconomicsCalculations:
                     / pv_of_electricity_to_grid_backfilled_row[_year]
                 )
 
-            lcoe_nominal_row_index = _get_row_index('LCOE Levelized cost of energy nominal (cents/kWh)')
+            lcoe_nominal_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
+            lcoe_nominal_row_index = _get_row_index(lcoe_nominal_row_name)
             if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
                 ret.insert(
                     lcoe_nominal_row_index + 1,
                     [
-                        *['LCOE Levelized cost of energy nominal [backfilled] (cents/kWh)'],
+                        *[_get_backfilled_row_name(lcoe_nominal_row_name)],
                         *lcoe_nominal_backfilled,
                     ],
                 )
