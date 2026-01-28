@@ -60,6 +60,8 @@ from geophires_x.Units import convertible_unit, EnergyCostUnit, CurrencyUnit, Un
 
 ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
 
+_INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS: bool = False
+
 
 @dataclass
 class SamEconomicsCalculations:
@@ -215,8 +217,6 @@ class SamEconomicsCalculations:
         FIXME WIP re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/444#issuecomment-3730443078
         """
 
-        insert_backfilled_rows: bool = False
-
         ret = cf_ret.copy()
 
         def _get_row_index(row_name_: str) -> list[Any]:
@@ -232,7 +232,7 @@ class SamEconomicsCalculations:
             *annual_costs[(self._pre_revenue_years_count + 1) :],
         ]
 
-        if insert_backfilled_rows:
+        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             ret.insert(
                 _get_row_index(annual_costs_usd_row_name) + 1,
                 [
@@ -245,7 +245,7 @@ class SamEconomicsCalculations:
         electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
         electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
 
-        if insert_backfilled_rows:
+        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             ret.insert(
                 # _get_row_index(electricity_to_grid_kwh_row_name),  # there are multiple rows with this name
                 _get_row_index(annual_costs_usd_row_name) + 4,
@@ -283,7 +283,7 @@ class SamEconomicsCalculations:
         ]
 
         pv_of_annual_costs_row_index = _get_row_index('Present value of annual costs ($)')
-        if insert_backfilled_rows:
+        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             ret.insert(
                 pv_of_annual_costs_row_index + 1,
                 pv_of_annual_costs_backfilled_row,
@@ -314,7 +314,7 @@ class SamEconomicsCalculations:
             )
 
         pv_of_annual_energy_row_index = _get_row_index('Present value of annual energy nominal (kWh)')
-        if insert_backfilled_rows:
+        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
             ret.insert(
                 pv_of_annual_energy_row_index + 1,
                 [
@@ -341,7 +341,7 @@ class SamEconomicsCalculations:
                 )
 
             lcoe_nominal_row_index = _get_row_index('LCOE Levelized cost of energy nominal (cents/kWh)')
-            if insert_backfilled_rows:
+            if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
                 ret.insert(
                     lcoe_nominal_row_index + 1,
                     [
@@ -494,7 +494,6 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
         model.economics.CCap.quantity().to(sam_economics.overnight_capital_cost.CurrentUnits.value).magnitude
     )
 
-    sam_economics.lcoe_nominal.value = sf(single_owner.Outputs.lcoe_nom)
     sam_economics.after_tax_irr.value = sf(_get_after_tax_irr_pct(single_owner, cash_flow_operational_years, model))
 
     sam_economics.project_npv.value = sf(_get_project_npv_musd(single_owner, cash_flow_operational_years, model))
@@ -525,6 +524,12 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
         _calculate_investment_tax_credit_value(sam_economics.sam_cash_flow_profile)
         .to(sam_economics.investment_tax_credit.CurrentUnits.value)
         .magnitude
+    )
+
+    # FIXME WIP
+    # Note that this calculation is order-dependent on sam_economics.nominal_discount_rate
+    sam_economics.lcoe_nominal.value = sf(
+        _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
 
     return sam_economics
@@ -580,6 +585,23 @@ def _get_project_npv_musd(single_owner: Singleowner, cash_flow: list[list[Any]],
         _calculate_nominal_discount_rate_and_wacc_pct(model, single_owner)[0] / 100.0, combined_cash_flow
     )
     return true_npv_usd * 1e-6  # Convert to M$
+
+
+# noinspection PyUnusedLocal
+def _get_lcoe_nominal_cents_per_kwh(
+    single_owner: Singleowner, sam_cash_flow_profile: list[list[Any]], model: Model
+) -> float:
+    lcoe_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
+
+    if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
+        split = lcoe_row_name.split(' (', maxsplit=1)
+        lcoe_row_name = f'{split[0]} [backfilled] ({split[1]}'
+
+    ret = _cash_flow_profile_row(sam_cash_flow_profile, lcoe_row_name)[1]
+
+    # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
+
+    return ret
 
 
 # noinspection PyUnusedLocal
