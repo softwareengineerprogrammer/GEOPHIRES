@@ -344,8 +344,6 @@ class SamEconomicsCalculations:
             ]
 
         # Backfill PV of electricity to grid
-        pv_of_electricity_to_grid_backfilled_row_name = _get_backfilled_row_name(pv_of_annual_costs_row_name)
-
         electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
         pv_of_electricity_to_grid_backfilled = []
         for year in range(self._pre_revenue_years_count):
@@ -365,8 +363,10 @@ class SamEconomicsCalculations:
                 electricity_to_grid_backfilled_pv_processed[0] + electricity_to_grid_at_year
             )
 
-        pv_of_annual_energy_row_index = _get_row_index('Present value of annual energy nominal (kWh)')
+        pv_of_annual_energy_row_name = 'Present value of annual energy nominal (kWh)'
+        pv_of_annual_energy_row_index = _get_row_index(pv_of_annual_energy_row_name)
         if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
+            pv_of_electricity_to_grid_backfilled_row_name = _get_backfilled_row_name(pv_of_annual_energy_row_name)
             ret.insert(
                 pv_of_annual_energy_row_index + 1,
                 [
