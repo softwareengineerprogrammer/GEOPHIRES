@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import math
 import os
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -280,8 +279,7 @@ class SamEconomicsCalculations:
         pv_of_annual_costs_backfilled = []
         for year in range(self._pre_revenue_years_count):
             pv_at_year = abs(
-                # Note we use floor instead of (arguably more correct) round(X,2) to match SAM convention
-                math.floor(
+                round(
                     npf.npv(
                         self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
                         annual_costs_backfilled_pv_processed,
@@ -360,9 +358,7 @@ class SamEconomicsCalculations:
             pv_of_ppa_revenue_row_index = _get_row_index_after(
                 'Present value of PPA revenue ($)', after_tax_lcoe_and_ppa_price_header_row_title
             )
-
-            # Note we use floor instead of (arguably more correct) round(X,2) to match SAM convention
-            first_year_pv_of_ppa_revenue_usd = math.floor(
+            first_year_pv_of_ppa_revenue_usd = round(
                 npf.npv(
                     self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
                     ret[ppa_revenue_row_index][1:],
