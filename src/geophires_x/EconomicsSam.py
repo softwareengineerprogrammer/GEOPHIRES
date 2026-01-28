@@ -267,6 +267,21 @@ class SamEconomicsCalculations:
         else:
             ret[_get_row_index(annual_costs_usd_row_name)][1:] = annual_costs_backfilled
 
+        ppa_revenue_row_name = 'PPA revenue ($)'
+        ppa_revenue_row_index = _get_row_index_after(
+            ppa_revenue_row_name, after_tax_lcoe_and_ppa_price_header_row_title
+        )
+        year_0_ppa_revenue: float = ret[ppa_revenue_row_index][self._pre_revenue_years_count]
+        if year_0_ppa_revenue != 0.0:
+            # Shouldn't happen
+            _log.warning(f'PPA revenue in Year 0 ({year_0_ppa_revenue}) is not zero, this is unexpected.')
+        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
+            pass
+        else:
+            ret[ppa_revenue_row_index][1 : self._pre_revenue_years_count] = [year_0_ppa_revenue] * (
+                self._pre_revenue_years_count - 1
+            )
+
         electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
         electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
         electricity_to_grid_backfilled = [0 if it == '' else it for it in electricity_to_grid[1:]]
