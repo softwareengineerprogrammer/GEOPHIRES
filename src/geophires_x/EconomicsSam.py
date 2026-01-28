@@ -62,9 +62,6 @@ _log = logging.getLogger(__name__)
 
 ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
 
-# TODO get rid of this (temporary flag for debugging during implementation)
-_INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS: bool = False
-
 
 @dataclass
 class SamEconomicsCalculations:
@@ -189,7 +186,6 @@ class SamEconomicsCalculations:
         if self._royalties_rate_schedule is not None:
             ret = self._insert_royalties_rate_schedule(ret)
 
-        # FIXME WIP
         ret = self._insert_calculated_levelized_metrics_line_items(ret)
 
         return ret
@@ -216,18 +212,11 @@ class SamEconomicsCalculations:
 
     # noinspection DuplicatedCode
     def _insert_calculated_levelized_metrics_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
-        """
-        FIXME WIP re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/444#issuecomment-3730443078
-        """
-
         ret = cf_ret.copy()
 
         __row_names: list[str] = [it[0] for it in ret]
 
         def _get_row_index(row_name_: str) -> int:
-            # if __row_names.count(row_name_) > 1:
-            #     _log.debug(f'Duplicate row name {row_name_} found in cash flow table.')
-
             return __row_names.index(row_name_)
 
         def _get_row_indexes(row_name_: str, after_row_name: str | None = None) -> list[int]:
@@ -247,10 +236,6 @@ class SamEconomicsCalculations:
 
         after_tax_lcoe_and_ppa_price_header_row_title = 'AFTER-TAX LCOE AND PPA PRICE'
 
-        def _get_backfilled_row_name(native_row_name: str) -> str:
-            split = native_row_name.split(' (', maxsplit=1)
-            return f'{split[0]} [backfilled] ({split[1]}'
-
         # Backfill annual costs
         annual_costs_usd_row_name = 'Annual costs ($)'
         annual_costs = cf_ret[_get_row_index(annual_costs_usd_row_name)].copy()
@@ -261,16 +246,7 @@ class SamEconomicsCalculations:
             *annual_costs[(self._pre_revenue_years_count + 1) :],
         ]
 
-        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
-            ret.insert(
-                _get_row_index(annual_costs_usd_row_name) + 1,
-                [
-                    *[_get_backfilled_row_name(annual_costs_usd_row_name)],
-                    *annual_costs_backfilled,
-                ],
-            )
-        else:
-            ret[_get_row_index(annual_costs_usd_row_name)][1:] = annual_costs_backfilled
+        ret[_get_row_index(annual_costs_usd_row_name)][1:] = annual_costs_backfilled
 
         ppa_revenue_row_name = 'PPA revenue ($)'
         ppa_revenue_row_index = _get_row_index_after(
@@ -280,12 +256,10 @@ class SamEconomicsCalculations:
         if year_0_ppa_revenue != 0.0:
             # Shouldn't happen
             _log.warning(f'PPA revenue in Year 0 ({year_0_ppa_revenue}) is not zero, this is unexpected.')
-        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
-            pass
-        else:
-            ret[ppa_revenue_row_index][1 : self._pre_revenue_years_count] = [year_0_ppa_revenue] * (
-                self._pre_revenue_years_count - 1
-            )
+
+        ret[ppa_revenue_row_index][1 : self._pre_revenue_years_count] = [year_0_ppa_revenue] * (
+            self._pre_revenue_years_count - 1
+        )
 
         electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
         electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
@@ -296,18 +270,9 @@ class SamEconomicsCalculations:
         electricity_to_grid_kwh_row_index = _get_row_index_after(
             electricity_to_grid_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
         )
-        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
-            ret.insert(
-                electricity_to_grid_kwh_row_index,
-                [
-                    *[_get_backfilled_row_name(electricity_to_grid_kwh_row_name)],
-                    *electricity_to_grid_backfilled,
-                ],
-            )
-        else:
-            ret[electricity_to_grid_kwh_row_index][1:] = electricity_to_grid_backfilled
+        ret[electricity_to_grid_kwh_row_index][1:] = electricity_to_grid_backfilled
 
-        pv_of_annual_costs_backfilled_row_name = _get_backfilled_row_name('Present value of annual costs ($)')
+        pv_of_annual_costs_backfilled_row_name = 'Present value of annual costs ($)'
 
         # Backfill PV of annual costs
         annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
@@ -334,16 +299,10 @@ class SamEconomicsCalculations:
 
         pv_of_annual_costs_row_name = 'Present value of annual costs ($)'
         pv_of_annual_costs_row_index = _get_row_index(pv_of_annual_costs_row_name)
-        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
-            ret.insert(
-                pv_of_annual_costs_row_index + 1,
-                pv_of_annual_costs_backfilled_row,
-            )
-        else:
-            ret[pv_of_annual_costs_row_index][1:] = [
-                pv_of_annual_costs_backfilled[0],
-                *([''] * (self._pre_revenue_years_count - 1)),
-            ]
+        ret[pv_of_annual_costs_row_index][1:] = [
+            pv_of_annual_costs_backfilled[0],
+            *([''] * (self._pre_revenue_years_count - 1)),
+        ]
 
         # Backfill PV of electricity to grid
         electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
@@ -366,24 +325,13 @@ class SamEconomicsCalculations:
             )
 
         pv_of_annual_energy_row_name = 'Present value of annual energy nominal (kWh)'
-        if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
-            pv_of_electricity_to_grid_backfilled_row_name = _get_backfilled_row_name(pv_of_annual_energy_row_name)
-            ret.insert(
-                _get_row_index(pv_of_annual_energy_row_name) + 1,
-                [
-                    *[pv_of_electricity_to_grid_backfilled_row_name],
-                    *pv_of_electricity_to_grid_backfilled_kwh,
-                ],
-            )
-        else:
-            for pv_of_annual_energy_row_index in _get_row_indexes(pv_of_annual_energy_row_name):
-                ret[pv_of_annual_energy_row_index][1:] = [
-                    pv_of_electricity_to_grid_backfilled_kwh[0],
-                    *([''] * (self._pre_revenue_years_count - 1)),
-                ]
+        for pv_of_annual_energy_row_index in _get_row_indexes(pv_of_annual_energy_row_name):
+            ret[pv_of_annual_energy_row_index][1:] = [
+                pv_of_electricity_to_grid_backfilled_kwh[0],
+                *([''] * (self._pre_revenue_years_count - 1)),
+            ]
 
         def backfill_lcoe_nominal() -> None:
-            # pv_of_annual_costs_backfilled_row = ret[_get_row_index(pv_of_annual_costs_backfilled_row_name)][1:]
             pv_of_electricity_to_grid_backfilled_row_kwh = pv_of_electricity_to_grid_backfilled_kwh
             pv_of_annual_costs_backfilled_row_values_usd = pv_of_annual_costs_backfilled_row[
                 1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
@@ -399,19 +347,10 @@ class SamEconomicsCalculations:
 
             lcoe_nominal_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
             lcoe_nominal_row_index = _get_row_index(lcoe_nominal_row_name)
-            if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
-                ret.insert(
-                    lcoe_nominal_row_index + 1,
-                    [
-                        *[_get_backfilled_row_name(lcoe_nominal_row_name)],
-                        *lcoe_nominal_backfilled,
-                    ],
-                )
-            else:
-                ret[lcoe_nominal_row_index][1:] = [
-                    round(lcoe_nominal_backfilled[0], 2),
-                    *([None] * (self._pre_revenue_years_count - 1)),
-                ]
+            ret[lcoe_nominal_row_index][1:] = [
+                round(lcoe_nominal_backfilled[0], 2),
+                *([None] * (self._pre_revenue_years_count - 1)),
+            ]
 
         backfill_lcoe_nominal()
 
@@ -430,17 +369,17 @@ class SamEconomicsCalculations:
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-            # TODO backfill 'LPPA Levelized PPA price nominal (cents/kWh)'
-            # FIXME WIP
             ppa_price_row_index = _get_row_index('PPA price (cents/kWh)')
             year_0_ppa_price: float = ret[ppa_price_row_index][self._pre_revenue_years_count]
             if year_0_ppa_price != 0.0:
                 # Shouldn't happen
                 _log.warning(f'PPA price in Year 0 ({year_0_ppa_price}) is not zero, this is unexpected.')
-            ppa_revenue_all_years = [
-                *([year_0_ppa_price] * (self._pre_revenue_years_count - 1)),
-                *ret[ppa_price_row_index][self._pre_revenue_years_count :],
-            ]
+
+            # TODO (maybe)
+            # ppa_revenue_all_years = [
+            #     *([year_0_ppa_price] * (self._pre_revenue_years_count - 1)),
+            #     *ret[ppa_price_row_index][self._pre_revenue_years_count :],
+            # ]
             # ret[_get_row_index('PPA price (cents/kWh)')][1:] = ppa_revenue_all_years
 
             # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
@@ -628,7 +567,6 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
         .magnitude
     )
 
-    # FIXME WIP
     # Note that this calculation is order-dependent on sam_economics.nominal_discount_rate
     sam_economics.lcoe_nominal.value = sf(
         _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
@@ -694,11 +632,6 @@ def _get_lcoe_nominal_cents_per_kwh(
     single_owner: Singleowner, sam_cash_flow_profile: list[list[Any]], model: Model
 ) -> float:
     lcoe_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
-
-    if _INSERT_BACKFILLED_ROWS_FOR_LEVELIZED_METRICS:
-        split = lcoe_row_name.split(' (', maxsplit=1)
-        lcoe_row_name = f'{split[0]} [backfilled] ({split[1]}'
-
     ret = _cash_flow_profile_row(sam_cash_flow_profile, lcoe_row_name)[0]
 
     # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
