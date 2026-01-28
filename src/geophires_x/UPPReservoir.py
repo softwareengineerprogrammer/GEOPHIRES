@@ -44,6 +44,8 @@ class UPPReservoir(Reservoir):
         self.reservoir_output_data = self.ParameterDict[self.reservoir_output_data.Name] = listParameter(
             reservoir_output_profile_param_name,
             DefaultValue=[],
+            Min=0,
+            Max=model.reserv.Tmax.Max,
             UnitType=Units.TEMPERATURE,
             CurrentUnits=TemperatureUnit.CELSIUS,
             PreferredUnits=TemperatureUnit.CELSIUS,
