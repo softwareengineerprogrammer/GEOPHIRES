@@ -17,6 +17,8 @@ drawdowns (funding early years purely with equity) and adjust `Inflation Rate Du
 
 ## Construction Cash Flows
 
+Multiple Construction Years example cash flow CSV: [example_SAM-single-owner-PPA-5.csv](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/example_SAM-single-owner-PPA-5.csv)
+
 The `CONSTRUCTION` cash flow category displays detailed financial movements during the pre-operational phase.
 Construction-specific line items are suffixed with `[construction]`.
 Construction years are indexed relative to the first year of operations (Year 1).
