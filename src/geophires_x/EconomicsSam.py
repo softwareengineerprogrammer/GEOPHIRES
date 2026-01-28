@@ -405,7 +405,10 @@ class SamEconomicsCalculations:
                     ],
                 )
             else:
-                ret[lcoe_nominal_row_index][1:] = lcoe_nominal_backfilled
+                ret[lcoe_nominal_row_index][1:] = [
+                    round(lcoe_nominal_backfilled[0], 2),
+                    *([None] * (self._pre_revenue_years_count - 1)),
+                ]
 
         backfill_lcoe_nominal()
 
@@ -652,7 +655,7 @@ def _get_lcoe_nominal_cents_per_kwh(
         split = lcoe_row_name.split(' (', maxsplit=1)
         lcoe_row_name = f'{split[0]} [backfilled] ({split[1]}'
 
-    ret = _cash_flow_profile_row(sam_cash_flow_profile, lcoe_row_name)[1]
+    ret = _cash_flow_profile_row(sam_cash_flow_profile, lcoe_row_name)[0]
 
     # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
 
