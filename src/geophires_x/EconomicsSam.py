@@ -337,7 +337,6 @@ class SamEconomicsCalculations:
                 pv_of_annual_costs_backfilled_row,
             )
         else:
-            # ret[pv_of_annual_costs_row_index][1:] = pv_of_annual_costs_backfilled
             ret[pv_of_annual_costs_row_index][1:] = [
                 pv_of_annual_costs_backfilled[0],
                 *([''] * (self._pre_revenue_years_count - 1)),
@@ -375,7 +374,10 @@ class SamEconomicsCalculations:
                 ],
             )
         else:
-            ret[pv_of_annual_energy_row_index][1:] = pv_of_electricity_to_grid_backfilled
+            ret[pv_of_annual_energy_row_index][1:] = [
+                pv_of_electricity_to_grid_backfilled[0],
+                *([''] * (self._pre_revenue_years_count - 1)),
+            ]
 
         def backfill_lcoe_nominal() -> None:
             # pv_of_annual_costs_backfilled_row = ret[_get_row_index(pv_of_annual_costs_backfilled_row_name)][1:]
