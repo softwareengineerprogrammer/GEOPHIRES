@@ -45,6 +45,12 @@ then
     python regenerate_example_result_csv.py example1_addons
 fi
 
+if [[ $1 == "example_SAM-single-owner-PPA-5" ]]
+then
+    echo "Regenerating example_SAM-single-owner-PPA-5 cash flow CSV..."
+    python regenerate_example_result_csv.py example_SAM-single-owner-PPA-5 --output-path examples --csv-type cash-flow
+fi
+
 if [[ $1 == "Fervo_Project_Cape-5" ]]
 then
     python ../src/geophires_docs/generate_fervo_project_cape_5_docs.py
