@@ -20,14 +20,10 @@ Bond Financing Start Year, -1
 
 Construction Years, 3
 
-# ATB advanced scenario
-# Construction CAPEX Schedule, 0.09,0.28,0.1,0.34,0.28
 
-# DOE scenario (alternative)
-# Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 # DOE-ATB hybrid scenario
-Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389
+Construction CAPEX Schedule, 0.075,0.525,0.4
 
 Investment Tax Credit Rate, 0.3, -- Geothermal Drilling and Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024).
 Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)

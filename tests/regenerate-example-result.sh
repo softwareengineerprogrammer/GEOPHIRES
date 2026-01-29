@@ -22,6 +22,11 @@ then
     echo "Syncing Fervo_Project_Cape-6.txt from Fervo_Project_Cape-5.txt..."
 
     sed -e 's/Construction Years,.*/Construction Years, 3/' \
+        -e 's/Construction CAPEX Schedule,.*/Construction CAPEX Schedule, 0.075,0.525,0.4/' \
+        -e '/^# Construction CAPEX Schedule/d' \
+        -e '/^# ATB advanced scenario/d' \
+        -e '/^# DOE scenario (alternative)/d' \
+        -e '/^# DOE-ATB hybrid scenario)/d' \
         -e 's/^Bond Financing Start Year.*/Bond Financing Start Year, -1/' \
         -e 's/^Number of Production Wells,.*/Number of Production Wells, 12/' \
         -e 's/^Production Flow Rate per Well.*/Production Flow Rate per Well, 100/' \
