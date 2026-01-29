@@ -192,10 +192,14 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example4.txt <tests/examples/example4.txt>`__
      - `.out <tests/examples/example4.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example4>`__
-   * - Example 5: User-Provided Reservoir Data
+   * - Example 5: User-Provided Reservoir Data (File Parameter)
      - `example5.txt <tests/examples/example5.txt>`__
      - `.out <tests/examples/example5.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example5>`__
+   * - Example 5b: User-Provided Reservoir Data (Profile Parameter)
+     - `example5b.txt <tests/examples/example5b.txt>`__
+     - `.out <tests/examples/example5b.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example5b>`__
    * - Example 6: TOUGH2 (Multiple Gradients)
      - `example6.txt <tests/examples/example6.txt>`__
      - `.out <tests/examples/example6.out>`__
