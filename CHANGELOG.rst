@@ -7,11 +7,7 @@ GEOPHIRES v3 (2023-2026)
 3.11
 ^^^^
 
-3.11.8: `User-Provided Reservoir Output File Fix, Reservoir Output Profile Parameter, and Redrilling Support <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/129>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.8>`__
-
-3.11.3: `SAM Economic Models ITC result output <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/124>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.3>`__
-
-3.11: `SAM Economic Models Project Payback Period fix <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/123>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.1>`__
+3.11: `Fervo_Project_Cape-5: Multi-Year Construction & Reservoir Engineering updates; SAM-EM Payback Period; SAM-EM ITC; User-Provided Reservoir Profile updates; SAM-EM MCY Levelized Metrics update <https://github.com/NatLabRockies/GEOPHIRES-X/pull/457>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.12>`__
 
 
 3.10
