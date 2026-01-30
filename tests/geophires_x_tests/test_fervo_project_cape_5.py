@@ -19,9 +19,6 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 
 
 class FervoProjectCape5TestCase(BaseTestCase):
-    """
-    FIXME WIP - see https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/117
-    """
 
     def test_internal_consistency(self):
 
@@ -108,7 +105,8 @@ class FervoProjectCape5TestCase(BaseTestCase):
 
     def test_fervo_project_cape_5_results_against_reference_values(self):
         """
-        Asserts that results conform to some of the key reference values claimed in docs/Fervo_Project_Cape-5.md.
+        Asserts that the results conform to some of the key reference values claimed in
+        docs/Fervo_Project_Cape-5.md{.jinja}.
         """
 
         r = GeophiresXClient().get_geophires_result(
@@ -157,12 +155,9 @@ class FervoProjectCape5TestCase(BaseTestCase):
         Useful for catching when minor updates are made to the case study which need to be manually synced to the
         documentation.
 
-        Note: for future case studies, generate the documentation Markdown from the input/result rather than writing
-        (partially) by hand so that they are guaranteed to be in sync and don't need to be tested like this,
-        which has proved messy.
-
-        Update 2026-01-13: Markdown is now partially generated from input and result in
-        src/geophires_docs/generate_fervo_project_cape_5_md.py.
+        Note that the relevant Markdown is largely generated from input and result in
+        src/geophires_docs/generate_fervo_project_cape_5_md.py, meaning this test is somewhat redundant,
+        but it still serves as a useful sanity check for the generated documentation.
         """
 
         def generate_documentation_markdown() -> None:
