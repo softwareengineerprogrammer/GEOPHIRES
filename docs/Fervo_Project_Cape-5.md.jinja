@@ -476,6 +476,28 @@ Key differences:
 
 {# TODO others e.g. Fervo_Project_Cape-3... #}
 
+## Discussion, Limitations, & Future Work
+
+While this case study establishes a validated baseline for Second-of-a-Kind (SOAK) EGS viability using standardized
+consensus data, users should interpret the economic results (LCOE, IRR, NPV, etc.) as a "plant-gate" feasibility
+capability rather than a fully burdened commercial pro-forma.
+Several financial, technical, and regulatory factors were not explicitly modeled and represent areas for future refinement.
+
+### Financial & Corporate Structure Limitations
+
+The current economic model (SAM Single Owner PPA) focuses on project-level cash flows but excludes several
+"soft cost" realities of non-recourse project financing.
+Including these would likely reduce the levered IRR by several percentage points:
+
+1. Working Capital & Reserves: The cash flow analysis assumes immediate liquidity. It does not model Debt Service Reserve Accounts (DSRA) or Major Maintenance Reserve Accounts (MMRA), which typically require "locking up" 6 months of debt service or significant cash balances, creating a cash drag on equity returns.
+1. Transaction & Closing Fees: The Total CAPEX includes interest during construction but does not explicitly budget for debt closing or bank fees. In large-scale energy infrastructure, these transaction costs may range from 1–3% of the total debt volume, representing a sunk cost at Financial Close (FID) that is not reflected here. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/451) to view the relevant tracking issue on GitHub.
+1. Insurance Premiums: The model does not include specific line items for Construction All-Risk (CAR) or Operation All-Risk (OAR) insurance. For EGS projects involving deep subsurface risks, insurance premiums could represent an additional annual operating expense not captured in the standard "percentage of CAPEX" OPEX methodology.
+
+### Technical & Operational Considerations
+
+1. Grid Interconnection & Transmission: For a 500 MWe project, interconnection costs (substation upgrades, gen-tie lines) can be substantial. Unless the site is adjacent to high-capacity transmission with available queue space, interconnection costs could add materially to the project budget.
+1. Seasonal and Hourly Performance Granularity: As noted in the Surface Plant Parameters, this study uses a fixed annual average ambient temperature. It does not model the seasonal or hourly impacts on air-cooled condenser efficiency. In reality, power output would likely dip during peak summer hours and increase during winter. Future versions of GEOPHIRES may add support for these considerations; [click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/395) to view the relevant tracking issue on GitHub.
+
 ---
 
 ## References
