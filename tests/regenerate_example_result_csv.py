@@ -38,12 +38,16 @@ if __name__ == '__main__':
     example_name = args.example_name
     example_relative_path = f'{"examples/" if example_name.startswith("example") else ""}{example_name}.out'
 
-    output_path = _get_file_path(Path(args.output_path, f'{example_name}.csv'))
+    is_cash_flow: bool = args.csv_type == 'cash-flow'
+
+    file_name = f'{example_name}{"_cash-flow" if is_cash_flow else ""}.csv'
+
+    output_path = _get_file_path(Path(args.output_path, file_name))
     with open(output_path, 'w', encoding='utf-8') as csvfile:
         geophires_result: GeophiresXResult = GeophiresXResult(_get_file_path(example_relative_path))
         if args.csv_type == 'result':
             csv_content = geophires_result.as_csv()
-        elif args.csv_type == 'cash-flow':
+        elif is_cash_flow:
             # TODO port to GeophiresXResult convenience method
             sam_cash_flow_profile: list[list[Any]] = geophires_result.result['SAM CASH FLOW PROFILE']
             f = StringIO()
