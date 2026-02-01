@@ -3,7 +3,7 @@
 [Multiple Construction Years example web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
 
 GEOPHIRES SAM Economic Models support multi-year construction timelines to deliver accurate, time-adjusted financial
-metrics, including IRR and NPV, for projects with extended development periods.
+metrics, including LCOE, IRR and NPV for projects with extended development periods.
 This feature models the pre-revenue phase to capture the real-world economic impact of Interest During Construction (IDC), inflation, and capital deployment timing.
 This ensures that key investment decision metrics correctly reflect the time value of money leading up to the Commercial
 Operation Date (COD).
