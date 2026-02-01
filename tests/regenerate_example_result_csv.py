@@ -8,8 +8,8 @@ from typing import Any
 from geophires_x_client import GeophiresXResult
 
 
-def _get_file_path(file_name: str) -> str:
-    return os.path.join(os.path.abspath(os.path.dirname(__file__)), str(file_name))
+def _get_file_path(file_name_: str) -> str:
+    return os.path.join(os.path.abspath(os.path.dirname(__file__)), str(file_name_))
 
 
 if __name__ == '__main__':
