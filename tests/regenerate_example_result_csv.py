@@ -52,8 +52,14 @@ if __name__ == '__main__':
             sam_cash_flow_profile: list[list[Any]] = geophires_result.result['SAM CASH FLOW PROFILE']
             f = StringIO()
             w = csv.writer(f)
+
+            # Find the maximum row length (number of columns)
+            max_cols = max(len(row) for row in sam_cash_flow_profile)
+
             for row in sam_cash_flow_profile:
-                w.writerow(row)
+                # Pad rows with empty strings to ensure all rows have the same number of columns
+                padded_row = row + [''] * (max_cols - len(row))
+                w.writerow(padded_row)
 
             csv_content = f.getvalue()
 
