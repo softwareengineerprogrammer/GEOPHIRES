@@ -26,6 +26,7 @@ A project with seven construction years, as in the example below, will start in 
 
 ![](_images/sam-em-mcy-construction-cash-flow-category.png)
 
+
 ## Construction Years Calculations
 
 For each construction year, the `CONSTRUCTION` cash flow is calculated as follows:
@@ -59,7 +60,11 @@ ratio that is passed to SAM (`debt_percent`).
 ## Post-Processing (Timeline-adjusted Metrics)
 
 After SAM computes the operational cash flows, GEOPHIRES merges the construction phase and
-operational phase net cash flows together to report accurate project-level metrics.
+operational phase net cash flows. It then post-processes applicable line items to calculate timeline-adjusted project-level metrics, as described below.
+
+Standard SAM line items that are not subject to post-processing, such as `Cash flow from investing activities ($)`
+and `Total pre-tax returns ($)`, reflect the capitalized equivalent basis at Year 0, displaying no values during the
+pre-revenue construction period.
 
 ### IRR and NPV
 The merged `After-tax net cash flow ($)` row represents the complete project lifecycle:
