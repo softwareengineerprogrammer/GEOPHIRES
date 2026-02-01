@@ -63,7 +63,7 @@ SAM Economic Models account for the timing of capital deployment (Construction C
 During Construction (IDC)
 based on the value of `Construction Years` parameter.
 The simulation calculates a capitalized cost at the Commercial Operation Date (COD; Year 1), ensuring that the final
-depreciation basis, debt sizing, and resulting metrics (IRR, NPV) correctly reflect the time value of money during
+depreciation basis, debt sizing, and resulting metrics (LCOE, IRR, NPV) correctly reflect the time value of money during
 construction.
 
 See [SAM Economic Models: Multiple Construction Years documentation](SAM-EM_Multiple-Construction-Years.html).
