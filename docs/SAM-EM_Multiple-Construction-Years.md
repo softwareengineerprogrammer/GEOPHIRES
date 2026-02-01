@@ -4,8 +4,7 @@
 
 GEOPHIRES SAM Economic Models support multi-year construction timelines to deliver accurate, time-adjusted financial
 metrics, including IRR and NPV, for projects with extended development periods.
-This feature models the pre-revenue phase to capture the real-world economic impact of Interest During Construction (
-IDC), inflation, and capital deployment timing.
+This feature models the pre-revenue phase to capture the real-world economic impact of Interest During Construction (IDC), inflation, and capital deployment timing.
 This ensures that key investment decision metrics correctly reflect the time value of money leading up to the Commercial
 Operation Date (COD).
 
