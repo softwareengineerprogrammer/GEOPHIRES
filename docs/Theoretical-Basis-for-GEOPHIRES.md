@@ -94,9 +94,9 @@ The sixth model—the _TOUGH2 Geothermal Reservoir Simulator_—is for nonisothe
 The reservoir pressure drop is calculated by specifying an overall reservoir impedance, or productivity and injectivity index. When specifying a productivity and injectivity index, a reservoir hydrostatic pressure is either provided by the user or calculated using the built-in modified Xie–Bloomfield–Shook equation (DOE 2016[^8]). The reservoir pressure drop is combined with the wellbore pressure drop to estimate the pumping power, as discussed in “[Wellbore model](#wellbore-model)” section. While currently not implemented in GEOPHIRES, a third option to account for the reservoir pressure drop would be to directly import the pressure data from a TOUGH2 simulation.
 
 For information on the other three reservoir models, see the documentation for the relevant module below:
-* [SUTRA](https://nrel.github.io/GEOPHIRES-X/reference/geophires_x.html#module-geophires_x.SUTRAReservoir)
-* [SBT](https://nrel.github.io/GEOPHIRES-X/reference/geophires_x.html#module-geophires_x.SBTReservoir)
-* [Cylindrical](https://nrel.github.io/GEOPHIRES-X/reference/geophires_x.html#module-geophires_x.CylindricalReservoir)
+* [SUTRA](https://softwareengineerprogrammer.github.io/GEOPHIRES/reference/geophires_x.html#module-geophires_x.SUTRAReservoir)
+* [SBT](https://softwareengineerprogrammer.github.io/GEOPHIRES/reference/geophires_x.html#module-geophires_x.SBTReservoir)
+* [Cylindrical](https://softwareengineerprogrammer.github.io/GEOPHIRES/reference/geophires_x.html#module-geophires_x.CylindricalReservoir)
 
 ### Wellbore model
 
@@ -202,8 +202,8 @@ with _d_ as the real discount rate (−), LT as the plant lifetime (years), and 
 The BICYCLE Levelized Life Cycle Cost model was developed at Los Alamos National Laboratory (Hardie 1981[^24]) and is the most detailed built-in levelized cost model in GEOPHIRES. It allows for accounting for variable debt/equity return rates, various tax rates (i.e., income, revenue, and property), and an investment tax credit (a tax credit as a percentage of the capital cost that is deducted from the income tax liability in the first year). All BICYCLE model equations implemented in GEOPHIRES were presented by Beckers (2016<a href="#fn-4">[4]</a>). The built-in version of the BICYCLE model requires as input the inflation rate and nominal discount rates (on equity and debt), and returns as output the real levelized cost in 2017 constant dollars. The BICYCLE model assumes linear depreciation of the invested capital over the plant lifetime with no salvage value.
 
 For information on the other two models, see the documentation for the relevant module below:
-* [CLGS](https://nrel.github.io/GEOPHIRES-X/reference/geophires_x.html#module-geophires_x.AGSEconomics)
-* [SAM Single-owner PPA](https://nrel.github.io/GEOPHIRES-X/SAM-Economic-Models.html)
+* [CLGS](https://softwareengineerprogrammer.github.io/GEOPHIRES/reference/geophires_x.html#module-geophires_x.AGSEconomics)
+* [SAM Single-owner PPA](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html)
 
 All built-in cost correlations were either developed for 2017 constant dollars ($2017) or indexed from a previous year to $2017; therefore, the levelized cost results have the year 2017 as base year. Unlike for example GETEM, no cost index curves (e.g., for labor, wells, pumps, etc.) have been built-into convert the results into a different year. However, the user can either manually enter costs for a different year or implement their cost index correlations directly into the GEOPHIRES code.
 

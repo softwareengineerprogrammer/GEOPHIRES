@@ -56,7 +56,7 @@ setup(
     project_urls={
         'Changelog': 'https://github.com/NREL/GEOPHIRES-X/blob/master/CHANGELOG.rst',
         'Issue Tracker': 'https://github.com/NREL/GEOPHIRES-X/issues',
-        'Documentation': 'https://nrel.github.io/GEOPHIRES-X/',
+        'Documentation': 'https://softwareengineerprogrammer.github.io/GEOPHIRES/',
     },
     keywords=['geothermal'],
     python_requires='>=3.8',
