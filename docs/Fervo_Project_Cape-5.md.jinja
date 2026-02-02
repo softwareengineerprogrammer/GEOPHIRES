@@ -478,10 +478,10 @@ Key differences:
 
 ## Discussion, Limitations, & Future Work
 
-While this case study establishes a validated baseline for Second-of-a-Kind (SOAK) EGS viability using standardized
-consensus data, users should interpret the economic results (LCOE, IRR, NPV, etc.) as an assessment of intrinsic project
+While this case study establishes a validated economic baseline for Second-of-a-Kind (SOAK) EGS using standardized
+consensus data, users should interpret results (LCOE, IRR, NPV, etc.) as an assessment of intrinsic project
 viability rather than a fully burdened commercial pro-forma.
-Several financial, technical, and regulatory factors were not explicitly modeled and represent areas for future refinement.
+Several financial, technical, and operational factors were not explicitly modeled and represent areas for future refinement.
 
 Users may wish to explicitly encode these cost factors in their own models by using applicable adjustment parameters.
 For OPEX, such parameters may include `Wellfield O&M Cost Adjustment Factor`,
@@ -490,9 +490,9 @@ For OPEX, such parameters may include `Wellfield O&M Cost Adjustment Factor`,
 
 ### Financial Considerations
 
-The case study economic results focus on project-level cash flows but do not explicitly include several overhead costs
+The case study economic results focus on project-level cash flows but do not explicitly itemize several overhead costs
 and administrative realities often associated with commercial project financing.
-Including these may reduce the levered IRR by several percentage points.
+Including these may reduce the levered IRR.
 
 1. Transaction & Closing Fees: The Total CAPEX includes interest during construction but does not explicitly budget for debt closing or bank fees. In large-scale energy infrastructure, these transaction costs may constitute a small percent of total debt volume. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/451) to view the relevant GEOPHIRES tracking issue on GitHub.
 1. Reserve Accounts: The cash flow analysis assumes immediate liquidity. It does not model working capital, debt service, or reserve accounts, or major equipment replacement reserve accounts. Project financial partners may require that the project owner(s) establish and fund reserve accounts. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/460) to view the relevant GEOPHIRES tracking issue on GitHub.
@@ -502,6 +502,8 @@ Including these may reduce the levered IRR by several percentage points.
 
 1. Grid Interconnection & Transmission: For a 500 MWe project, interconnection costs (substation upgrades, gen-tie lines) can be substantial. Unless the site is adjacent to high-capacity transmission with available queue space, interconnection costs could add materially to the project budget.
 1. Seasonal and Hourly Performance Granularity: As noted in the Surface Plant Parameters, this study uses a fixed annual average ambient temperature. It does not model the seasonal or hourly impacts on air-cooled condenser efficiency. In reality, power output would likely dip during peak summer hours and increase during winter. Future versions of GEOPHIRES may add support for these considerations; [click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/395) to view the relevant GEOPHIRES tracking issue on GitHub.
+1. Redrilling Assumptions: Management of thermal decline is modeled as periodic redrilling events that reset the reservoir's heat content to initial conditions at intervals determined by the `Maximum Drawdown` parameter. The cost of these events is amortized into a uniform annual operating expense. In reality, these events may be scheduled as discrete capital-intensive campaigns punctuated by years of lower spending, or as a continuous program of make-up well drilling to mitigate decline. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/381) to view the relevant GEOPHIRES tracking issue on GitHub.
+1. Reservoir Modeling Fidelity: The base case utilizes an analytical model (Gringarten) which assumes uniform flow across idealized fractures. While this approach is computationally efficient for economic scoping, it cannot fully capture complex behaviors like flow channeling (short-circuiting) or fracture heterogeneity. Future work should prioritize integration with physics-based numerical simulators (e.g. TOUGH or ResFrac) to better bound these risks. This case study includes an initial step in this direction via the "ResFrac Profile" variant, which calibrates the production curve to the specific heterogeneous flow behaviors observed in the Singh et al. (2025) study.
 
 ---
 
