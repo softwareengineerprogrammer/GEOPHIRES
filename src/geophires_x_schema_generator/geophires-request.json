@@ -1639,7 +1639,7 @@
       "maximum": 10
     },
     "Total Capital Cost": {
-      "description": "Total initial capital cost.",
+      "description": "Total initial capital cost. For SAM Economic Models, this is treated as the Overnight Capital Cost.",
       "type": "number",
       "units": "MUSD",
       "category": "Economics",
