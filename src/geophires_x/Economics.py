@@ -920,7 +920,8 @@ class Economics:
             Valid=False,
             ErrMessage="calculate total capital cost using user-provided costs or" +
                        " built-in correlations for each category.",
-            ToolTipText="Total initial capital cost."
+            ToolTipText=f'Total initial capital cost. For SAM Economic Models, '
+                        f'this is treated as the {overnight_capital_cost_output_parameter().Name}.'
         )
         self.oamtotalfixed = self.ParameterDict[self.oamtotalfixed.Name] = floatParameter(
             "Total O&M Cost",
