@@ -108,8 +108,8 @@ Injection Well Diameter, 8.535, -- See Production Well Diameter
 
 Production Wellhead Pressure, 303 psi, -- Modeled at a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
 
-Injectivity Index, 1.809, -- Based on ATB Conservative Scenario (NREL, 2025) derated by 40% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
-Productivity Index, 1.4964, -- See Injectivity Index
+Injectivity Index, 1.29, -- Based on ATB Conservative Scenario (NREL, 2025) derated by (FIXME WIP)% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
+Productivity Index, 1.02, -- See Injectivity Index
 
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
 Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023). Note: GEOPHIRES enforces a thermodynamic optimum that overrides higher values, such as Fervo's considered operational target of 80°C (intended for silica scaling mitigation), resulting in a "maximum theoretical power" scenario. Support for higher reinjection temperatures may be added in future GEOPHIRES versions.
