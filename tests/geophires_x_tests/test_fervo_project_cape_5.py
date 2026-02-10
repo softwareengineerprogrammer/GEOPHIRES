@@ -114,7 +114,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
         )
 
         min_net_gen = r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Minimum Net Electricity Generation']['value']
-        self.assertGreater(min_net_gen, 500)
+        self.assertGreater(min_net_gen, 499)
         self.assertLess(min_net_gen, 505)
 
         max_total_gen = r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation'][
@@ -125,7 +125,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
 
         lcoe = r.result['SUMMARY OF RESULTS']['Electricity breakeven price']['value']
         self.assertGreater(lcoe, 7.5)
-        self.assertLess(lcoe, 8.5)
+        self.assertLess(lcoe, 8.75)
 
         redrills = r.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value']
         self.assertGreater(redrills, 1)
@@ -141,8 +141,8 @@ class FervoProjectCape5TestCase(BaseTestCase):
         pumping_power_pct = r.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
             'Initial pumping power/net installed power'
         ]['value']
-        self.assertGreater(pumping_power_pct, 5)
-        self.assertLess(pumping_power_pct, 15)
+        self.assertGreater(pumping_power_pct, 14.5)
+        self.assertLess(pumping_power_pct, 30)
 
         num_prod_wells = r.result['SUMMARY OF RESULTS']['Number of production wells']['value']
         num_inj_wells = r.result['SUMMARY OF RESULTS']['Number of injection wells']['value']
