@@ -108,7 +108,7 @@ Injection Well Diameter, 8.535, -- See Production Well Diameter
 
 Production Wellhead Pressure, 303 psi, -- Modeled at a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
 
-Injectivity Index, 1.38, -- Based on ATB Conservative Scenario (NREL, 2025) derated by (FIXME WIP)% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
+Injectivity Index, 1.38, -- Based on ATB Conservative Scenario (NREL, 2025) derated to align with expected parasitic loads of 15–20% and per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
 Productivity Index, 1.13, -- See Injectivity Index
 
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
