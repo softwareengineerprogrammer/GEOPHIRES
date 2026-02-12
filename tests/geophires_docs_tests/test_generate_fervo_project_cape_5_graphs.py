@@ -11,12 +11,16 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 class FervoProjectCape5GraphsTestCase(BaseTestCase):
 
     def test_get_redrilling_event_indexes(self) -> None:
-        input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-            from_file_path=self._get_test_file_path('../examples/Fervo_Project_Cape-5.txt')
-        )
-        r: GeophiresXResult = GeophiresXClient().get_geophires_result(input_params)
+        for example_id in [
+            'Fervo_Project_Cape-5',
+            # 'Fervo_Project_Cape-6'  # TODO (requires tuning)
+        ]:
+            input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+                from_file_path=self._get_test_file_path(f'../examples/{example_id}.txt')
+            )
+            r: GeophiresXResult = GeophiresXClient().get_geophires_result(input_params)
 
-        redrilling_indexes = _get_redrilling_event_indexes((input_params, r))
-        self.assertEqual(
-            r.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value'], len(redrilling_indexes)
-        )
+            redrilling_indexes = _get_redrilling_event_indexes((input_params, r))
+            self.assertEqual(
+                r.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value'], len(redrilling_indexes)
+            )
