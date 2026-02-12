@@ -81,7 +81,7 @@ Fracture Separation, 9.8255, -- Based on 30 foot cluster spacing (Singh et al., 
 
 Fracture Shape, 4, -- Bench design and fracture geometry in Singh et al., 2025 are given in rectangular dimensions.
 Fracture Width, 305, -- Matches intra-bench well spacing of 500 ft (corresponding to fracture length of 1000 ft) (Singh. et al., 2025)
-Fracture Height, 95, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
+Fracture Height, 100, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
 
 Water Loss Fraction, 0.01, -- "Long-term modeling, calibrated to early field data, predicts circulation recapture rates exceeding 99%" ([Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/); Fervo Energy, 2025). Modeling in Singh et al., 2025 predicts fluid loss of 0.36% to 0.49%.
 Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs. Development near/on land with active/shut-in oil and gas wells could potentially utilize waste water to recover losses and offset costs.
@@ -100,7 +100,7 @@ Number of Injection Wells per Production Well, 0.666, -- Modeled on the referenc
 Nonvertical Length per Multilateral Section, 5000 feet, -- Target lateral length given in environmental assessment (BLM, 2024). Note that lateral length is assumed to be an upper bound constraining the number of fractures per well for a given cluster spacing.
 Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost.
 
-Production Flow Rate per Well, 103, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec that gradually decrease over time (Singh et al., 2025). The case study flow rate is chosen both as a conservative target for long-term sustainability and to achieve a more economically favorable drawdown and redrilling schedule.
+Production Flow Rate per Well, 107, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec that gradually decrease over time (Singh et al., 2025). The case study flow rate is chosen both as a conservative target for long-term sustainability and to achieve a more economically favorable drawdown and redrilling schedule.
 # The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
 
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
@@ -108,8 +108,8 @@ Injection Well Diameter, 8.535, -- See Production Well Diameter
 
 Production Wellhead Pressure, 303 psi, -- Modeled at a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
 
-Injectivity Index, 1.809, -- Based on ATB Conservative Scenario (NREL, 2025) derated by 40% per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
-Productivity Index, 1.4964, -- See Injectivity Index
+Injectivity Index, 1.38, -- Based on ATB Conservative Scenario (NREL, 2025) derated to align with expected parasitic loads of 15–20% and per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024).
+Productivity Index, 1.13, -- See Injectivity Index
 
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
 Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023). Note: GEOPHIRES enforces a thermodynamic optimum that overrides higher values, such as Fervo's considered operational target of 80°C (intended for silica scaling mitigation), resulting in a "maximum theoretical power" scenario. Support for higher reinjection temperatures may be added in future GEOPHIRES versions.

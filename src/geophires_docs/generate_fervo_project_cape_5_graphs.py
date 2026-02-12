@@ -78,7 +78,7 @@ def _get_redrilling_event_indexes(
 
     redrilling_positions = []
 
-    step_size = 6
+    step_size = 4
     for i in range(ceil(time_steps_per_year * 0.25), len(temperatures_celsius) - (step_size - 1), step_size):
         temp_increase = temperatures_celsius[i] - temperatures_celsius[i - step_size]
         if temp_increase >= threshold_degc:
