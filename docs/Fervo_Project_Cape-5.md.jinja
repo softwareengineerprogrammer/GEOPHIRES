@@ -328,7 +328,7 @@ See [GEOPHIRES output parameters documentation](parameters.html#economic-paramet
 
 #### Production Temperature Profile
 
-<img src="_images/fervo_project_cape-5-production-temperature.png" class="no-active" style="max-width: 66%" />
+<img src="_images/fervo_project_cape-5-production-temperature.png" class="no-active" style="max-width: 66%;" />
 
 The production temperature profile exhibits distinctive cyclical behavior driven by the interaction between wellbore physics and reservoir thermal evolution:
 
@@ -338,7 +338,7 @@ The production temperature profile exhibits distinctive cyclical behavior driven
 
 #### Power Generation Profile
 
-<img src="_images/fervo_project_cape-5-power-production.png" class="no-active" style="max-width: 66%" />
+<img src="_images/fervo_project_cape-5-power-production.png" class="no-active" style="max-width: 66%;" />
 
 Power generation is a direct function of production temperature, so the power production profile mirrors the thermal behavior described above. The graph shows both total (gross) electricity generation and net electricity generation after parasitic losses. The gap between the two curves represents the energy consumed by the circulation pumps.
 
@@ -430,7 +430,21 @@ Higher flow rate per production well does not necessarily result in improved pro
 Higher flow rates result in increased generation in the short term, but also cause faster thermal decline.
 Additional make-up wells may need to be drilled to compensate for increased thermal decline and maintain a minimum net generation (redrilling),
 the cost of which may offset incremental revenue from increased generation.
-This tradeoff was considered in reservoir modeling that guided Fervo's field implementation (Singh et al., 2025).
+This trade-off was considered in reservoir modeling that guided Fervo's field implementation (Singh et al., 2025).
+
+The parametric analysis below visualizes the trade-off within the context of the case study GEOPHIRES scenario,
+revealing a sawtooth-shaped profile in the economic metrics (LCOE, IRR, NPV) despite the approximately linear increase in electricity production.
+This pattern emerges because GEOPHIRES models capacity maintenance as discrete step functions
+(shown in the Number of times redrilling chart) where exceeding the `Maximum Drawdown` threshold forces an entire new
+redrilling campaign.
+While real-world operators would likely mitigate these sharp transitions through continuous make-up drilling,
+dynamic flow rate modulation, or other adaptive reservoir management strategies,
+the model highlights a fundamental reality: the economic optimum is not necessarily the maximum achievable flow rate.
+Instead, it is the rate that effectively balances immediate generation gains against the potential step-wise increase
+in operational costs required to offset thermal decline.
+See [Redrilling Assumptions](#technical-operational-considerations) below for further discussion.
+
+<img src="_images/fervo_project_cape-5-sensitivity-analysis-flow-rate.png" class="no-active" style="max-width: 60%;" alt="Flow rate sensitivity analysis graphs" />
 
 ## Variants
 
