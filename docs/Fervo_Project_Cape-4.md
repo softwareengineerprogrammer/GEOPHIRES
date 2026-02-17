@@ -1,8 +1,8 @@
-# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
+# \[Deprecated\] Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station (2025)
 
 .. raw:: html
 
-    <p style="font-style: italic;">ℹ️ <a href="Fervo_Project_Cape-5.html">Click here</a> to view an updated preview version of the case study (<tt>Fervo_Project_Cape-5</tt>).</p>
+    <p style="font-style: italic; font-weight: bold;">⚠️️ This is a deprecated version of the case study. <a href="Fervo_Project_Cape-5.html">Click here</a> to view an updated version (<tt>Fervo_Project_Cape-5</tt>).</p>
 
 ---
 
