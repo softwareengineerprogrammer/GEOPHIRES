@@ -7,7 +7,9 @@ GEOPHIRES v3 (2023-2026)
 3.11
 ^^^^
 
-3.11: `Fervo_Project_Cape-5: Multi-Year Construction & Reservoir Engineering updates; SAM-EM Payback Period; SAM-EM ITC; User-Provided Reservoir Profile updates; SAM-EM MCY Levelized Metrics update <https://github.com/NatLabRockies/GEOPHIRES-X/pull/457>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.12>`__
+3.11.13: `[Public Release] Fervo_Project_Cape-5: 500 MW EGS Modeled on Fervo Cape Station (2026 Update) <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/135>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.13>`__
+
+3.11: `[Preview] Fervo_Project_Cape-5: Multi-Year Construction & Reservoir Engineering; SAM-EM Payback Period; SAM-EM ITC; User-Provided Reservoir Profile updates; SAM-EM MCY Levelized Metrics update <https://github.com/NatLabRockies/GEOPHIRES-X/pull/457>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.12>`__
 
 
 3.10
