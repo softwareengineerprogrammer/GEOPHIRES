@@ -1036,6 +1036,10 @@ def _ppa_pricing_model(
 
 
 def _get_royalty_rate_schedule(model: Model) -> list[float]:
+    """
+    Delegates to the Economics instance which now supports the DSL-based
+    royalty_rate_schedule parameter with automatic fallback.
+    """
     return model.economics.get_royalty_rate_schedule(model)
 
 

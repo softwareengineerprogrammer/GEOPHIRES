@@ -330,31 +330,133 @@ class EconomicsAddOns(Economics.Economics):
 
         is_sam_em = model.economics.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA
 
-        # sum all the AddOn values together, so we can treat all AddOns together. If an AddOn slot is not used,
-        # it has zeros for the values, so this won't create problems
-        if len(self.AddOnCAPEX.value) > 0:
-            self.AddOnCAPEXTotal.value = np.sum(self.AddOnCAPEX.value)
-        if len(self.AddOnOPEXPerYear.value) > 0:
-            self.AddOnOPEXTotalPerYear.value = np.sum(self.AddOnOPEXPerYear.value)
-        if len(self.AddOnElecGainedPerYear.value) > 0:
-            self.AddOnElecGainedTotalPerYear.value = np.sum(self.AddOnElecGainedPerYear.value)
-        if len(self.AddOnHeatGainedPerYear.value) > 0:
-            self.AddOnHeatGainedTotalPerYear.value = np.sum(self.AddOnHeatGainedPerYear.value)
-        if len(self.AddOnProfitGainedPerYear.value) > 0:
-            self.AddOnProfitGainedTotalPerYear.value = np.sum(self.AddOnProfitGainedPerYear.value)
+        construction_years: int = model.surfaceplant.construction_years.value
+        plant_lifetime: int = model.surfaceplant.plant_lifetime.value
+        total_years: int = construction_years + plant_lifetime
+
+        # Determine the number of add-ons from the longest value list
+        num_addons = max(
+            len(self.AddOnCAPEX.value),
+            len(self.AddOnOPEXPerYear.value),
+            len(self.AddOnElecGainedPerYear.value),
+            len(self.AddOnHeatGainedPerYear.value),
+            len(self.AddOnProfitGainedPerYear.value),
+            1,
+        ) if any(len(lst.value) > 0 for lst in [
+            self.AddOnCAPEX, self.AddOnOPEXPerYear, self.AddOnElecGainedPerYear,
+            self.AddOnHeatGainedPerYear, self.AddOnProfitGainedPerYear,
+        ]) else 0
+
+        # Ensure boolean lists are padded with defaults (False) to match num_addons
+        while len(self.AddOnAppliesDuringConstruction.value) < num_addons:
+            self.AddOnAppliesDuringConstruction.value.append(False)
+        while len(self.AddOnGoesToRoyaltyHolder.value) < num_addons:
+            self.AddOnGoesToRoyaltyHolder.value.append(False)
+
+        def _expand_addon_schedule(
+            raw_values: list, addon_index: int, applies_during_construction: bool
+        ) -> list[float]:
+            """Expand a single add-on's value into a full time-series array."""
+            if addon_index >= len(raw_values) or raw_values[addon_index] in (None, ''):
+                return [0.0] * total_years
+
+            raw_val = raw_values[addon_index]
+            schedule_str = str(raw_val).strip()
+
+            # Check if value contains DSL syntax (has '*' or ',')
+            if '*' in schedule_str or ',' in schedule_str:
+                segments = [s.strip() for s in schedule_str.split(',')]
+                if applies_during_construction:
+                    expanded = expand_schedule(segments, total_years)
+                else:
+                    expanded = expand_schedule(segments, plant_lifetime)
+                    expanded = [0.0] * construction_years + expanded
+                return expanded
+
+            # Legacy scalar path: single numeric value broadcast uniformly
+            scalar = float(schedule_str)
+            if applies_during_construction:
+                return [scalar] * total_years
+            else:
+                return [0.0] * construction_years + [scalar] * plant_lifetime
+
+        # Build per-addon time-series and aggregate
+        agg_capex = np.zeros(total_years)
+        agg_opex = np.zeros(total_years)
+        agg_profit = np.zeros(total_years)
+        agg_elec = np.zeros(total_years)
+        agg_heat = np.zeros(total_years)
+        agg_royalty_holder_cf = np.zeros(total_years)
+
+        for i in range(num_addons):
+            applies_during_construction = self.AddOnAppliesDuringConstruction.value[i]
+            goes_to_royalty_holder = self.AddOnGoesToRoyaltyHolder.value[i]
+
+            capex_ts = np.array(
+                _expand_addon_schedule(self.AddOnCAPEX.value, i, applies_during_construction)
+            )
+            opex_ts = np.array(
+                _expand_addon_schedule(self.AddOnOPEXPerYear.value, i, applies_during_construction)
+            )
+            profit_ts = np.array(
+                _expand_addon_schedule(self.AddOnProfitGainedPerYear.value, i, applies_during_construction)
+            )
+            elec_ts = np.array(
+                _expand_addon_schedule(self.AddOnElecGainedPerYear.value, i, applies_during_construction)
+            )
+            heat_ts = np.array(
+                _expand_addon_schedule(self.AddOnHeatGainedPerYear.value, i, applies_during_construction)
+            )
+
+            agg_capex += capex_ts
+            agg_opex += opex_ts
+            agg_profit += profit_ts
+            agg_elec += elec_ts
+            agg_heat += heat_ts
+
+            if goes_to_royalty_holder:
+                addon_cf = profit_ts - opex_ts
+                agg_royalty_holder_cf += addon_cf
+
+        # Store per-year arrays for downstream consumers (SAM integration, etc.)
+        self._addon_capex_timeseries = agg_capex.tolist()
+        self._addon_opex_timeseries = agg_opex.tolist()
+        self._addon_profit_timeseries = agg_profit.tolist()
+        self._addon_elec_timeseries = agg_elec.tolist()
+        self._addon_heat_timeseries = agg_heat.tolist()
+        self._royalty_holder_cash_flow = agg_royalty_holder_cf.tolist()
+
+        # Compute aggregate totals (backward-compatible scalar summaries)
+        self.AddOnCAPEXTotal.value = float(np.sum(agg_capex))
+        # Operational-year totals only (construction years excluded for OPEX/energy/profit)
+        self.AddOnOPEXTotalPerYear.value = float(
+            np.mean(agg_opex[construction_years:]) if plant_lifetime > 0 else 0.0
+        )
+        self.AddOnElecGainedTotalPerYear.value = float(
+            np.mean(agg_elec[construction_years:]) if plant_lifetime > 0 else 0.0
+        )
+        self.AddOnHeatGainedTotalPerYear.value = float(
+            np.mean(agg_heat[construction_years:]) if plant_lifetime > 0 else 0.0
+        )
+        self.AddOnProfitGainedTotalPerYear.value = float(
+            np.mean(agg_profit[construction_years:]) if plant_lifetime > 0 else 0.0
+        )
 
         # The amount of electricity and/or heat have for the project already been calculated in SurfacePlant,
         # so we need to update them here so when they get used in the final economic calculation (below),
         # the new values reflect the addition of the AddOns
-        for i in range(0, model.surfaceplant.plant_lifetime.value):
+        for i in range(0, plant_lifetime):
+            ts_idx = construction_years + i
+            addon_elec_this_year = float(agg_elec[ts_idx]) if ts_idx < total_years else 0.0
+            addon_heat_this_year = float(agg_heat[ts_idx]) if ts_idx < total_years else 0.0
             if model.surfaceplant.enduse_option.value is not EndUseOptions.HEAT:  # all these end-use options have an electricity generation component
-                model.surfaceplant.TotalkWhProduced.value[i] = model.surfaceplant.TotalkWhProduced.value[i] + self.AddOnElecGainedTotalPerYear.value
-                model.surfaceplant.NetkWhProduced.value[i] = model.surfaceplant.NetkWhProduced.value[i] + self.AddOnElecGainedTotalPerYear.value
+                model.surfaceplant.TotalkWhProduced.value[i] = model.surfaceplant.TotalkWhProduced.value[i] + addon_elec_this_year
+                model.surfaceplant.NetkWhProduced.value[i] = model.surfaceplant.NetkWhProduced.value[i] + addon_elec_this_year
                 if model.surfaceplant.enduse_option.value is not EndUseOptions.ELECTRICITY:
-                    model.surfaceplant.HeatkWhProduced.value[i] = model.surfaceplant.HeatkWhProduced.value[i] + self.AddOnHeatGainedTotalPerYear.value
+                    model.surfaceplant.HeatkWhProduced.value[i] = model.surfaceplant.HeatkWhProduced.value[i] + addon_heat_this_year
             else:
                 # all the end-use option of direct-use only components have a heat generation component
-                model.surfaceplant.HeatkWhProduced.value[i] = model.surfaceplant.HeatkWhProduced.value[i] + self.AddOnHeatGainedTotalPerYear.value
+                model.surfaceplant.HeatkWhProduced.value[i] = model.surfaceplant.HeatkWhProduced.value[i] + addon_heat_this_year
 
         # Calculate the adjusted OPEX and CAPEX
         self.AdjustedProjectCAPEX.value = model.economics.CCap.value + self.AddOnCAPEXTotal.value
@@ -365,38 +467,42 @@ class EconomicsAddOns(Economics.Economics):
             model.economics.CCap.value = self.AdjustedProjectCAPEX.value
             model.economics.Coam.value = self.AdjustedProjectOPEX.value
 
-        AddOnCapCostPerYear = self.AddOnCAPEXTotal.value / model.surfaceplant.construction_years.value
-        ProjectCapCostPerYear = self.AdjustedProjectCAPEX.value / model.surfaceplant.construction_years.value
+        AddOnCapCostPerYear = self.AddOnCAPEXTotal.value / construction_years
+        ProjectCapCostPerYear = self.AdjustedProjectCAPEX.value / construction_years
 
         # (re)Calculate the revenues
-        self.AddOnElecRevenue.value = [0.0] * model.surfaceplant.plant_lifetime.value
-        self.AddOnHeatRevenue.value = [0.0] * model.surfaceplant.plant_lifetime.value
-        self.AddOnRevenue.value = [0.0] * model.surfaceplant.plant_lifetime.value
-        self.AddOnCashFlow.value = [0.0] * model.surfaceplant.plant_lifetime.value
-        self.ProjectCashFlow.value = [0.0] * model.surfaceplant.plant_lifetime.value
-        for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
+        self.AddOnElecRevenue.value = [0.0] * plant_lifetime
+        self.AddOnHeatRevenue.value = [0.0] * plant_lifetime
+        self.AddOnRevenue.value = [0.0] * plant_lifetime
+        self.AddOnCashFlow.value = [0.0] * plant_lifetime
+        self.ProjectCashFlow.value = [0.0] * plant_lifetime
+        for i in range(0, plant_lifetime, 1):
+            ts_idx = construction_years + i
+            addon_opex_this_year = float(agg_opex[ts_idx]) if ts_idx < total_years else self.AddOnOPEXTotalPerYear.value
+            addon_profit_this_year = float(agg_profit[ts_idx]) if ts_idx < total_years else self.AddOnProfitGainedTotalPerYear.value
+
             ProjectElectricalEnergy = 0.0
             ProjectHeatEnergy = 0.0
             AddOnElectricalEnergy = 0.0
             AddOnHeatEnergy = 0.0
             if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:  # This option has no heat component
                 ProjectElectricalEnergy = model.surfaceplant.NetkWhProduced.value[i]
-                AddOnElectricalEnergy = self.AddOnElecGainedTotalPerYear.value
+                AddOnElectricalEnergy = float(agg_elec[ts_idx]) if ts_idx < total_years else self.AddOnElecGainedTotalPerYear.value
             elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:  # has heat component but no electricity
                 ProjectHeatEnergy = model.surfaceplant.HeatkWhProduced.value[i]
-                AddOnHeatEnergy = self.AddOnHeatGainedTotalPerYear.value
+                AddOnHeatEnergy = float(agg_heat[ts_idx]) if ts_idx < total_years else self.AddOnHeatGainedTotalPerYear.value
             else:  # everything else has a component of both
                 ProjectElectricalEnergy = model.surfaceplant.NetkWhProduced.value[i]
                 ProjectHeatEnergy = model.surfaceplant.HeatkWhProduced.value[i]
-                AddOnElectricalEnergy = self.AddOnElecGainedTotalPerYear.value
-                AddOnHeatEnergy = self.AddOnHeatGainedTotalPerYear.value
+                AddOnElectricalEnergy = float(agg_elec[ts_idx]) if ts_idx < total_years else self.AddOnElecGainedTotalPerYear.value
+                AddOnHeatEnergy = float(agg_heat[ts_idx]) if ts_idx < total_years else self.AddOnHeatGainedTotalPerYear.value
 
             self.AddOnElecRevenue.value[i] = (AddOnElectricalEnergy * model.economics.ElecPrice.value[
                 i]) / 1_000_000.0  # Electricity revenue in MUSD
             self.AddOnHeatRevenue.value[i] = (AddOnHeatEnergy * model.economics.HeatPrice.value[
                 i]) / 1_000_000.0  # Heat revenue in MUSD
             self.AddOnRevenue.value[i] = self.AddOnElecRevenue.value[i] + self.AddOnHeatRevenue.value[
-                i] + self.AddOnProfitGainedTotalPerYear.value - self.AddOnOPEXTotalPerYear.value
+                i] + addon_profit_this_year - addon_opex_this_year
             self.AddOnCashFlow.value[i] = self.AddOnRevenue.value[i]
             self.ProjectCashFlow.value[i] = self.AddOnRevenue.value[i] + (((ProjectElectricalEnergy *
                                             model.economics.ElecPrice.value[i]) + (ProjectHeatEnergy *
@@ -404,7 +510,7 @@ class EconomicsAddOns(Economics.Economics):
 
         # now insert the cost of construction into the front of the array that will be used to calculate
         # NPV = the convention is that the upfront CAPEX is negative
-        for i in range(0, model.surfaceplant.construction_years.value, 1):
+        for i in range(0, construction_years, 1):
             self.AddOnCashFlow.value.insert(0, -1.0 * AddOnCapCostPerYear)
             self.ProjectCashFlow.value.insert(0, -1.0 * ProjectCapCostPerYear)
 
@@ -447,7 +553,7 @@ class EconomicsAddOns(Economics.Economics):
         # Calculate MOIC which depends on CumCashFlow
         self.ProjectMOIC.value = self.ProjectCummCashFlow.value[len(self.ProjectCummCashFlow.value) - 1] / (
                 self.AdjustedProjectCAPEX.value + (
-                    self.AdjustedProjectOPEX.value * model.surfaceplant.plant_lifetime.value))
+                    self.AdjustedProjectOPEX.value * plant_lifetime))
 
         if not is_sam_em:
             # recalculate LCOE/LCOH
