@@ -15,7 +15,7 @@ from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter,
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
-    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter
+    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
@@ -1032,9 +1032,15 @@ class Economics:
                         f"{' Defaults to 100% (no effective cap).' if maximum_royalty_rate_default_val == 1.0 else ''}"
         )
 
-        # TODO support custom royalty rate schedule as a list parameter
-        #  (as an alternative to specifying rate/escalation/max)
-
+        self.royalty_rate_schedule = self.ParameterDict[self.royalty_rate_schedule.Name] = listParameter(
+            'Royalty Rate Schedule',
+            UnitType=Units.NONE,
+            ToolTipText='A schedule DSL string defining the royalty rate for each year of the project. '
+                        'Syntax: "<rate> * <years>, <rate> * <years>, ..., <terminal_rate>". '
+                        'For example "0.0175 * 10, 0.035" means 1.75%% for 10 years then 3.5%% thereafter. '
+                        'If provided, this overrides Royalty Rate, Royalty Rate Escalation, '
+                        'and Royalty Rate Maximum.'
+        )
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(
             'Royalty Holder Discount Rate',
             DefaultValue=0.05,
@@ -2613,6 +2619,11 @@ class Economics:
                                                      " range 0-10. GEOPHIRES will assume default surface plant O&M cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
+                    elif key.startswith('Royalty Rate Schedule'):
+                        # TODO/WIP - may not be necessary
+                        val = str(model.InputParameters[key].sValue)
+                        self.royalty_rate_schedule.value.append(val)
+                        self.royalty_rate_schedule.Provided = True
 
             if self.HeatStartPrice.value > self.HeatEndPrice.value:
                 s = f'{self.HeatStartPrice.Name} ({self.HeatStartPrice.quantity()}) cannot be ' \
@@ -3390,29 +3401,33 @@ class Economics:
 
     def get_royalty_rate_schedule(self, model: Model) -> list[float]:
         """
-        Builds a year-by-year schedule of royalty rates based on escalation and cap.
+        Build the royalty rate schedule for each operational year.
 
-        :type model: :class:`~geophires_x.Model.Model`
-        :return: schedule: A list of rates as fractions (e.g., 0.05 for 5%).
+        If ``royalty_rate_schedule`` was provided via the DSL, it is expanded using
+        :func:`expand_schedule` and takes precedence.  Otherwise the legacy
+        ``royalty_rate`` + ``royalty_escalation_rate`` + ``maximum_royalty_rate`` logic
+        is used.
+
+        :returns: A list of royalty rates (fractional, e.g. 0.035 for 3.5%) with
+            one entry per operational year (length == ``plant_lifetime``).
         """
+        plant_lifetime: int = model.surfaceplant.plant_lifetime.value
 
-        def r(x: float) -> float:
-            """Ignore apparent float precision issue"""
-            _precision = 8
-            return round(x, _precision)
+        if self.royalty_rate_schedule.Provided and self.royalty_rate_schedule.value:
+            return expand_schedule(self.royalty_rate_schedule.value, plant_lifetime)
 
-        plant_lifetime = model.surfaceplant.plant_lifetime.value
+        base_rate: float = self.royalty_rate.value
+        escalation_rate: float = self.royalty_escalation_rate.value
+        escalation_start: int = self.royalty_escalation_rate_start_year.value
+        max_rate: float = self.maximum_royalty_rate.value
 
-        escalation_rate = r(self.royalty_escalation_rate.value)
-        max_rate = r(self.maximum_royalty_rate.value)
-
-        schedule = []
-        current_rate = r(self.royalty_rate.value)
-        for year_index in range(plant_lifetime):
-            current_rate = r(current_rate)
-            schedule.append(min(current_rate, max_rate))
-            if year_index >= (model.economics.royalty_escalation_rate_start_year.value - 2):
-                current_rate += escalation_rate
+        schedule: list[float] = [0.0] * plant_lifetime
+        current_rate = base_rate
+        for i in range(plant_lifetime):
+            year_number = i + 1
+            if year_number >= escalation_start:
+                current_rate = min(current_rate + escalation_rate, max_rate)
+            schedule[i] = current_rate
 
         return schedule
 
