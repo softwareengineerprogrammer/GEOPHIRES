@@ -142,7 +142,7 @@ class EconomicsTestCase(BaseTestCase):
                 ImmutableGeophiresInputParameters(
                     from_file_path=self._get_test_file_path('../examples/example1_addons.txt'),
                     params={
-                        'AddOn OPEX Applies During Construction': '1',  # FIXME WIP support 'True'/True
+                        'AddOn OPEX Applies During Construction': 'true',
                     },
                 )
             )

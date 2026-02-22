@@ -266,7 +266,8 @@ class EconomicsAddOns(Economics.Economics):
             if key.startswith("AddOn CAPEX"):
                 val = float(model.InputParameters[key].sValue)
                 self.AddOnCAPEX.value.append(val)  # this assumes they put the values in the file in consecutive fashion
-            if key.startswith("AddOn OPEX"):
+            if key.startswith("AddOn OPEX") and not key.startswith((
+                    self.AddOnOPEXAppliesDuringConstruction.Name, self.AddOnOPEXGoesToRoyaltyHolder.Name)):
                 val = float(model.InputParameters[key].sValue)
                 self.AddOnOPEXPerYear.value.append(val)  # this assumes they put the values in the file in consecutive fashion
 
@@ -306,10 +307,10 @@ class EconomicsAddOns(Economics.Economics):
                     addon_number_tag = f'#{i + 1}'
                     nickname = addon_number_tag
                     if i < len(self.AddOnNickname.value):
-                        nickname = f'{self.AddOnNickname.value[i]} ({addon_number_tag})'
+                        nickname = f'"{self.AddOnNickname.value[i]}" ({addon_number_tag})'
 
                     raise NotImplementedError(
-                        f'AddOn "{nickname}" has {sam_em_only_param.Name} = True, '
+                        f'AddOn {nickname} has {sam_em_only_param.Name} = True, '
                         f'but this feature is only supported with the '
                         f'SAM Single Owner PPA economic model. '
                         f'(Provided Economic Model = {EconomicModel.SAM_SINGLE_OWNER_PPA.int_value}).'

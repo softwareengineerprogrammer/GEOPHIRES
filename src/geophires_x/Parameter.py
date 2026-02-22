@@ -432,7 +432,7 @@ def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None
     model.logger.info(f'Complete {str(__name__)}: {sys._getframe().f_code.co_name}')
 
 
-def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None:
+def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify: listParameter, model) -> None:
     """
     :type ParamToModify: :class:`~geophires_x.Parameter.Parameter`
     :type model: :class:`~geophires_x.Model.Model`
@@ -462,21 +462,41 @@ def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify, model) 
 
     ParamToModify.Provided = True
 
+    # TODO make this a property of listParameter
+    is_boolean_type = (ParamToModify.DefaultValue is not None and
+        (isinstance(ParamToModify.DefaultValue, Iterable) and
+        len(ParamToModify.DefaultValue) > 0 and
+        isinstance(ParamToModify.DefaultValue[0], bool))
+        or (isinstance(ParamToModify.DefaultValue, bool)))
+
+
+    def _is_bool_val(_val: Any) -> bool:
+        return isinstance(_val, bool) or (str(_val).strip().lower() in ['true', 'false', '1', '0', 'yes', 'no'])
+
     valid = True
     for i in range(len(ParamToModify.value)):
         New_val = ParamToModify.value[i]
+        if is_boolean_type:
+            if _is_bool_val(New_val):
+                continue
+            msg = f'Value given ({str(New_val)}) for {ParamToModify.Name} is not boolean.'
+            valid = False
+
         if isinstance(New_val, str):
             if '*' in New_val:
                 New_val = New_val.split('*')[0]
             New_val = float(New_val.strip())
+
         if (New_val < float(ParamToModify.Min)) or (New_val > float(ParamToModify.Max)):
             msg = (
                 f'Value given ({str(New_val)}) for {ParamToModify.Name} outside of valid range '
                 f'({ParamToModify.Min}–{ParamToModify.Max}).'
             )
+            valid = False
+
+        if not valid:
             print(f'Warning: {msg}')
             model.logger.warning(msg)
-            valid = False
 
     ParamToModify.Valid = valid
 
