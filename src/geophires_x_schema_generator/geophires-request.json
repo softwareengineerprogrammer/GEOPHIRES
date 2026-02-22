@@ -1962,7 +1962,7 @@
       ]
     },
     "Do AddOn Calculations": {
-      "description": "Set to true if you want the add-on economics calculations to be made",
+      "description": "By default, add-on calculations are automatically enabled if add-ons parameters are provided. Set this value to false to disable add-on economics calculations. (If, for example, you wish to quickly compare between economics with and without add-ons.)",
       "type": "boolean",
       "units": null,
       "category": "Economics",

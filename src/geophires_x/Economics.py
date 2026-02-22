@@ -1271,8 +1271,9 @@ class Economics:
             DefaultValue=False,
             UnitType=Units.NONE,
             Required=False,
-            ErrMessage="assume default: no economics calculations",
-            ToolTipText="Set to true if you want the add-on economics calculations to be made"
+            ToolTipText="By default, add-on calculations are automatically enabled if add-ons parameters are provided. "
+                        "Set this value to false to disable add-on economics calculations. "
+                        "(If, for example, you wish to quickly compare between economics with and without add-ons.)"
         )
         self.DoCarbonCalculations = self.ParameterDict[self.DoCarbonCalculations.Name] = boolParameter(
             "Do Carbon Price Calculations",
