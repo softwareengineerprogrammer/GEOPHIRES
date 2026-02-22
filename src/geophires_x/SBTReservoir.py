@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import numpy as np
 import pandas as pd
-from scipy.special import erf, erfc, jv, yv, exp1
+from scipy.special import erf, erfc, jv, yv, exp1, expi
 from scipy.interpolate import interp1d
 from scipy.integrate import trapezoid
 import scipy.io as sio
@@ -42,10 +42,205 @@ def interpolator(time_value: float, times: np.ndarray, values: np.ndarray) -> fl
             return values[i - 1] + ratio * value_diff
 
 
-def generate_wireframe_model(lateral_endpoint_depth: float, number_of_laterals: int, lateral_spacing: float, element_length: float,
+def generate_wireframe_model_ULOOP(lateral_endpoint_depth: float, number_of_laterals: int, lateral_spacing: float, element_length: float,
                              junction_depth:float, vertical_section_depth: float, angle: float,
                              vertical_well_spacing: float, generate_graphics: bool = False) -> tuple:
 
+    # Generate inj well profile
+    zinj = np.linspace(0, -vertical_section_depth, round(vertical_section_depth / element_length)).reshape(-1,1)
+    yinj = np.zeros(len(zinj)).reshape(-1,1)
+    xinj = np.zeros(len(zinj)).reshape(-1,1)
+
+    # Generate prod well profile
+    zprod = np.flip(zinj)
+    xprod = np.flip(xinj)
+    yprod = np.flip(yinj + vertical_well_spacing)
+
+    # (x, y, z)-coordinates of laterals are stored in three matrices (one each for the x, y, and z coordinates).
+    # The number of columns in each matrix corresponds to the number of laterals. The number of discretizations
+    # should be the same for each lateral. Coordinates are provided in the direction of flow; the first coordinate should match
+    # the last coordinate of the injection well, and the last coordinate should match the first coordinate of the
+    # production well
+
+    lateral_length = vertical_well_spacing
+    n_lat = int(np.round(lateral_length / element_length)) + 1
+
+    laterals = np.linspace(
+        number_of_laterals,
+        number_of_laterals,
+        number_of_laterals
+    )
+
+    # containers
+    xlat = np.zeros((n_lat, number_of_laterals))
+    ylat = np.zeros((n_lat, number_of_laterals))
+    zlat = np.zeros((n_lat, number_of_laterals))
+
+    # lateral i = even and i DNE 1
+    ylat_base = np.concatenate(
+        (np.array([0, element_length, 2*element_length]),
+        np.linspace(3*element_length,
+                    vertical_well_spacing - 3*element_length,
+                    n_lat - 6),
+        np.array([vertical_well_spacing - 2*element_length,
+                vertical_well_spacing - element_length,
+                vertical_well_spacing]))
+    )
+
+    xlat_base = np.concatenate((
+        lateral_spacing * np.cos(np.linspace(-np.pi/2, 0, int(np.round(n_lat/4)))),
+        lateral_spacing * np.ones(n_lat - 2*(int(np.round(n_lat/4)))),
+        lateral_spacing * np.cos(np.linspace(0, np.pi/2, int(np.round(n_lat/4))))
+    ))
+    zlat_base = -vertical_section_depth * np.ones(n_lat)
+
+    # --- populate laterals ---
+    for i, lateral in enumerate(laterals):
+        if i == 0:
+            xlat[:, i] = 0.0
+            ylat[:, i] = np.linspace(0, vertical_well_spacing, n_lat)
+            zlat[:, i] = -vertical_section_depth
+
+        else:
+            k = (i + 1) // 2           # 1, 1, 2, 2, 3, 3, ...
+            sign = 1 if i % 2 == 1 else -1
+
+            xlat[:, i] = sign * k * xlat_base
+            ylat[:, i] = ylat_base
+            zlat[:, i] = zlat_base
+
+
+    if generate_graphics:
+        # Plot profile
+        # Make 3D figure of borehole geometry to make sure it looks correct
+        plt.close('all') #close all curent figures
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        ax.plot(xinj, yinj, zinj, 'b-o', linewidth=2)
+        ax.plot(xprod, yprod, zprod, 'r-o', linewidth=2)
+        for i in range(number_of_laterals):
+            ax.plot(xlat[:, i], ylat[:, i], zlat[:, i], 'k-o', linewidth=2)
+        #ax.axis('equal') # Uncomment this line to set the plotted geometry to correct scale with equal axis unit spacing
+        ax.set_xlim([np.min(xlat) - 200, np.max(xlat) + 200])
+        ax.set_ylim([np.min(ylat) - 200, np.max(ylat) + 200])
+        ax.set_zlim([np.min(zlat) - 500, 0])
+        ax.set_zlabel('Depth (m)')
+        ax.set_xlabel('x (m)')
+        ax.set_ylabel('y (m)')
+        ax.legend(['Injection Well', 'Production Well', 'Lateral(s)'])
+        plt_show(block=False)
+
+    return xinj, yinj, zinj, xprod, yprod, zprod, xlat, ylat, zlat
+
+def generate_wireframe_model_ULOOP_v2(lateral_endpoint_depth: float, number_of_laterals: int, lateral_spacing: float, element_length: float,
+                                     junction_depth: float, vertical_section_depth: float, angle: float,
+                                     vertical_well_spacing: float, generate_graphics: bool = False) -> tuple:
+    cos_angle = np.cos(angle)
+    sin_angle = np.sin(angle)
+
+    # 1. Wellbores profiles
+    # 1.1 Vertical Section
+    n_vertical = int(round(vertical_section_depth / element_length)) + 1
+    z_vertical = np.linspace(0, -vertical_section_depth, n_vertical)
+
+    # 1.2 Inclined Section
+    inclined_length = abs(junction_depth - vertical_section_depth) / cos_angle
+    n_inclined = int(round(inclined_length / element_length)) + 1
+    z_inclined = np.linspace(-vertical_section_depth, -junction_depth, n_inclined)
+    y_inclined = np.linspace(0, inclined_length * sin_angle, n_inclined)
+
+    # 1.3 Injection and Production Wellbores
+    zinj = np.concatenate((z_vertical, z_inclined[1:]))
+    yinj = np.concatenate((np.zeros(n_vertical), y_inclined[1:]))
+    xinj = np.zeros(len(zinj))
+
+    zprod = np.flip(zinj)
+    xprod = np.flip(xinj)
+    yprod = vertical_well_spacing - np.flip(yinj)
+
+    # 2. Lateral Profile
+    num_spread = 1
+    n_spread = num_spread + 1
+    spread_length = num_spread * element_length
+    spread_fracs = np.linspace(0, 1, n_spread)
+
+    lateral_length = vertical_well_spacing - 2 * spread_length - 2 * inclined_length * sin_angle
+    num_lateral = int(round(lateral_length / element_length))
+    n_lateral = num_lateral + 1
+    lateral_fracs = np.linspace(0, 1, n_lateral)
+
+    x_offsets = np.arange(number_of_laterals) * lateral_spacing
+
+    # 2.1 Injection spread section
+    x_spread_ends_inj = x_offsets
+    y_spread_ends_inj = np.full(number_of_laterals, yinj[-1] + spread_length)
+    z_spread_ends_inj = np.full(number_of_laterals, zinj[-1])
+
+    x_spread_inj = np.outer(spread_fracs, x_spread_ends_inj - xinj[-1]) + xinj[-1]
+    y_spread_inj = np.outer(spread_fracs, y_spread_ends_inj - yinj[-1]) + yinj[-1]
+    z_spread_inj = np.outer(spread_fracs, z_spread_ends_inj - zinj[-1]) + zinj[-1]
+
+    # 2.2 Lateral section
+    x_lateral_ends = x_offsets
+    y_lateral_ends = y_spread_ends_inj + lateral_length
+    z_lateral_ends = z_spread_ends_inj
+
+    x_lateral = np.outer(np.ones(n_lateral), x_spread_ends_inj)
+    y_lateral = np.outer(lateral_fracs, y_lateral_ends - y_spread_ends_inj) + y_spread_ends_inj
+    z_lateral = np.outer(np.ones(n_lateral), z_spread_ends_inj)
+
+    # 2.3 Production spread section
+    x_spread_prod = np.outer(spread_fracs, xprod[0] - x_lateral_ends) + x_lateral_ends
+    y_spread_prod = np.outer(spread_fracs, yprod[0] - y_lateral_ends) + y_lateral_ends
+    z_spread_prod = np.outer(spread_fracs, zprod[0] - z_lateral_ends) + z_lateral_ends
+
+    # 2.4 Package all sections into xlat, ylat, zlat
+    # Flow: inj spread -> lateral -> prod spread
+    xlat = np.vstack((
+        x_spread_inj,
+        x_lateral[1:, :],      # Skip first point (duplicate of spread end)
+        x_spread_prod[1:, :]   # Skip first point (duplicate of lateral end)
+    ))
+
+    ylat = np.vstack((
+        y_spread_inj,
+        y_lateral[1:, :],
+        y_spread_prod[1:, :]
+    ))
+
+    zlat = np.vstack((
+        z_spread_inj,
+        z_lateral[1:, :],
+        z_spread_prod[1:, :]
+    ))
+
+    if generate_graphics:
+        # Plot profile
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot(xinj, yinj, zinj, 'b-o', linewidth=2, label='Injection Well')
+        ax.plot(xprod, yprod, zprod, 'r-o', linewidth=2, label='Production Well')
+
+        for i in range(number_of_laterals):
+            ax.plot(xlat[:, i], ylat[:, i], zlat[:, i], 'k-o', linewidth=2)
+
+        ax.set_facecolor('white')
+        ax.tick_params(axis='both', which='major', labelsize=22)
+        ax.set_xlabel('x (m)', fontsize=22)
+        ax.set_ylabel('y (m)', fontsize=22)
+        ax.set_zlabel('Depth (m)', fontsize=22)
+        # ax.legend(['Injection Well', 'Production Well', 'Lateral(s)'], fontsize=22)
+
+        az, el = 71.5676, 10.4739
+        ax.view_init(az, el)
+        plt_show(block=False)
+
+    return xinj, yinj, zinj, xprod, yprod, zprod, xlat, ylat, zlat
+
+def generate_wireframe_model_EAVOR(lateral_endpoint_depth: float, number_of_laterals: int, lateral_spacing: float, element_length: float,
+                             junction_depth:float, vertical_section_depth: float, angle: float,
+                             vertical_well_spacing: float, generate_graphics: bool = False) -> tuple:
     # Generate inj well profile
     zinj = np.linspace(0, -vertical_section_depth, round(vertical_section_depth / element_length))
     yinj = np.zeros(len(zinj))
@@ -83,7 +278,7 @@ def generate_wireframe_model(lateral_endpoint_depth: float, number_of_laterals: 
     number_of_elements_lateral = round(lateral_length / element_length)
     z_template_lateral = np.linspace(z_laterals_inj[-1], -lateral_endpoint_depth, number_of_elements_lateral)
     x_template_lateral = np.linspace(x_laterals_inj[-1], x_laterals_inj[-1] + lateral_length * np.sin(angle),
-                                     number_of_elements_lateral)
+                                    number_of_elements_lateral)
     y_template_lateral = np.full(number_of_elements_lateral, y_laterals_inj[-1])
 
     # Add section upwards
@@ -149,6 +344,145 @@ def generate_wireframe_model(lateral_endpoint_depth: float, number_of_laterals: 
         ax.set_ylabel('y (m)', fontsize=22)
         ax.set_zlabel('Depth (m)', fontsize=22)
         # ax.legend(['Injection Well', 'Production Well', 'Lateral(s)'], fontsize=22)  # Uncomment to add legend
+
+        az, el = 71.5676, 10.4739
+        ax.view_init(az, el)
+        plt_show(block=False)
+
+    return xinj, yinj, zinj, xprod, yprod, zprod, xlat, ylat, zlat
+
+
+def generate_wireframe_model_EAVOR_v2(lateral_endpoint_depth: float, number_of_laterals: int, lateral_spacing: float, element_length: float,
+                                            junction_depth: float, vertical_section_depth: float, angle: float,
+                                            vertical_well_spacing: float, generate_graphics: bool = False) -> tuple:
+    cos_angle = np.cos(angle)
+    sin_angle = np.sin(angle)
+
+    # 1. Wellbore profile - vertical + inclined sections
+    # 1.1 Vertical section
+    n_vertical = int(round(vertical_section_depth / element_length)) + 1
+    z_vertical = np.linspace(0, -vertical_section_depth, n_vertical)
+
+    # 1.2 Inclined section
+    inclined_length = abs(junction_depth - vertical_section_depth) / cos_angle
+    n_inclined = int(round(inclined_length / element_length)) + 1
+
+    z_inclined = np.linspace(-vertical_section_depth, -junction_depth, n_inclined)
+    x_inclined = np.linspace(0, inclined_length * sin_angle, n_inclined)
+
+    # 1.3 Wellbore Profile - Injection
+    zinj = np.concatenate((z_vertical, z_inclined[1:])) # Duplicate vertical depth
+    xinj = np.concatenate((np.zeros(n_vertical), x_inclined[1:]))
+    yinj = np.zeros(len(zinj))
+
+    # Wellbore Profile - Production
+    zprod = np.flip(zinj)
+    xprod = np.flip(xinj)
+    yprod = np.flip(yinj + vertical_well_spacing)
+
+    # 2. Lateral Profile: Spread + Lateral + Intersection
+    num_spread = 3
+    num_intersection = 2
+
+    # Lateral Offsets
+    y_lateral_offset = lateral_spacing * (number_of_laterals - 1) / 2
+    y_well_offset = (yprod[0] - yinj[-1]) / 2
+
+    # 2.1 Spread section (n_spread x number_of_laterals)
+    n_spread = num_spread + 1
+    spread_fracs = np.linspace(0, 1, n_spread)
+
+    # Spread Ends / Lateral Branch-off points
+    spread_length = element_length * num_spread
+    x_spread_ends_inj = np.full(number_of_laterals, xinj[-1] + spread_length * sin_angle)
+    y_spread_ends_inj = yinj[-1] + (np.arange(number_of_laterals) * lateral_spacing - y_lateral_offset) + y_well_offset
+    z_spread_ends_inj = np.full(number_of_laterals, zinj[-1] - spread_length * cos_angle)
+
+    x_spread_inj = np.outer(spread_fracs, x_spread_ends_inj - xinj[-1]) + xinj[-1]
+    y_spread_inj = np.outer(spread_fracs, y_spread_ends_inj - yinj[-1]) + yinj[-1]
+    z_spread_inj = np.outer(spread_fracs, z_spread_ends_inj - zinj[-1]) + zinj[-1]
+
+    # 2.2 Injection Well Lateral section (n_lateral x number_of_laterals)
+    lateral_length = abs(-lateral_endpoint_depth - z_spread_ends_inj[0]) / cos_angle
+    num_lateral = int(round(lateral_length / element_length))
+    n_lateral = num_lateral + 1
+    lateral_fracs = np.linspace(0, 1, n_lateral)
+
+    # Lateral Ends
+    x_lateral_ends_inj = x_spread_ends_inj + lateral_length * sin_angle
+    y_lateral_ends_inj = y_spread_ends_inj
+    z_lateral_ends_inj = np.full(number_of_laterals, -lateral_endpoint_depth)
+
+    x_lateral_inj = np.outer(lateral_fracs, x_lateral_ends_inj - x_spread_ends_inj) + x_spread_ends_inj
+    y_lateral_inj = np.outer(lateral_fracs, y_lateral_ends_inj - y_spread_ends_inj) + y_spread_ends_inj
+    z_lateral_inj = np.outer(lateral_fracs, z_lateral_ends_inj - z_spread_ends_inj) + z_spread_ends_inj
+
+    # 2.3 Intersection Section (n_intersection x number_of_laterals)
+    n_intersection = num_intersection + 1
+    intersection_length = num_intersection * element_length
+
+    # Intersection endpoints
+    x_intersection_ends = x_lateral_ends_inj
+    y_intersection_ends = y_lateral_ends_inj
+    z_intersection_ends = z_lateral_ends_inj + intersection_length
+
+    intersection_fracs = np.linspace(0, 1, n_intersection)
+    x_intersection_inj = np.outer(intersection_fracs, x_intersection_ends - x_lateral_ends_inj) + x_lateral_ends_inj
+    y_intersection_inj = np.outer(intersection_fracs, y_intersection_ends - y_lateral_ends_inj) + y_lateral_ends_inj
+    z_intersection_inj = np.outer(intersection_fracs, z_intersection_ends - z_lateral_ends_inj) + z_lateral_ends_inj
+
+    # 2.4 Production Well Lateral Sections
+    x_lateral_prod = np.flip(x_lateral_inj, axis=0)
+    y_lateral_prod = np.flip(y_lateral_inj, axis=0)
+    z_lateral_prod = np.flip(z_lateral_inj, axis=0) + intersection_length
+
+    # 2.5 Spread Section (Production Well)
+    x_spread_prod = np.outer(spread_fracs, xprod[0] - x_lateral_prod[-1, :]) + x_lateral_prod[-1, :]
+    y_spread_prod = np.outer(spread_fracs, yprod[0] - y_lateral_prod[-1, :]) + y_lateral_prod[-1, :]
+    z_spread_prod = np.outer(spread_fracs, zprod[0] - z_lateral_prod[-1, :]) + z_lateral_prod[-1, :]
+
+    # 2.6 Complete Laterals
+    # Flow: inj spread -> inj lateral -> intersection -> prod lateral -> prod spread
+    xlat = np.vstack((
+        x_spread_inj,
+        x_lateral_inj[1:, :],
+        x_intersection_inj[1:, :],
+        x_lateral_prod[1:, :],
+        x_spread_prod[1:, :]
+    ))
+
+    ylat = np.vstack((
+        y_spread_inj,
+        y_lateral_inj[1:, :],
+        y_intersection_inj[1:, :],
+        y_lateral_prod[1:, :],
+        y_spread_prod[1:, :]
+    ))
+
+    zlat = np.vstack((
+        z_spread_inj,
+        z_lateral_inj[1:, :],
+        z_intersection_inj[1:, :],
+        z_lateral_prod[1:, :],
+        z_spread_prod[1:, :]
+    ))
+
+    if generate_graphics:
+        # Plot profile
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot(xinj, yinj, zinj, 'b-o', linewidth=2, label='Injection Well')
+        ax.plot(xprod, yprod, zprod, 'r-o', linewidth=2, label='Production Well')
+
+        for i in range(number_of_laterals):
+            ax.plot(xlat[:, i], ylat[:, i], zlat[:, i], 'k-o', linewidth=2)
+
+        ax.set_facecolor('white')
+        ax.tick_params(axis='both', which='major', labelsize=22)
+        ax.set_xlabel('x (m)', fontsize=22)
+        ax.set_ylabel('y (m)', fontsize=22)
+        ax.set_zlabel('Depth (m)', fontsize=22)
+        # ax.legend(['Injection Well', 'Production Well', 'Lateral(s)'], fontsize=22)
 
         az, el = 71.5676, 10.4739
         ax.view_init(az, el)
@@ -382,8 +716,6 @@ class SBTReservoir(CylindricalReservoir):
         """
         model.logger.info(f'Init {str(__class__)}: {sys._getframe().f_code.co_name}')
 
-        raise NotImplementedError('SBT with coaxial configuration is not implemented at this time.')
-
         # Clear all equivalent: Initialize variables and import necessary libraries
 
         # SBT v2 for co-axial heat exchanger with high-temperature capability
@@ -440,15 +772,13 @@ class SBTReservoir(CylindricalReservoir):
         boilerelements = np.arange(31, 41)
 
         # Make 3D figure of borehole geometry to make sure it looks correct
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='3d')
-        # ax.plot3D(x, y, z, 'k-o', linewidth=2)
-        # ax.set_xlabel('x (m)')
-        # ax.set_ylabel('y (m)')
-        # x.set_zlabel('Depth (m)')
-        # x.set_title('Co-axial heat exchanger geometry')
-        # plt.grid()
-        # plt.show()
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot3D(x, y, z, 'k-o', linewidth=2)
+        ax.set_xlabel('x (m)')
+        ax.set_ylabel('y (m)')
+        plt.grid()
+        plt.show()
 
         # 2. Pre-Processing
         print('Start pre-processing ...')
@@ -1148,11 +1478,32 @@ class SBTReservoir(CylindricalReservoir):
         # interpolate time steps - but consider ignoring the first step.
         # simulation times [s] (must start with 0; to obtain smooth results,
         # abrupt changes in time step size should be avoided. logarithmic spacing is recommended)
-        initial_times = np.linspace(0, self.initial_final_timestep_transition.value, self.initial_timestep_count.value)
-        initial_time_interval = initial_times[1] - initial_times[0]
-        final_start = self.initial_final_timestep_transition.value + initial_time_interval
-        final_times = np.logspace(np.log10(final_start), np.log10(model.surfaceplant.plant_lifetime.value * 365 * 24 * 3600), int(self.final_timestep_count.value))
-        times = np.concatenate([initial_times, final_times])
+        #the code had abrupt changes, updated to reflect log scale in MATLAB - ag
+        seconds_per_year = 365 * 24 * 3600
+        end_time = model.surfaceplant.plant_lifetime.value * seconds_per_year
+        times_1 = np.arange(0, 1000, 100)
+        times_2 = np.arange(1000, 10000, 1000)
+        times_3 = np.logspace(
+            np.log10(10000),
+            np.log10(end_time),
+            75
+        )
+        year_times = np.arange(
+            1,
+            model.surfaceplant.plant_lifetime.value + 1
+        ) * seconds_per_year
+        times = np.unique(
+            np.concatenate([times_1, times_2, times_3, year_times])
+        )
+        # print("Total steps:", len(times))
+        timeslist = times.astype(float).tolist()
+        # print(timeslist)
+        # initial_time_interval = initial_times[1] - initial_times[0]
+        # final_start = self.initial_final_timestep_transition.value + initial_time_interval
+        # final_times = np.logspace(np.log10(final_start), np.log10(model.surfaceplant.plant_lifetime.value * 365 * 24 * 3600), int(self.final_timestep_count.value))
+        # print(final_times)
+        # times = np.concatenate([initial_times, final_times])
+        # print(times)
         # Note 1: When providing a variable injection temperature or flow rate, a finer time grid should be considered.
         # Below is one with long term time steps of about 36 days.
         # times = [0] + list(range(100, 10000, 100)) + list(np.logspace(np.log10(100*100), np.log10(0.1*365*24*3600), 40)) + list(np.arange(0.2*365*24*3600, 20*365*24*3600, 0.1*365*24*3600))
@@ -1166,25 +1517,41 @@ class SBTReservoir(CylindricalReservoir):
         # The vectors storing the x-, y- and z-coordinates should be column vectors
         # To obtain smooth results, abrupt changes in segment lengths should be avoided.
         # Coordinates of injection well (coordinates are provided from top to bottom in the direction of flow)
-        xinj, yinj, zinj, xprod, yprod, zprod, xlat, ylat, zlat = generate_wireframe_model(model.wellbores.lateral_endpoint_depth.value,
-                                                                                           model.wellbores.numnonverticalsections.value,
-                                                                                           model.wellbores.lateral_spacing.value,
-                                                                                           model.wellbores.element_length.value,
-                                                                                           model.wellbores.junction_depth.value,
-                                                                                           model.wellbores.vertical_section_length.value,
-                                                                                           model.wellbores.lateral_inclination_angle.value * np.pi / 180.0,
-                                                                                           model.wellbores.vertical_wellbore_spacing.value,
-                                                                                           self.generate_wireframe_graphics.value)
+
+
+        if model.wellbores.Configuration.value == Configuration.EAVORLOOP:
+            xinj, yinj, zinj, xprod, yprod, zprod, xlat, ylat, zlat = generate_wireframe_model_EAVOR(model.wellbores.lateral_endpoint_depth.value,
+                                                                                    model.wellbores.numnonverticalsections.value,
+                                                                                    model.wellbores.lateral_spacing.value,
+                                                                                    model.wellbores.element_length.value,
+                                                                                    model.wellbores.junction_depth.value,
+                                                                                    model.wellbores.vertical_section_length.value,
+                                                                                    model.wellbores.lateral_inclination_angle.value * np.pi / 180.0,
+                                                                                    model.wellbores.vertical_wellbore_spacing.value,
+                                                                                    self.generate_wireframe_graphics.value)
+            plt.show()
+        elif model.wellbores.Configuration.value == Configuration.ULOOP:
+            xinj, yinj, zinj, xprod, yprod, zprod, xlat, ylat, zlat = generate_wireframe_model_ULOOP(model.wellbores.lateral_endpoint_depth.value,
+                                                                        model.wellbores.numnonverticalsections.value,
+                                                                        model.wellbores.lateral_spacing.value,
+                                                                        model.wellbores.element_length.value,
+                                                                        model.wellbores.junction_depth.value,
+                                                                        model.wellbores.vertical_section_length.value,
+                                                                        model.wellbores.lateral_inclination_angle.value * np.pi / 180.0,
+                                                                        model.wellbores.vertical_wellbore_spacing.value,
+                                                                        self.generate_wireframe_graphics.value)
+            plt.show()
 
         # Merge x-, y-, and z-coordinates
-        x = np.concatenate((xinj, xprod))
-        y = np.concatenate((yinj, yprod))
-        z = np.concatenate((zinj, zprod))
+        x = np.concatenate((xinj.ravel(), xprod.ravel()))
+        y = np.concatenate((yinj.ravel(), yprod.ravel()))
+        z = np.concatenate((zinj.ravel(), zprod.ravel()))
 
         for i in range(model.wellbores.numnonverticalsections.value):
-            x = np.concatenate((x, xlat[:, i].reshape(-1, 1).flatten()))
-            y = np.concatenate((y, ylat[:, i].reshape(-1, 1).flatten()))
-            z = np.concatenate((z, zlat[:, i].reshape(-1, 1).flatten()))
+            x = np.concatenate((x, xlat[:, i]))
+            y = np.concatenate((y, ylat[:, i]))
+            z = np.concatenate((z, zlat[:, i]))
+
 
         gamma = 0.577215665  # Euler's constant
         alpha_f = model.surfaceplant.k_fluid.value / model.surfaceplant.rho_fluid.value / model.surfaceplant.cp_fluid.value  # Fluid thermal diffusivity [m2/s]
@@ -1208,9 +1575,16 @@ class SBTReservoir(CylindricalReservoir):
         # Quality Control
         LoverR = Deltaz / radiusvector  # Ratio of pipe segment length to radius along the wellbore [-]
         smallestLoverR = np.min(LoverR)  # Smallest ratio of pipe segment length to pipe radius. This ratio should be larger than 10. [-]
+        largestLoverR = np.max(LoverR) #largest
+        # print(f'{smallestLoverR}, {largestLoverR}')
 
         if smallestLoverR < 10:
             msg = 'Warning: smallest ratio of segment length over radius is less than 10. Good practice is to keep this ratio larger than 10.'
+            print(f'{msg}')
+            model.logger.warning(msg)
+
+        if largestLoverR > 1000:
+            msg = 'Warning: largest ration of segment length over radius is greater than 1000. Good practice is to keep this ratio smaller than 1000.'
             print(f'{msg}')
             model.logger.warning(msg)
 
@@ -1781,6 +2155,11 @@ class SBTReservoir(CylindricalReservoir):
         # Save the nonlinear Time results as 2D array Output Parameter
         self.NonLinearTime_temperature.value = np.column_stack((times, self.Tresoutput.value))
 
+        # TRES=[]
+        # for x in self.Tresoutput.value:
+        #     if isinstance(x, np.float64):
+        #         TRES.append(float(x))
+        # print(TRES)
         # define the linear time array, in years
         self.timevector.value = np.linspace(0, model.surfaceplant.plant_lifetime.value, model.economics.timestepsperyear.value * model.surfaceplant.plant_lifetime.value)
 
