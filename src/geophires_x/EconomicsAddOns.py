@@ -5,6 +5,7 @@ import numpy as np
 import numpy_financial as npf
 import geophires_x.Economics as Economics
 import geophires_x.Model as Model
+from geophires_x.EconomicsUtils import expand_schedule
 from geophires_x.OptionList import EndUseOptions, EconomicModel
 from geophires_x.Parameter import listParameter, OutputParameter
 from geophires_x.Units import *
@@ -354,7 +355,7 @@ class EconomicsAddOns(Economics.Economics):
             self.AddOnGoesToRoyaltyHolder.value.append(False)
 
         def _expand_addon_schedule(
-            raw_values: list, addon_index: int, applies_during_construction: bool
+            raw_values: list, addon_index: int, _applies_during_construction: bool
         ) -> list[float]:
             """Expand a single add-on's value into a full time-series array."""
             if addon_index >= len(raw_values) or raw_values[addon_index] in (None, ''):
@@ -366,7 +367,7 @@ class EconomicsAddOns(Economics.Economics):
             # Check if value contains DSL syntax (has '*' or ',')
             if '*' in schedule_str or ',' in schedule_str:
                 segments = [s.strip() for s in schedule_str.split(',')]
-                if applies_during_construction:
+                if _applies_during_construction:
                     expanded = expand_schedule(segments, total_years)
                 else:
                     expanded = expand_schedule(segments, plant_lifetime)
@@ -375,7 +376,7 @@ class EconomicsAddOns(Economics.Economics):
 
             # Legacy scalar path: single numeric value broadcast uniformly
             scalar = float(schedule_str)
-            if applies_during_construction:
+            if _applies_during_construction:
                 return [scalar] * total_years
             else:
                 return [0.0] * construction_years + [scalar] * plant_lifetime
