@@ -1584,7 +1584,7 @@ class SBTReservoir(CylindricalReservoir):
             model.logger.warning(msg)
 
         if largestLoverR > 1000:
-            msg = 'Warning: largest ration of segment length over radius is greater than 1000. Good practice is to keep this ratio smaller than 1000.'
+            msg = 'Warning: largest ratio of segment length over radius is greater than 1000. Good practice is to keep this ratio smaller than 1000.'
             print(f'{msg}')
             model.logger.warning(msg)
 
