@@ -1019,22 +1019,29 @@ class EconomicsSamTestCase(BaseTestCase):
         royalty_rate = 0.1
         escalation_rate = 0.01
         max_rate = royalty_rate + 5 * escalation_rate
-        m: Model = EconomicsSamTestCase._new_model(
-            self._egs_test_file_path(),
-            additional_params={
-                'Royalty Rate': royalty_rate,
-                'Royalty Rate Escalation': escalation_rate,
-                'Royalty Rate Maximum': max_rate,
-            },
-        )
+        rate_params = {
+            'Royalty Rate': royalty_rate,
+            'Royalty Rate Escalation': escalation_rate,
+            'Royalty Rate Maximum': max_rate,
+        }
 
-        schedule: list[float] = _get_royalty_rate_schedule(m)
+        for params_type in [
+            ('Rate-based', rate_params),
+            ('Schedule-based', {'Royalty Rate Schedule': '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15'}),
+        ]:
+            with self.subTest(params_type[0]):
+                m: Model = EconomicsSamTestCase._new_model(
+                    self._egs_test_file_path(),
+                    additional_params=params_type[1],
+                )
 
-        self.assertListAlmostEqual(
-            [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 15],
-            schedule,
-            places=3,
-        )
+                schedule: list[float] = _get_royalty_rate_schedule(m)
+
+                self.assertListAlmostEqual(
+                    [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 15],
+                    schedule,
+                    places=3,
+                )
 
     def test_royalty_rate_escalation_start_year(self) -> None:
         construction_years: int = 5

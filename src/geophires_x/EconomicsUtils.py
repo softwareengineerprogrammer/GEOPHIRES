@@ -221,7 +221,7 @@ def investment_tax_credit_output_parameter() -> OutputParameter:
     )
 
 
-def expand_schedule(schedule_strings: list[str], total_years: int) -> list[float]:
+def expand_schedule(schedule_strings: list[str | float], total_years: int) -> list[float]:
     """
     Parse a duration-based scheduling DSL and expand it into a fixed-length time-series array.
 
@@ -256,7 +256,7 @@ def expand_schedule(schedule_strings: list[str], total_years: int) -> list[float
 
     segments: list[tuple[float, int | None]] = []
     for raw in schedule_strings:
-        raw = raw.strip()
+        raw = str(raw).strip()
         if '*' in raw:
             parts = raw.split('*')
             if len(parts) != 2:

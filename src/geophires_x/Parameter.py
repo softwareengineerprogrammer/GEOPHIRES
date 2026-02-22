@@ -438,14 +438,7 @@ def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify, model) 
     :type model: :class:`~geophires_x.Model.Model`
     """
 
-    def _is_int(o: Any) -> bool:
-        try:
-            float_n = float(o)
-            int_n = int(float_n)
-        except ValueError:
-            return False
-        else:
-            return float_n == int_n
+    from geophires_x.GeoPHIRESUtils import is_float, is_int as _is_int  # avoid circular imports
 
     is_positional_parameter = ' ' in ParameterReadIn.Name and _is_int(ParamToModify.Name.split(' ')[-1])
     if is_positional_parameter:
@@ -463,14 +456,19 @@ def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify, model) 
         # In an ideal world this would be handled in ParameterEntry such that its sValue and Comment are
         # correct; however that would only be practical if ParameterEntry had typing information to know
         # whether to treat text after a second comma as a comment or list entry.
-        ParamToModify.value = [float(x.strip()) for x in ParameterReadIn.raw_entry.split('--')[0].split(',')[1:]
-                               if x.strip() != '']
+
+        ParamToModify.value = [float(x.strip()) if is_float(x.strip()) else x.strip() for x in
+                               ParameterReadIn.raw_entry.split('--')[0].split(',')[1:] if x.strip() != '']
 
     ParamToModify.Provided = True
 
     valid = True
     for i in range(len(ParamToModify.value)):
         New_val = ParamToModify.value[i]
+        if isinstance(New_val, str):
+            if '*' in New_val:
+                New_val = New_val.split('*')[0]
+            New_val = float(New_val.strip())
         if (New_val < float(ParamToModify.Min)) or (New_val > float(ParamToModify.Max)):
             msg = (
                 f'Value given ({str(New_val)}) for {ParamToModify.Name} outside of valid range '
