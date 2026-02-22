@@ -1026,6 +1026,7 @@ class EconomicsSamTestCase(BaseTestCase):
         }
 
         expected_schedule_1 = [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 20]
+        expected_schedule_2 = [*[0.03] * 10, *[0.04] * 10, *[0.05] * 5]
 
         for params_type_case in [
             ('Rate-based', rate_params, expected_schedule_1),
@@ -1036,11 +1037,13 @@ class EconomicsSamTestCase(BaseTestCase):
             ),
             (
                 'Schedule-based 2',
-                {
-                    'Royalty Rate Schedule': '0.03, 0.03 * 9, '  # FIXME WIP support/switch to '0.03 * 10'
-                    '0.04 * 10, 0.05'
-                },
-                [*[0.03] * 10, *[0.04] * 10, *[0.05] * 5],
+                {'Royalty Rate Schedule': '0.03, 0.03 * 9, 0.04 * 10, 0.05'},
+                expected_schedule_2,
+            ),
+            (
+                'Schedule-based 3',
+                {'Royalty Rate Schedule': '0.03 * 10, 0.04 * 10, 0.05'},
+                expected_schedule_2,
             ),
         ]:
             with self.subTest(params_type_case[0]):

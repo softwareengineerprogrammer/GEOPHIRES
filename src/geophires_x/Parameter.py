@@ -325,16 +325,17 @@ def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None
         return
 
     # deal with the case where the value has a unit involved - that will be indicated by a space in it
-    if ' ' in ParameterReadIn.sValue:
+    if ' ' in ParameterReadIn.sValue and '*' not in ParameterReadIn.sValue:
         new_str = ConvertUnits(ParamToModify, ParameterReadIn.sValue, model)
         if len(new_str) > 0:
             ParameterReadIn.sValue = new_str
-    #else:
+    else:
         # The value came in without any units
         # TODO: determine the proper action in this case
         # (previously, it was assumed that the value must be
         # using the default PreferredUnits, which was not always
         # valid and led to incorrect units in the output)
+        pass
 
     def default_parameter_value_message(new_val: Any, param_to_modify_name: str, default_value: Any) -> str:
         return (

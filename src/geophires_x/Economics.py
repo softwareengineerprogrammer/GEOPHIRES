@@ -1034,7 +1034,9 @@ class Economics:
 
         self.royalty_rate_schedule = self.ParameterDict[self.royalty_rate_schedule.Name] = listParameter(
             'Royalty Rate Schedule',
-            UnitType=Units.NONE,
+            UnitType=Units.PERCENT,
+            PreferredUnits=PercentUnit.TENTH,
+            CurrentUnits=PercentUnit.TENTH,
             ToolTipText='A schedule DSL string defining the royalty rate for each year of the project. '
                         'Syntax: "<rate> * <years>, <rate> * <years>, ..., <terminal_rate>". '
                         'For example "0.0175 * 10, 0.035" means 1.75%% for 10 years then 3.5%% thereafter. '
