@@ -3423,11 +3423,10 @@ class Economics:
 
         schedule: list[float] = [0.0] * plant_lifetime
         current_rate = base_rate
-        for i in range(plant_lifetime):
-            year_number = i + 1
-            if year_number >= escalation_start:
+        for year_index in range(plant_lifetime):
+            if year_index >= escalation_start:
                 current_rate = min(current_rate + escalation_rate, max_rate)
-            schedule[i] = current_rate
+            schedule[year_index] = current_rate
 
         return schedule
 
