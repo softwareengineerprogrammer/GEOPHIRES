@@ -67,6 +67,7 @@ class EconomicsAddOns(Economics.Economics):
             CurrentUnits=CurrencyUnit.MDOLLARS,
             ToolTipText=multi_addon_tooltip_text("AddOn CAPEX")
         )
+
         self.AddOnOPEXPerYear = self.ParameterDict[self.AddOnOPEXPerYear.Name] = listParameter(
             "AddOn OPEX",
             Min=0.0,
@@ -76,6 +77,26 @@ class EconomicsAddOns(Economics.Economics):
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             ToolTipText=f'Annual operating cost. {multi_addon_tooltip_text("AddOn OPEX")}'
         )
+        self.AddOnOPEXAppliesDuringConstruction = self.ParameterDict[
+            self.AddOnOPEXAppliesDuringConstruction.Name
+        ] = listParameter(
+            'AddOn OPEX Applies During Construction',
+            UnitType=Units.NONE,
+            DefaultValue=[False],
+            ToolTipText='If True, OPEX for this add-on is applied during construction. '
+                        f'{multi_addon_tooltip_text("AddOn OPEX Applies During Construction")}'
+        )
+        self.AddOnOPEXGoesToRoyaltyHolder = self.ParameterDict[
+            self.AddOnOPEXGoesToRoyaltyHolder.Name
+        ] = listParameter(
+            'AddOn OPEX Goes To Royalty Holder',
+            UnitType=Units.NONE,
+            DefaultValue=[False],
+            ToolTipText='If True, OPEX for this add-on is aggregated into the royalty holder cash '
+                        'flow for NPV and revenue tracking. '
+                        f'{multi_addon_tooltip_text("AddOn OPEX Goes To Royalty Holder")}'
+        )
+
         self.AddOnElecGainedPerYear = self.ParameterDict[self.AddOnElecGainedPerYear.Name] = listParameter(
             "AddOn Electricity Gained",
             Min=0.0,
@@ -102,27 +123,6 @@ class EconomicsAddOns(Economics.Economics):
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             ToolTipText=f'Annual profit gained. {multi_addon_tooltip_text("AddOn Profit Gained")}'
-        )
-        self.AddOnAppliesDuringConstruction = self.ParameterDict[
-            self.AddOnAppliesDuringConstruction.Name
-        ] = listParameter(
-            'AddOn Applies During Construction',
-            UnitType=Units.NONE,
-            ToolTipText='If True, the add-on schedule index 0 corresponds to the first '
-                        'construction year. If False (default), index 0 corresponds to '
-                        'operational year 1 and construction years are filled with 0.0. '
-                        f'{multi_addon_tooltip_text("AddOn Applies During Construction")}'
-        )
-
-        self.AddOnGoesToRoyaltyHolder = self.ParameterDict[
-            self.AddOnGoesToRoyaltyHolder.Name
-        ] = listParameter(
-            'AddOn Goes To Royalty Holder',
-            UnitType=Units.NONE,
-            ToolTipText='If True, the cash flows from this add-on (e.g. negative profit '
-                        'acting as a payment) are aggregated into the royalty holder cash '
-                        'flow for NPV and revenue tracking. Default is False. '
-                        f'{multi_addon_tooltip_text("AddOn Goes To Royalty Holder")}'
         )
 
         # local variables that need initialization
@@ -287,27 +287,35 @@ class EconomicsAddOns(Economics.Economics):
             if key.startswith("AddOn Profit Gained"):
                 val = str(model.InputParameters[key].sValue)
                 self.AddOnProfitGainedPerYear.value.append(val)
-            if key.startswith('AddOn Applies During Construction'):
-                val = str(model.InputParameters[key].sValue).strip().lower() in ('true', '1', 'yes')
-                self.AddOnAppliesDuringConstruction.value.append(val)
-            if key.startswith('AddOn Goes To Royalty Holder'):
-                val = str(model.InputParameters[key].sValue).strip().lower() in ('true', '1', 'yes')
-                self.AddOnGoesToRoyaltyHolder.value.append(val)
 
-        # Guardrail: AddOn Applies During Construction requires SAM Single Owner PPA
-        for i, applies in enumerate(self.AddOnAppliesDuringConstruction.value):
+            def _read_bool(input_param_s_value:Any) -> bool:
+                """
+                TODO genericize re: https://github.com/NREL/GEOPHIRES-X/issues/362
+                """
+                return str(input_param_s_value).strip().lower() in ('true', '1', 'yes')
+
+            if key.startswith(self.AddOnOPEXAppliesDuringConstruction.Name):
+                self.AddOnOPEXAppliesDuringConstruction.value.append(_read_bool(model.InputParameters[key].sValue))
+            if key.startswith(self.AddOnOPEXGoesToRoyaltyHolder.Name):
+                self.AddOnOPEXGoesToRoyaltyHolder.value.append(_read_bool(model.InputParameters[key].sValue))
+
+        # Validate: AddOn OPEX Applies During Construction requires SAM Single Owner PPA
+        for i, applies in enumerate(self.AddOnOPEXAppliesDuringConstruction.value):
             if applies and not is_sam_econ_model:
-                nickname = (
-                    self.AddOnNickname.value[i]
-                    if i < len(self.AddOnNickname.value)
-                    else f'#{i + 1}'
-                )
+                addon_number_tag = f'#{i + 1}'
+                nickname = addon_number_tag
+                if i < len(self.AddOnNickname.value):
+                    nickname = f'{self.AddOnNickname.value[i]} ({addon_number_tag})'
+
                 raise NotImplementedError(
-                    f'AddOn "{nickname}" has Applies During Construction = True, '
+                    f'AddOn "{nickname}" has {self.AddOnOPEXAppliesDuringConstruction.Name} = True, '
                     f'but this feature is only supported with the '
                     f'SAM Single Owner PPA economic model '
-                    f'(Economic Model = {EconomicModel.SAM_SINGLE_OWNER_PPA.int_value}).'
+                    f'(Provided Economic Model = {EconomicModel.SAM_SINGLE_OWNER_PPA.int_value}).'
                 )
+
+        # TODO Validate: AddOn OPEX Goes To Royalty Holder requires SAM Single Owner PPA
+
         model.logger.info(f"complete {__class__!s}: {sys._getframe().f_code.co_name}")
 
     def Calculate(self, model: Model) -> None:

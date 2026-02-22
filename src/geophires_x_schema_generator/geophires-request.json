@@ -2465,6 +2465,28 @@
       "minimum": 0.0,
       "maximum": 1000.0
     },
+    "AddOn OPEX Applies During Construction": {
+      "description": "If True, OPEX for this add-on is applied during construction. If using multiple add-ons: either (1) specify this value as an array or (2) use multiple parameters suffixed with a number e.g. 'AddOn OPEX Applies During Construction 1', 'AddOn OPEX Applies During Construction 2', etc.",
+      "type": "array",
+      "units": null,
+      "category": "Economics",
+      "default": [
+        false
+      ],
+      "minimum": -Infinity,
+      "maximum": Infinity
+    },
+    "AddOn OPEX Goes To Royalty Holder": {
+      "description": "If True, OPEX for this add-on is aggregated into the royalty holder cash flow for NPV and revenue tracking. If using multiple add-ons: either (1) specify this value as an array or (2) use multiple parameters suffixed with a number e.g. 'AddOn OPEX Goes To Royalty Holder 1', 'AddOn OPEX Goes To Royalty Holder 2', etc.",
+      "type": "array",
+      "units": null,
+      "category": "Economics",
+      "default": [
+        false
+      ],
+      "minimum": -Infinity,
+      "maximum": Infinity
+    },
     "AddOn Electricity Gained": {
       "description": "Annual electricity gained. If using multiple add-ons: either (1) specify this value as an array or (2) use multiple parameters suffixed with a number e.g. 'AddOn Electricity Gained 1', 'AddOn Electricity Gained 2', etc.",
       "type": "array",
@@ -2491,24 +2513,6 @@
       "default": [],
       "minimum": 0.0,
       "maximum": 1000.0
-    },
-    "AddOn Applies During Construction": {
-      "description": "If True, the add-on schedule index 0 corresponds to the first construction year. If False (default), index 0 corresponds to operational year 1 and construction years are filled with 0.0. If using multiple add-ons: either (1) specify this value as an array or (2) use multiple parameters suffixed with a number e.g. 'AddOn Applies During Construction 1', 'AddOn Applies During Construction 2', etc.",
-      "type": "array",
-      "units": null,
-      "category": "Economics",
-      "default": [],
-      "minimum": -Infinity,
-      "maximum": Infinity
-    },
-    "AddOn Goes To Royalty Holder": {
-      "description": "If True, the cash flows from this add-on (e.g. negative profit acting as a payment) are aggregated into the royalty holder cash flow for NPV and revenue tracking. Default is False. If using multiple add-ons: either (1) specify this value as an array or (2) use multiple parameters suffixed with a number e.g. 'AddOn Goes To Royalty Holder 1', 'AddOn Goes To Royalty Holder 2', etc.",
-      "type": "array",
-      "units": null,
-      "category": "Economics",
-      "default": [],
-      "minimum": -Infinity,
-      "maximum": Infinity
     }
   }
 }
