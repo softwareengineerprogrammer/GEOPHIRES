@@ -1025,20 +1025,35 @@ class EconomicsSamTestCase(BaseTestCase):
             'Royalty Rate Maximum': max_rate,
         }
 
-        for params_type in [
-            ('Rate-based', rate_params),
-            ('Schedule-based', {'Royalty Rate Schedule': '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15'}),
+        expected_schedule_1 = [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 20]
+
+        for params_type_case in [
+            ('Rate-based', rate_params, expected_schedule_1),
+            (
+                'Schedule-based 1',
+                {'Royalty Rate Schedule': '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15'},
+                expected_schedule_1,
+            ),
+            (
+                'Schedule-based 2',
+                {
+                    'Royalty Rate Schedule': '0.03, 0.03 * 9, '  # FIXME WIP support/switch to '0.03 * 10'
+                    '0.04 * 10, 0.05'
+                },
+                [*[0.03] * 10, *[0.04] * 10, *[0.05] * 5],
+            ),
         ]:
-            with self.subTest(params_type[0]):
+            with self.subTest(params_type_case[0]):
                 m: Model = EconomicsSamTestCase._new_model(
                     self._egs_test_file_path(),
-                    additional_params=params_type[1],
+                    additional_params={**params_type_case[1], 'Plant Lifetime': 25},
                 )
 
                 schedule: list[float] = _get_royalty_rate_schedule(m)
+                expected_schedule = params_type_case[2]
 
                 self.assertListAlmostEqual(
-                    [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 15],
+                    expected_schedule,
                     schedule,
                     places=3,
                 )

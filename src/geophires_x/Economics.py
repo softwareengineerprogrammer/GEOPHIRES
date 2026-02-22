@@ -2620,11 +2620,6 @@ class Economics:
                                                      " range 0-10. GEOPHIRES will assume default surface plant O&M cost correlation with" +
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
-                    elif key.startswith('Royalty Rate Schedule'):
-                        # TODO/WIP - may not be necessary
-                        val = str(model.InputParameters[key].sValue)
-                        self.royalty_rate_schedule.value.append(val)
-                        self.royalty_rate_schedule.Provided = True
 
             if self.HeatStartPrice.value > self.HeatEndPrice.value:
                 s = f'{self.HeatStartPrice.Name} ({self.HeatStartPrice.quantity()}) cannot be ' \
