@@ -29,6 +29,7 @@ _JSON_PARAMETER_TYPE_ARRAY = 'array'
 _JSON_PARAMETER_TYPE_BOOLEAN = 'boolean'
 _JSON_PARAMETER_TYPE_OBJECT = 'object'
 
+
 class HasQuantity(ABC):
 
     def quantity(self) -> PlainQuantity:
@@ -36,7 +37,16 @@ class HasQuantity(ABC):
         :rtype: pint.registry.Quantity - note type annotation uses PlainQuantity due to issues with python 3.8 failing
             to import the Quantity TypeAlias
         """
-        return _ureg.Quantity(self.value, str(self.CurrentUnits.value))
+
+        quant_val = self.value
+
+        if isinstance(quant_val, str):
+            quant_val = float(quant_val)
+
+        if isinstance(quant_val, Iterable):
+            quant_val = [float(it) for it in quant_val]
+
+        return _ureg.Quantity(quant_val, str(self.CurrentUnits.value))
 
 
 @dataclass
