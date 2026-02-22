@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 import numpy_financial as npf
 
@@ -109,20 +110,6 @@ class EconomicsTestCase(BaseTestCase):
     def test_indirect_cost_factor(self) -> None:
         self.assertEqual(1.12, self._new_model().economics._indirect_cost_factor)
 
-    # noinspection PyMethodMayBeStatic
-    def _new_model(self) -> Model:
-        stash_cwd = Path.cwd()
-        stash_sys_argv = sys.argv
-
-        sys.argv = ['']
-
-        m = Model(enable_geophires_logging_config=False)
-
-        sys.argv = stash_sys_argv
-        os.chdir(stash_cwd)
-
-        return m
-
     def test_peaking_boiler_cost(self):
         def _get_result(peaking_boiler_cost_: int) -> GeophiresXResult:
             return GeophiresXClient().get_geophires_result(
@@ -143,3 +130,32 @@ class EconomicsTestCase(BaseTestCase):
         lcoh, peaking_boiler_cost = _lcoh_pbc(_get_result(0))
         self.assertLess(lcoh, 13.19)
         self.assertEqual(0, peaking_boiler_cost)
+
+    # noinspection PyMethodMayBeStatic
+    def _new_model(
+        self, input_file: Path | None = None, additional_params: dict[str, Any] | None = None, read_and_calculate=True
+    ) -> Model:
+        model_args = {'enable_geophires_logging_config': False}
+
+        if input_file is not None:
+            if additional_params is not None:
+                params = GeophiresInputParameters(from_file_path=input_file, params=additional_params)
+                input_file = params.as_file_path()
+
+            model_args['input_file'] = input_file
+
+        stash_cwd = Path.cwd()
+        stash_sys_argv = sys.argv
+
+        sys.argv = ['']
+
+        m = Model(**model_args)
+
+        sys.argv = stash_sys_argv
+        os.chdir(stash_cwd)
+
+        if read_and_calculate:
+            m.read_parameters()
+            m.Calculate()
+
+        return m
