@@ -299,22 +299,21 @@ class EconomicsAddOns(Economics.Economics):
             if key.startswith(self.AddOnOPEXGoesToRoyaltyHolder.Name):
                 self.AddOnOPEXGoesToRoyaltyHolder.value.append(_read_bool(model.InputParameters[key].sValue))
 
-        # Validate: AddOn OPEX Applies During Construction requires SAM Single Owner PPA
-        for i, applies in enumerate(self.AddOnOPEXAppliesDuringConstruction.value):
-            if applies and not is_sam_econ_model:
-                addon_number_tag = f'#{i + 1}'
-                nickname = addon_number_tag
-                if i < len(self.AddOnNickname.value):
-                    nickname = f'{self.AddOnNickname.value[i]} ({addon_number_tag})'
+        # Validate SAM-EM-only features
+        for sam_em_only_param in [self.AddOnOPEXAppliesDuringConstruction, self.AddOnOPEXGoesToRoyaltyHolder]:
+            for i, applies in enumerate(sam_em_only_param.value):
+                if applies and not is_sam_econ_model:
+                    addon_number_tag = f'#{i + 1}'
+                    nickname = addon_number_tag
+                    if i < len(self.AddOnNickname.value):
+                        nickname = f'{self.AddOnNickname.value[i]} ({addon_number_tag})'
 
-                raise NotImplementedError(
-                    f'AddOn "{nickname}" has {self.AddOnOPEXAppliesDuringConstruction.Name} = True, '
-                    f'but this feature is only supported with the '
-                    f'SAM Single Owner PPA economic model '
-                    f'(Provided Economic Model = {EconomicModel.SAM_SINGLE_OWNER_PPA.int_value}).'
-                )
-
-        # TODO Validate: AddOn OPEX Goes To Royalty Holder requires SAM Single Owner PPA
+                    raise NotImplementedError(
+                        f'AddOn "{nickname}" has {sam_em_only_param.Name} = True, '
+                        f'but this feature is only supported with the '
+                        f'SAM Single Owner PPA economic model. '
+                        f'(Provided Economic Model = {EconomicModel.SAM_SINGLE_OWNER_PPA.int_value}).'
+                    )
 
         model.logger.info(f"complete {__class__!s}: {sys._getframe().f_code.co_name}")
 

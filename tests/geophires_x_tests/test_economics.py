@@ -10,7 +10,12 @@ import numpy_financial as npf
 # ruff: noqa: I001  # Successful module initialization is dependent on this specific import order.
 from geophires_x.Model import Model
 from geophires_x.Economics import CalculateFinancialPerformance
-from geophires_x_client import GeophiresXResult, GeophiresXClient, GeophiresInputParameters
+from geophires_x_client import (
+    GeophiresXResult,
+    GeophiresXClient,
+    GeophiresInputParameters,
+    ImmutableGeophiresInputParameters,
+)
 from tests.base_test_case import BaseTestCase
 
 
@@ -130,6 +135,18 @@ class EconomicsTestCase(BaseTestCase):
         lcoh, peaking_boiler_cost = _lcoh_pbc(_get_result(0))
         self.assertLess(lcoh, 13.19)
         self.assertEqual(0, peaking_boiler_cost)
+
+    def test_sam_em_only_add_on_features_throw_validation_error_for_non_sam_em_inputs(self):
+        with self.assertRaises(RuntimeError) as e:
+            GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('../examples/example1_addons.txt'),
+                    params={
+                        'AddOn OPEX Applies During Construction': '1',  # FIXME WIP support 'True'/True
+                    },
+                )
+            )
+        self.assertIn('feature is only supported', str(e.exception))
 
     # noinspection PyMethodMayBeStatic
     def _new_model(
