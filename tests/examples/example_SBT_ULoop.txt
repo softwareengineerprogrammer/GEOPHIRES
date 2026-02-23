@@ -1,0 +1,67 @@
+# SBT ULoop Case
+# Note 1: Geometry and initial file
+# Note 2:
+
+
+Reservoir Model, 8,                 # CLG SBT Model
+
+### ** Reservoir/Material Parameters ** ###
+
+Reservoir Volume Option, 4,         # woof
+Reservoir Volume, 2400000000,       # m^3
+Reservoir Density, 2500,            # kg/m^3
+Reservoir Heat Capacity, 1100,      # J/kgK
+Reservoir Thermal Conductivity, 3,  # W/m/K
+Number of Segments, 1,              # rock segments; SBT assumes only one layer of rock -- hard rock in our case
+Gradient 1, 50,                     # C/km
+Ambient Temperature, 14,            # degC
+Surface Temperature, 12,            # degC
+
+### ** Wellbore ** ###
+
+# FLUID
+Heat Transfer Fluid, 1,             # Water
+Water Thermal Conductivity, 0.6,    # Default, reasonable assumption
+Production Flow Rate per Well, 20,  # kg/s
+Injection Temperature, 20,          # degC
+
+# VERTICAL WELLS
+Number of Injection Wells, 1,       # accounts for cost of drilling first vertical bore
+Number of Production Wells, 1,      # accounts for cost of drilling second vertical bore
+Production Well Diameter, 8.5,      # inch
+Injection Well Diameter, 8.5,       # inch
+Ramey Production Wellbore Model, 0, # not applied
+Reservoir Impedance, 0.001,         # note that in GEOPHIRES "impedance" only affects the pumping power required (and associated O&M); CLG is not pumped (Thermosiphon effect)
+Vertical Section Length, 2000,      # depth at which vertical section terminates
+Vertical Wellbore Spacing, 1000,    # this is the lateral length when generating the wireframe
+
+# CLG CONTROLS (SET UP SBT)
+Well Geometry Configuration, 1,     # ULOOP = 1
+Is AGS, True,                       # trigger SBT
+Has Nonvertical Section, True,      # laterals
+Multilaterals Cased, False,         # open hole, assume sealed with proprietary sealant (e.g., Eavor's Rock Seal)
+Number of Multilateral Sections, 2, # number of laterals
+SBT Accuracy Desired, 5,            # model calculation accuracy
+Discretization Length, 80,         # line source discretization
+SBT Generate Wireframe Graphics, True, # show modeled geometry = True; don't show = False
+
+# CLG SBT LATERAL GEOMETRY (2-LATERAL U-LOOP)
+Nonvertical Wellbore Diameter, 0.216, # m
+Junction Depth, 1000,               # m, reservoir depth
+Lateral Spacing, 40,                # m, spacing between laterals (ensures pulse non-interference over time)
+
+### ** Economics ** ###
+End-Use Option, 2,                  # direct-use heat
+Plant Lifetime, 40,                 # assumed plant life = CLGWG webapp years (40)
+Economic Model, 2,                  # LCOH
+All-in Vertical Drilling Costs, 800,
+All-in Nonvertical Drilling Costs, 800,
+End-Use Efficiency Factor, 0.82,    # assume 18% heat loss in hypothetical heating scenario
+Circulation Pump Efficiency, 0.80,  # GETEM current assummption
+Utilization Factor, 0.60,           # heating end-use potentially having utilization factor of 60%
+Reservoir Stimulation Capital Cost, 0,
+Exploration Capital Cost, 0,
+Starting Heat Sale Price, 0.05,     # to start, not yet relevant
+Ending Heat Sale Price, 0.05,       # to start, not yet relevant
+
+#Well Drilling Cost Correlation, 18, # cost correlation is of the updated GeoVision baseline from last year, 2025
