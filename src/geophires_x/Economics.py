@@ -1043,6 +1043,21 @@ class Economics:
                         'If provided, this overrides Royalty Rate, Royalty Rate Escalation, '
                         'and Royalty Rate Maximum.'
         )
+
+        self.royalty_supplemental_payments_schedule = self.ParameterDict[
+            self.royalty_supplemental_payments_schedule.Name] = listParameter(
+            'Royalty Supplemental Payments',
+            UnitType=Units.CURRENCYFREQUENCY,
+            PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
+            CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
+            # WIP...
+            ToolTipText='A schedule DSL string defining the royalty supplemental payments for each year of the '
+                        'project. '
+                        'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_yearly_amount>". '
+                        'For example "1 * 3, 0.25" means $1M for 3 years then $250k/year thereafter. '
+                        'Only supported for SAM Economic Models.'
+        )
+
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(
             'Royalty Holder Discount Rate',
             DefaultValue=0.05,
@@ -2634,6 +2649,8 @@ class Economics:
             else:
                 sam_em_only_params: list[Parameter] = [
                     self.royalty_rate,
+                    self.royalty_rate_schedule,
+                    self.royalty_supplemental_payments_schedule,
                     # TODO other royalty params
                     self.construction_capex_schedule,
                     self.bond_financing_start_year
