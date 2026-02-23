@@ -716,6 +716,8 @@ class SBTReservoir(CylindricalReservoir):
         """
         model.logger.info(f'Init {str(__class__)}: {sys._getframe().f_code.co_name}')
 
+        raise NotImplementedError('SBT with coaxial configuration is not implemented at this time.')
+
         # Clear all equivalent: Initialize variables and import necessary libraries
 
         # SBT v2 for co-axial heat exchanger with high-temperature capability
