@@ -540,7 +540,7 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.project_npv.value = sf(_get_project_npv_musd(single_owner, cash_flow_operational_years, model))
     sam_economics.capex.value = single_owner.Outputs.adjusted_installed_cost * 1e-6
 
-    if model.economics.royalty_rate.Provided:  # FIXME WIP account for royalty schedule
+    if model.economics.royalty_rate.Provided or model.economics.royalty_rate_schedule.Provided:
         # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
         # updated if more O&M production-based expenses are added to SAM-EM
         sam_economics.royalties_opex.value = [
