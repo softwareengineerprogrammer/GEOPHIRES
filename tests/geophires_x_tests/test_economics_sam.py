@@ -1028,8 +1028,10 @@ class EconomicsSamTestCase(BaseTestCase):
         expected_schedule_1 = [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 20]
         expected_schedule_2 = [*[0.03] * 10, *[0.04] * 10, *[0.05] * 5]
 
+        rate_based_case_name = 'Rate-based'
+
         for params_type_case in [
-            ('Rate-based', rate_params, expected_schedule_1),
+            (rate_based_case_name, rate_params, expected_schedule_1),
             (
                 'Schedule-based 1',
                 {'Royalty Rate Schedule': '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15'},
@@ -1046,7 +1048,8 @@ class EconomicsSamTestCase(BaseTestCase):
                 expected_schedule_2,
             ),
         ]:
-            with self.subTest(params_type_case[0]):
+            case_name = params_type_case[0]
+            with self.subTest(case_name):
                 m: Model = EconomicsSamTestCase._new_model(
                     self._egs_test_file_path(),
                     additional_params={**params_type_case[1], 'Plant Lifetime': 25},
@@ -1060,6 +1063,40 @@ class EconomicsSamTestCase(BaseTestCase):
                     schedule,
                     places=3,
                 )
+
+                if case_name == rate_based_case_name:
+                    rate_based_result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
+                    royalty_rate_row = self._get_cash_flow_row(
+                        rate_based_result.result['SAM CASH FLOW PROFILE'], 'Royalty rate (%)'
+                    )[1:]
+                    self.assertIsNotNone(royalty_rate_row)  # FIXME WIP
+                    equivalent_schedule_param = ', '.join([str(float(it) / 100.0) for it in royalty_rate_row])
+                    equivalent_schedule_based_result: GeophiresXResult = GeophiresXClient().get_geophires_result(
+                        ImmutableGeophiresInputParameters(
+                            from_file_path=self._egs_test_file_path(),
+                            params={'Royalty Schedule': equivalent_schedule_param},
+                        )
+                    )
+
+                    def _d_san(d: dict[str, Any]) -> dict[str, Any]:
+                        for k in ['metadata', 'Simulation Metadata']:
+                            d.pop(k, None)
+
+                        return d
+
+                    try:
+                        self.assertDictAlmostEqual(
+                            _d_san(rate_based_result.result),
+                            _d_san(equivalent_schedule_based_result.result),
+                            percent=0.04698,
+                        )
+                    except AssertionError as dict_almost_equal_error:
+                        try:
+                            self.assertDictEqual(
+                                _d_san(rate_based_result.result), _d_san(equivalent_schedule_based_result.result)
+                            )
+                        except AssertionError as dict_exactly_equal_error:
+                            raise dict_exactly_equal_error from dict_almost_equal_error
 
     def test_royalty_rate_escalation_start_year(self) -> None:
         construction_years: int = 5
@@ -1144,9 +1181,7 @@ class EconomicsSamTestCase(BaseTestCase):
             places=3,
         )
 
-        m.outputs.PrintOutputs(m)
-        result: GeophiresXResult = GeophiresXResult(m.outputs.output_file)
-        #  Ideally we'd provide a temporary output file path, but the default (HDR.out) is fine for now...
+        result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
 
         opex_cashflow = self._get_cash_flow_row(result.result['SAM CASH FLOW PROFILE'], 'O&M fixed expense ($)')
         operational_years_opex_cashflow_usd = opex_cashflow[construction_years:]
@@ -1209,3 +1244,11 @@ class EconomicsSamTestCase(BaseTestCase):
             m.Calculate()
 
         return m
+
+    @staticmethod
+    def _get_result_from_model(m: Model) -> GeophiresXResult:
+        m.outputs.PrintOutputs(m)
+        result: GeophiresXResult = GeophiresXResult(m.outputs.output_file)
+        #  Ideally we'd provide a temporary output file path, but the default (HDR.out) is fine for now...
+
+        return result
