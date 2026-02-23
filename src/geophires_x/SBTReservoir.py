@@ -780,7 +780,7 @@ class SBTReservoir(CylindricalReservoir):
         ax.set_xlabel('x (m)')
         ax.set_ylabel('y (m)')
         plt.grid()
-        plt.show()
+        plt_show(block=False)
 
         # 2. Pre-Processing
         print('Start pre-processing ...')
@@ -939,7 +939,7 @@ class SBTReservoir(CylindricalReservoir):
         # import matplotlib.pyplot as plt
         # plt.loglog(Amin1vector, finitecorrectiony, 'k-')
         # plt.loglog(argumentbesselvec, besselcylinderresult, 'r-')
-        # plt.show()
+        # plt_show(block=False)
 
         # Precalculate finite pipe correction for boiler
         fpcminarg = min(Deltaz) ** 2 / (4 * alpha_m_boiler * times[-1])
@@ -979,7 +979,7 @@ class SBTReservoir(CylindricalReservoir):
         # import matplotlib.pyplot as plt
         # plt.loglog(Amin1vector_boiler, finitecorrectiony_boiler, 'k-')
         # plt.loglog(argumentbesselvec_boiler, besselcylinderresult_boiler, 'r-')
-        # plt.show()
+        # plt_show(block=False)
         print('SBT distributions calculated successfully')
 
         # MIR N = len(x) - 1
@@ -1459,7 +1459,7 @@ class SBTReservoir(CylindricalReservoir):
         # lt.legend()
         # plt.title('Temperature vs Time')
         # plt.grid()
-        # plt.show()
+        # plt_show(block=False)
 
         model.logger.info(f'complete {str(__class__)}: {sys._getframe().f_code.co_name}')
 
@@ -1531,7 +1531,7 @@ class SBTReservoir(CylindricalReservoir):
                                                                                     model.wellbores.lateral_inclination_angle.value * np.pi / 180.0,
                                                                                     model.wellbores.vertical_wellbore_spacing.value,
                                                                                     self.generate_wireframe_graphics.value)
-            plt.show()
+            plt_show(block=False)
         elif model.wellbores.Configuration.value == Configuration.ULOOP:
             xinj, yinj, zinj, xprod, yprod, zprod, xlat, ylat, zlat = generate_wireframe_model_ULOOP(model.wellbores.lateral_endpoint_depth.value,
                                                                         model.wellbores.numnonverticalsections.value,
@@ -1542,7 +1542,7 @@ class SBTReservoir(CylindricalReservoir):
                                                                         model.wellbores.lateral_inclination_angle.value * np.pi / 180.0,
                                                                         model.wellbores.vertical_wellbore_spacing.value,
                                                                         self.generate_wireframe_graphics.value)
-            plt.show()
+            plt_show(block=False)
 
         # Merge x-, y-, and z-coordinates
         x = np.concatenate((xinj.ravel(), xprod.ravel()))
