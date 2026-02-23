@@ -268,6 +268,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SBT_Lo_T.txt <tests/examples/example_SBT_Lo_T.txt>`__
      - `.out <tests/examples/example_SBT_Lo_T.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SBT_Lo_T>`__
+   * - CLGS: SBT ULoop
+     - `example_SBT_ULoop.txt <tests/examples/example_SBT_ULoop.txt>`__
+     - `.out <tests/examples/example_SBT_ULoop.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SBT_ULoop>`__
    * - SUTRA Example 1
      - `SUTRAExample1.txt <tests/examples/SUTRAExample1.txt>`__
      - `.out <tests/examples/SUTRAExample1.out>`__
