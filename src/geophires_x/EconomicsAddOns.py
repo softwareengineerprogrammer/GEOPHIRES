@@ -67,7 +67,6 @@ class EconomicsAddOns(Economics.Economics):
             CurrentUnits=CurrencyUnit.MDOLLARS,
             ToolTipText=multi_addon_tooltip_text("AddOn CAPEX")
         )
-
         self.AddOnOPEXPerYear = self.ParameterDict[self.AddOnOPEXPerYear.Name] = listParameter(
             "AddOn OPEX",
             Min=0.0,
@@ -77,26 +76,6 @@ class EconomicsAddOns(Economics.Economics):
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             ToolTipText=f'Annual operating cost. {multi_addon_tooltip_text("AddOn OPEX")}'
         )
-        self.AddOnOPEXAppliesDuringConstruction = self.ParameterDict[
-            self.AddOnOPEXAppliesDuringConstruction.Name
-        ] = listParameter(
-            'AddOn OPEX Applies During Construction',
-            UnitType=Units.NONE,
-            DefaultValue=[False],
-            ToolTipText='If True, OPEX for this add-on is applied during construction. '
-                        f'{multi_addon_tooltip_text("AddOn OPEX Applies During Construction")}'
-        )
-        self.AddOnOPEXGoesToRoyaltyHolder = self.ParameterDict[
-            self.AddOnOPEXGoesToRoyaltyHolder.Name
-        ] = listParameter(
-            'AddOn OPEX Goes To Royalty Holder',
-            UnitType=Units.NONE,
-            DefaultValue=[False],
-            ToolTipText='If True, OPEX for this add-on is aggregated into the royalty holder cash '
-                        'flow for NPV and revenue tracking. '
-                        f'{multi_addon_tooltip_text("AddOn OPEX Goes To Royalty Holder")}'
-        )
-
         self.AddOnElecGainedPerYear = self.ParameterDict[self.AddOnElecGainedPerYear.Name] = listParameter(
             "AddOn Electricity Gained",
             Min=0.0,
@@ -266,8 +245,7 @@ class EconomicsAddOns(Economics.Economics):
             if key.startswith("AddOn CAPEX"):
                 val = float(model.InputParameters[key].sValue)
                 self.AddOnCAPEX.value.append(val)  # this assumes they put the values in the file in consecutive fashion
-            if key.startswith("AddOn OPEX") and not key.startswith((
-                    self.AddOnOPEXAppliesDuringConstruction.Name, self.AddOnOPEXGoesToRoyaltyHolder.Name)):
+            if key.startswith("AddOn OPEX"):
                 val = float(model.InputParameters[key].sValue)
                 self.AddOnOPEXPerYear.value.append(val)  # this assumes they put the values in the file in consecutive fashion
 
@@ -286,36 +264,8 @@ class EconomicsAddOns(Economics.Economics):
                 self.AddOnHeatGainedPerYear.value.append(val)  # this assumes they put the values in the file in consecutive fashion
 
             if key.startswith("AddOn Profit Gained"):
-                val = str(model.InputParameters[key].sValue)
-                self.AddOnProfitGainedPerYear.value.append(val)
-
-            def _read_bool(input_param_s_value:Any) -> bool:
-                """
-                TODO genericize re: https://github.com/NREL/GEOPHIRES-X/issues/362
-                """
-                return str(input_param_s_value).strip().lower() in ('true', '1', 'yes')
-
-            if key.startswith(self.AddOnOPEXAppliesDuringConstruction.Name):
-                self.AddOnOPEXAppliesDuringConstruction.value.append(_read_bool(model.InputParameters[key].sValue))
-            if key.startswith(self.AddOnOPEXGoesToRoyaltyHolder.Name):
-                self.AddOnOPEXGoesToRoyaltyHolder.value.append(_read_bool(model.InputParameters[key].sValue))
-
-        # Validate SAM-EM-only features
-        for sam_em_only_param in [self.AddOnOPEXAppliesDuringConstruction, self.AddOnOPEXGoesToRoyaltyHolder]:
-            for i, applies in enumerate(sam_em_only_param.value):
-                if applies and not is_sam_econ_model:
-                    addon_number_tag = f'#{i + 1}'
-                    nickname = addon_number_tag
-                    if i < len(self.AddOnNickname.value):
-                        nickname = f'"{self.AddOnNickname.value[i]}" ({addon_number_tag})'
-
-                    raise NotImplementedError(
-                        f'AddOn {nickname} has {sam_em_only_param.Name} = True, '
-                        f'but this feature is only supported with the '
-                        f'SAM Single Owner PPA economic model. '
-                        f'(Provided Economic Model = {EconomicModel.SAM_SINGLE_OWNER_PPA.int_value}).'
-                    )
-
+                val = float(model.InputParameters[key].sValue)
+                self.AddOnProfitGainedPerYear.value.append(val)  # this assumes they put the values in the file in consecutive fashion
         model.logger.info(f"complete {__class__!s}: {sys._getframe().f_code.co_name}")
 
     def Calculate(self, model: Model) -> None:
@@ -349,7 +299,7 @@ class EconomicsAddOns(Economics.Economics):
         if len(self.AddOnHeatGainedPerYear.value) > 0:
             self.AddOnHeatGainedTotalPerYear.value = np.sum(self.AddOnHeatGainedPerYear.value)
         if len(self.AddOnProfitGainedPerYear.value) > 0:
-            self.AddOnProfitGainedTotalPerYear.value = np.sum(self.AddOnProfitGainedPerYear.quantity().magnitude)
+            self.AddOnProfitGainedTotalPerYear.value = np.sum(self.AddOnProfitGainedPerYear.value)
 
         # The amount of electricity and/or heat have for the project already been calculated in SurfacePlant,
         # so we need to update them here so when they get used in the final economic calculation (below),
