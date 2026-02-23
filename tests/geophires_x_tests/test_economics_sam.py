@@ -1019,7 +1019,7 @@ class EconomicsSamTestCase(BaseTestCase):
         royalty_rate = 0.1
         escalation_rate = 0.01
         max_rate = royalty_rate + 5 * escalation_rate
-        rate_params = {
+        rate_based_params = {
             'Royalty Rate': royalty_rate,
             'Royalty Rate Escalation': escalation_rate,
             'Royalty Rate Maximum': max_rate,
@@ -1030,21 +1030,25 @@ class EconomicsSamTestCase(BaseTestCase):
 
         rate_based_case_name = 'Rate-based'
 
+        base_additional_params = {'Plant Lifetime': 25}
+
+        royalty_rate_schedule_param_name = 'Royalty Rate Schedule'
+
         for params_type_case in [
-            (rate_based_case_name, rate_params, expected_schedule_1),
+            (rate_based_case_name, rate_based_params, expected_schedule_1),
             (
                 'Schedule-based 1',
-                {'Royalty Rate Schedule': '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15'},
+                {royalty_rate_schedule_param_name: '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15'},
                 expected_schedule_1,
             ),
             (
                 'Schedule-based 2',
-                {'Royalty Rate Schedule': '0.03, 0.03 * 9, 0.04 * 10, 0.05'},
+                {royalty_rate_schedule_param_name: '0.03, 0.03 * 9, 0.04 * 10, 0.05'},
                 expected_schedule_2,
             ),
             (
                 'Schedule-based 3',
-                {'Royalty Rate Schedule': '0.03 * 10, 0.04 * 10, 0.05'},
+                {royalty_rate_schedule_param_name: '0.03 * 10, 0.04 * 10, 0.05'},
                 expected_schedule_2,
             ),
         ]:
@@ -1052,7 +1056,7 @@ class EconomicsSamTestCase(BaseTestCase):
             with self.subTest(case_name):
                 m: Model = EconomicsSamTestCase._new_model(
                     self._egs_test_file_path(),
-                    additional_params={**params_type_case[1], 'Plant Lifetime': 25},
+                    additional_params={**params_type_case[1], **base_additional_params},
                 )
 
                 schedule: list[float] = _get_royalty_rate_schedule(m)
@@ -1064,18 +1068,31 @@ class EconomicsSamTestCase(BaseTestCase):
                     places=3,
                 )
 
+                case_result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
+
+                royalty_rate_row = self._get_cash_flow_row(
+                    case_result.result['SAM CASH FLOW PROFILE'], 'Royalty rate (%)'
+                )[1:]
+                self.assertIsNotNone(royalty_rate_row)
+
                 if case_name == rate_based_case_name:
-                    rate_based_result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
-                    royalty_rate_row = self._get_cash_flow_row(
-                        rate_based_result.result['SAM CASH FLOW PROFILE'], 'Royalty rate (%)'
-                    )[1:]
-                    self.assertIsNotNone(royalty_rate_row)  # FIXME WIP
                     equivalent_schedule_param = ', '.join([str(float(it) / 100.0) for it in royalty_rate_row])
                     equivalent_schedule_based_result: GeophiresXResult = GeophiresXClient().get_geophires_result(
                         ImmutableGeophiresInputParameters(
                             from_file_path=self._egs_test_file_path(),
-                            params={'Royalty Schedule': equivalent_schedule_param},
+                            params={
+                                royalty_rate_schedule_param_name: equivalent_schedule_param,
+                                **base_additional_params,
+                            },
                         )
+                    )
+
+                    equivalent_schedule_based_result_royalty_rate_row = self._get_cash_flow_row(
+                        case_result.result['SAM CASH FLOW PROFILE'], 'Royalty rate (%)'
+                    )[1:]
+
+                    self.assertListEqual(
+                        [round(it * 100) for it in expected_schedule], equivalent_schedule_based_result_royalty_rate_row
                     )
 
                     def _d_san(d: dict[str, Any]) -> dict[str, Any]:
@@ -1086,14 +1103,14 @@ class EconomicsSamTestCase(BaseTestCase):
 
                     try:
                         self.assertDictAlmostEqual(
-                            _d_san(rate_based_result.result),
+                            _d_san(case_result.result),
                             _d_san(equivalent_schedule_based_result.result),
                             percent=0.04698,
                         )
                     except AssertionError as dict_almost_equal_error:
                         try:
                             self.assertDictEqual(
-                                _d_san(rate_based_result.result), _d_san(equivalent_schedule_based_result.result)
+                                _d_san(case_result.result), _d_san(equivalent_schedule_based_result.result)
                             )
                         except AssertionError as dict_exactly_equal_error:
                             raise dict_exactly_equal_error from dict_almost_equal_error
