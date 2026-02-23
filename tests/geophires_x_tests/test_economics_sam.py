@@ -1123,17 +1123,18 @@ class EconomicsSamTestCase(BaseTestCase):
         )
 
     def test_royalty_supplemental_payments(self):
+        plant_lifetime = 25
         for test_case in [
             (
                 'Schedule 1',
                 {'Royalty Supplemental Payments': '1 * 3, 0.25'},
-                [1e6, 1e6, 1e6, 0.25e6, 0.25e6],
+                [1e6, 1e6, 1e6, 0.25e6, 0.25e6, *[0.25e6] * plant_lifetime],
             ),
         ]:
             with self.subTest(test_case[0]):
                 m: Model = EconomicsSamTestCase._new_model(
                     self._egs_test_file_path(),
-                    additional_params={**test_case[1], 'Plant Lifetime': 25, 'Construction Years': 5},
+                    additional_params={**test_case[1], 'Plant Lifetime': plant_lifetime, 'Construction Years': 5},
                 )
 
                 schedule_usd: list[float] = m.economics.get_royalty_supplemental_payments_schedule_usd(m)

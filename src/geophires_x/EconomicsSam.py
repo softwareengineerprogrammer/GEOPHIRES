@@ -920,8 +920,15 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     # Pass the final, correct values to SAM
     ret['total_installed_cost'] = total_installed_cost_usd
 
-    opex_musd = econ.Coam.value
-    ret['om_fixed'] = [opex_musd * 1e6] * model.surfaceplant.plant_lifetime.value
+    opex_base_usd = econ.Coam.quantity().to('USD/yr').magnitude
+    opex_by_year_usd = []
+    royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
+        _pre_revenue_years_count(model) :
+    ]
+    for year_index in range(model.surfaceplant.plant_lifetime.value):
+        opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
+
+    ret['om_fixed'] = opex_by_year_usd
 
     # GEOPHIRES assumes O&M fixed costs are not affected by inflation
     ret['om_fixed_escal'] = -1.0 * _pct(econ.RINFL)

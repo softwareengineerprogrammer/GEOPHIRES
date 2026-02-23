@@ -3448,9 +3448,10 @@ class Economics:
 
     def get_royalty_supplemental_payments_schedule_usd(self, model: Model) -> list[float]:
         construction_years: int = model.surfaceplant.construction_years.value
+        operational_years: int = model.surfaceplant.plant_lifetime.value
 
         royalty_supplemental_payments_schedule_expanded = expand_schedule(
-            self.royalty_supplemental_payments_schedule.value, construction_years)
+            self.royalty_supplemental_payments_schedule.value, construction_years + operational_years)
 
         royalty_supplemental_payments_schedule_usd = [
             PlainQuantity(it, self.royalty_supplemental_payments_schedule.CurrentUnits).to('USD/yr').magnitude
