@@ -3445,6 +3445,19 @@ class Economics:
 
         return schedule
 
+    def get_royalty_supplemental_payments_schedule_usd(self, model: Model) -> list[float]:
+        construction_years: int = model.surfaceplant.construction_years.value
+
+        royalty_supplemental_payments_schedule_expanded = expand_schedule(
+            self.royalty_supplemental_payments_schedule.value, construction_years)
+
+        royalty_supplemental_payments_schedule_usd = [
+            PlainQuantity(it, self.royalty_supplemental_payments_schedule.CurrentUnits).to('USD').magnitude
+            for it in royalty_supplemental_payments_schedule_expanded
+        ]
+
+        return royalty_supplemental_payments_schedule_usd
+
 
     def calculate_cashflow(self, model: Model) -> None:
             """

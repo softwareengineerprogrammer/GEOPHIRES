@@ -1122,6 +1122,29 @@ class EconomicsSamTestCase(BaseTestCase):
             expected_royalties_based_on_cash_flow_ppa_revenue, result_4_royalty_cash_flow_usd, percent=0.0001
         )
 
+    def test_royalty_supplemental_payments(self):
+        for test_case in [
+            (
+                'Schedule 1',
+                {'Royalty Supplemental Payments': '1 * 3, 0.25'},
+                [1e6, 1e6, 1e6, 0.25e6, 0.25e6],
+            ),
+        ]:
+            with self.subTest(test_case[0]):
+                m: Model = EconomicsSamTestCase._new_model(
+                    self._egs_test_file_path(),
+                    additional_params={**test_case[1], 'Plant Lifetime': 25, 'Construction Years': 5},
+                )
+
+                schedule_usd: list[float] = m.econ.get_royalty_supplemental_payments_schedule_usd(m)
+                expected_schedule = test_case[2]
+
+                self.assertListAlmostEqual(
+                    expected_schedule,
+                    schedule_usd,
+                    places=3,
+                )
+
     def test_sam_cash_flow_total_after_tax_returns_all_years(self):
         input_file = self._egs_test_file_path()
         additional_params = {'Construction Years': 2}
