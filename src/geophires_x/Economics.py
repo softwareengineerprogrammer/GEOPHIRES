@@ -3452,7 +3452,7 @@ class Economics:
             self.royalty_supplemental_payments_schedule.value, construction_years)
 
         royalty_supplemental_payments_schedule_usd = [
-            PlainQuantity(it, self.royalty_supplemental_payments_schedule.CurrentUnits).to('USD').magnitude
+            PlainQuantity(it, self.royalty_supplemental_payments_schedule.CurrentUnits).to('USD/yr').magnitude
             for it in royalty_supplemental_payments_schedule_expanded
         ]
 

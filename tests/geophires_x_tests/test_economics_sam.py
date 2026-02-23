@@ -1136,7 +1136,7 @@ class EconomicsSamTestCase(BaseTestCase):
                     additional_params={**test_case[1], 'Plant Lifetime': 25, 'Construction Years': 5},
                 )
 
-                schedule_usd: list[float] = m.econ.get_royalty_supplemental_payments_schedule_usd(m)
+                schedule_usd: list[float] = m.economics.get_royalty_supplemental_payments_schedule_usd(m)
                 expected_schedule = test_case[2]
 
                 self.assertListAlmostEqual(

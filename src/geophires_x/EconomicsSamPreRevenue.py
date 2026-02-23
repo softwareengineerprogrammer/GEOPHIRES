@@ -5,10 +5,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
-from pint.facets.plain import PlainQuantity
-
-from geophires_x.Economics import Economics
-from geophires_x.EconomicsUtils import expand_schedule
 from geophires_x.GeoPHIRESUtils import is_float, quantity, sig_figs
 from scipy.interpolate import interp1d
 
