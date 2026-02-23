@@ -2145,6 +2145,7 @@ class Economics:
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             ToolTipText='The average annual cost paid to a royalty holder, calculated as a percentage of the '
                         'project\'s gross annual revenue. This is modeled as a variable operating expense.'
+            # TODO adjust for Royalty Supplemental Payments, including explaining construction vs. operational years
         )
 
 
@@ -3577,7 +3578,7 @@ class Economics:
         ).to(self.interest_during_construction.CurrentUnits.value).magnitude
 
 
-        if self.royalty_rate.Provided:
+        if self.royalty_rate.Provided:  # FIXME WIP account for royalty schedule
             # ignore pre-revenue year(s) (e.g. Year 0)
             pre_revenue_years_slice_index = model.surfaceplant.construction_years.value
 
@@ -3592,6 +3593,7 @@ class Economics:
 
             self.Coam.value += (self.royalties_average_annual_cost.quantity()
                                 .to(self.Coam.CurrentUnits.value).magnitude)
+            # Note that updating Coam's value here does not affect already-calculated cash flow/result OPEX
 
             self.royalty_holder_npv.value = quantity(
                 calculate_npv(
