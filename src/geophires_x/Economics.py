@@ -1055,6 +1055,7 @@ class Economics:
                         'project. '
                         'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_yearly_amount>". '
                         'For example "1 * 3, 0.25" means $1M for 3 years then $250k/year thereafter. '
+                        'Note that the schedule applies during both construction and operations. '
                         'Only supported for SAM Economic Models.'
         )
 
