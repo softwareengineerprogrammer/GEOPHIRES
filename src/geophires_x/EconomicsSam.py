@@ -540,18 +540,22 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.project_npv.value = sf(_get_project_npv_musd(single_owner, cash_flow_operational_years, model))
     sam_economics.capex.value = single_owner.Outputs.adjusted_installed_cost * 1e-6
 
-    if model.economics.royalty_rate.Provided or model.economics.royalty_rate_schedule.Provided:
-        # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
-        # updated if more O&M production-based expenses are added to SAM-EM
-        sam_economics.royalties_opex.value = [
-            *_pre_revenue_years_vector(model),
-            *[
-                quantity(it, 'USD / year').to(sam_economics.royalties_opex.CurrentUnits).magnitude
-                for it in _cash_flow_profile_row(cash_flow_operational_years, ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY)
-            ],
-        ]
+    if model.economics.has_royalties:
+        # FIXME WIP handle royalty supplemental payments
+        if model.economics.has_production_based_royalties:
+            # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
+            # updated if more O&M production-based expenses are added to SAM-EM
+            sam_economics.royalties_opex.value = [
+                *_pre_revenue_years_vector(model),
+                *[
+                    quantity(it, 'USD / year').to(sam_economics.royalties_opex.CurrentUnits).magnitude
+                    for it in _cash_flow_profile_row(
+                        cash_flow_operational_years, ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY
+                    )
+                ],
+            ]
 
-        sam_economics._royalties_rate_schedule = model.economics.get_royalty_rate_schedule(model)
+            sam_economics._royalties_rate_schedule = model.economics.get_royalty_rate_schedule(model)
 
     sam_economics.nominal_discount_rate.value, sam_economics.wacc.value = _calculate_nominal_discount_rate_and_wacc_pct(
         model, single_owner
@@ -956,7 +960,7 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     ppa_price_schedule_per_kWh = _get_ppa_price_schedule_per_kWh(model)
     ret['ppa_price_input'] = ppa_price_schedule_per_kWh
 
-    if model.economics.royalty_rate.Provided:  # FIXME WIP account for royalty schedule
+    if model.economics.has_production_based_royalties:
         ret['om_production'] = _get_royalties_variable_om_USD_per_MWh_schedule(model)
 
     # Debt/equity ratio

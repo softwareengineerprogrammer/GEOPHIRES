@@ -3578,7 +3578,7 @@ class Economics:
         ).to(self.interest_during_construction.CurrentUnits.value).magnitude
 
 
-        if self.royalty_rate.Provided:  # FIXME WIP account for royalty schedule
+        if self.has_royalties:  # FIXME WIP account for royalty schedule
             # ignore pre-revenue year(s) (e.g. Year 0)
             pre_revenue_years_slice_index = model.surfaceplant.construction_years.value
 
@@ -3654,6 +3654,13 @@ class Economics:
                 (model.wellbores.nprod.value + model.wellbores.ninj.value)
             )
 
+    @property
+    def has_production_based_royalties(self):
+        return self.royalty_rate.Provided or self.royalty_rate_schedule.Provided
+
+    @property
+    def has_royalties(self):
+        return self.has_production_based_royalties or self.royalty_supplemental_payments_schedule.Provided
 
 
     def __str__(self):

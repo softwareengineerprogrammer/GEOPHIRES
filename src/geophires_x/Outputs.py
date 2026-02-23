@@ -562,7 +562,7 @@ class Outputs:
                         aoc_label = Outputs._field_label(model.addeconomics.AddOnOPEXTotalPerYear.display_name, 47)
                         f.write(f'         {aoc_label}{model.addeconomics.AddOnOPEXTotalPerYear.value:10.2f} {model.addeconomics.AddOnOPEXTotalPerYear.CurrentUnits.value}\n')
 
-                    if econ.royalty_rate.Provided:  # FIXME WIP account for royalty schedule
+                    if econ.has_production_based_royalties:
                         royalties_label = Outputs._field_label(econ.royalties_average_annual_cost.display_name, 47)
                         f.write(f'         {royalties_label}{econ.royalties_average_annual_cost.value:10.2f} {econ.royalties_average_annual_cost.CurrentUnits.value}\n')
 
@@ -804,7 +804,7 @@ class Outputs:
                 addon_df, addon_results = model.addoutputs.PrintOutputs(model)
                 extended_economics_header_printed = True
 
-            if econ.royalty_rate.Provided:  # FIXME WIP account for royalty schedule
+            if econ.has_royalties:
                 with open(self.output_file, 'a', encoding='UTF-8') as f_:
                     if not extended_economics_header_printed:
                         self._print_extended_economics_header(f_)
