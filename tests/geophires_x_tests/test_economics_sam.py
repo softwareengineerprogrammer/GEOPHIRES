@@ -1019,22 +1019,101 @@ class EconomicsSamTestCase(BaseTestCase):
         royalty_rate = 0.1
         escalation_rate = 0.01
         max_rate = royalty_rate + 5 * escalation_rate
-        m: Model = EconomicsSamTestCase._new_model(
-            self._egs_test_file_path(),
-            additional_params={
-                'Royalty Rate': royalty_rate,
-                'Royalty Rate Escalation': escalation_rate,
-                'Royalty Rate Maximum': max_rate,
-            },
-        )
+        rate_based_params = {
+            'Royalty Rate': royalty_rate,
+            'Royalty Rate Escalation': escalation_rate,
+            'Royalty Rate Maximum': max_rate,
+        }
 
-        schedule: list[float] = _get_royalty_rate_schedule(m)
+        expected_schedule_1 = [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 20]
+        expected_schedule_2 = [*[0.03] * 10, *[0.04] * 10, *[0.05] * 5]
 
-        self.assertListAlmostEqual(
-            [0.1, 0.11, 0.12, 0.13, 0.14, *[0.15] * 15],
-            schedule,
-            places=3,
-        )
+        rate_based_case_name = 'Rate-based'
+
+        base_additional_params = {'Plant Lifetime': 25}
+
+        royalty_rate_schedule_param_name = 'Royalty Rate Schedule'
+
+        for params_type_case in [
+            (rate_based_case_name, rate_based_params, expected_schedule_1),
+            (
+                'Schedule-based 1',
+                {royalty_rate_schedule_param_name: '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15'},
+                expected_schedule_1,
+            ),
+            (
+                'Schedule-based 2',
+                {royalty_rate_schedule_param_name: '0.03, 0.03 * 9, 0.04 * 10, 0.05'},
+                expected_schedule_2,
+            ),
+            (
+                'Schedule-based 3',
+                {royalty_rate_schedule_param_name: '0.03 * 10, 0.04 * 10, 0.05'},
+                expected_schedule_2,
+            ),
+        ]:
+            case_name = params_type_case[0]
+            with self.subTest(case_name):
+                m: Model = EconomicsSamTestCase._new_model(
+                    self._egs_test_file_path(),
+                    additional_params={**params_type_case[1], **base_additional_params},
+                )
+
+                schedule: list[float] = _get_royalty_rate_schedule(m)
+                expected_schedule = params_type_case[2]
+
+                self.assertListAlmostEqual(
+                    expected_schedule,
+                    schedule,
+                    places=3,
+                )
+
+                case_result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
+
+                royalty_rate_row = self._get_cash_flow_row(
+                    case_result.result['SAM CASH FLOW PROFILE'], 'Royalty rate (%)'
+                )[1:]
+                self.assertIsNotNone(royalty_rate_row)
+
+                if case_name == rate_based_case_name:
+                    equivalent_schedule_param = ', '.join([str(float(it) / 100.0) for it in royalty_rate_row])
+                    equivalent_schedule_based_result: GeophiresXResult = GeophiresXClient().get_geophires_result(
+                        ImmutableGeophiresInputParameters(
+                            from_file_path=self._egs_test_file_path(),
+                            params={
+                                royalty_rate_schedule_param_name: equivalent_schedule_param,
+                                **base_additional_params,
+                            },
+                        )
+                    )
+
+                    equivalent_schedule_based_result_royalty_rate_row = self._get_cash_flow_row(
+                        case_result.result['SAM CASH FLOW PROFILE'], 'Royalty rate (%)'
+                    )[1:]
+
+                    self.assertListEqual(
+                        [round(it * 100) for it in expected_schedule], equivalent_schedule_based_result_royalty_rate_row
+                    )
+
+                    def _d_san(d: dict[str, Any]) -> dict[str, Any]:
+                        for k in ['metadata', 'Simulation Metadata']:
+                            d.pop(k, None)
+
+                        return d
+
+                    try:
+                        self.assertDictAlmostEqual(
+                            _d_san(case_result.result),
+                            _d_san(equivalent_schedule_based_result.result),
+                            percent=0.04698,
+                        )
+                    except AssertionError as dict_almost_equal_error:
+                        try:
+                            self.assertDictEqual(
+                                _d_san(case_result.result), _d_san(equivalent_schedule_based_result.result)
+                            )
+                        except AssertionError as dict_exactly_equal_error:
+                            raise dict_exactly_equal_error from dict_almost_equal_error
 
     def test_royalty_rate_escalation_start_year(self) -> None:
         construction_years: int = 5
@@ -1052,7 +1131,7 @@ class EconomicsSamTestCase(BaseTestCase):
                 'Royalty Rate Escalation Start Year': start_year,
                 'Print Output to Console': 1,
             }
-            input_params: GeophiresInputParameters = GeophiresInputParameters(
+            input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
                 from_file_path=_input_file_path,
                 params=_additional_params,
             )
@@ -1096,6 +1175,34 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertListAlmostEqual(
             expected_royalties_based_on_cash_flow_ppa_revenue, result_4_royalty_cash_flow_usd, percent=0.0001
         )
+
+    # def test_royalty_supplemental_payments(self):
+    #     plant_lifetime = 25
+    #     construction_years = 5
+    #
+    #     m: Model = EconomicsSamTestCase._new_model(
+    #         self._egs_test_file_path(),
+    #         additional_params={
+    #             'Royalty Supplemental Payments': '1 * 3, 0.25 * 5, 0.1',
+    #             'Plant Lifetime': plant_lifetime,
+    #             'Construction Years': construction_years,
+    #         },
+    #     )
+    #
+    #     schedule_usd: list[float] = m.economics.get_royalty_supplemental_payments_schedule_usd(m)
+    #     expected_schedule = [1e6, 1e6, 1e6, 0.25e6, 0.25e6, *[0.25e6] * 3, *[0.1e6] * (plant_lifetime - 3)]
+    #
+    #     self.assertListAlmostEqual(
+    #         expected_schedule,
+    #         schedule_usd,
+    #         places=3,
+    #     )
+    #
+    #     result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
+    #
+    #     opex_cashflow = self._get_cash_flow_row(result.result['SAM CASH FLOW PROFILE'], 'O&M fixed expense ($)')
+    #     operational_years_opex_cashflow_usd = opex_cashflow[construction_years:]
+    #     self.assertEqual(150_000, operational_years_opex_cashflow_usd[2] - operational_years_opex_cashflow_usd[3])
 
     def test_sam_cash_flow_total_after_tax_returns_all_years(self):
         input_file = self._egs_test_file_path()
@@ -1154,3 +1261,11 @@ class EconomicsSamTestCase(BaseTestCase):
             m.Calculate()
 
         return m
+
+    @staticmethod
+    def _get_result_from_model(m: Model) -> GeophiresXResult:
+        m.outputs.PrintOutputs(m)
+        result: GeophiresXResult = GeophiresXResult(m.outputs.output_file)
+        #  Ideally we'd provide a temporary output file path, but the default (HDR.out) is fine for now...
+
+        return result

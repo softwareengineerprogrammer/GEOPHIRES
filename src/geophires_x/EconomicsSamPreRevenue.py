@@ -57,7 +57,7 @@ class PreRevenueCostsAndCashflow:
 
 
 def calculate_pre_revenue_costs_and_cashflow(model: 'Model') -> PreRevenueCostsAndCashflow:
-    econ = model.economics
+    econ: 'Economics' = model.economics
     if econ.inflrateconstruction.Provided:
         pre_revenue_inflation_rate = econ.inflrateconstruction.quantity().to('dimensionless').magnitude
     else:
@@ -76,6 +76,13 @@ def calculate_pre_revenue_costs_and_cashflow(model: 'Model') -> PreRevenueCostsA
         0,  # Treat bond financing years prior to construction as starting in the first year of construction
     )
 
+    additional_kw_args = {}
+
+    # if econ.royalty_supplemental_payments_schedule.Provided:
+    #     additional_kw_args['additional_payments_schedule_usd'] = econ.get_royalty_supplemental_payments_schedule_usd(
+    #         model
+    #     )[:construction_years]
+
     return _calculate_pre_revenue_costs_and_cashflow(
         total_overnight_capex_usd=econ.CCap.quantity().to('USD').magnitude,
         pre_revenue_years_count=construction_years,
@@ -85,6 +92,7 @@ def calculate_pre_revenue_costs_and_cashflow(model: 'Model') -> PreRevenueCostsA
         debt_fraction=econ.FIB.quantity().to('dimensionless').magnitude,
         debt_financing_start_year=debt_financing_start_year,
         logger=model.logger,
+        **additional_kw_args,
     )
 
 
@@ -100,19 +108,29 @@ def _calculate_pre_revenue_costs_and_cashflow(
     debt_fraction: float,
     debt_financing_start_year: int,
     logger: logging.Logger,
+    additional_payments_schedule_usd: list[float] | None = None,
 ) -> PreRevenueCostsAndCashflow:
     """
     Calculates the true capitalized cost and interest during pre-revenue years (exploration/permitting/appraisal,
     construction) by simulating a year-by-year phased expenditure with inflation.
 
     Also builds a pre-revenue cash flow profile for construction revenue years.
-
-    :param include_summary_line_items: Include cash flow from investment and financing activities and pre-tax returns
-    in the summary line items. Disabled by default since they are redundant with other construction line items and
-    confusing to reconcile with their non-construction equivalents.
     """
 
     logger.info(f"Using Phased CAPEX Schedule: {phased_capex_schedule}")
+
+    if additional_payments_schedule_usd is None:
+        additional_payments_schedule_usd = [0] * pre_revenue_years_count
+    elif len(additional_payments_schedule_usd) < pre_revenue_years_count:
+        additional_payments_schedule_usd = [
+            *additional_payments_schedule_usd,
+            *[0] * (pre_revenue_years_count - len(additional_payments_schedule_usd)),
+        ]
+    elif len(additional_payments_schedule_usd) > pre_revenue_years_count:
+        raise ValueError(
+            f'Additional payments schedule is longer ({len(additional_payments_schedule_usd)} years) '
+            f'than pre-revenue years ({pre_revenue_years_count}).'
+        )
 
     current_debt_balance_usd = 0.0
     total_capitalized_cost_usd = 0.0
@@ -138,7 +156,9 @@ def _calculate_pre_revenue_costs_and_cashflow(
 
         inflation_cost_vec.append(inflation_cost_this_year_usd)
 
-        capex_this_year_usd = base_capex_this_year_usd + inflation_cost_this_year_usd
+        capex_this_year_usd = (
+            base_capex_this_year_usd + inflation_cost_this_year_usd + additional_payments_schedule_usd[year_index]
+        )
 
         # Interest is calculated on the opening balance (from previous years' draws)
         interest_this_year_usd = current_debt_balance_usd * pre_revenue_bond_interest_rate
