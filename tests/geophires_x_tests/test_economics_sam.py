@@ -1131,7 +1131,7 @@ class EconomicsSamTestCase(BaseTestCase):
                 'Royalty Rate Escalation Start Year': start_year,
                 'Print Output to Console': 1,
             }
-            input_params: GeophiresInputParameters = GeophiresInputParameters(
+            input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
                 from_file_path=_input_file_path,
                 params=_additional_params,
             )
@@ -1176,33 +1176,33 @@ class EconomicsSamTestCase(BaseTestCase):
             expected_royalties_based_on_cash_flow_ppa_revenue, result_4_royalty_cash_flow_usd, percent=0.0001
         )
 
-    def test_royalty_supplemental_payments(self):
-        plant_lifetime = 25
-        construction_years = 5
-
-        m: Model = EconomicsSamTestCase._new_model(
-            self._egs_test_file_path(),
-            additional_params={
-                'Royalty Supplemental Payments': '1 * 3, 0.25 * 5, 0.1',
-                'Plant Lifetime': plant_lifetime,
-                'Construction Years': construction_years,
-            },
-        )
-
-        schedule_usd: list[float] = m.economics.get_royalty_supplemental_payments_schedule_usd(m)
-        expected_schedule = [1e6, 1e6, 1e6, 0.25e6, 0.25e6, *[0.25e6] * 3, *[0.1e6] * (plant_lifetime - 3)]
-
-        self.assertListAlmostEqual(
-            expected_schedule,
-            schedule_usd,
-            places=3,
-        )
-
-        result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
-
-        opex_cashflow = self._get_cash_flow_row(result.result['SAM CASH FLOW PROFILE'], 'O&M fixed expense ($)')
-        operational_years_opex_cashflow_usd = opex_cashflow[construction_years:]
-        self.assertEqual(150_000, operational_years_opex_cashflow_usd[2] - operational_years_opex_cashflow_usd[3])
+    # def test_royalty_supplemental_payments(self):
+    #     plant_lifetime = 25
+    #     construction_years = 5
+    #
+    #     m: Model = EconomicsSamTestCase._new_model(
+    #         self._egs_test_file_path(),
+    #         additional_params={
+    #             'Royalty Supplemental Payments': '1 * 3, 0.25 * 5, 0.1',
+    #             'Plant Lifetime': plant_lifetime,
+    #             'Construction Years': construction_years,
+    #         },
+    #     )
+    #
+    #     schedule_usd: list[float] = m.economics.get_royalty_supplemental_payments_schedule_usd(m)
+    #     expected_schedule = [1e6, 1e6, 1e6, 0.25e6, 0.25e6, *[0.25e6] * 3, *[0.1e6] * (plant_lifetime - 3)]
+    #
+    #     self.assertListAlmostEqual(
+    #         expected_schedule,
+    #         schedule_usd,
+    #         places=3,
+    #     )
+    #
+    #     result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
+    #
+    #     opex_cashflow = self._get_cash_flow_row(result.result['SAM CASH FLOW PROFILE'], 'O&M fixed expense ($)')
+    #     operational_years_opex_cashflow_usd = opex_cashflow[construction_years:]
+    #     self.assertEqual(150_000, operational_years_opex_cashflow_usd[2] - operational_years_opex_cashflow_usd[3])
 
     def test_sam_cash_flow_total_after_tax_returns_all_years(self):
         input_file = self._egs_test_file_path()

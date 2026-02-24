@@ -541,7 +541,7 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.capex.value = single_owner.Outputs.adjusted_installed_cost * 1e-6
 
     if model.economics.has_royalties:
-        # FIXME WIP handle royalty supplemental payments
+        # TODO: royalty supplemental payments
         if model.economics.has_production_based_royalties:
             # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
             # updated if more O&M production-based expenses are added to SAM-EM
@@ -926,11 +926,14 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
 
     opex_base_usd = econ.Coam.quantity().to('USD/yr').magnitude
     opex_by_year_usd = []
-    royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
-        _pre_revenue_years_count(model) :
-    ]
+    # royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
+    #     _pre_revenue_years_count(model):
+    # ]
     for year_index in range(model.surfaceplant.plant_lifetime.value):
-        opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
+        opex_by_year_usd.append(
+            opex_base_usd
+            # + royalty_supplemental_payments_by_year_usd[year_index]
+        )
 
     ret['om_fixed'] = opex_by_year_usd
 

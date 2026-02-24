@@ -78,10 +78,10 @@ def calculate_pre_revenue_costs_and_cashflow(model: 'Model') -> PreRevenueCostsA
 
     additional_kw_args = {}
 
-    if econ.royalty_supplemental_payments_schedule.Provided:
-        additional_kw_args['additional_payments_schedule_usd'] = econ.get_royalty_supplemental_payments_schedule_usd(
-            model
-        )[:construction_years]
+    # if econ.royalty_supplemental_payments_schedule.Provided:
+    #     additional_kw_args['additional_payments_schedule_usd'] = econ.get_royalty_supplemental_payments_schedule_usd(
+    #         model
+    #     )[:construction_years]
 
     return _calculate_pre_revenue_costs_and_cashflow(
         total_overnight_capex_usd=econ.CCap.quantity().to('USD').magnitude,

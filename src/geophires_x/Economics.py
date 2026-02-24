@@ -1034,6 +1034,8 @@ class Economics:
 
         self.royalty_rate_schedule = self.ParameterDict[self.royalty_rate_schedule.Name] = listParameter(
             'Royalty Rate Schedule',
+            Min=0.0,
+            Max=1.0,
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
@@ -1042,21 +1044,6 @@ class Economics:
                         'For example "0.0175 * 10, 0.035" means 1.75%% for 10 years then 3.5%% thereafter. '
                         'If provided, this overrides Royalty Rate, Royalty Rate Escalation, '
                         'and Royalty Rate Maximum.'
-        )
-
-        self.royalty_supplemental_payments_schedule = self.ParameterDict[
-            self.royalty_supplemental_payments_schedule.Name] = listParameter(
-            'Royalty Supplemental Payments',
-            UnitType=Units.CURRENCYFREQUENCY,
-            PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            # WIP...
-            ToolTipText='A schedule DSL string defining the royalty supplemental payments for each year of the '
-                        'project. '
-                        'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_yearly_amount>". '
-                        'For example "1 * 3, 0.25" means $1M for 3 years then $250k/year thereafter. '
-                        'Note that the schedule applies during both construction and operations. '
-                        'Only supported for SAM Economic Models.'
         )
 
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(
@@ -2652,7 +2639,6 @@ class Economics:
                 sam_em_only_params: list[Parameter] = [
                     self.royalty_rate,
                     self.royalty_rate_schedule,
-                    self.royalty_supplemental_payments_schedule,
                     # TODO other royalty params
                     self.construction_capex_schedule,
                     self.bond_financing_start_year
@@ -3433,33 +3419,39 @@ class Economics:
         if self.royalty_rate_schedule.Provided and self.royalty_rate_schedule.value:
             return expand_schedule(self.royalty_rate_schedule.value, plant_lifetime)
 
-        base_rate: float = self.royalty_rate.value
-        escalation_rate: float = self.royalty_escalation_rate.value
-        escalation_start: int = self.royalty_escalation_rate_start_year.value
-        max_rate: float = self.maximum_royalty_rate.value
+        def r(x: float) -> float:
+            """Ignore apparent float precision issue"""
+            _precision = 8
+            return round(x, _precision)
 
-        schedule: list[float] = [0.0] * plant_lifetime
-        current_rate = base_rate
+        plant_lifetime = model.surfaceplant.plant_lifetime.value
+
+        escalation_rate = r(self.royalty_escalation_rate.value)
+        max_rate = r(self.maximum_royalty_rate.value)
+
+        schedule = []
+        current_rate = r(self.royalty_rate.value)
         for year_index in range(plant_lifetime):
-            if year_index >= escalation_start:
-                current_rate = min(current_rate + escalation_rate, max_rate)
-            schedule[year_index] = current_rate
+            current_rate = r(current_rate)
+            schedule.append(min(current_rate, max_rate))
+            if year_index >= (model.economics.royalty_escalation_rate_start_year.value - 2):
+                current_rate += escalation_rate
 
         return schedule
 
-    def get_royalty_supplemental_payments_schedule_usd(self, model: Model) -> list[float]:
-        construction_years: int = model.surfaceplant.construction_years.value
-        operational_years: int = model.surfaceplant.plant_lifetime.value
-
-        royalty_supplemental_payments_schedule_expanded = expand_schedule(
-            self.royalty_supplemental_payments_schedule.value, construction_years + operational_years)
-
-        royalty_supplemental_payments_schedule_usd = [
-            PlainQuantity(it, self.royalty_supplemental_payments_schedule.CurrentUnits).to('USD/yr').magnitude
-            for it in royalty_supplemental_payments_schedule_expanded
-        ]
-
-        return royalty_supplemental_payments_schedule_usd
+    # def get_royalty_supplemental_payments_schedule_usd(self, model: Model) -> list[float]:
+    #     construction_years: int = model.surfaceplant.construction_years.value
+    #     operational_years: int = model.surfaceplant.plant_lifetime.value
+    #
+    #     royalty_supplemental_payments_schedule_expanded = expand_schedule(
+    #         self.royalty_supplemental_payments_schedule.value, construction_years + operational_years)
+    #
+    #     royalty_supplemental_payments_schedule_usd = [
+    #         PlainQuantity(it, self.royalty_supplemental_payments_schedule.CurrentUnits).to('USD/yr').magnitude
+    #         for it in royalty_supplemental_payments_schedule_expanded
+    #     ]
+    #
+    #     return royalty_supplemental_payments_schedule_usd
 
 
     def calculate_cashflow(self, model: Model) -> None:
@@ -3660,7 +3652,7 @@ class Economics:
 
     @property
     def has_royalties(self):
-        return self.has_production_based_royalties or self.royalty_supplemental_payments_schedule.Provided
+        return self.has_production_based_royalties  # or self.royalty_supplemental_payments_schedule.Provided
 
 
     def __str__(self):
