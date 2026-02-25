@@ -121,9 +121,12 @@ jobs:
       run: >
         tox -e ${{ matrix.tox_env }} -v
 
-  coveralls:
-    name: Upload coverage to Coveralls
-    if: github.ref == 'refs/heads/main' # Prevent from running on PRs, tags
+  coverage:
+    name: Upload coverage # to Coveralls/codecov
+
+    # if: github.ref == 'refs/heads/main' # Prevent from running on PRs, tags
+    if: github.ref == 'refs/heads/coveralls-io-workaround'  # FIXME TEMP WIP
+
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -148,8 +151,12 @@ jobs:
         run: |
           tox -e py311
 
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@v2.3.0
+#      - name: Coveralls GitHub Action
+#        uses: coverallsapp/github-action@v2.3.0
+      - name: Codecov GitHub Action
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}  # https://github.com/softwareengineerprogrammer/GEOPHIRES/settings/secrets/actions
 
 
   deploy_docs:
