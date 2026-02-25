@@ -156,7 +156,9 @@ jobs:
       - name: Codecov GitHub Action
         uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}  # https://github.com/softwareengineerprogrammer/GEOPHIRES/settings/secrets/actions
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # Token configuration: https://github.com/softwareengineerprogrammer/GEOPHIRES/settings/secrets/actions
+          # See https://github.com/NatLabRockies/GEOPHIRES-X/pull/468 for further details
 
 
   deploy_docs:
