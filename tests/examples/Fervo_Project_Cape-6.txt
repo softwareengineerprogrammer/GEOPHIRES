@@ -52,8 +52,6 @@ End-Use Option, 1, -- Electricity
 Power Plant Type, 2, -- Gen 2 ORC units (Turboden, 2025).
 Plant Lifetime, 30, -- Sets the project economic horizon, aligned with Fervo's anticipated 30-year well life (Fervo Energy, 2025). Modeling Distinction: While Fervo projects physical wellbore integrity for 30 years, GEOPHIRES simulates "redrilling events" to model thermal management of the reservoir volume. This treats the 30-year lifespan as an aggregate of shorter-lived thermal cycles delineated by discrete redrilling events occurring at intervals dictated by the Maximum Drawdown parameter. The modeled cost of each redrilling event is equivalent to the drilling and stimulation cost of the entire wellfield, serving as a conservative cost proxy for the major interventions (e.g., sidetracking and stimulating laterals into fresh rock, or drilling new wells if necessary) required to sustain the PPA target against thermal depletion.
 
-Reservoir Model, 1
-
 Surface Temperature, 13, -- Surface temperature near Milford, UT (38.4987670, -112.9163432) ([Project InnerSpace, 2025](https://geomap.projectinnerspace.org/test/)).
 
 Number of Segments, 3
@@ -70,6 +68,7 @@ Reservoir Heat Capacity, 790
 Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118
 
+Reservoir Model, 1, -- See the [reservoir engineering calibration section](#res-eng-params-calibration-section) for additional details.
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
 
 Number of Fractures per Stimulated Well, 150, -- The model assumes an Extreme Limited Entry stimulation design (Fervo Energy, 2023) utilizing 12 stages with 15 clusters per stage (derived from Singh et al., 2025) and 81–85% stimulation success rate per 2024b ATB Moderate Scenario (NREL, 2025).
