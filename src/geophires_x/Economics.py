@@ -2406,6 +2406,7 @@ class Economics:
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
+            # TODO clarify that this includes construction years (production-based vs. supplemental payments)
             ToolTipText="The royalty holder's gross (pre-tax) annual revenue stream from the royalty agreement."
         )
         self.royalty_holder_total_revenue = self.OutputParameterDict[
