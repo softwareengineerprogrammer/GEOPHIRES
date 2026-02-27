@@ -1,5 +1,5 @@
- # Example: SAM Single Owner PPA Economic Model: 50 MWe with Royalties
-# This example models example_SAM-single-owner with royalties that start at 5% and escalate to 10%
+# Example: SAM Single Owner PPA Economic Model: 50 MWe with Royalties Schedule and Royalty Supplemental Payments
+# This example models example_SAM-single-owner with a royalties schedule and royalty supplemental payments
 # See "SAM Economic Models" in GEOPHIRES documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#royalties
 
 
@@ -7,9 +7,8 @@
 # *************************************
 Economic Model, 5, -- SAM Single Owner PPA
 
-Royalty Rate, 0.05
-Royalty Rate Escalation, 0.01
-Royalty Rate Maximum, 0.1
+Royalty Rate Schedule, 0.025 * 5, 0.05 * 5, 0.075
+Royalty Supplemental Payments, 1*2, 0.25
 
 Starting Electricity Sale Price, 0.08
 Ending Electricity Sale Price, 1.00
@@ -33,7 +32,7 @@ Capital Cost for Power Plant for Electricity Generation, 1900
 End-Use Option, 1, -- Electricity
 Power Plant Type, 2, -- Supercritical ORC
 Plant Lifetime, 20
-Construction Years, 1
+Construction Years, 3
 
 Reservoir Model, 1
 
