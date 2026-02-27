@@ -8,7 +8,7 @@
 Economic Model, 5, -- SAM Single Owner PPA
 
 Royalty Rate Schedule, 0.025 * 5, 0.05 * 5, 0.075
-Royalty Supplemental Payments, 1*2, 0.25
+Royalty Supplemental Payments, 1*2, 0.25 * 6, 0.1
 
 Starting Electricity Sale Price, 0.08
 Ending Electricity Sale Price, 1.00

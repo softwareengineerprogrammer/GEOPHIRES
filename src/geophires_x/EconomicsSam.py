@@ -926,14 +926,11 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
 
     opex_base_usd = econ.Coam.quantity().to('USD/yr').magnitude
     opex_by_year_usd = []
-    # royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
-    #     _pre_revenue_years_count(model):
-    # ]
+    royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
+        _pre_revenue_years_count(model) :
+    ]
     for year_index in range(model.surfaceplant.plant_lifetime.value):
-        opex_by_year_usd.append(
-            opex_base_usd
-            # + royalty_supplemental_payments_by_year_usd[year_index]
-        )
+        opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
 
     ret['om_fixed'] = opex_by_year_usd
 
