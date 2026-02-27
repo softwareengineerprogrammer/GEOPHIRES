@@ -2135,7 +2135,8 @@ class Economics:
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             ToolTipText=f'GEOPHIRES estimates the annual O&M costs as the sum of the annual surface plant, wellfield, '
-                        f'make-up water, and pumping O&M costs.'
+                        f'make-up water, pumping O&M costs, '
+                        f'and average royalty costs (both production-based and supplemental payments).'
         )
         self.averageannualpumpingcosts = OutputParameter(
             Name="Average Annual Pumping Costs",
@@ -3688,7 +3689,7 @@ class Economics:
 
     @property
     def has_royalties(self):
-        return self.has_production_based_royalties  # or self.royalty_supplemental_payments_schedule.Provided
+        return self.has_production_based_royalties or self.royalty_supplemental_payments.Provided
 
 
     def __str__(self):

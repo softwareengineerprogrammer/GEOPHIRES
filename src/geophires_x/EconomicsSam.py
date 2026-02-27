@@ -541,11 +541,15 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.capex.value = single_owner.Outputs.adjusted_installed_cost * 1e-6
 
     if model.economics.has_royalties:
-        # TODO: royalty supplemental payments
+        combined_royalties_usd = [
+            *_pre_revenue_years_vector(model),
+            *([0] * (model.surfaceplant.plant_lifetime.value + 1)),
+        ]
+
         if model.economics.has_production_based_royalties:
             # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
             # updated if more O&M production-based expenses are added to SAM-EM
-            sam_economics.royalties_opex.value = [
+            production_based_royalties_usd = [
                 *_pre_revenue_years_vector(model),
                 *[
                     quantity(it, 'USD / year').to(sam_economics.royalties_opex.CurrentUnits).magnitude
@@ -555,7 +559,20 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
                 ],
             ]
 
+            for i, annual_production_based_royalties_usd in enumerate(production_based_royalties_usd):
+                combined_royalties_usd[i] += annual_production_based_royalties_usd
+
             sam_economics._royalties_rate_schedule = model.economics.get_royalty_rate_schedule(model)
+
+        if model.economics.royalty_supplemental_payments.Provided:
+            royalty_supplemental_payments_schedule_usd = model.economics.get_royalty_supplemental_payments_schedule_usd(
+                model
+            )
+
+            for i, annual_royalty_supplemental_payment_usd in enumerate(royalty_supplemental_payments_schedule_usd):
+                combined_royalties_usd[i] += annual_royalty_supplemental_payment_usd
+
+        sam_economics.royalties_opex.value = combined_royalties_usd
 
     sam_economics.nominal_discount_rate.value, sam_economics.wacc.value = _calculate_nominal_discount_rate_and_wacc_pct(
         model, single_owner
