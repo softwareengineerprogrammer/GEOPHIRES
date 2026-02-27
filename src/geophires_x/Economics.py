@@ -3607,7 +3607,7 @@ class Economics:
         ).to(self.interest_during_construction.CurrentUnits.value).magnitude
 
 
-        if self.has_royalties:  # FIXME WIP account for royalty schedule
+        if self.has_royalties:
             # ignore pre-revenue year(s) (e.g. Year 0)
             pre_revenue_years_slice_index = model.surfaceplant.construction_years.value
 
@@ -3627,17 +3627,23 @@ class Economics:
             self.royalty_holder_npv.value = quantity(
                 calculate_npv(
                     self.royalty_holder_discount_rate.value,
-                    self.sam_economics_calculations.royalties_opex.value,
+                    self.sam_economics_calculations.royalties_opex.value,   # Includes construction years
                     self.discount_initial_year_cashflow.value
                 ),
                 self.sam_economics_calculations.royalties_opex.CurrentUnits.get_currency_unit_str()
             ).to(self.royalty_holder_npv.CurrentUnits).magnitude
 
-            self.royalty_holder_annual_revenue.value = self.royalties_average_annual_cost.value
+
+            self.royalty_holder_annual_revenue.value = (quantity(
+                np.average(
+                    self.sam_economics_calculations.royalties_opex.value  # Includes construction years
+                ),
+                self.sam_economics_calculations.royalties_opex.CurrentUnits
+            ).to(self.royalty_holder_annual_revenue.CurrentUnits).magnitude)
 
             self.royalty_holder_total_revenue.value = quantity(
                 np.sum(
-                    self.sam_economics_calculations.royalties_opex.value[pre_revenue_years_slice_index:]
+                    self.sam_economics_calculations.royalties_opex.value  # Includes construction years
                 ),
                 self.sam_economics_calculations.royalties_opex.CurrentUnits.get_currency_unit_str()
             ).to(self.royalty_holder_total_revenue.CurrentUnits).magnitude
