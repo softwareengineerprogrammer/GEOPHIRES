@@ -1039,11 +1039,26 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
-            ToolTipText='A schedule DSL string defining the royalty rate for each year of the project. '
+            ToolTipText='A schedule DSL string defining the royalty rate for each year of the project, '
+                        'starting at Year 1. '  # TODO clarify this means operational phase/COD
                         'Syntax: "<rate> * <years>, <rate> * <years>, ..., <terminal_rate>". '
-                        'For example "0.0175 * 10, 0.035" means 1.75%% for 10 years then 3.5%% thereafter. '
+                        'For example "0.0175 * 10, 0.035" means 1.75% for 10 years then 3.5% thereafter. '
                         'If provided, this overrides Royalty Rate, Royalty Rate Escalation, '
                         'and Royalty Rate Maximum.'
+        )
+
+        self.royalty_supplemental_payments = self.ParameterDict[self.royalty_supplemental_payments.Name] = listParameter(
+            'Royalty Supplemental Payments',
+            Min=0.0,
+            Max=1.0,
+            UnitType=Units.CURRENCYFREQUENCY,
+            PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
+            CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
+            # TODO improve phrasing, contrast with Royalty Rate Schedule beginning at Year 1
+            ToolTipText='A schedule DSL string defining the royalty supplemental payments for each year of the '
+                        'project, starting at the first construction year. '
+                        'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>". '
+                        'For example "1 * 2, 0.25" means $1M for 2 years then $250k/year thereafter. '
         )
 
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(

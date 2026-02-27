@@ -1720,9 +1720,18 @@
       "maximum": 1.0
     },
     "Royalty Rate Schedule": {
-      "description": "A schedule DSL string defining the royalty rate for each year of the project. Syntax: \"<rate> * <years>, <rate> * <years>, ..., <terminal_rate>\". For example \"0.0175 * 10, 0.035\" means 1.75%% for 10 years then 3.5%% thereafter. If provided, this overrides Royalty Rate, Royalty Rate Escalation, and Royalty Rate Maximum.",
+      "description": "A schedule DSL string defining the royalty rate for each year of the project, starting at Year 1. Syntax: \"<rate> * <years>, <rate> * <years>, ..., <terminal_rate>\". For example \"0.0175 * 10, 0.035\" means 1.75% for 10 years then 3.5% thereafter. If provided, this overrides Royalty Rate, Royalty Rate Escalation, and Royalty Rate Maximum.",
       "type": "array",
       "units": "",
+      "category": "Economics",
+      "default": [],
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "Royalty Supplemental Payments": {
+      "description": "A schedule DSL string defining the royalty supplemental payments for each year of the project, starting at the first construction year. Syntax: \"<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>\". For example \"1 * 2, 0.25\" means $1M for 2 years then $250k/year thereafter. ",
+      "type": "array",
+      "units": "MUSD/yr",
       "category": "Economics",
       "default": [],
       "minimum": 0.0,
