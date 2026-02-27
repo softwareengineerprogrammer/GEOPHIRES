@@ -2291,6 +2291,15 @@ class Economics:
         self.inflation_cost_during_construction = self.OutputParameterDict[
             self.inflation_cost_during_construction.Name] = inflation_cost_during_construction_output_parameter()
 
+        self.royalty_supplemental_payments_cost_during_construction = self.OutputParameterDict[
+            self.royalty_supplemental_payments_cost_during_construction.Name] = OutputParameter(
+                Name='Royalty supplemental payments during construction',
+                UnitType=Units.CURRENCY,
+                PreferredUnits=CurrencyUnit.MDOLLARS,
+                CurrentUnits=CurrencyUnit.MDOLLARS,
+                ToolTipText='The sum of royalty supplemental payments during the construction period.',
+            )
+
         self.interest_during_construction = self.OutputParameterDict[
             self.interest_during_construction.Name] = interest_during_construction_output_parameter()
 
@@ -3647,6 +3656,13 @@ class Economics:
                 ),
                 self.sam_economics_calculations.royalties_opex.CurrentUnits.get_currency_unit_str()
             ).to(self.royalty_holder_total_revenue.CurrentUnits).magnitude
+
+            self.royalty_supplemental_payments_cost_during_construction.value = quantity(
+                np.sum(
+                    self.sam_economics_calculations.royalties_opex.value[:pre_revenue_years_slice_index]
+                ),
+                self.sam_economics_calculations.royalties_opex.CurrentUnits.get_currency_unit_str()
+            ).to(self.royalty_supplemental_payments_cost_during_construction.CurrentUnits).magnitude
 
 
         self.wacc.value = self.sam_economics_calculations.wacc.value
