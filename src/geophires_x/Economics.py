@@ -2088,6 +2088,17 @@ class Economics:
             CurrentUnits=CurrencyUnit.MDOLLARS,
         )
         self.capex_total = self.OutputParameterDict[self.capex_total.Name] = total_capex_parameter_output_parameter()
+        self.capex_total_per_kw = self.OutputParameterDict[self.capex_total_per_kw.Name] = OutputParameter(
+            Name="Total CAPEX ($/kW)",
+            UnitType=Units.ENERGYCOST,
+            PreferredUnits=EnergyCostUnit.DOLLARSPERKW,
+            CurrentUnits=EnergyCostUnit.DOLLARSPERKW,
+            ToolTipText='The total capital expenditure (CAPEX) required to construct the plant, '
+                        'normalized per kilowatt of capacity. '
+                        'This metric is calculated based on the maximum net electricity generation of the facility. '
+                        'It reflects all direct and indirect costs, contingency, and applicable cost escalations '
+                        'included in the base Total CAPEX.',
+        )
 
         # noinspection SpellCheckingInspection
         self.Coam = self.OutputParameterDict[self.Coam.Name] = OutputParameter(
@@ -3521,6 +3532,16 @@ class Economics:
         # since SAM Economic Model doesn't subtract ITC from this value.
         self.capex_total.value = (self.sam_economics_calculations.capex.quantity()
                                   .to(self.capex_total.CurrentUnits.value).magnitude)
+        # self.capex_total_per_kw.value = PlainQuantity(self.capex_total.value, f'{self.capex_total.CurrentUnits}'
+
+        # TODO define this as an output of SurfacePlant rather than calculating it on-demand here and elsewhere
+        max_net_electricity_generation_kw = quantity(
+            np.max(model.surfaceplant.NetElectricityProduced.value),
+            model.surfaceplant.NetElectricityProduced.CurrentUnits
+        ).to('kW')
+        capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
+        self.capex_total_per_kw.value = capex_total_per_kw_q.magnitude
+
         self.CCap.value = (self.sam_economics_calculations.capex.quantity()
                            .to(self.CCap.CurrentUnits.value).magnitude)
 
