@@ -432,11 +432,12 @@ def InjPressureDropsAndPumpingPowerUsingImpedenceModel(f1: float, vinj: float, r
 
     return newDPOverall, PumpingPower, DPInjWell
 
+
 def get_hydrostatic_pressure_kPa(
         Trock_degC: float,
         Tsurf_degC: float,
         depth_m: float,
-        gradient_C_per_km: float,
+        gradient_C_per_m: float,  # converted from C/km to C/m
         lithostatic_pressure: PlainQuantity) -> float:
     """
     Correlation cited as being from Xie, Bloomfield, and Shook in
@@ -446,7 +447,7 @@ def get_hydrostatic_pressure_kPa(
     CT = 9E-4 / (30.796 * Trock_degC ** (-0.552))
     return 0 + 1. / CP * (math.exp(
         density_water_kg_per_m3(Tsurf_degC, pressure=lithostatic_pressure) * 9.81 * CP / 1000 * (
-            depth_m - CT / 2 * gradient_C_per_km * depth_m ** 2)) - 1)
+            depth_m - CT / 2 * gradient_C_per_m * depth_m ** 2)) - 1)
 
 
 def ProdPressureDropAndPumpingPowerUsingIndexes(
@@ -1052,7 +1053,7 @@ class WellBores:
             ToolTipText='; '.join([f'{it.int_value}: {it.value}' for it in WorkingFluid])
         )
 
-        # Input data for subsurface condition
+        # Inputs data for subsurface condition
         self.Nonvertical_length = self.ParameterDict[self.Nonvertical_length.Name] = floatParameter(
             "Nonvertical Length per Multilateral Section",
             DefaultValue=1000.0,

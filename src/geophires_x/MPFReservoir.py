@@ -26,11 +26,11 @@ class MPFReservoir(Reservoir):
         Setting up includes giving it a name, a default value, The Unit Type (length, volume, temperature, etc)
         and Unit Name of that value, sets it as required (or not), sets allowable range,
         the error message if that range is exceeded, the ToolTip Text, and the name of teh class that created it.
-        This includes setting up temporary variables that will be available to all the class but noy read in by user,
+        This includes setting up temporary variables that will be available to all the class but not read in by user,
         or used for Output
         This also includes all Parameters that are calculated and then published using the Printouts function.
         If you choose to subclass this master class, you can do so before or after you create your own parameters.
-        If you do, you can also choose to call this method from you class,
+        If you do, you can also choose to call this method from your class,
         which will effectively add and set all these parameters to your class.
         :param model: The container class of the application, giving access to everything else, including the logger
         :type model: :class:`~geophires_x.Model.Model`

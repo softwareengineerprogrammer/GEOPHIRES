@@ -21,6 +21,8 @@
     "Cylindrical Reservoir Output Depth",
     "Cylindrical Reservoir Length",
     "Drilled length",
+    "Number of Horizontal Injection Well Cells",
+    "Number of Horizontal Production Well Cells",
     "Number of Production Wells",
     "Number of Injection Wells",
     "Production Well Diameter",
@@ -642,7 +644,133 @@
       "type": "string",
       "units": null,
       "category": "Reservoir",
-      "default": null,
+      "default": "Doublet",
+      "minimum": null,
+      "maximum": null
+    },
+    "Vertical Injection Well Cell ID": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3Q23",
+      "minimum": null,
+      "maximum": null
+    },
+    "Vertical Production Well Cell ID": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3Q28",
+      "minimum": null,
+      "maximum": null
+    },
+    "Number of Horizontal Injection Well Cells": {
+      "description": "Number of cells assumed as horizontal injection wells",
+      "type": "integer",
+      "units": null,
+      "category": "Reservoir",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 5
+    },
+    "Horizontal Injection Well Cell ID 1": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3R23",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Injection Well Cell ID 2": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3S23",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Injection Well Cell ID 3": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3T23",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Injection Well Cell ID 4": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3U23",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Injection Well Cell ID 5": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3V23",
+      "minimum": null,
+      "maximum": null
+    },
+    "Number of Horizontal Production Well Cells": {
+      "description": "Number of cells assumed as horizontal production wells",
+      "type": "integer",
+      "units": null,
+      "category": "Reservoir",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 5
+    },
+    "Horizontal Production Well Cell ID 1": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3R28",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Production Well Cell ID 2": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3S28",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Production Well Cell ID 3": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3T28",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Production Well Cell ID 4": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3U28",
+      "minimum": null,
+      "maximum": null
+    },
+    "Horizontal Production Well Cell ID 5": {
+      "description": "",
+      "type": "string",
+      "units": null,
+      "category": "Reservoir",
+      "default": "A3V28",
       "minimum": null,
       "maximum": null
     },
@@ -652,7 +780,7 @@
       "units": "meter",
       "category": "Reservoir",
       "default": 0.0,
-      "minimum": 10,
+      "minimum": 5,
       "maximum": 10000
     },
     "Reservoir Width": {

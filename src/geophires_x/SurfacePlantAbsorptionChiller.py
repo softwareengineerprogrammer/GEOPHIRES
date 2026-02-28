@@ -36,7 +36,7 @@ class SurfacePlantAbsorptionChiller(SurfacePlant):
         self.MyClass = self.__class__.__name__
         self.MyPath = __file__
 
-        # Input parameters absorption chiller
+        # Inputs parameters absorption chiller
         self.absorption_chiller_cop = self.ParameterDict[self.absorption_chiller_cop.Name] = floatParameter(
             "Absorption Chiller COP",
             value=0.7,
