@@ -991,6 +991,8 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
+            # TODO clarify relation to supplemental payments
+            # TODO document mutual incompatibility with Royalty Rate Schedule
             ToolTipText="The fraction of the project's gross annual revenue paid to the royalty holder. "
                         "This is modeled as a variable production-based operating expense, reducing the developer's "
                         "taxable income."
@@ -1004,6 +1006,7 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
+            # TODO clarify applies to Royalty Rate and not schedule
             ToolTipText="The additive amount the royalty rate increases each year. For example, a value of 0.001 "
                         "increases a 4% rate (0.04) to 4.1% (0.041) in the next year."
         )
@@ -1015,6 +1018,7 @@ class Economics:
             UnitType=Units.NONE,
             PreferredUnits=TimeUnit.YEAR,
             CurrentUnits=TimeUnit.YEAR,
+            # TODO clarify applies to Royalty Rate and not schedule
             ToolTipText=f'The first year that the {self.royalty_escalation_rate.Name} is applied. '
                         f'{_YEAR_INDEX_VALUE_EXPLANATION_SNIPPET}.'
         )
@@ -1028,6 +1032,7 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
+            # TODO clarify applies to Royalty Rate and not schedule
             ToolTipText=f"The maximum royalty rate after escalation, expressed as a fraction (e.g., 0.06 for a 6% cap)."
                         f"{' Defaults to 100% (no effective cap).' if maximum_royalty_rate_default_val == 1.0 else ''}"
         )
@@ -1043,8 +1048,9 @@ class Economics:
                         'starting at Year 1. '  # TODO clarify this means operational phase/COD
                         'Syntax: "<rate> * <years>, <rate> * <years>, ..., <terminal_rate>". '
                         'For example "0.0175 * 10, 0.035" means 1.75% for 10 years then 3.5% thereafter. '
-                        'If provided, this overrides Royalty Rate, Royalty Rate Escalation, '
-                        'and Royalty Rate Maximum.'
+                        # TODO document mutual exclusivity with Royalty Rate
+                        # 'If provided, this overrides Royalty Rate, Royalty Rate Escalation, '
+                        # 'and Royalty Rate Maximum.'
         )
 
         self.royalty_supplemental_payments = self.ParameterDict[self.royalty_supplemental_payments.Name] = listParameter(
