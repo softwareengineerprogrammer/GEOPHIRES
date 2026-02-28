@@ -2675,8 +2675,11 @@ class Economics:
             else:
                 sam_em_only_params: list[Parameter] = [
                     self.royalty_rate,
+                    self.royalty_escalation_rate,
+                    self.royalty_escalation_rate_start_year,
+                    self.maximum_royalty_rate,
                     self.royalty_rate_schedule,
-                    # TODO other royalty params
+                    self.royalty_supplemental_payments,
                     self.construction_capex_schedule,
                     self.bond_financing_start_year
                 ]
