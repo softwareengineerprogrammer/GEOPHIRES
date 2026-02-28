@@ -513,16 +513,21 @@ class Outputs:
                     f.write(
                         f'         {occ_label}{econ.overnight_capital_cost.value:10.2f} {econ.overnight_capital_cost.CurrentUnits.value}\n')
 
+                if econ.royalty_supplemental_payments.Provided:
+                    rsp_label = Outputs._field_label(econ.royalty_supplemental_payments_cost_during_construction.display_name, 41)
+                    f.write(
+                        f'         {rsp_label}   {econ.royalty_supplemental_payments_cost_during_construction.value:.2f} {econ.royalty_supplemental_payments_cost_during_construction.CurrentUnits.value}\n')
+
+                if display_occ_and_inflation_during_construction_in_capital_costs:
+                    icc_label = Outputs._field_label(econ.inflation_cost_during_construction.display_name, 47)
+                    f.write(f'         {icc_label}{econ.inflation_cost_during_construction.value:10.2f} {econ.inflation_cost_during_construction.CurrentUnits.value}\n')
+
                 display_idc_in_capital_costs = is_sam_econ_model \
                                                        and model.surfaceplant.construction_years.value > 1
                 if display_idc_in_capital_costs:
                     idc_label = Outputs._field_label(econ.interest_during_construction.display_name, 47)
                     f.write(
                         f'         {idc_label}{econ.interest_during_construction.value:10.2f} {econ.interest_during_construction.CurrentUnits.value}\n')
-
-                if display_occ_and_inflation_during_construction_in_capital_costs:
-                    icc_label = Outputs._field_label(econ.inflation_cost_during_construction.display_name, 47)
-                    f.write(f'         {icc_label}{econ.inflation_cost_during_construction.value:10.2f} {econ.inflation_cost_during_construction.CurrentUnits.value}\n')
 
                 if is_sam_econ_model and econ.DoAddOnCalculations.value:
                     # Non-SAM econ models print this in Extended Economics profile
@@ -563,7 +568,7 @@ class Outputs:
                         aoc_label = Outputs._field_label(model.addeconomics.AddOnOPEXTotalPerYear.display_name, 47)
                         f.write(f'         {aoc_label}{model.addeconomics.AddOnOPEXTotalPerYear.value:10.2f} {model.addeconomics.AddOnOPEXTotalPerYear.CurrentUnits.value}\n')
 
-                    if econ.royalty_rate.Provided:
+                    if econ.has_production_based_royalties:
                         royalties_label = Outputs._field_label(econ.royalties_average_annual_cost.display_name, 47)
                         f.write(f'         {royalties_label}{econ.royalties_average_annual_cost.value:10.2f} {econ.royalties_average_annual_cost.CurrentUnits.value}\n')
 
@@ -805,7 +810,7 @@ class Outputs:
                 addon_df, addon_results = model.addoutputs.PrintOutputs(model)
                 extended_economics_header_printed = True
 
-            if econ.royalty_rate.Provided:
+            if econ.has_royalties:
                 with open(self.output_file, 'a', encoding='UTF-8') as f_:
                     if not extended_economics_header_printed:
                         self._print_extended_economics_header(f_)

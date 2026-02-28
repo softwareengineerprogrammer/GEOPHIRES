@@ -203,6 +203,7 @@ def royalty_cost_output_parameter() -> OutputParameter:
         UnitType=Units.CURRENCYFREQUENCY,
         PreferredUnits=CurrencyFrequencyUnit.DOLLARSPERYEAR,
         CurrentUnits=CurrencyFrequencyUnit.DOLLARSPERYEAR,
+        # TODO/WIP - clarify production-based vs. supplemental payments
         ToolTipText='The annual costs paid to a royalty holder, calculated as a percentage of the '
         'project\'s gross annual revenue. This is modeled as a variable operating expense.',
     )
@@ -219,3 +220,77 @@ def investment_tax_credit_output_parameter() -> OutputParameter:
         'For SAM Economic Models, this accounts for the standard Year 1 Federal ITC as well as any '
         'applicable State ITCs or multi-year credit schedules.',
     )
+
+
+def expand_schedule(schedule_strings: list[str | float], total_years: int) -> list[float]:
+    """
+    Parse a duration-based scheduling DSL and expand it into a fixed-length time-series array.
+
+    Syntax: ``[Value] * [Years], [Value] * [Years], ..., [Terminal Value]``
+
+    The terminal (last) value is repeated to fill ``total_years``.  A bare scalar
+    (e.g. ``['2.5']``) is treated as a terminal value and broadcast across all years.
+
+    Examples::
+
+        expand_schedule(['1.0 * 3', '0.1'], total_years=6)
+        # => [1.0, 1.0, 1.0, 0.1, 0.1, 0.1]
+
+        expand_schedule(['2.5'], total_years=4)
+        # => [2.5, 2.5, 2.5, 2.5]
+
+    :param schedule_strings: list of DSL segment strings.  Each element is either
+        ``"<value> * <years>"`` (a run-length segment) or ``"<value>"`` (a scalar,
+        which becomes the terminal value when it is the last element, or a 1-year
+        segment otherwise).
+    :param total_years: The total number of years the expanded array must span
+        (typically ``construction_years + plant_lifetime``).
+    :returns: A ``list[float]`` of length ``total_years``.
+    :raises ValueError: On malformed DSL strings or when explicit segments exceed
+        ``total_years``.
+    """
+    if total_years <= 0:
+        return []
+
+    if not schedule_strings:
+        return [0.0] * total_years
+
+    segments: list[tuple[float, int | None]] = []
+    for raw in schedule_strings:
+        raw = str(raw).strip()
+        if '*' in raw:
+            parts = raw.split('*')
+            if len(parts) != 2:
+                raise ValueError(f'Invalid schedule segment "{raw}": expected "<value> * <years>".')
+            value = float(parts[0].strip())
+            years = int(parts[1].strip())
+            if years < 0:
+                raise ValueError(f'Invalid schedule segment "{raw}": year count must be non-negative.')
+            segments.append((value, years))
+        else:
+            value = float(raw)
+            segments.append((value, None))
+
+    result: list[float] = []
+    terminal_value = 0.0
+
+    for idx, (value, years) in enumerate(segments):
+        is_last = idx == len(segments) - 1
+        if years is not None:
+            result.extend([value] * years)
+            terminal_value = value
+        else:
+            if is_last:
+                terminal_value = value
+            else:
+                result.append(value)
+                terminal_value = value
+
+    if len(result) > total_years:
+        raise ValueError(f'Schedule expands to {len(result)} years which exceeds total_years={total_years}.')
+
+    remaining = total_years - len(result)
+    if remaining > 0:
+        result.extend([terminal_value] * remaining)
+
+    return result

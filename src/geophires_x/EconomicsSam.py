@@ -433,7 +433,7 @@ def validate_read_parameters(model: Model) -> None:
             f'{eir.Name} provided value ({eir.value}) will be ignored. (SAM Economics does not support {eir.Name}.)'
         )
 
-    econ = model.economics
+    econ: 'Economics' = model.economics
 
     econ.construction_capex_schedule.value = _validate_construction_capex_schedule(
         econ.construction_capex_schedule,
@@ -447,6 +447,11 @@ def validate_read_parameters(model: Model) -> None:
             f'{econ.bond_financing_start_year.Name} ({econ.bond_financing_start_year.value}) is earlier than '
             f'first {model.surfaceplant.construction_years.Name[:-1]} ({-1 * (construction_years - 1)}). (OK)'
         )
+
+    if econ.royalty_rate.Provided and econ.royalty_rate_schedule.Provided:
+        raise ValueError(f'Only one of {econ.royalty_rate.Name} and {econ.royalty_rate_schedule.Name} may be provided.')
+
+        # TODO validate that other rate-style params are not provided when schedule is provided
 
 
 def _validate_construction_capex_schedule(
@@ -540,18 +545,39 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.project_npv.value = sf(_get_project_npv_musd(single_owner, cash_flow_operational_years, model))
     sam_economics.capex.value = single_owner.Outputs.adjusted_installed_cost * 1e-6
 
-    if model.economics.royalty_rate.Provided:
-        # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
-        # updated if more O&M production-based expenses are added to SAM-EM
-        sam_economics.royalties_opex.value = [
+    if model.economics.has_royalties:
+        combined_royalties_usd = [
             *_pre_revenue_years_vector(model),
-            *[
-                quantity(it, 'USD / year').to(sam_economics.royalties_opex.CurrentUnits).magnitude
-                for it in _cash_flow_profile_row(cash_flow_operational_years, ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY)
-            ],
+            *([0] * (model.surfaceplant.plant_lifetime.value + 1)),
         ]
 
-        sam_economics._royalties_rate_schedule = model.economics.get_royalty_rate_schedule(model)
+        if model.economics.has_production_based_royalties:
+            # Assumes that royalties opex is the only possible O&M production-based expense - this logic will need to be
+            # updated if more O&M production-based expenses are added to SAM-EM
+            production_based_royalties_usd = [
+                *_pre_revenue_years_vector(model),
+                *[
+                    quantity(it, 'USD / year').to(sam_economics.royalties_opex.CurrentUnits).magnitude
+                    for it in _cash_flow_profile_row(
+                        cash_flow_operational_years, ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY
+                    )
+                ],
+            ]
+
+            for i, annual_production_based_royalties_usd in enumerate(production_based_royalties_usd):
+                combined_royalties_usd[i] += annual_production_based_royalties_usd
+
+            sam_economics._royalties_rate_schedule = model.economics.get_royalty_rate_schedule(model)
+
+        if model.economics.royalty_supplemental_payments.Provided:
+            royalty_supplemental_payments_schedule_usd = model.economics.get_royalty_supplemental_payments_schedule_usd(
+                model
+            )
+
+            for i, annual_royalty_supplemental_payment_usd in enumerate(royalty_supplemental_payments_schedule_usd):
+                combined_royalties_usd[i] += annual_royalty_supplemental_payment_usd
+
+        sam_economics.royalties_opex.value = combined_royalties_usd
 
     sam_economics.nominal_discount_rate.value, sam_economics.wacc.value = _calculate_nominal_discount_rate_and_wacc_pct(
         model, single_owner
@@ -920,8 +946,15 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     # Pass the final, correct values to SAM
     ret['total_installed_cost'] = total_installed_cost_usd
 
-    opex_musd = econ.Coam.value
-    ret['om_fixed'] = [opex_musd * 1e6] * model.surfaceplant.plant_lifetime.value
+    opex_base_usd = econ.Coam.quantity().to('USD/yr').magnitude
+    opex_by_year_usd = []
+    royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
+        _pre_revenue_years_count(model) :
+    ]
+    for year_index in range(model.surfaceplant.plant_lifetime.value):
+        opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
+
+    ret['om_fixed'] = opex_by_year_usd
 
     # GEOPHIRES assumes O&M fixed costs are not affected by inflation
     ret['om_fixed_escal'] = -1.0 * _pct(econ.RINFL)
@@ -949,7 +982,7 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     ppa_price_schedule_per_kWh = _get_ppa_price_schedule_per_kWh(model)
     ret['ppa_price_input'] = ppa_price_schedule_per_kWh
 
-    if model.economics.royalty_rate.Provided:
+    if model.economics.has_production_based_royalties:
         ret['om_production'] = _get_royalties_variable_om_USD_per_MWh_schedule(model)
 
     # Debt/equity ratio
@@ -1036,6 +1069,10 @@ def _ppa_pricing_model(
 
 
 def _get_royalty_rate_schedule(model: Model) -> list[float]:
+    """
+    Delegates to the Economics instance which now supports the DSL-based
+    royalty_rate_schedule parameter with automatic fallback.
+    """
     return model.economics.get_royalty_rate_schedule(model)
 
 
