@@ -3604,7 +3604,6 @@ class Economics:
         # since SAM Economic Model doesn't subtract ITC from this value.
         self.capex_total.value = (self.sam_economics_calculations.capex.quantity()
                                   .to(self.capex_total.CurrentUnits.value).magnitude)
-        # self.capex_total_per_kw.value = PlainQuantity(self.capex_total.value, f'{self.capex_total.CurrentUnits}'
 
         # TODO define this as an output of SurfacePlant rather than calculating it on-demand here and elsewhere
         max_net_electricity_generation_kw = quantity(
