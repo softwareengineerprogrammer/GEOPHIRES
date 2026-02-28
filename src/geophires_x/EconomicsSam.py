@@ -433,7 +433,7 @@ def validate_read_parameters(model: Model) -> None:
             f'{eir.Name} provided value ({eir.value}) will be ignored. (SAM Economics does not support {eir.Name}.)'
         )
 
-    econ = model.economics
+    econ: 'Economics' = model.economics
 
     econ.construction_capex_schedule.value = _validate_construction_capex_schedule(
         econ.construction_capex_schedule,
@@ -447,6 +447,11 @@ def validate_read_parameters(model: Model) -> None:
             f'{econ.bond_financing_start_year.Name} ({econ.bond_financing_start_year.value}) is earlier than '
             f'first {model.surfaceplant.construction_years.Name[:-1]} ({-1 * (construction_years - 1)}). (OK)'
         )
+
+    if econ.royalty_rate.Provided and econ.royalty_rate_schedule.Provided:
+        raise ValueError(f'Only one of {econ.royalty_rate.Name} and {econ.royalty_rate_schedule.Name} may be provided.')
+
+        # TODO validate that other rate-style params are not provided when schedule is provided
 
 
 def _validate_construction_capex_schedule(
