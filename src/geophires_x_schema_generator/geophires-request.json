@@ -1735,7 +1735,7 @@
       "category": "Economics",
       "default": [],
       "minimum": 0.0,
-      "maximum": 1.0
+      "maximum": 100000.0
     },
     "Royalty Holder Discount Rate": {
       "description": "The discount rate used to calculate the Net Present Value (NPV) of the royalty holder's income stream. This rate should reflect the royalty holder's specific risk profile and is separate from the main project discount rate.",

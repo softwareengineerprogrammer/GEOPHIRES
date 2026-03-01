@@ -1056,7 +1056,8 @@ class Economics:
         self.royalty_supplemental_payments = self.ParameterDict[self.royalty_supplemental_payments.Name] = listParameter(
             'Royalty Supplemental Payments',
             Min=0.0,
-            Max=1.0,
+            # pint treats GUSD as billions of dollars (G for giga)
+            Max=quantity(100, 'GUSD').to('MUSD').magnitude,
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
