@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import re
 
 import sys
 from array import array
@@ -455,11 +456,11 @@ def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify: listPar
             ParamToModify.value.insert(position, New_val)
     else:
         # In an ideal world this would be handled in ParameterEntry such that its sValue and Comment are
-        # correct; however that would only be practical if ParameterEntry had typing information to know
+        # correct; however, that would only be practical if ParameterEntry had typing information to know
         # whether to treat text after a second comma as a comment or list entry.
 
         ParamToModify.value = [float(x.strip()) if is_float(x.strip()) else x.strip() for x in
-                               ParameterReadIn.raw_entry.split('--')[0].split(',')[1:] if x.strip() != '']
+                               re.split(r',\s*--', ParameterReadIn.raw_entry)[0].split(',')[1:] if x.strip() != '']
 
     ParamToModify.Provided = True
 
