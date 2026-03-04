@@ -15,7 +15,7 @@ from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter,
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
-    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule
+    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
@@ -3464,7 +3464,7 @@ class Economics:
         plant_lifetime: int = model.surfaceplant.plant_lifetime.value
 
         if self.royalty_rate_schedule.Provided and self.royalty_rate_schedule.value:
-            return expand_schedule(self.royalty_rate_schedule.value, plant_lifetime)
+            return expand_schedule_dsl(self.royalty_rate_schedule.value, plant_lifetime)
 
         def r(x: float) -> float:
             """Ignore apparent float precision issue"""
@@ -3490,7 +3490,7 @@ class Economics:
         construction_years: int = model.surfaceplant.construction_years.value
         operational_years: int = model.surfaceplant.plant_lifetime.value
 
-        royalty_supplemental_payments_schedule_expanded = expand_schedule(
+        royalty_supplemental_payments_schedule_expanded = expand_schedule_dsl(
             self.royalty_supplemental_payments.value, construction_years + operational_years)
 
         royalty_supplemental_payments_schedule_usd = [
