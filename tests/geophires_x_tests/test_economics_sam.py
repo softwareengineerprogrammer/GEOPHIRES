@@ -1135,10 +1135,7 @@ class EconomicsSamTestCase(BaseTestCase):
 
         m_mod: Model = EconomicsSamTestCase._new_model(
             self._egs_test_file_path(),
-            additional_params=base_params
-            | {
-                'Royalty Rate Escalation': 0.01,
-            },
+            additional_params={**base_params, 'Royalty Rate Escalation': 0.01},
             read_and_calculate=True,
             enable_logging_config=True,
         )
