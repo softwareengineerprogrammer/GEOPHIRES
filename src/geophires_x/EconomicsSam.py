@@ -451,7 +451,18 @@ def validate_read_parameters(model: Model) -> None:
     if econ.royalty_rate.Provided and econ.royalty_rate_schedule.Provided:
         raise ValueError(f'Only one of {econ.royalty_rate.Name} and {econ.royalty_rate_schedule.Name} may be provided.')
 
-        # TODO validate that other rate-style params are not provided when schedule is provided
+    if econ.royalty_rate_schedule.Provided:
+        ignored_rate_modifiers = [
+            econ.royalty_escalation_rate,
+            econ.royalty_escalation_rate_start_year,
+            econ.maximum_royalty_rate,
+        ]
+        for modifier in ignored_rate_modifiers:
+            if modifier.Provided:
+                model.logger.warning(
+                    f'{modifier.Name} provided value ({modifier.value}) will be ignored. '
+                    f'This parameter is not currently applied when {econ.royalty_rate_schedule.Name} is used.'
+                )
 
 
 def _validate_construction_capex_schedule(

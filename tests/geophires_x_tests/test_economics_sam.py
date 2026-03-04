@@ -1116,6 +1116,43 @@ class EconomicsSamTestCase(BaseTestCase):
                         except AssertionError as dict_exactly_equal_error:
                             raise dict_exactly_equal_error from dict_almost_equal_error
 
+    def test_royalty_schedule_ignores_rate_modifier_params(self):
+        plant_lifetime = 25
+        construction_years = 5
+
+        royalty_rate_schedule_param_name = 'Royalty Rate Schedule'
+
+        base_params = {
+            royalty_rate_schedule_param_name: '0.1, 0.11, 0.12, 0.13, 0.14, 0.15 * 15',
+            'Plant Lifetime': plant_lifetime,
+            'Construction Years': construction_years,
+        }
+
+        m_base: Model = EconomicsSamTestCase._new_model(
+            self._egs_test_file_path(), additional_params=base_params, read_and_calculate=True
+        )
+        r_base: GeophiresXResult = self._get_result_from_model(m_base)
+
+        m_mod: Model = EconomicsSamTestCase._new_model(
+            self._egs_test_file_path(),
+            additional_params=base_params
+            | {
+                'Royalty Rate Escalation': 0.01,
+            },
+            read_and_calculate=True,
+            enable_logging_config=True,
+        )
+        r_mod: GeophiresXResult = self._get_result_from_model(m_mod)
+
+        def _dm(r_r: dict[str, Any]) -> dict[str, Any]:
+            for k in ['metadata', 'Simulation Metadata']:
+                r_r.pop(k, None)
+            return r_r
+
+        self.assertDictAlmostEqual(_dm(r_base.result), _dm(r_mod.result))
+
+        # TODO assert ignore message in logs
+
     def test_royalty_rate_escalation_start_year(self) -> None:
         construction_years: int = 5
         plant_lifetime: int = 20
@@ -1270,7 +1307,12 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertEqual(lcoe_row[0], round(pv_annual_costs_row[0] * 100 / pv_annual_energy_row[0], 2))
 
     @staticmethod
-    def _new_model(input_file: Path, additional_params: dict[str, Any] | None = None, read_and_calculate=True) -> Model:
+    def _new_model(
+        input_file: Path,
+        additional_params: dict[str, Any] | None = None,
+        read_and_calculate=True,
+        enable_logging_config: bool = False,
+    ) -> Model:
         if additional_params is not None:
             params = GeophiresInputParameters(from_file_path=input_file, params=additional_params)
             input_file = params.as_file_path()
@@ -1280,7 +1322,7 @@ class EconomicsSamTestCase(BaseTestCase):
 
         sys.argv = ['']
 
-        m = Model(enable_geophires_logging_config=False, input_file=input_file)
+        m = Model(enable_geophires_logging_config=enable_logging_config, input_file=input_file)
 
         sys.argv = stash_sys_argv
         os.chdir(stash_cwd)
