@@ -1201,7 +1201,13 @@ class EconomicsSamTestCase(BaseTestCase):
 
         result: GeophiresXResult = EconomicsSamTestCase._get_result_from_model(m)
 
+        pre_rev_cashflow = self._get_cash_flow_row(
+            result.result['SAM CASH FLOW PROFILE'], 'Royalty supplemental payments [construction] ($)'
+        )
+        self.assertEqual(-3_500_000, sum(pre_rev_cashflow))
+
         opex_cashflow = self._get_cash_flow_row(result.result['SAM CASH FLOW PROFILE'], 'O&M fixed expense ($)')
+
         operational_years_opex_cashflow_usd = opex_cashflow[construction_years:]
         self.assertEqual(150_000, operational_years_opex_cashflow_usd[2] - operational_years_opex_cashflow_usd[3])
 
@@ -1211,6 +1217,21 @@ class EconomicsSamTestCase(BaseTestCase):
             PlainQuantity(sum(expected_schedule), 'USD').to(royalty_holder_total_revenue_vu['unit']).magnitude,
             places=2,
         )
+
+    def test_royalty_supplemental_payments_negative_value_invalid(self):
+        plant_lifetime = 25
+        construction_years = 5
+
+        with self.assertRaises(ValueError) as ve:
+            EconomicsSamTestCase._new_model(
+                self._egs_test_file_path(),
+                additional_params={
+                    'Royalty Supplemental Payments': '-1 * 3, 0.25 * 5, 0.1',
+                    'Plant Lifetime': plant_lifetime,
+                    'Construction Years': construction_years,
+                },
+            )
+            self.assertIn('Royalty Supplemental Payments is invalid', str(ve.exception))
 
     def test_sam_cash_flow_total_after_tax_returns_all_years(self):
         input_file = self._egs_test_file_path()
