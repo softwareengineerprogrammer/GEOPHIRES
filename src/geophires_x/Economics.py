@@ -2166,9 +2166,9 @@ class Economics:
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            ToolTipText='The average annual cost paid to a royalty holder, calculated as a percentage of the '
-                        'project\'s gross annual revenue. This is modeled as a variable operating expense.'
-            # TODO adjust for Royalty Supplemental Payments, including explaining construction vs. operational years
+            ToolTipText="The developer's average annual royalty expense over the project\'s operational lifetime. "
+                        "This value combines both production-based royalties (percentage of gross revenue) and any "
+                        "scheduled supplemental royalty payments."
         )
 
 
@@ -2403,7 +2403,8 @@ class Economics:
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
-            ToolTipText=f"The pre-tax Net Present Value (NPV) of the royalty holder's income stream, "
+            ToolTipText=f"The pre-tax Net Present Value (NPV) of the royalty holder's income stream "
+                        f"(production-based and supplemental payments), "
                         f"calculated using the {self.royalty_holder_discount_rate.Name}. "
                         f"This is a pre-tax value because the model does not account for the royalty holder's specific "
                         f"tax liabilities."
@@ -2415,8 +2416,8 @@ class Economics:
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            # TODO clarify that this includes construction years (production-based vs. supplemental payments)
-            ToolTipText="The royalty holder's gross (pre-tax) annual revenue stream from the royalty agreement."
+            ToolTipText="The royalty holder's average gross (pre-tax) annual revenue stream during the operational "
+                        "phase, combining both production-based and supplemental payments."
         )
         self.royalty_holder_total_revenue = self.OutputParameterDict[
             self.royalty_holder_total_revenue.Name
@@ -2425,8 +2426,9 @@ class Economics:
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
-            ToolTipText='The total gross (pre-tax), undiscounted revenue received by the royalty holder over the '
-                        'project lifetime.'
+            ToolTipText="The total gross (pre-tax), undiscounted revenue received by the royalty holder over the "
+                        "entire project timeline. This includes both production-based royalties during operations and "
+                        "supplemental payments made during construction and operations."
         )
 
         model.logger.info(f'Complete {__class__!s}: {sys._getframe().f_code.co_name}')
