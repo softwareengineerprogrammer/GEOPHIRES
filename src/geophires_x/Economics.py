@@ -983,6 +983,9 @@ class Economics:
                         "will be automatically set to the same value."
         )
 
+        royalty_rate_and_schedule_mutual_exclusivity_note = ("Note: Providing both Royalty Rate and Royalty Rate "
+                                                             "Schedule is invalid and will result in an error.")
+
         self.royalty_rate = self.ParameterDict[self.royalty_rate.Name] = floatParameter(
             'Royalty Rate',
             DefaultValue=0.,
@@ -991,11 +994,10 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
-            # TODO clarify relation to supplemental payments
-            # TODO document mutual incompatibility with Royalty Rate Schedule
             ToolTipText="The fraction of the project's gross annual revenue paid to the royalty holder. "
                         "This is modeled as a variable production-based operating expense, reducing the developer's "
-                        "taxable income."
+                        "taxable income. It is calculated in addition to any scheduled Royalty Supplemental Payments. "
+                        f"{royalty_rate_and_schedule_mutual_exclusivity_note}"
         )
 
         rate_based_only_param_note = (f'Note: This parameter only applies if {self.royalty_rate.Name} is provided '
@@ -1048,13 +1050,11 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
-            ToolTipText='A schedule DSL string defining the royalty rate for each year of the project, '
-                        'starting at Year 1. '  # TODO clarify this means operational phase/COD
-                        'Syntax: "<rate> * <years>, <rate> * <years>, ..., <terminal_rate>". '
-                        'For example "0.0175 * 10, 0.035" means 1.75% for 10 years then 3.5% thereafter. '
-                        # TODO document mutual exclusivity with Royalty Rate
-                        # 'If provided, this overrides Royalty Rate, Royalty Rate Escalation, '
-                        # 'and Royalty Rate Maximum.'
+            ToolTipText=f'A schedule DSL string defining the royalty rate for each year of the project, '
+                        f'starting at the first year of plant operations (Year 1, post-construction). '
+                        f'Syntax: "<rate> * <years>, <rate> * <years>, ..., <terminal_rate>". '
+                        f'For example "0.0175 * 10, 0.035" means 1.75% for 10 years then 3.5% thereafter. '
+                        f'{royalty_rate_and_schedule_mutual_exclusivity_note}'
         )
 
         self.royalty_supplemental_payments = self.ParameterDict[self.royalty_supplemental_payments.Name] = listParameter(
@@ -1066,11 +1066,12 @@ class Economics:
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            # TODO improve phrasing, contrast with Royalty Rate Schedule beginning at Year 1
-            ToolTipText='A schedule DSL string defining the royalty supplemental payments for each year of the '
-                        'project, starting at the first construction year. '
-                        'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>". '
-                        'For example "1 * 2, 0.25" means $1M for 2 years then $250k/year thereafter. '
+            ToolTipText=f'A schedule DSL string defining the royalty supplemental payments for each year of the '
+                        f'project. Unlike the {self.royalty_rate_schedule.Name} which begins at operations, '
+                        f'this schedule begins at the first year of project construction. '
+                        f'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>". '
+                        f'For example "1 * 2, 0.25" means $1M for 2 years (e.g., during construction) then $250k/year '
+                        f'thereafter. '
         )
 
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(
