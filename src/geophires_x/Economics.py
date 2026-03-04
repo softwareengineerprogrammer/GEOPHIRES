@@ -2419,8 +2419,9 @@ class Economics:
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            ToolTipText="The royalty holder's average gross (pre-tax) annual revenue stream during the operational "
-                        "phase, combining both production-based and supplemental payments."
+            ToolTipText="The royalty holder's average gross (pre-tax) annual revenue stream over the entire project "
+                        "timeline (construction + operations). "
+                        "This combines both production-based royalties and any scheduled supplemental payments."
         )
         self.royalty_holder_total_revenue = self.OutputParameterDict[
             self.royalty_holder_total_revenue.Name
