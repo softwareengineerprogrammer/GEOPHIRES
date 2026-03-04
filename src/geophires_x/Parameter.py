@@ -166,7 +166,7 @@ class Parameter(HasQuantity):
 
     parameter_category: str = None
 
-    ValuesEnum:GeophiresInputEnum = None
+    ValuesEnum: GeophiresInputEnum = None
 
     def __post_init__(self):
         if self.PreferredUnits is None:
@@ -290,6 +290,9 @@ class listParameter(Parameter):
     Min: float = -1.8e308
     Max: float = 1.8e308
     json_parameter_type: str = _JSON_PARAMETER_TYPE_ARRAY
+
+    auto_raise_exception_on_invalid_read: bool = False  # Should be True for newly added parameters
+    # TODO push this up to the Parameter class and add support for all parameter types (not just list)
 
 
 def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None:
@@ -501,6 +504,9 @@ def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify: listPar
             model.logger.warning(msg)
 
     ParamToModify.Valid = valid
+
+    if not ParamToModify.Valid and ParamToModify.auto_raise_exception_on_invalid_read:
+        raise ValueError(f'Invalid value provided for {ParamToModify.Name}: {ParamToModify.value}')
 
 
 def ConvertUnits(ParamToModify, strUnit: str, model) -> str:

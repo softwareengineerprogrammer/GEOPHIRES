@@ -1231,7 +1231,7 @@ class EconomicsSamTestCase(BaseTestCase):
                     'Construction Years': construction_years,
                 },
             )
-            self.assertIn('Royalty Supplemental Payments is invalid', str(ve.exception))
+            self.assertIn('Invalid value provided for Royalty Supplemental Payments:', str(ve.exception))
 
     def test_sam_cash_flow_total_after_tax_returns_all_years(self):
         input_file = self._egs_test_file_path()

@@ -453,11 +453,6 @@ def validate_read_parameters(model: Model) -> None:
 
         # TODO validate that other rate-style params are not provided when schedule is provided
 
-    royalty_schedule_param: listParameter
-    for royalty_schedule_param in [econ.royalty_rate_schedule, econ.royalty_supplemental_payments]:
-        if royalty_schedule_param.Provided and not royalty_schedule_param.Valid:
-            raise ValueError(f'{royalty_schedule_param.Name} is invalid: {royalty_schedule_param.value}')
-
 
 def _validate_construction_capex_schedule(
     econ_capex_schedule: listParameter, construction_years: int, model: Model

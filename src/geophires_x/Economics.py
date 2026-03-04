@@ -1041,6 +1041,7 @@ class Economics:
             'Royalty Rate Schedule',
             Min=0.0,
             Max=1.0,
+            auto_raise_exception_on_invalid_read=True,
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
@@ -1058,6 +1059,7 @@ class Economics:
             Min=0.0,
             # pint treats GUSD as billions of dollars (G for giga)
             Max=quantity(100, 'GUSD').to('MUSD').magnitude,
+            auto_raise_exception_on_invalid_read=True,
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
