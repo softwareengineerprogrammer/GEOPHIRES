@@ -84,34 +84,38 @@ Add-ons with electricity and heat are not currently supported, but may be suppor
 
 ## Royalties
 
-[Royalties example web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
+SAM Economic Models can model royalty agreements where compensation is paid to a third party (the "royalty holder").
+GEOPHIRES supports two complementary mechanisms for these agreements: **production-based royalties**
+(a percentage of the project's gross revenue)
+and **supplemental royalty payments** (a scheduled fixed cash flow, such as option payments or land leases).
 
-SAM Economic Models can model a royalty agreement where a percentage of the project's gross revenue is paid to a third
-party (the "royalty holder"). This feature is enabled by providing the `Royalty Rate` parameter.
+From the perspective of the project developer (Single Owner), these payments are modeled as tax-deductible expenses to ensure accurate after-tax metrics (NPV, IRR, etc.).
+The two mechanisms are mapped to SAM differently:
 
-The royalty payment is modeled as a tax-deductible variable operating expense from the perspective of the project
-developer (Single Owner).
-This reduces the developer's taxable income and ensures their final after-tax metrics (NPV, IRR, etc.) are calculated
-accurately.
-
-This is implemented by having GEOPHIRES create a year-by-year schedule for SAM's Variable operating cost (
-`om_production`) input.
-The value for each year is calculated based on that year's PPA price and the user-provided `Royalty Rate`, ensuring the
-expense in SAM matches the royalty due on gross revenue.
+1. **Production-based royalties**: GEOPHIRES translates the percentage rate into a year-by-year schedule for SAM's Variable operating cost (`om_production`) input, calculated against the PPA price to accurately reflect a cut of the gross revenue.
+    1. [Production-based royalties example web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
+1. **Supplemental payments**: These are split between the construction and operational phases. Payments made during construction are capitalized into the project's basis (added to the total installed cost and debt-financed), while payments during the operational phase are treated as fixed O&M expenses (`om_fixed`).
+    1. [Supplemental royalty payments example web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b) (also includes production-based royalties specified as a schedule)
 
 Input Parameters:
 
-1. `Royalty Rate`: The percentage of the project's gross annual revenue paid to the royalty holder. It can be optionally
+1. `Royalty Rate` (production-based royalties): The percentage of the project's gross annual revenue paid to the royalty holder. It can be optionally
    escalated by providing `Royalty Rate Escalation` and capped with `Royalty Rate Maximum`, starting at
    `Royalty Rate Escalation Start Year`.
+    1. Alternatively, you can provide `Royalty Rate Schedule` to explicitly define the rates over time using the scheduling syntax (see below), beginning at Year 1 (beginning of operations).
+1. `Royalty Supplemental Payments`: A scheduled cash flow of absolute payments (in M$) made to the royalty holder. This is useful for modeling option payments, land leases, or minimum fixed royalties.
+    1. Scheduling Syntax: Schedules are defined using a `<value> * <years>` duration format. If a duration is omitted, that value becomes the terminal value and repeats for the remainder of the project.
+    1. Example:` 1.0 * 3, 0.1 `results in \$1M/year for the first 3 years, dropping to $100k/year for all remaining years.
+    1. Note: The `Royalty Supplemental Payments` schedule begins at the first year of construction (unlike `Royalty Rate Schedule`) . If you wish to defer payments until operations begin, pad the front of your schedule with zeros (e.g., `0.0 * 2, 0.5` for a 2-year construction period).
 1. `Royalty Holder Discount Rate` (optional): The discount rate used to calculate the Net Present Value (NPV) of the
    royalty holder's income stream. This is separate from the project's main discount rate to reflect the different risk
    profiles of the two parties.
 
 Output Parameters:
 
-1. Cash Flow: The royalty rate schedule is displayed in the `Royalty rate (%)` cash flow line item. The royalties
-   expense for each year is included in the cash flow line item `O&M production-based expense ($)`.
+1. **Cash Flow**:
+    1. The production-based royalty rate schedule is displayed in the `Royalty rate (%)` line item, and its corresponding dollar expense is included in `O&M production-based expense ($)`.
+    1. Operational supplemental payments are rolled into the `O&M fixed expense ($)` line item. Pre-revenue supplemental payments are capitalized into the project's `Installed cost ($)`.
 1. `Average Annual Royalty Cost`: The developer's average annual royalty expense over the project's lifetime after
    construction is complete (Year 1). The same value is also output as `Royalty Holder Average Annual Revenue`.
 1. `Royalty Holder Total Revenue`: The total gross (pre-tax), undiscounted royalty income over the project's lifetime.
