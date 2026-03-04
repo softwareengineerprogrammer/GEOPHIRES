@@ -998,6 +998,9 @@ class Economics:
                         "taxable income."
         )
 
+        rate_based_only_param_note = (f'Note: This parameter only applies if {self.royalty_rate.Name} is provided '
+                                      f'and is invalid if Royalty Rate Schedule is provided.')
+
         self.royalty_escalation_rate = self.ParameterDict[self.royalty_escalation_rate.Name] = floatParameter(
             'Royalty Rate Escalation',
             DefaultValue=0.,
@@ -1006,9 +1009,9 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
-            # TODO clarify applies to Royalty Rate and not schedule
-            ToolTipText="The additive amount the royalty rate increases each year. For example, a value of 0.001 "
-                        "increases a 4% rate (0.04) to 4.1% (0.041) in the next year."
+            ToolTipText=f"The additive amount the royalty rate increases each year. For example, a value of 0.001 "
+                        f"increases a 4% rate (0.04) to 4.1% (0.041) in the next year. "
+                        f"{rate_based_only_param_note}"
         )
 
         self.royalty_escalation_rate_start_year = self.ParameterDict[self.royalty_escalation_rate_start_year.Name] = intParameter(
@@ -1018,9 +1021,9 @@ class Economics:
             UnitType=Units.NONE,
             PreferredUnits=TimeUnit.YEAR,
             CurrentUnits=TimeUnit.YEAR,
-            # TODO clarify applies to Royalty Rate and not schedule
             ToolTipText=f'The first year that the {self.royalty_escalation_rate.Name} is applied. '
-                        f'{_YEAR_INDEX_VALUE_EXPLANATION_SNIPPET}.'
+                        f'{_YEAR_INDEX_VALUE_EXPLANATION_SNIPPET}. '
+                        f'{rate_based_only_param_note}'
         )
 
         maximum_royalty_rate_default_val = 1.0
@@ -1032,9 +1035,9 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
-            # TODO clarify applies to Royalty Rate and not schedule
             ToolTipText=f"The maximum royalty rate after escalation, expressed as a fraction (e.g., 0.06 for a 6% cap)."
-                        f"{' Defaults to 100% (no effective cap).' if maximum_royalty_rate_default_val == 1.0 else ''}"
+                        f"{' Defaults to 100% (no effective cap).' if maximum_royalty_rate_default_val == 1.0 else ''} "
+                        f"{rate_based_only_param_note}"
         )
 
         self.royalty_rate_schedule = self.ParameterDict[self.royalty_rate_schedule.Name] = listParameter(
