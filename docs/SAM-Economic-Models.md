@@ -131,6 +131,7 @@ Documentation: [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](F
 1. [SAM Single Owner PPA: 50 MWe](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA)
 2. [SAM Single Owner PPA: 50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
 3. [SAM Single Owner PPA: 50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
+4. [SAM Economic Model: Royalty Schedule & Supplemental Payments](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b)
 4. [SAM Economic Model Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
 
 ### SAM Single Owner PPA: 400 MWe BICYCLE Comparison
