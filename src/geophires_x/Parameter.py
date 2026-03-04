@@ -6,9 +6,8 @@ import dataclasses
 import re
 
 import sys
-from array import array
 from collections.abc import Iterable
-from typing import List, Optional, Any
+from typing import List, Optional
 from dataclasses import dataclass, field
 from enum import IntEnum
 from forex_python.converter import CurrencyRates, CurrencyCodes
@@ -291,8 +290,12 @@ class listParameter(Parameter):
     Max: float = 1.8e308
     json_parameter_type: str = _JSON_PARAMETER_TYPE_ARRAY
 
-    auto_raise_exception_on_invalid_read: bool = False  # Should be True for newly added parameters
     # TODO push this up to the Parameter class and add support for all parameter types (not just list)
+    auto_raise_exception_on_invalid_read: bool = False
+    """
+    Whether to automatically raise an exception when an invalid read occurs.
+    Should be True for newly added parameters (False default is for backwards compatibility).
+    """
 
 
 def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None:
