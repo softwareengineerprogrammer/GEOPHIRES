@@ -198,14 +198,16 @@ def total_capex_parameter_output_parameter() -> OutputParameter:
 
 
 def royalty_cost_output_parameter() -> OutputParameter:
+    """
+    Note: this is an internal-only intermediate output parameter, so it has no user-facing tooltip text.
+    See usage in EconomicsSam.py.
+    """
+
     return OutputParameter(
         Name='Royalty Cost',
         UnitType=Units.CURRENCYFREQUENCY,
         PreferredUnits=CurrencyFrequencyUnit.DOLLARSPERYEAR,
         CurrentUnits=CurrencyFrequencyUnit.DOLLARSPERYEAR,
-        # TODO/WIP - clarify production-based vs. supplemental payments
-        ToolTipText='The annual costs paid to a royalty holder, calculated as a percentage of the '
-        'project\'s gross annual revenue. This is modeled as a variable operating expense.',
     )
 
 
