@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from geophires_x.Parameter import OutputParameter
+from geophires_x.Parameter import OutputParameter, SCHEDULE_DSL_MULTIPLIER_SYMBOL
 from geophires_x.Units import Units, PercentUnit, TimeUnit, CurrencyUnit, CurrencyFrequencyUnit
 
 CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME = 'Construction CAPEX Schedule'
@@ -226,10 +226,10 @@ def expand_schedule_dsl(schedule_strings: list[str | float], total_years: int) -
     """
     Parse a duration-based scheduling DSL and expand it into a fixed-length time-series array.
 
-    Syntax: ``[Value] * [Years], [Value] * [Years], ..., [Terminal Value]``
+    Syntax: `[Value] * [Years], [Value] * [Years], ..., [Terminal Value]`
 
-    The terminal (last) value is repeated to fill ``total_years``.  A bare scalar
-    (e.g. ``['2.5']``) is treated as a terminal value and broadcast across all years.
+    The terminal (last) value is repeated to fill `total_years`.  A bare scalar
+    (e.g. `['2.5']`) is treated as a terminal value and broadcast across all years.
 
     Examples::
 
@@ -240,14 +240,14 @@ def expand_schedule_dsl(schedule_strings: list[str | float], total_years: int) -
         # => [2.5, 2.5, 2.5, 2.5]
 
     :param schedule_strings: list of DSL segment strings.  Each element is either
-        ``"<value> * <years>"`` (a run-length segment) or ``"<value>"`` (a scalar,
+        `"<value> * <years>"``(a run-length segment) or `"<value>"` (a scalar,
         which becomes the terminal value when it is the last element, or a 1-year
         segment otherwise).
     :param total_years: The total number of years the expanded array must span
-        (typically ``construction_years + plant_lifetime``).
-    :returns: A ``list[float]`` of length ``total_years``.
+        (typically `construction_years + plant_lifetime`).
+    :returns: A `list[float]` of length `total_years`.
     :raises ValueError: On malformed DSL strings or when explicit segments exceed
-        ``total_years``.
+        `total_years`.
     """
     if total_years <= 0:
         return []
@@ -258,8 +258,8 @@ def expand_schedule_dsl(schedule_strings: list[str | float], total_years: int) -
     segments: list[tuple[float, int | None]] = []
     for raw in schedule_strings:
         raw = str(raw).strip()
-        if '*' in raw:
-            parts = raw.split('*')
+        if SCHEDULE_DSL_MULTIPLIER_SYMBOL in raw:
+            parts = raw.split(SCHEDULE_DSL_MULTIPLIER_SYMBOL)
             if len(parts) != 2:
                 raise ValueError(f'Invalid schedule segment "{raw}": expected "<value> * <years>".')
             value = float(parts[0].strip())

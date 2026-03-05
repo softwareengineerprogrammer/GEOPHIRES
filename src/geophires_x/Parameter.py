@@ -19,6 +19,8 @@ from pint.facets.plain import PlainQuantity
 from geophires_x.OptionList import GeophiresInputEnum
 from geophires_x.Units import *
 
+SCHEDULE_DSL_MULTIPLIER_SYMBOL = '*'
+
 _ureg = get_unit_registry()
 _DISABLE_FOREX_API = True  # See https://github.com/NREL/GEOPHIRES-X/issues/236#issuecomment-2414681434
 
@@ -332,7 +334,7 @@ def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None
         return
 
     # deal with the case where the value has a unit involved - that will be indicated by a space in it
-    if ' ' in ParameterReadIn.sValue and '*' not in ParameterReadIn.sValue:
+    if ' ' in ParameterReadIn.sValue and SCHEDULE_DSL_MULTIPLIER_SYMBOL not in ParameterReadIn.sValue:
         new_str = ConvertUnits(ParamToModify, ParameterReadIn.sValue, model)
         if len(new_str) > 0:
             ParameterReadIn.sValue = new_str
