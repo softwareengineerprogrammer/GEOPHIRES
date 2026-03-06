@@ -172,7 +172,7 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `Fervo_Project_Cape-5.txt <tests/examples/Fervo_Project_Cape-5.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape-5.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-5>`__
-   * - 100 MW EGS Modeled on Fervo Cape Station (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html#Fervo_Project_Cape-6-section>`__)
+   * - 100 MW EGS Modeled on Fervo Cape Station
      - `Fervo_Project_Cape-6.txt <tests/examples/Fervo_Project_Cape-6.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape-6.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-6>`__
@@ -316,7 +316,7 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SHR-2.txt <tests/examples/example_SHR-2.txt>`__
      - `.out <tests/examples/example_SHR-2.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-2>`__
-   * - SAM Single Owner PPA: 50 MWe
+   * - SAM Single Owner PPA: 50 MWe (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html>`__)
      - `example_SAM-single-owner-PPA.txt <tests/examples/example_SAM-single-owner-PPA.txt>`__
      - `.out <tests/examples/example_SAM-single-owner-PPA.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA>`__
