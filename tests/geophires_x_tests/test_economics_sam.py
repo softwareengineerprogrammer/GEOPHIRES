@@ -1252,6 +1252,20 @@ class EconomicsSamTestCase(BaseTestCase):
             places=2,
         )
 
+        cap_costs = result.result['CAPITAL COSTS (M$)']
+        expected_total_musd = 0
+        for field in [
+            'Overnight Capital Cost',
+            'Inflation costs during construction',
+            'Royalty supplemental payments during construction',
+            'Interest during construction',
+        ]:
+            output = cap_costs[field]
+            assert output['unit'] == 'MUSD'
+            expected_total_musd += output['value']
+
+        self.assertAlmostEqual(cap_costs['Total CAPEX']['value'], expected_total_musd, places=1)
+
     def test_royalty_supplemental_payments_negative_value_invalid(self):
         plant_lifetime = 25
         construction_years = 5
