@@ -272,6 +272,7 @@ class GeophiresXResult:
                 'Overnight Capital Cost',
                 # Displayed for economic models that treat inflation costs as capital costs (SAM-EM)
                 'Inflation costs during construction',
+                'Royalty supplemental payments during construction',
                 'Interest during construction',
                 'Total Add-on CAPEX',
                 'Total capital costs',
