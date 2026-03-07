@@ -454,7 +454,7 @@
         },
         "Overnight Capital Cost": {
           "type": "number",
-          "description": "Overnight Capital Cost (OCC) represents the total capital cost required to construct the plant if it were built instantly (\"overnight\"). This value excludes time-dependent costs such as inflation and interest incurred during the construction period.",
+          "description": "Overnight Capital Cost (OCC) represents the total capital cost required to construct the plant if it were built instantly (\"overnight\"). This value excludes time-dependent costs such as inflation, royalty supplemental payments, and interest incurred during the construction period.",
           "units": "MUSD"
         },
         "Inflation costs during construction": {

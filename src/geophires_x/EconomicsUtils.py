@@ -157,7 +157,8 @@ def overnight_capital_cost_output_parameter() -> OutputParameter:
         CurrentUnits=CurrencyUnit.MDOLLARS,
         ToolTipText='Overnight Capital Cost (OCC) represents the total capital cost required '
         'to construct the plant if it were built instantly ("overnight"). '
-        'This value excludes time-dependent costs such as inflation and '
+        'This value excludes time-dependent costs such as inflation, '
+        'royalty supplemental payments, and '
         'interest incurred during the construction period.',
     )
 
