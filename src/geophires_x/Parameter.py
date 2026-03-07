@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import re
 
 import sys
-from array import array
 from collections.abc import Iterable
-from typing import List, Optional, Any
+from typing import List, Optional
 from dataclasses import dataclass, field
 from enum import IntEnum
 from forex_python.converter import CurrencyRates, CurrencyCodes
@@ -19,6 +19,8 @@ from pint.facets.plain import PlainQuantity
 from geophires_x.OptionList import GeophiresInputEnum
 from geophires_x.Units import *
 
+SCHEDULE_DSL_MULTIPLIER_SYMBOL = '*'
+
 _ureg = get_unit_registry()
 _DISABLE_FOREX_API = True  # See https://github.com/NREL/GEOPHIRES-X/issues/236#issuecomment-2414681434
 
@@ -29,6 +31,7 @@ _JSON_PARAMETER_TYPE_ARRAY = 'array'
 _JSON_PARAMETER_TYPE_BOOLEAN = 'boolean'
 _JSON_PARAMETER_TYPE_OBJECT = 'object'
 
+
 class HasQuantity(ABC):
 
     def quantity(self) -> PlainQuantity:
@@ -36,7 +39,16 @@ class HasQuantity(ABC):
         :rtype: pint.registry.Quantity - note type annotation uses PlainQuantity due to issues with python 3.8 failing
             to import the Quantity TypeAlias
         """
-        return _ureg.Quantity(self.value, str(self.CurrentUnits.value))
+
+        quant_val = self.value
+
+        if isinstance(quant_val, str):
+            quant_val = float(quant_val)
+
+        if isinstance(quant_val, Iterable):
+            quant_val = [float(it) for it in quant_val]
+
+        return _ureg.Quantity(quant_val, str(self.CurrentUnits.value))
 
 
 @dataclass
@@ -155,7 +167,7 @@ class Parameter(HasQuantity):
 
     parameter_category: str = None
 
-    ValuesEnum:GeophiresInputEnum = None
+    ValuesEnum: GeophiresInputEnum = None
 
     def __post_init__(self):
         if self.PreferredUnits is None:
@@ -280,6 +292,13 @@ class listParameter(Parameter):
     Max: float = 1.8e308
     json_parameter_type: str = _JSON_PARAMETER_TYPE_ARRAY
 
+    # TODO push this up to the Parameter class and add support for all parameter types (not just list)
+    auto_raise_exception_on_invalid_read: bool = False
+    """
+    Whether to automatically raise an exception when an invalid read occurs.
+    Should be True for newly added parameters (False default is for backwards compatibility).
+    """
+
 
 def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None:
     """
@@ -315,16 +334,17 @@ def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None
         return
 
     # deal with the case where the value has a unit involved - that will be indicated by a space in it
-    if ' ' in ParameterReadIn.sValue:
+    if ' ' in ParameterReadIn.sValue and SCHEDULE_DSL_MULTIPLIER_SYMBOL not in ParameterReadIn.sValue:
         new_str = ConvertUnits(ParamToModify, ParameterReadIn.sValue, model)
         if len(new_str) > 0:
             ParameterReadIn.sValue = new_str
-    #else:
+    else:
         # The value came in without any units
         # TODO: determine the proper action in this case
         # (previously, it was assumed that the value must be
         # using the default PreferredUnits, which was not always
         # valid and led to incorrect units in the output)
+        pass
 
     def default_parameter_value_message(new_val: Any, param_to_modify_name: str, default_value: Any) -> str:
         return (
@@ -422,20 +442,13 @@ def ReadParameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None
     model.logger.info(f'Complete {str(__name__)}: {sys._getframe().f_code.co_name}')
 
 
-def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify, model) -> None:
+def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify: listParameter, model) -> None:
     """
     :type ParamToModify: :class:`~geophires_x.Parameter.Parameter`
     :type model: :class:`~geophires_x.Model.Model`
     """
 
-    def _is_int(o: Any) -> bool:
-        try:
-            float_n = float(o)
-            int_n = int(float_n)
-        except ValueError:
-            return False
-        else:
-            return float_n == int_n
+    from geophires_x.GeoPHIRESUtils import is_float, is_int as _is_int  # avoid circular imports
 
     is_positional_parameter = ' ' in ParameterReadIn.Name and _is_int(ParamToModify.Name.split(' ')[-1])
     if is_positional_parameter:
@@ -451,26 +464,54 @@ def _read_list_parameter(ParameterReadIn: ParameterEntry, ParamToModify, model) 
             ParamToModify.value.insert(position, New_val)
     else:
         # In an ideal world this would be handled in ParameterEntry such that its sValue and Comment are
-        # correct; however that would only be practical if ParameterEntry had typing information to know
+        # correct; however, that would only be practical if ParameterEntry had typing information to know
         # whether to treat text after a second comma as a comment or list entry.
-        ParamToModify.value = [float(x.strip()) for x in ParameterReadIn.raw_entry.split('--')[0].split(',')[1:]
-                               if x.strip() != '']
+
+        ParamToModify.value = [float(x.strip()) if is_float(x.strip()) else x.strip() for x in
+                               re.split(r',\s*--', ParameterReadIn.raw_entry)[0].split(',')[1:] if x.strip() != '']
 
     ParamToModify.Provided = True
+
+    # TODO make this a property of listParameter
+    is_boolean_type = (ParamToModify.DefaultValue is not None and
+        (isinstance(ParamToModify.DefaultValue, Iterable) and
+        len(ParamToModify.DefaultValue) > 0 and
+        isinstance(ParamToModify.DefaultValue[0], bool))
+        or (isinstance(ParamToModify.DefaultValue, bool)))
+
+
+    def _is_bool_val(_val: Any) -> bool:
+        return isinstance(_val, bool) or (str(_val).strip().lower() in ['true', 'false', '1', '0', 'yes', 'no'])
 
     valid = True
     for i in range(len(ParamToModify.value)):
         New_val = ParamToModify.value[i]
+        if is_boolean_type:
+            if _is_bool_val(New_val):
+                continue
+            msg = f'Value given ({str(New_val)}) for {ParamToModify.Name} is not boolean.'
+            valid = False
+
+        if isinstance(New_val, str):
+            if '*' in New_val:
+                New_val = New_val.split('*')[0]
+            New_val = float(New_val.strip())
+
         if (New_val < float(ParamToModify.Min)) or (New_val > float(ParamToModify.Max)):
             msg = (
                 f'Value given ({str(New_val)}) for {ParamToModify.Name} outside of valid range '
                 f'({ParamToModify.Min}–{ParamToModify.Max}).'
             )
-            print(f'Warning: {msg}')
-            model.logger.warning(msg)
             valid = False
 
+        if not valid:
+            print(f'Warning: {msg}')
+            model.logger.warning(msg)
+
     ParamToModify.Valid = valid
+
+    if not ParamToModify.Valid and ParamToModify.auto_raise_exception_on_invalid_read:
+        raise ValueError(f'Invalid value provided for {ParamToModify.Name}: {ParamToModify.value}')
 
 
 def ConvertUnits(ParamToModify, strUnit: str, model) -> str:

@@ -197,6 +197,7 @@ class ParameterTestCase(BaseTestCase):
 
             self.assertIn('GEOPHIRES failed to convert your units for OPEX', str(re))
 
+    # noinspection PyMethodMayBeStatic
     def _new_model(self) -> Model:
         stash_cwd = Path.cwd()
         stash_sys_argv = sys.argv
