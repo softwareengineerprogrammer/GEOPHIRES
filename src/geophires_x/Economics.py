@@ -1071,7 +1071,7 @@ class Economics:
                         f'this schedule begins at the first year of project construction. '
                         f'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>". '
                         f'For example "1 * 2, 0.25" means $1M for 2 years (e.g., during construction) then $250k/year '
-                        f'thereafter. '
+                        f'thereafter.'
         )
 
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(

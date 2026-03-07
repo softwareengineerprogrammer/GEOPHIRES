@@ -1729,7 +1729,7 @@
       "maximum": 1.0
     },
     "Royalty Supplemental Payments": {
-      "description": "A schedule DSL string defining the royalty supplemental payments for each year of the project. Unlike the Royalty Rate Schedule which begins at operations, this schedule begins at the first year of project construction. Syntax: \"<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>\". For example \"1 * 2, 0.25\" means $1M for 2 years (e.g., during construction) then $250k/year thereafter. ",
+      "description": "A schedule DSL string defining the royalty supplemental payments for each year of the project. Unlike the Royalty Rate Schedule which begins at operations, this schedule begins at the first year of project construction. Syntax: \"<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>\". For example \"1 * 2, 0.25\" means $1M for 2 years (e.g., during construction) then $250k/year thereafter.",
       "type": "array",
       "units": "MUSD/yr",
       "category": "Economics",
