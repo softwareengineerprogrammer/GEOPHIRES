@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from geophires_x.GeoPHIRESUtils import is_float, is_int
 from geophires_x.Parameter import OutputParameter, SCHEDULE_DSL_MULTIPLIER_SYMBOL
 from geophires_x.Units import Units, PercentUnit, TimeUnit, CurrencyUnit, CurrencyFrequencyUnit
 
@@ -266,12 +267,26 @@ def expand_schedule_dsl(schedule_strings: list[str | float], total_years: int) -
             parts = raw.split(SCHEDULE_DSL_MULTIPLIER_SYMBOL)
             if len(parts) != 2:
                 raise ValueError(f'Invalid schedule segment "{raw}": expected "<value> * <years>".')
-            value = float(parts[0].strip())
-            years = int(parts[1].strip())
+
+            val_raw = parts[0].strip()
+            if not is_float(val_raw):
+                raise ValueError(f'Invalid schedule segment "{raw}": "{val_raw}" is not a float.')
+            value = float(val_raw)
+            if value < 0:
+                raise ValueError(f'Invalid schedule segment "{raw}": {val_raw} is negative.')
+
+            years_raw = parts[1].strip()
+            if not is_int(years_raw):
+                raise ValueError(f'Invalid schedule segment "{raw}": "{years_raw}" is not an int.')
+
+            years = int(years_raw)
             if years < 0:
                 raise ValueError(f'Invalid schedule segment "{raw}": year count must be non-negative.')
             segments.append((value, years))
         else:
+            if not is_float(raw):
+                raise ValueError(f'Invalid schedule segment "{raw}": "{raw}" is not a float.')
+
             value = float(raw)
             segments.append((value, None))
 
@@ -291,7 +306,9 @@ def expand_schedule_dsl(schedule_strings: list[str | float], total_years: int) -
                 terminal_value = value
 
     if len(result) > total_years:
-        raise ValueError(f'Schedule expands to {len(result)} years which exceeds total_years={total_years}.')
+        raise ValueError(
+            f'Invalid schedule: Schedule expands to {len(result)} years ' f'which exceeds total_years={total_years}.'
+        )
 
     remaining = total_years - len(result)
     if remaining > 0:
