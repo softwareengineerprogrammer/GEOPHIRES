@@ -3650,7 +3650,8 @@ class Economics:
 
             self.Coam.value += (self.royalties_average_annual_cost.quantity()
                                 .to(self.Coam.CurrentUnits.value).magnitude)
-            # Note that updating Coam's value here does not affect already-calculated cash flow/result OPEX
+            # Note that updating Coam's value here does not affect already-calculated cash flow/result OPEX;
+            #   ideally this would be avoided by definition of a separate OPEX output parameter (possible future work).
 
             self.royalty_holder_npv.value = quantity(
                 calculate_npv(

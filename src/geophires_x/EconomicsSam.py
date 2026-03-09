@@ -463,6 +463,9 @@ def validate_read_parameters(model: Model) -> None:
                     f'{modifier.Name} provided value ({modifier.value}) will be ignored. '
                     f'This parameter is not currently applied when {econ.royalty_rate_schedule.Name} is used.'
                 )
+                # Note that logging a warning over raising an exception is an intentional design decision to make
+                # temporarily switching/testing and/or migrating between schedule-based and rate-based more user
+                # friendly by only requiring enabling/disabling 2 parameters rather than up to 6.
 
 
 def _validate_construction_capex_schedule(
