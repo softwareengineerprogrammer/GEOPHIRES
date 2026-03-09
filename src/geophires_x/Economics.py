@@ -3462,14 +3462,14 @@ class Economics:
         """
         Build the royalty rate schedule for each operational year.
 
-        If ``royalty_rate_schedule`` was provided via the DSL, it is expanded using
-        :func:`expand_schedule` and takes precedence.  Otherwise the legacy
-        ``royalty_rate`` + ``royalty_escalation_rate`` + ``maximum_royalty_rate`` logic
-        is used.
+        If `royalty_rate_schedule` was provided via the DSL, it is expanded using
+        `expand_schedule_dsl` and takes precedence.  Otherwise rate-based logic
+        (`royalty_rate` + `royalty_escalation_rate` + `maximum_royalty_rate`) is used.
 
         :returns: A list of royalty rates (fractional, e.g. 0.035 for 3.5%) with
-            one entry per operational year (length == ``plant_lifetime``).
+            one entry per operational year (length == `plant_lifetime`).
         """
+
         plant_lifetime: int = model.surfaceplant.plant_lifetime.value
 
         if self.royalty_rate_schedule.Provided and self.royalty_rate_schedule.value:
