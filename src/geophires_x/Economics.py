@@ -15,7 +15,7 @@ from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter,
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
-    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter
+    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
@@ -983,6 +983,9 @@ class Economics:
                         "will be automatically set to the same value."
         )
 
+        royalty_rate_and_schedule_mutual_exclusivity_note = ("Note: Providing both Royalty Rate and Royalty Rate "
+                                                             "Schedule is invalid and will result in an error.")
+
         self.royalty_rate = self.ParameterDict[self.royalty_rate.Name] = floatParameter(
             'Royalty Rate',
             DefaultValue=0.,
@@ -993,8 +996,12 @@ class Economics:
             CurrentUnits=PercentUnit.TENTH,
             ToolTipText="The fraction of the project's gross annual revenue paid to the royalty holder. "
                         "This is modeled as a variable production-based operating expense, reducing the developer's "
-                        "taxable income."
+                        "taxable income. It is calculated in addition to any scheduled Royalty Supplemental Payments. "
+                        f"{royalty_rate_and_schedule_mutual_exclusivity_note}"
         )
+
+        rate_based_only_param_note = (f'Note: This parameter only applies if {self.royalty_rate.Name} is provided '
+                                      f'and is invalid if Royalty Rate Schedule is provided.')
 
         self.royalty_escalation_rate = self.ParameterDict[self.royalty_escalation_rate.Name] = floatParameter(
             'Royalty Rate Escalation',
@@ -1004,8 +1011,9 @@ class Economics:
             UnitType=Units.PERCENT,
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
-            ToolTipText="The additive amount the royalty rate increases each year. For example, a value of 0.001 "
-                        "increases a 4% rate (0.04) to 4.1% (0.041) in the next year."
+            ToolTipText=f"The additive amount the royalty rate increases each year. For example, a value of 0.001 "
+                        f"increases a 4% rate (0.04) to 4.1% (0.041) in the next year. "
+                        f"{rate_based_only_param_note}"
         )
 
         self.royalty_escalation_rate_start_year = self.ParameterDict[self.royalty_escalation_rate_start_year.Name] = intParameter(
@@ -1016,7 +1024,8 @@ class Economics:
             PreferredUnits=TimeUnit.YEAR,
             CurrentUnits=TimeUnit.YEAR,
             ToolTipText=f'The first year that the {self.royalty_escalation_rate.Name} is applied. '
-                        f'{_YEAR_INDEX_VALUE_EXPLANATION_SNIPPET}.'
+                        f'{_YEAR_INDEX_VALUE_EXPLANATION_SNIPPET}. '
+                        f'{rate_based_only_param_note}'
         )
 
         maximum_royalty_rate_default_val = 1.0
@@ -1029,11 +1038,41 @@ class Economics:
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
             ToolTipText=f"The maximum royalty rate after escalation, expressed as a fraction (e.g., 0.06 for a 6% cap)."
-                        f"{' Defaults to 100% (no effective cap).' if maximum_royalty_rate_default_val == 1.0 else ''}"
+                        f"{' Defaults to 100% (no effective cap).' if maximum_royalty_rate_default_val == 1.0 else ''} "
+                        f"{rate_based_only_param_note}"
         )
 
-        # TODO support custom royalty rate schedule as a list parameter
-        #  (as an alternative to specifying rate/escalation/max)
+        self.royalty_rate_schedule = self.ParameterDict[self.royalty_rate_schedule.Name] = listParameter(
+            'Royalty Rate Schedule',
+            Min=0.0,
+            Max=1.0,
+            auto_raise_exception_on_invalid_read=True,
+            UnitType=Units.PERCENT,
+            PreferredUnits=PercentUnit.TENTH,
+            CurrentUnits=PercentUnit.TENTH,
+            ToolTipText=f'A schedule DSL string defining the royalty rate for each year of the project, '
+                        f'starting at the first year of plant operations (Year 1, post-construction). '
+                        f'Syntax: "<rate> * <years>, <rate> * <years>, ..., <terminal_rate>". '
+                        f'For example "0.0175 * 10, 0.035" means 1.75% for 10 years then 3.5% thereafter. '
+                        f'{royalty_rate_and_schedule_mutual_exclusivity_note}'
+        )
+
+        self.royalty_supplemental_payments = self.ParameterDict[self.royalty_supplemental_payments.Name] = listParameter(
+            'Royalty Supplemental Payments',
+            Min=0.0,
+            # pint treats GUSD as billions of dollars (G for giga)
+            Max=quantity(100, 'GUSD').to('MUSD').magnitude,
+            auto_raise_exception_on_invalid_read=True,
+            UnitType=Units.CURRENCYFREQUENCY,
+            PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
+            CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
+            ToolTipText=f'A schedule DSL string defining the royalty supplemental payments for each year of the '
+                        f'project. Unlike the {self.royalty_rate_schedule.Name} which begins at operations, '
+                        f'this schedule begins at the first year of project construction. '
+                        f'Syntax: "<amount> * <years>, <amount> * <years>, ..., <terminal_amount_per_year>". '
+                        f'For example "1 * 2, 0.25" means $1M for 2 years (e.g., during construction) then $250k/year '
+                        f'thereafter.'
+        )
 
         self.royalty_holder_discount_rate = self.ParameterDict[self.royalty_holder_discount_rate.Name] = floatParameter(
             'Royalty Holder Discount Rate',
@@ -1265,8 +1304,9 @@ class Economics:
             DefaultValue=False,
             UnitType=Units.NONE,
             Required=False,
-            ErrMessage="assume default: no economics calculations",
-            ToolTipText="Set to true if you want the add-on economics calculations to be made"
+            ToolTipText="By default, add-on calculations are automatically enabled if add-ons parameters are provided. "
+                        "Set this value to false to disable add-on economics calculations. "
+                        "(If, for example, you wish to quickly compare between economics with and without add-ons.)"
         )
         self.DoCarbonCalculations = self.ParameterDict[self.DoCarbonCalculations.Name] = boolParameter(
             "Do Carbon Price Calculations",
@@ -2108,7 +2148,8 @@ class Economics:
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             ToolTipText=f'GEOPHIRES estimates the annual O&M costs as the sum of the annual surface plant, wellfield, '
-                        f'make-up water, and pumping O&M costs.'
+                        f'make-up water, pumping O&M costs, '
+                        f'and average royalty costs (both production-based and supplemental payments).'
         )
         self.averageannualpumpingcosts = OutputParameter(
             Name="Average Annual Pumping Costs",
@@ -2129,8 +2170,9 @@ class Economics:
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            ToolTipText='The average annual cost paid to a royalty holder, calculated as a percentage of the '
-                        'project\'s gross annual revenue. This is modeled as a variable operating expense.'
+            ToolTipText="The developer's average annual royalty expense over the project\'s operational lifetime. "
+                        "This value combines both production-based royalties (percentage of gross revenue) and any "
+                        "scheduled supplemental royalty payments."
         )
 
 
@@ -2262,6 +2304,15 @@ class Economics:
         self.inflation_cost_during_construction = self.OutputParameterDict[
             self.inflation_cost_during_construction.Name] = inflation_cost_during_construction_output_parameter()
 
+        self.royalty_supplemental_payments_cost_during_construction = self.OutputParameterDict[
+            self.royalty_supplemental_payments_cost_during_construction.Name] = OutputParameter(
+                Name='Royalty supplemental payments during construction',
+                UnitType=Units.CURRENCY,
+                PreferredUnits=CurrencyUnit.MDOLLARS,
+                CurrentUnits=CurrencyUnit.MDOLLARS,
+                ToolTipText='The sum of royalty supplemental payments during the construction period.',
+            )
+
         self.interest_during_construction = self.OutputParameterDict[
             self.interest_during_construction.Name] = interest_during_construction_output_parameter()
 
@@ -2356,7 +2407,8 @@ class Economics:
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
-            ToolTipText=f"The pre-tax Net Present Value (NPV) of the royalty holder's income stream, "
+            ToolTipText=f"The pre-tax Net Present Value (NPV) of the royalty holder's income stream "
+                        f"(production-based and supplemental payments), "
                         f"calculated using the {self.royalty_holder_discount_rate.Name}. "
                         f"This is a pre-tax value because the model does not account for the royalty holder's specific "
                         f"tax liabilities."
@@ -2368,7 +2420,9 @@ class Economics:
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
-            ToolTipText="The royalty holder's gross (pre-tax) annual revenue stream from the royalty agreement."
+            ToolTipText="The royalty holder's average gross (pre-tax) annual revenue stream over the entire project "
+                        "timeline (construction + operations). "
+                        "This combines both production-based royalties and any scheduled supplemental payments."
         )
         self.royalty_holder_total_revenue = self.OutputParameterDict[
             self.royalty_holder_total_revenue.Name
@@ -2377,8 +2431,9 @@ class Economics:
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
-            ToolTipText='The total gross (pre-tax), undiscounted revenue received by the royalty holder over the '
-                        'project lifetime.'
+            ToolTipText="The total gross (pre-tax), undiscounted revenue received by the royalty holder over the "
+                        "entire project timeline. This includes both production-based royalties during operations and "
+                        "supplemental payments made during construction and operations."
         )
 
         model.logger.info(f'Complete {__class__!s}: {sys._getframe().f_code.co_name}')
@@ -2636,7 +2691,11 @@ class Economics:
             else:
                 sam_em_only_params: list[Parameter] = [
                     self.royalty_rate,
-                    # TODO other royalty params
+                    self.royalty_escalation_rate,
+                    self.royalty_escalation_rate_start_year,
+                    self.maximum_royalty_rate,
+                    self.royalty_rate_schedule,
+                    self.royalty_supplemental_payments,
                     self.construction_capex_schedule,
                     self.bond_financing_start_year
                 ]
@@ -3401,11 +3460,20 @@ class Economics:
 
     def get_royalty_rate_schedule(self, model: Model) -> list[float]:
         """
-        Builds a year-by-year schedule of royalty rates based on escalation and cap.
+        Build the royalty rate schedule for each operational year.
 
-        :type model: :class:`~geophires_x.Model.Model`
-        :return: schedule: A list of rates as fractions (e.g., 0.05 for 5%).
+        If `royalty_rate_schedule` was provided via the DSL, it is expanded using
+        `expand_schedule_dsl` and takes precedence.  Otherwise rate-based logic
+        (`royalty_rate` + `royalty_escalation_rate` + `maximum_royalty_rate`) is used.
+
+        :returns: A list of royalty rates (fractional, e.g. 0.035 for 3.5%) with
+            one entry per operational year (length == `plant_lifetime`).
         """
+
+        plant_lifetime: int = model.surfaceplant.plant_lifetime.value
+
+        if self.royalty_rate_schedule.Provided and self.royalty_rate_schedule.value:
+            return expand_schedule_dsl(self.royalty_rate_schedule.value, plant_lifetime)
 
         def r(x: float) -> float:
             """Ignore apparent float precision issue"""
@@ -3426,6 +3494,20 @@ class Economics:
                 current_rate += escalation_rate
 
         return schedule
+
+    def get_royalty_supplemental_payments_schedule_usd(self, model: Model) -> list[float]:
+        construction_years: int = model.surfaceplant.construction_years.value
+        operational_years: int = model.surfaceplant.plant_lifetime.value
+
+        royalty_supplemental_payments_schedule_expanded = expand_schedule_dsl(
+            self.royalty_supplemental_payments.value, construction_years + operational_years)
+
+        royalty_supplemental_payments_schedule_usd = [
+            PlainQuantity(it, self.royalty_supplemental_payments.CurrentUnits).to('USD/yr').magnitude
+            for it in royalty_supplemental_payments_schedule_expanded
+        ]
+
+        return royalty_supplemental_payments_schedule_usd
 
 
     def calculate_cashflow(self, model: Model) -> None:
@@ -3532,7 +3614,6 @@ class Economics:
         # since SAM Economic Model doesn't subtract ITC from this value.
         self.capex_total.value = (self.sam_economics_calculations.capex.quantity()
                                   .to(self.capex_total.CurrentUnits.value).magnitude)
-        # self.capex_total_per_kw.value = PlainQuantity(self.capex_total.value, f'{self.capex_total.CurrentUnits}'
 
         # TODO define this as an output of SurfacePlant rather than calculating it on-demand here and elsewhere
         max_net_electricity_generation_kw = quantity(
@@ -3554,7 +3635,7 @@ class Economics:
         ).to(self.interest_during_construction.CurrentUnits.value).magnitude
 
 
-        if self.royalty_rate.Provided:
+        if self.has_royalties:
             # ignore pre-revenue year(s) (e.g. Year 0)
             pre_revenue_years_slice_index = model.surfaceplant.construction_years.value
 
@@ -3569,24 +3650,39 @@ class Economics:
 
             self.Coam.value += (self.royalties_average_annual_cost.quantity()
                                 .to(self.Coam.CurrentUnits.value).magnitude)
+            # Note that updating Coam's value here does not affect already-calculated cash flow/result OPEX;
+            #   ideally this would be avoided by definition of a separate OPEX output parameter (possible future work).
 
             self.royalty_holder_npv.value = quantity(
                 calculate_npv(
                     self.royalty_holder_discount_rate.value,
-                    self.sam_economics_calculations.royalties_opex.value,
+                    self.sam_economics_calculations.royalties_opex.value,   # Includes construction years
                     self.discount_initial_year_cashflow.value
                 ),
                 self.sam_economics_calculations.royalties_opex.CurrentUnits.get_currency_unit_str()
             ).to(self.royalty_holder_npv.CurrentUnits).magnitude
 
-            self.royalty_holder_annual_revenue.value = self.royalties_average_annual_cost.value
+
+            self.royalty_holder_annual_revenue.value = (quantity(
+                np.average(
+                    self.sam_economics_calculations.royalties_opex.value  # Includes construction years
+                ),
+                self.sam_economics_calculations.royalties_opex.CurrentUnits
+            ).to(self.royalty_holder_annual_revenue.CurrentUnits).magnitude)
 
             self.royalty_holder_total_revenue.value = quantity(
                 np.sum(
-                    self.sam_economics_calculations.royalties_opex.value[pre_revenue_years_slice_index:]
+                    self.sam_economics_calculations.royalties_opex.value  # Includes construction years
                 ),
                 self.sam_economics_calculations.royalties_opex.CurrentUnits.get_currency_unit_str()
             ).to(self.royalty_holder_total_revenue.CurrentUnits).magnitude
+
+            self.royalty_supplemental_payments_cost_during_construction.value = quantity(
+                np.sum(
+                    self.sam_economics_calculations.royalties_opex.value[:pre_revenue_years_slice_index]
+                ),
+                self.sam_economics_calculations.royalties_opex.CurrentUnits.get_currency_unit_str()
+            ).to(self.royalty_supplemental_payments_cost_during_construction.CurrentUnits).magnitude
 
 
         self.wacc.value = self.sam_economics_calculations.wacc.value
@@ -3629,6 +3725,13 @@ class Economics:
                 (model.wellbores.nprod.value + model.wellbores.ninj.value)
             )
 
+    @property
+    def has_production_based_royalties(self):
+        return self.royalty_rate.Provided or self.royalty_rate_schedule.Provided
+
+    @property
+    def has_royalties(self):
+        return self.has_production_based_royalties or self.royalty_supplemental_payments.Provided
 
 
     def __str__(self):

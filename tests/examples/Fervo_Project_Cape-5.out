@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.11.16
+ GEOPHIRES Version: 3.11.18
  Simulation Date: 2026-02-27
- Simulation Time:  09:49
- Calculation Time:      1.881 sec
+ Simulation Time:  13:15
+ Calculation Time:      1.785 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -116,8 +116,8 @@ Simulation Metadata
          Total surface equipment costs:                    1516.11 MUSD
          Exploration costs:                                  30.00 MUSD
          Overnight Capital Cost:                           2437.12 MUSD
-         Interest during construction:                      142.66 MUSD
          Inflation costs during construction:               285.92 MUSD
+         Interest during construction:                      142.66 MUSD
       Total CAPEX:                                         2865.69 MUSD
 
 
@@ -233,6 +233,8 @@ Capital expenditure schedule [construction] (%)  	1.40          	2.70       	13.
 Overnight capital expenditure [construction] ($) 	-34,119,619   	-65,802,123	-338,759,075	-1,050,396,845	-948,037,988
 plus:
 Inflation cost [construction] ($)                	-921,230      	-3,601,284 	-28,187,019 	-118,120,553  	-135,085,460
+plus:
+Royalty supplemental payments [construction] ($) 	0             	0          	0           	0             	0
 equals:
 Nominal capital expenditure [construction] ($)   	-35,040,849   	-69,403,407	-366,946,094	-1,168,517,398	-1,083,123,448
 
@@ -468,5 +470,5 @@ Interest earned on reserves ($)                  	              	           	   
                                 ***EXTENDED ECONOMICS***
 
       Royalty Holder NPV:                                  136.02 MUSD
-      Royalty Holder Average Annual Revenue:                12.19 MUSD/yr
+      Royalty Holder Average Annual Revenue:                10.44 MUSD/yr
       Royalty Holder Total Revenue:                        365.56 MUSD

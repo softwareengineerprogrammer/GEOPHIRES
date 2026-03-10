@@ -188,17 +188,17 @@
         "AddOns Payback Period": {},
         "Royalty Holder NPV": {
           "type": "number",
-          "description": "The pre-tax Net Present Value (NPV) of the royalty holder's income stream, calculated using the Royalty Holder Discount Rate. This is a pre-tax value because the model does not account for the royalty holder's specific tax liabilities.",
+          "description": "The pre-tax Net Present Value (NPV) of the royalty holder's income stream (production-based and supplemental payments), calculated using the Royalty Holder Discount Rate. This is a pre-tax value because the model does not account for the royalty holder's specific tax liabilities.",
           "units": "MUSD"
         },
         "Royalty Holder Average Annual Revenue": {
           "type": "number",
-          "description": "The royalty holder's gross (pre-tax) annual revenue stream from the royalty agreement.",
+          "description": "The royalty holder's average gross (pre-tax) annual revenue stream over the entire project timeline (construction + operations). This combines both production-based royalties and any scheduled supplemental payments.",
           "units": "MUSD/yr"
         },
         "Royalty Holder Total Revenue": {
           "type": "number",
-          "description": "The total gross (pre-tax), undiscounted revenue received by the royalty holder over the project lifetime.",
+          "description": "The total gross (pre-tax), undiscounted revenue received by the royalty holder over the entire project timeline. This includes both production-based royalties during operations and supplemental payments made during construction and operations.",
           "units": "MUSD"
         }
       }
@@ -454,12 +454,17 @@
         },
         "Overnight Capital Cost": {
           "type": "number",
-          "description": "Overnight Capital Cost (OCC) represents the total capital cost required to construct the plant if it were built instantly (\"overnight\"). This value excludes time-dependent costs such as inflation and interest incurred during the construction period.",
+          "description": "Overnight Capital Cost (OCC) represents the total capital cost required to construct the plant if it were built instantly (\"overnight\"). This value excludes time-dependent costs such as inflation, royalty supplemental payments, and interest incurred during the construction period.",
           "units": "MUSD"
         },
         "Inflation costs during construction": {
           "type": "number",
           "description": "The calculated amount of cost escalation due to inflation over the construction period.",
+          "units": "MUSD"
+        },
+        "Royalty supplemental payments during construction": {
+          "type": "number",
+          "description": "The sum of royalty supplemental payments during the construction period.",
           "units": "MUSD"
         },
         "Interest during construction": {
@@ -525,7 +530,7 @@
         "Average annual pumping costs": {},
         "Average Annual Royalty Cost": {
           "type": "number",
-          "description": "The average annual cost paid to a royalty holder, calculated as a percentage of the project's gross annual revenue. This is modeled as a variable operating expense.",
+          "description": "The developer's average annual royalty expense over the project's operational lifetime. This value combines both production-based royalties (percentage of gross revenue) and any scheduled supplemental royalty payments.",
           "units": "MUSD/yr"
         },
         "Average annual auxiliary fuel cost": {},
@@ -543,7 +548,7 @@
         "Total average annual O&M costs": {},
         "Total operating and maintenance costs": {
           "type": "number",
-          "description": "Total O&M Cost. GEOPHIRES estimates the annual O&M costs as the sum of the annual surface plant, wellfield, make-up water, and pumping O&M costs.",
+          "description": "Total O&M Cost. GEOPHIRES estimates the annual O&M costs as the sum of the annual surface plant, wellfield, make-up water, pumping O&M costs, and average royalty costs (both production-based and supplemental payments).",
           "units": "MUSD/yr"
         },
         "OPEX": {}

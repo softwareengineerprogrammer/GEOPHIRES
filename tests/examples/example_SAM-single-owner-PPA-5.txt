@@ -10,6 +10,8 @@ Construction Years, 7
 Construction CAPEX Schedule, 0.01,0.02,0.07,0.1,0.2,0.2,0.4
 Bond Financing Start Year, -3
 
+Royalty Supplemental Payments, 1.5, 0.1, -- $1.5M first year option payment and $100k/yr land lease payment thereafter
+
 Capital Cost for Power Plant for Electricity Generation, 1900
 Exploration Capital Cost, 120
 
@@ -34,8 +36,6 @@ Reservoir Stimulation Capital Cost per Production Well, 2.1739130435, -- Baselin
 Reservoir Stimulation Indirect Capital Cost Percentage, 0, -- Baseline stimulation cost includes indirect costs
 
 Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs represent 2% of facilities CAPEX per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
-
-
 
 # *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
 # *************************************************

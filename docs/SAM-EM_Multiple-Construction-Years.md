@@ -4,7 +4,8 @@
 
 GEOPHIRES SAM Economic Models support multi-year construction timelines to deliver accurate, time-adjusted financial
 metrics, including LCOE, IRR and NPV for projects with extended development periods.
-This feature models the pre-revenue phase to capture the real-world economic impact of Interest During Construction (IDC), inflation, and capital deployment timing.
+This feature models the pre-revenue phase to capture the real-world economic impact of capital deployment timing,
+inflation, royalty supplemental costs (such as option payments or land leases), and Interest During Construction (IDC).
 This ensures that key investment decision metrics correctly reflect the time value of money leading up to the Commercial
 Operation Date (COD).
 
@@ -35,6 +36,7 @@ For each construction year, the `CONSTRUCTION` cash flow is calculated as follow
    percentage of the total `Overnight Capital Cost` based on the `Construction CAPEX Schedule`.
 1. **Inflation**: An inflation adder is calculated using `Inflation Rate During Construction` and added to the overnight
    cost to yield `Nominal capital expenditure [construction]`.
+1. **Royalty Supplemental Costs**: Any `Royalty Supplemental Payments`[^royalties-docs] scheduled during the construction phase are applied as an additional capital cost for the year. This ensures that pre-revenue site control costs (such as option payments or land leases) are properly capitalized into the project basis.
 1. **Debt & Equity Draws**: Costs are covered by issuance of equity and debt based on `Fraction of Investment in Bonds`.
    Debt
    financing can be delayed by specifying `Bond Financing Start Year`. Years prior to this threshold are financed 100%
@@ -46,6 +48,8 @@ For each construction year, the `CONSTRUCTION` cash flow is calculated as follow
    `Nominal capital expenditure [construction]` and `Debt interest payment [construction]` (capitalized IDC).
 
 ![](_images/sam-em-mcy-design-diagram.png)
+
+[^royalties-docs]: See [royalties documentation](SAM-Economic-Models.html#royalties).
 
 ## Operational Years (SAM Integration)
 
@@ -90,4 +94,4 @@ The result case report LCOE metric (`Electricity breakeven price`) reflects the 
 
 ---
 
-See [SAM Economic Models documentation](SAM-Economic-Models.html).
+See also [SAM Economic Models documentation](SAM-Economic-Models.html).
