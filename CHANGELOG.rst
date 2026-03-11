@@ -7,7 +7,7 @@ GEOPHIRES v3 (2023-2026)
 3.11
 ^^^^
 
-3.11.25: `Royalty Rate Schedule & Royalty Supplemental Payments <https://github.com/NatLabRockies/GEOPHIRES-X/pull/472>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.25>`__ |  `documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#royalties>`__ | **Changed:** The calculation for `Royalty Holder Average Annual Revenue` now averages over the entire project timeline (construction + operations) rather than just the operational phase. For projects with multi-year construction periods, this will result in a lower average value than in previous versions. See documentation for further details.
+3.11.25: `Royalty Rate Schedule & Royalty Supplemental Payments <https://github.com/NatLabRockies/GEOPHIRES-X/pull/472>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.25>`__ |  `documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#royalties>`__ | **Changed:** The calculation for Royalty Holder Average Annual Revenue now averages over the entire project timeline (construction + operations) rather than just the operational phase. For projects with multi-year construction periods, this will result in a lower average value than in previous versions. See documentation for further details.
 
 3.11.17: `Add Total CAPEX ($/kW) output for SAM-EM in Summary of Results category <https://github.com/NREL/GEOPHIRES-X/pull/470>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.11.17>`__
 
