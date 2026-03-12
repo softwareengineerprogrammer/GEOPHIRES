@@ -19,18 +19,38 @@
     forked repo's docs instead, since they may differ from the main repo's (e.g. when there is a pending PR to merge).
     */
     const locationHref = location?.href?.toLowerCase();
-    ["nrel", "natlabrockies"].map((organizationName) => {
-        ["python-geophires-x", "GEOPHIRES-X"].map((repositoryName) => {
-            if (locationHref.indexOf(`${organizationName}.github.io/${repositoryName}`) !== -1
-                && document.referrer.indexOf(`https://github.com/softwareengineerprogrammer/${repositoryName}`) !== -1) {
+    const docReferrer = document.referrer?.toLowerCase() ?? '';
+
+    ["nrel", "natlabrockies"].forEach((mainRepoOrganizationName) => {
+        ["python-geophires-x", "GEOPHIRES-X"].forEach((mainRepoRepositoryName) => {
+            if (locationHref.indexOf(`${mainRepoOrganizationName}.github.io/${mainRepoRepositoryName}`.toLowerCase()) !== -1
+                && docReferrer?.indexOf(`https://github.com/softwareengineerprogrammer/${mainRepoRepositoryName}`.toLowerCase()) !== -1) {
                 console.debug('Redirecting to fork docs based on referrer:', document.referrer);
-                location.href = locationHref.replace(
-                    `${organizationName}.github.io/${repositoryName}`,
-                    `softwareengineerprogrammer.github.io/${repositoryName}`
+                location.href = location?.href?.replace(
+                    `${mainRepoOrganizationName}.github.io/${mainRepoRepositoryName}`,
+                    `softwareengineerprogrammer.github.io/${mainRepoRepositoryName}`
                 )
             }
         })
-    })
+    });
+
+    /* We also want the inverse behavior for links that are hardcoded to the fork repo pages. */
+    ["softwareengineerprogrammer"].forEach((forkOrganizationName) => {
+        ["GEOPHIRES"].forEach((forkRepositoryName) => {
+            if (locationHref.indexOf(`${forkOrganizationName}.github.io/${forkRepositoryName}`.toLowerCase()) !== -1
+                && (
+                    docReferrer.indexOf(`https://github.com/NatLabRockies/${forkRepositoryName}-X`.toLowerCase()) !== -1
+                    ||
+                    document.referrer?.toLowerCase().indexOf(`https://github.com/NREL/${forkRepositoryName}-X`.toLowerCase()) !== -1)
+            ) {
+                console.debug('Redirecting to main repo docs based on referrer:', document.referrer);
+                location.href = location?.href?.replace(
+                    `${forkOrganizationName}.github.io/${forkRepositoryName}`,
+                    `natlabrockies.github.io/${forkRepositoryName}-X`
+                )
+            }
+        })
+    });
 
     setTimeout(function() {
         // sidebar.js erroneously adds a second sidebar button
