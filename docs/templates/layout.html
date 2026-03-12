@@ -19,9 +19,10 @@
     forked repo's docs instead, since they may differ from the main repo's (e.g. when there is a pending PR to merge).
     */
     const locationHref = location?.href?.toLowerCase();
-    const docReferrer = document.referrer?.toLowerCase();
-    ["nrel", "natlabrockies"].map((mainRepoOrganizationName) => {
-        ["python-geophires-x", "GEOPHIRES-X"].map((mainRepoRepositoryName) => {
+    const docReferrer = document.referrer?.toLowerCase() ?? '';
+
+    ["nrel", "natlabrockies"].forEach((mainRepoOrganizationName) => {
+        ["python-geophires-x", "GEOPHIRES-X"].forEach((mainRepoRepositoryName) => {
             if (locationHref.indexOf(`${mainRepoOrganizationName}.github.io/${mainRepoRepositoryName}`.toLowerCase()) !== -1
                 && docReferrer?.indexOf(`https://github.com/softwareengineerprogrammer/${mainRepoRepositoryName}`.toLowerCase()) !== -1) {
                 console.debug('Redirecting to fork docs based on referrer:', document.referrer);
@@ -34,8 +35,8 @@
     });
 
     /* We also want the inverse behavior for links that are hardcoded to the fork repo pages. */
-    ["softwareengineerprogrammer"].map((forkOrganizationName) => {
-        ["GEOPHIRES"].map((forkRepositoryName) => {
+    ["softwareengineerprogrammer"].forEach((forkOrganizationName) => {
+        ["GEOPHIRES"].forEach((forkRepositoryName) => {
             if (locationHref.indexOf(`${forkOrganizationName}.github.io/${forkRepositoryName}`.toLowerCase()) !== -1
                 && (
                     docReferrer.indexOf(`https://github.com/NatLabRockies/${forkRepositoryName}-X`.toLowerCase()) !== -1
