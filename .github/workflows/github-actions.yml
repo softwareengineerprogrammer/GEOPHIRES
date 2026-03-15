@@ -118,6 +118,10 @@ jobs:
     - name: test
       env:
         TOXPYTHON: '${{ matrix.toxpython }}'
+
+        # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+        FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
       run: >
         tox -e ${{ matrix.tox_env }} -v
 
@@ -150,6 +154,10 @@ jobs:
       - name: generate coverage report
         env:
           TOXPYTHON: '3.11'
+
+          # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
         run: |
           tox -e py311
 
@@ -189,6 +197,10 @@ jobs:
     - name: generate docs
       env:
         TOXPYTHON: '3.11'
+
+        # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+        FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
       run: |
         tox -e docs -v
         ls -l dist/docs
