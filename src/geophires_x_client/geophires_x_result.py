@@ -269,12 +269,15 @@ class GeophiresXResult:
                 'Total surface equipment costs',
                 'Exploration costs',
                 'Investment Tax Credit',
+                'One-time Flat License Fees Etc',
+                'Other Incentives',
+                'One-time Grants Etc',
+                'Total Add-on CAPEX',
                 'Overnight Capital Cost',
                 # Displayed for economic models that treat inflation costs as capital costs (SAM-EM)
                 'Inflation costs during construction',
                 'Royalty supplemental payments during construction',
                 'Interest during construction',
-                'Total Add-on CAPEX',
                 'Total capital costs',
                 'Annualized capital costs',
                 # AGS/CLGS
