@@ -1,10 +1,10 @@
 # Example 14: 1 GW Geothermal-Powered Data Center
-
-# This example models a 1 gigawatt-electric (GW) Enhanced Geothermal System (EGS) designed to power a hyperscale data center.
-# Based on the techno-economic analysis by Project InnerSpace and Future Ventures, the simulation incorporates direct
-# cooling via an absorption chiller. This integrated power and cooling approach is modeled as an Add-On,
-# yielding an estimated $107 million in annual operating cost savings over a 30-year project lifespan.
-
+#
+# This example models a 1 GWe Enhanced Geothermal System (EGS) to power a hyperscale data center.
+# Based on the techno-economic analysis by Project InnerSpace (Yusifov & Enriquez, 2025), the simulation incorporates direct
+# cooling via an absorption chiller, yielding an estimated $107 million in annual operating cost savings over the 30-year project lifespan.
+# The absorption chiller is modeled as an Add-On providing capacity payment revenue equivalent to the estimated savings.
+#
 # Reference: Yusifov, M., & Enriquez, N. (2025, July). From Core to Code: Powering the AI Revolution with Geothermal Energy. Project InnerSpace & Future Ventures. https://projectinnerspace.org/resources/Powering-the-AI-Revolution.pdf
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
