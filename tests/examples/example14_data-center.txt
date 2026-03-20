@@ -20,11 +20,10 @@ Electricity Escalation Start Year, 1
 Discount Rate, 0.12
 Fraction of Investment in Bonds, .6, -- Based on fraction of CAPEX with $1 billion in sponsor equity per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
 Inflated Bond Interest Rate, .056
-Inflation Rate, .023, -- US inflation as of April 2025
-Inflation Rate During Construction, 0.046529, -- 2.3% inflation rate compounded over 2-year construction period
+Inflation Rate, .027, -- US inflation as of December 2025
 
 Combined Income Tax Rate, .28
-Investment Tax Credit Rate, 0.3
+Investment Tax Credit Rate, 0.4, -- 30% base ITC plus 10% bonus credits (necessary for positive NPV)
 Property Tax Rate, 0
 
 One-time Flat License Fees Etc, 100, -- Permitting & Land Acquisition = $100M
@@ -71,12 +70,13 @@ Reservoir Thermal Conductivity, 3.05
 Reservoir Porosity, 0.0118
 
 Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
+
 Fracture Separation, 18, -- Per https://eartharxiv.org/repository/view/7665/, lateral length is 4700 ft = 1432 m. Dividing 1432 by 80 = ~18 m fracture spacing.
 Fracture Shape, 4, -- Square
 Fracture Height, 95
 Fracture Width, 305
-
 Number of Fractures per Stimulated Well, 102
+
 Injectivity Index, 2.1105
 Productivity Index, 1.7458
 
@@ -90,11 +90,11 @@ Injection Temperature, 53.6, -- GEOPHIRES model-calculated reinjection temperatu
 Injection Wellbore Temperature Gain, 3
 
 Ambient Temperature, 10
-Surface Temperature, 0, -- Per case study specifications for depth and BHT/production temperature target
+Surface Temperature, 1.1, -- Calibrated to case study specifications for depth and BHT/production temperature target
 
 Maximum Drawdown, 0.044, -- Average net power output per well = 6.3 MWe (no redrilling; same value as Fervo_Project_Cape-4)
 
-Water Loss Fraction, 0.15, -- Estimated to be between 10 and 20%
+Water Loss Fraction, 0.15
 
 Utilization Factor, .9
 Plant Outlet Pressure, 1000 psi, -- https://doi.org/10.31223/X5VH8C
