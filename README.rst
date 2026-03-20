@@ -236,6 +236,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example13.txt <tests/examples/example13.txt>`__
      - `.out <tests/examples/example13.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example13>`__
+   * - Example 14: Data Center
+     - `example14_data-center.txt <tests/examples/example14_data-center.txt>`__
+     - `.out <tests/examples/example14_data-center.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example14_data-center>`__
    * - CLGS: Coaxial sCO2: Heat
      - `[...]Coaxial_sCO2_heat.txt <tests/examples/Beckers_et_al_2023_Tabulated_Database_Coaxial_sCO2_heat.txt>`__
      - `.out <tests/examples/Beckers_et_al_2023_Tabulated_Database_Coaxial_sCO2_heat.out>`__
