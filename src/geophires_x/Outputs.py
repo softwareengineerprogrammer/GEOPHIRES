@@ -465,12 +465,11 @@ class Outputs:
                         if model.wellbores.productionwellpumping.value:
                             f.write(f'      Average Production Well Pump Pressure Drop:      {np.average(model.wellbores.DPProdWell.value):10.1f} ' + model.wellbores.DPProdWell.PreferredUnits.value + NL)
 
-                f.write(NL)
-                f.write(NL)
-                f.write('                          ***CAPITAL COSTS (M$)***\n')
-                f.write(NL)
+
+                f.write('\n\n                          ***CAPITAL COSTS (M$)***\n\n')
                 if not model.economics.totalcapcost.Valid:
                     f.write(f'         {model.economics.Cwell.display_name}:                 {model.economics.Cwell.value:10.2f} {model.economics.Cwell.CurrentUnits.value}\n')
+
                     if econ.cost_lateral_section.value > 0.0:
                         f.write(f'             Drilling and completion costs per vertical production well:   {econ.cost_one_production_well.value:10.2f} ' + econ.cost_one_production_well.CurrentUnits.value + NL)
                         f.write(f'             Drilling and completion costs per vertical injection well:    {econ.cost_one_injection_well.value:10.2f} ' + econ.cost_one_injection_well.CurrentUnits.value + NL)
@@ -482,7 +481,9 @@ class Outputs:
                     else:
                         cpw_label = Outputs._field_label(econ.drilling_and_completion_costs_per_well.display_name, 47)
                         f.write(f'         {cpw_label}{econ.drilling_and_completion_costs_per_well.value:10.2f} {econ.Cwell.CurrentUnits.value}\n')
+
                     f.write(f'         {econ.Cstim.display_name}:                             {econ.Cstim.value:10.2f} {econ.Cstim.CurrentUnits.value}\n')
+
                     f.write(f'         {econ.Cplant.display_name}:                     {econ.Cplant.value:10.2f} {econ.Cplant.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                         f.write(f'            of which Absorption Chiller Cost:           {model.economics.chillercapex.value:10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
@@ -491,11 +492,15 @@ class Outputs:
                     if model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
                         f.write(f'            of which Peaking Boiler Cost:               {model.economics.peakingboilercost.value:10.2f} ' + model.economics.peakingboilercost.CurrentUnits.value + NL)
                     f.write(f'         {model.economics.Cgath.display_name}:                  {model.economics.Cgath.value:10.2f} {model.economics.Cgath.CurrentUnits.value}\n')
+
                     if model.surfaceplant.piping_length.value > 0:
                         f.write(f'         {model.economics.Cpiping.display_name}:                    {model.economics.Cpiping.value:10.2f} {model.economics.Cpiping.CurrentUnits.value}\n')
+
                     if model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
                         f.write(f'         District Heating System Cost:                  {model.economics.dhdistrictcost.value:10.2f} {model.economics.dhdistrictcost.CurrentUnits.value}\n')
+
                     f.write(f'         Total surface equipment costs:                 {(model.economics.Cplant.value+model.economics.Cgath.value):10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
+
                     f.write(f'         {model.economics.Cexpl.display_name}:                             {model.economics.Cexpl.value:10.2f} {model.economics.Cexpl.CurrentUnits.value}\n')
 
                 if model.economics.totalcapcost.Valid and model.wellbores.redrill.value > 0:
@@ -506,6 +511,27 @@ class Outputs:
                 if model.economics.RITCValue.value and not is_sam_econ_model:
                     # Note ITC is in ECONOMIC PARAMETERS category for SAM-EM (not capital costs)
                     f.write(f'         {econ.RITCValue.display_name}:                         {-1 * econ.RITCValue.value:10.2f} {econ.RITCValue.CurrentUnits.value}\n')
+
+                additional_capex_modifiers: list[tuple[Parameter, int]] = [
+                    (econ.FlatLicenseEtc, 1),
+                    (econ.OtherIncentives, -1),
+                    (econ.TotalGrant, -1)
+                ]
+                for additional_capex_modifier_entry in additional_capex_modifiers:
+                    additional_capex_modifier_param: Parameter = additional_capex_modifier_entry[0]
+                    additional_capex_modifier_multiplier: int = additional_capex_modifier_entry[1]
+
+                    acm_render_value = additional_capex_modifier_param.value * additional_capex_modifier_multiplier
+
+                    if additional_capex_modifier_param.Provided:
+                        acm_label = Outputs._field_label(additional_capex_modifier_param.Name, 47)
+                        f.write(
+                            f'         {acm_label}{acm_render_value:10.2f} {additional_capex_modifier_param.CurrentUnits.value}\n')
+
+                if is_sam_econ_model and econ.DoAddOnCalculations.value:
+                    # Non-SAM econ models print this in Extended Economics profile
+                    aoc_label = Outputs._field_label(model.addeconomics.AddOnCAPEXTotal.display_name, 47)
+                    f.write(f'         {aoc_label}{model.addeconomics.AddOnCAPEXTotal.value:10.2f} {model.addeconomics.AddOnCAPEXTotal.CurrentUnits.value}\n')
 
                 display_occ_and_inflation_during_construction_in_capital_costs = is_sam_econ_model
                 if display_occ_and_inflation_during_construction_in_capital_costs:
@@ -527,11 +553,6 @@ class Outputs:
                     idc_label = Outputs._field_label(econ.interest_during_construction.display_name, 47)
                     f.write(
                         f'         {idc_label}{econ.interest_during_construction.value:10.2f} {econ.interest_during_construction.CurrentUnits.value}\n')
-
-                if is_sam_econ_model and econ.DoAddOnCalculations.value:
-                    # Non-SAM econ models print this in Extended Economics profile
-                    aoc_label = Outputs._field_label(model.addeconomics.AddOnCAPEXTotal.display_name, 47)
-                    f.write(f'         {aoc_label}{model.addeconomics.AddOnCAPEXTotal.value:10.2f} {model.addeconomics.AddOnCAPEXTotal.CurrentUnits.value}\n')
 
                 capex_param = econ.CCap if not is_sam_econ_model else econ.capex_total
                 capex_label = Outputs._field_label(capex_param.display_name, 50)

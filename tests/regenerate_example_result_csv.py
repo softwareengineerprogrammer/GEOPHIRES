@@ -42,7 +42,8 @@ if __name__ == '__main__':
 
     file_name = f'{example_name}{"_cash-flow" if is_cash_flow else ""}.csv'
 
-    output_path = _get_file_path(Path(args.output_path, file_name))
+    output_path_base = args.output_path if args.output_path is not None else ''
+    output_path = _get_file_path(Path(output_path_base, file_name))
     with open(output_path, 'w', encoding='utf-8') as csvfile:
         geophires_result: GeophiresXResult = GeophiresXResult(_get_file_path(example_relative_path))
         if args.csv_type == 'result':
