@@ -452,6 +452,14 @@
           "description": "Investment Tax Credit Value. Represents the total undiscounted ITC sum. For SAM Economic Models, this accounts for the standard Year 1 Federal ITC as well as any applicable State ITCs or multi-year credit schedules.",
           "units": "MUSD"
         },
+        "One-time Flat License Fees Etc": {},
+        "Other Incentives": {},
+        "One-time Grants Etc": {},
+        "Total Add-on CAPEX": {
+          "type": "number",
+          "description": "AddOn CAPEX Total",
+          "units": "MUSD"
+        },
         "Overnight Capital Cost": {
           "type": "number",
           "description": "Overnight Capital Cost (OCC) represents the total capital cost required to construct the plant if it were built instantly (\"overnight\"). This value excludes time-dependent costs such as inflation, royalty supplemental payments, and interest incurred during the construction period.",
@@ -470,11 +478,6 @@
         "Interest during construction": {
           "type": "number",
           "description": "Interest During Construction (IDC) is the total accumulated interest incurred on debt during the construction phase. This cost is capitalized (added to the loan principal and total installed cost) rather than paid in cash.",
-          "units": "MUSD"
-        },
-        "Total Add-on CAPEX": {
-          "type": "number",
-          "description": "AddOn CAPEX Total",
           "units": "MUSD"
         },
         "Total capital costs": {
