@@ -993,7 +993,11 @@ class EconomicsSamTestCase(BaseTestCase):
             ]:
                 capex_line_item_sum += quantity(capex_line_item['value'], capex_line_item['unit']).to(total_capex_unit)
 
-        self.assertEqual(total_capex, capex_line_item_sum)
+        self.assertAlmostEqual(
+            total_capex,
+            capex_line_item_sum,
+            places=10,  # Values are effectively exactly equal but summation is subject to a floating point issue
+        )
 
     def test_royalty_rate(self):
         royalty_rate = 0.1

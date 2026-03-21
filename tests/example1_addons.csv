@@ -71,13 +71,13 @@ RESERVOIR SIMULATION RESULTS,Production Wellbore Heat Transmission Model,,Ramey 
 RESERVOIR SIMULATION RESULTS,Average Production Well Temperature Drop,,3.0,degC
 RESERVOIR SIMULATION RESULTS,Average Injection Well Pump Pressure Drop,,217.9,kPa
 RESERVOIR SIMULATION RESULTS,Average Production Well Pump Pressure Drop,,1112.0,kPa
+CAPITAL COSTS (M$),Exploration costs,,4.49,MUSD
 CAPITAL COSTS (M$),Drilling and completion costs,,17.38,MUSD
 CAPITAL COSTS (M$),Drilling and completion costs per well,,4.35,MUSD
 CAPITAL COSTS (M$),Stimulation costs,,3.02,MUSD
 CAPITAL COSTS (M$),Surface power plant costs,,20.8,MUSD
 CAPITAL COSTS (M$),Field gathering system costs,,2.3,MUSD
 CAPITAL COSTS (M$),Total surface equipment costs,,23.1,MUSD
-CAPITAL COSTS (M$),Exploration costs,,4.49,MUSD
 CAPITAL COSTS (M$),One-time Flat License Fees Etc,,0.0,MUSD
 CAPITAL COSTS (M$),Other Incentives,,-2.11,MUSD
 CAPITAL COSTS (M$),One-time Grants Etc,,-20.21,MUSD
@@ -101,8 +101,8 @@ SURFACE EQUIPMENT SIMULATION RESULTS,Average Annual Net Electricity Generation,,
 SURFACE EQUIPMENT SIMULATION RESULTS,Average Pumping Power,,0.2,MW
 SURFACE EQUIPMENT SIMULATION RESULTS,Initial pumping power/net installed power,,3.82,%
 SURFACE EQUIPMENT SIMULATION RESULTS,Heat to Power Conversion Efficiency,,10.07,%
-Simulation Metadata,GEOPHIRES Version,,3.11.25,
-Simulation Metadata,Calculation Time,,0.883,sec
+Simulation Metadata,GEOPHIRES Version,,3.11.26,
+Simulation Metadata,Calculation Time,,0.894,sec
 POWER GENERATION PROFILE,THERMAL DRAWDOWN,1,1.0,
 POWER GENERATION PROFILE,THERMAL DRAWDOWN,2,1.0056,
 POWER GENERATION PROFILE,THERMAL DRAWDOWN,3,1.0073,

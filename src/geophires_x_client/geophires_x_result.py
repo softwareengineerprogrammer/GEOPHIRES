@@ -248,6 +248,7 @@ class GeophiresXResult:
                 'Average Round-Trip Efficiency',
             ],
             'CAPITAL COSTS (M$)': [
+                'Exploration costs',
                 'Drilling and completion costs',
                 'Drilling and completion costs per well',
                 'Drilling and completion costs per production well',
@@ -267,7 +268,6 @@ class GeophiresXResult:
                 'District Heating System Cost',
                 'Field gathering system costs',
                 'Total surface equipment costs',
-                'Exploration costs',
                 'Investment Tax Credit',
                 'One-time Flat License Fees Etc',
                 'Other Incentives',

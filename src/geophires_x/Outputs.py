@@ -468,6 +468,8 @@ class Outputs:
 
                 f.write('\n\n                          ***CAPITAL COSTS (M$)***\n\n')
                 if not model.economics.totalcapcost.Valid:
+                    f.write(f'         {econ.Cexpl.display_name}:                             {econ.Cexpl.value:10.2f} {econ.Cexpl.CurrentUnits.value}\n')
+
                     f.write(f'         {model.economics.Cwell.display_name}:                 {model.economics.Cwell.value:10.2f} {model.economics.Cwell.CurrentUnits.value}\n')
 
                     if econ.cost_lateral_section.value > 0.0:
@@ -500,8 +502,6 @@ class Outputs:
                         f.write(f'         District Heating System Cost:                  {model.economics.dhdistrictcost.value:10.2f} {model.economics.dhdistrictcost.CurrentUnits.value}\n')
 
                     f.write(f'         Total surface equipment costs:                 {(model.economics.Cplant.value+model.economics.Cgath.value):10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
-
-                    f.write(f'         {model.economics.Cexpl.display_name}:                             {model.economics.Cexpl.value:10.2f} {model.economics.Cexpl.CurrentUnits.value}\n')
 
                 if model.economics.totalcapcost.Valid and model.wellbores.redrill.value > 0:
                     f.write(f'         Drilling and completion costs (for redrilling):{econ.Cwell.value:10.2f} {econ.Cwell.CurrentUnits.value}\n')
