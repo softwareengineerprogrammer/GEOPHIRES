@@ -582,7 +582,12 @@ def ConvertUnits(ParamToModify, strUnit: str, model) -> str:
             currFactor = currFactor / 1_000_000.0
         elif currPrefix and currType[0] in ['K', 'k']:
             currFactor = currFactor / 1000.0
+
         Factor = currFactor * prefFactor
+
+        if currSuff != prefSuff:
+            Factor *= 1/_ureg.Quantity(1, currSuff[1:]).to(prefSuff[1:]).magnitude
+
         if prefPrefix:
             prefShort = prefType[1:]
         if currPrefix:
@@ -594,7 +599,7 @@ def ConvertUnits(ParamToModify, strUnit: str, model) -> str:
 
             val = float(val) * Factor
             strUnit = str(val)
-            ParamToModify.CurrentUnits = currType
+            ParamToModify.CurrentUnits = f'{currType}{currSuff}'
             return strUnit
 
         try:

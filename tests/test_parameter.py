@@ -15,6 +15,7 @@ from geophires_x.Units import EnergyCostUnit
 from geophires_x.Units import LengthUnit
 from geophires_x.Units import PressureUnit
 from geophires_x.Units import Units
+from geophires_x_client import GeophiresXClient, ImmutableGeophiresInputParameters, GeophiresXResult
 from tests.base_test_case import BaseTestCase
 
 
@@ -196,6 +197,16 @@ class ParameterTestCase(BaseTestCase):
             ConvertUnitsBack(param2, model)
 
             self.assertIn('GEOPHIRES failed to convert your units for OPEX', str(re))
+
+    def test_convert_units_usd_per_tonne(self):
+        result:GeophiresXResult = GeophiresXClient().get_geophires_result(ImmutableGeophiresInputParameters(
+            from_file_path=self._get_test_file_path('examples/example_SAM-single-owner-PPA-6_carbon-revenue.txt'),
+            params={
+                'Starting Carbon Credit Value': '100 USD/tonne'
+            }
+        ))
+
+        self.assertIsNotNone(result)  # FIXME WIP
 
     # noinspection PyMethodMayBeStatic
     def _new_model(self) -> Model:
