@@ -123,9 +123,9 @@ Output Parameters:
    `Royalty Holder Discount Rate`. This is a pre-tax value because the model does not account for the royalty holder's
    specific tax liabilities.
 
-## Carbon Revenue
+## Carbon Credits
 
-Carbon revenue is included in `Capacity payment revenue ($)`.
+Carbon credits revenue is included in `Capacity payment revenue ($)`.
 See [example_SAM-single-owner-PPA-6_carbon-revenue in the web interface](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue).
 
 See also relevant parameters and outputs in [GEOPHIRES Parameters documentation](parameters.html#economics):
