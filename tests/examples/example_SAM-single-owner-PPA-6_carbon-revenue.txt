@@ -5,10 +5,9 @@
 Economic Model, 5, -- The SAM Single Owner PPA economic model is used to calculate financial results including LCOE, NPV, IRR, and pro-forma cash flow analysis. See [GEOPHIRES documentation of SAM Economic Models](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html) for details on how System Advisor Model financial models are integrated into GEOPHIRES.
 
 Do Carbon Price Calculations, True
-Starting Carbon Credit Value, 0.015
-Ending Carbon Credit Value, 0.1
-Carbon Escalation Start Year, 5
-Carbon Escalation Rate Per Year, 0.01
+Starting Carbon Credit Value, 80 USD/kilotonne
+Ending Carbon Credit Value, 80 USD/kilotonne
+Carbon Escalation Rate Per Year, 0
 Units:Total Saved Carbon Production, kilotonne
 
 Inflation Rate, .027, -- US inflation as of December 2025. Note: [2024b ATB models lower inflation](https://atb.nrel.gov/electricity/2024b/definitions#inflation).

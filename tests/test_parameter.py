@@ -206,7 +206,7 @@ class ParameterTestCase(BaseTestCase):
                 from_file_path=self._get_test_file_path('examples/example_SAM-single-owner-PPA-6_carbon-revenue.txt'),
                 params={
                     'Starting Carbon Credit Value': '1 USD/kilogram',
-                    'Ending Carbon Credit Value': 100,
+                    'Ending Carbon Credit Value': 100,  # arbitrary high number
                     'Carbon Escalation Rate Per Year': 0,
                     'Units:Total Saved Carbon Production': 'kilogram',
                 },
