@@ -226,7 +226,7 @@ class ParameterTestCase(BaseTestCase):
             'Total Avoided Carbon Emissions'
         ]
         self.assertEqual('kilogram', total_avoided_carbon_emissions_vu['unit'])
-        self.assertEqual(round(total_avoided_carbon_emissions_vu['value']), total_capacity_payment_revenue_usd)
+        self.assertEqual(int(total_avoided_carbon_emissions_vu['value']), total_capacity_payment_revenue_usd)
 
     # noinspection PyMethodMayBeStatic
     def _new_model(self) -> Model:
