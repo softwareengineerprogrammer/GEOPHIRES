@@ -1011,6 +1011,16 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
 
     ret['ibi_oth_amount'] = (econ.OtherIncentives.quantity() + econ.TotalGrant.quantity()).to('USD').magnitude
 
+    ret = {**ret, **_get_capacity_payment_parameters(model)}
+
+    return ret
+
+
+def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
+    ret = {}
+
+    econ = model.economics
+
     if econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value:
         ret['cp_capacity_payment_type'] = 1
         ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
