@@ -127,7 +127,16 @@ Output Parameters:
 
 Carbon revenue is included in `Capacity payment revenue ($)`.
 See [example_SAM-single-owner-PPA-6_carbon-revenue in the web interface](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue).
-See also relevant parameters and outputs in [GEOPHIRES Parameters documentation](parameters.html#economics).
+
+See also relevant parameters and outputs in [GEOPHIRES Parameters documentation](parameters.html#economics):
+
+1. `Starting Carbon Credit Value`
+2. `Ending Carbon Credit Value`
+3. `Carbon Escalation Start Year`
+4. `Carbon Escalation Rate Per Year`
+5. `Current Grid CO2 production`
+6. `CO2 produced by Natural Gas`
+7. `Total Avoided Carbon Emissions`
 
 ## Examples
 
