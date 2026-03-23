@@ -130,6 +130,7 @@ See [example_SAM-single-owner-PPA-6_carbon-revenue in the web interface](https:/
 
 See also relevant parameters and outputs in [GEOPHIRES Parameters documentation](parameters.html#economics):
 
+1. `Do Carbon Price Calculations`
 1. `Starting Carbon Credit Value`
 2. `Ending Carbon Credit Value`
 3. `Carbon Escalation Start Year`
