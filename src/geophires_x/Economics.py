@@ -1314,7 +1314,9 @@ class Economics:
             UnitType=Units.NONE,
             Required=False,
             ErrMessage="assume default: no Carbon Credit calculations",
-            ToolTipText="Set to true if you want the Carbon Credit economics calculations to be made"
+            ToolTipText="By default, carbon credit calculations are automatically enabled if carbon credit parameters "
+                        "are provided. "
+                        "Set this value to false to disable carbon credit calculations."
         )
         self.DoSDACGTCalculations = self.ParameterDict[self.DoSDACGTCalculations.Name] = boolParameter(
             "Do S-DAC-GT Calculations",
@@ -1322,7 +1324,9 @@ class Economics:
             UnitType=Units.NONE,
             Required=False,
             ErrMessage="assume default: no S-DAC-GT calculations",
-            ToolTipText="Set to true if you want the S-DAC-GT economics calculations to be made"
+            ToolTipText="By default, S-DAC-GT economics calculations are automatically enabled if S-DAC-GT parameters "
+                        "are provided. "
+                        "Set this value to false to disable S-DAC-GT economics calculations."
         )
 
         self.Vertical_drilling_cost_per_m = self.ParameterDict[self.Vertical_drilling_cost_per_m.Name] = floatParameter(
@@ -2706,16 +2710,22 @@ class Economics:
         else:
             model.logger.info("No parameters read because no content provided")
 
-        # we can determine on-the-fly if Addons, CCUS, or S-DAC-GT are being used in the user input file
+        # we can determine on-the-fly if Addons, S-DAC-GT, or Carbon Credits are being used in the user input file
         for key in model.InputParameters.keys():
             if key.startswith("AddOn") and not self.DoAddOnCalculations.Provided:
                 self.DoAddOnCalculations.value = True
-                break
 
-        for key in model.InputParameters.keys():
-            if key.startswith("S-DAC-GT"):
+            if key.startswith("S-DAC-GT") and not self.DoSDACGTCalculations.Provided:
                 self.DoSDACGTCalculations.value = True
-                break
+
+            if (key in [it.Name for it in [
+                self.CarbonStartPrice,
+                self.CarbonEndPrice,
+                self.CarbonEscalationStart,
+                self.CarbonEscalationRate]
+                ]
+                    and not self.DoCarbonCalculations.Provided):
+                self.DoCarbonCalculations.value = True
 
         coerce_int_params_to_enum_values(self.ParameterDict)
         self.sync_interest_rate(model)

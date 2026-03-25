@@ -15,6 +15,9 @@ from geophires_x.Units import EnergyCostUnit
 from geophires_x.Units import LengthUnit
 from geophires_x.Units import PressureUnit
 from geophires_x.Units import Units
+from geophires_x_client import GeophiresXClient
+from geophires_x_client import GeophiresXResult
+from geophires_x_client import ImmutableGeophiresInputParameters
 from tests.base_test_case import BaseTestCase
 
 
@@ -196,6 +199,34 @@ class ParameterTestCase(BaseTestCase):
             ConvertUnitsBack(param2, model)
 
             self.assertIn('GEOPHIRES failed to convert your units for OPEX', str(re))
+
+    def test_convert_cost_per_mass(self):
+        result: GeophiresXResult = GeophiresXClient().get_geophires_result(
+            ImmutableGeophiresInputParameters(
+                from_file_path=self._get_test_file_path('examples/example_SAM-single-owner-PPA-6_carbon-revenue.txt'),
+                params={
+                    'Starting Carbon Credit Value': '1 USD/kilogram',
+                    'Ending Carbon Credit Value': 100,  # arbitrary high number
+                    'Carbon Escalation Rate Per Year': 0,
+                    'Units:Total Saved Carbon Production': 'kilogram',
+                },
+            )
+        )
+
+        def _cash_flow_row(r: GeophiresXResult, row_name: str) -> str:
+            from geophires_x.EconomicsSam import _cash_flow_profile_row
+            from geophires_x.GeoPHIRESUtils import is_float
+
+            return [it for it in _cash_flow_profile_row(r.result['SAM CASH FLOW PROFILE'], row_name) if is_float(it)]
+
+        capacity_payment_revenue_usd_row = _cash_flow_row(result, 'Capacity payment revenue ($)')
+        total_capacity_payment_revenue_usd = sum(capacity_payment_revenue_usd_row)
+
+        total_avoided_carbon_emissions_vu: dict[str, float] = result.result['SUMMARY OF RESULTS'][
+            'Total Avoided Carbon Emissions'
+        ]
+        self.assertEqual('kilogram', total_avoided_carbon_emissions_vu['unit'])
+        self.assertEqual(int(total_avoided_carbon_emissions_vu['value']), total_capacity_payment_revenue_usd)
 
     # noinspection PyMethodMayBeStatic
     def _new_model(self) -> Model:

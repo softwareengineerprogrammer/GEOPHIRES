@@ -33,6 +33,7 @@ The following table describes how GEOPHIRES parameters are transformed into SAM 
 | `Inflated Bond Interest Rate`                                                                                                                   | Financial Parameters → Project Term Debt               | `Annual interest rate`                                                                                       | `Singleowner`                     | `term_int_rate`                                              | .. N/A                                                                                                                                                                                                                                                                                                                                                      |
 | `Starting Electricity Sale Price`, `Ending Electricity Sale Price`, `Electricity Escalation Rate Per Year`, `Electricity Escalation Start Year` | Revenue                                                | `PPA price`                                                                                                  | `Singleowner`                     | `ppa_price_input`                                            | GEOPHIRES's pricing model is used to create a PPA price schedule that is passed to SAM.                                                                                                                                                                                                                                                                     |
 | `Total AddOn Profit Gained`                                                                                                                     | Revenue → Capacity Payments                            | `Fixed amount`, `Capacity payment amount`                                                                    | `Singleowner`                     | `cp_capacity_payment_type = 1`, `cp_capacity_payment_amount` |                                                                                                                                                                                                                                                                                                                                                             |
+| `Starting Carbon Credit Value`, `Ending Carbon Credit Value`, `Carbon Escalation Rate Per Year`, `Carbon Escalation Start Year`                 | Revenue → Capacity Payments                            | `Fixed amount`, `Capacity payment amount`                                                                    | `Singleowner`                     | `cp_capacity_payment_type = 1`, `cp_capacity_payment_amount` |                                                                                                                                                                                                                                                                                                                                                             |
 | `Investment Tax Credit Rate`                                                                                                                    | Incentives → Investment Tax Credit (ITC)               | `Federal` → `Percentage (%)`                                                                                 | `Singleowner`                     | `itc_fed_percent`                                            | Note that unlike the BICYCLE Economic Model's `Total capital costs`, SAM Economic Model's `Total CAPEX` is the total installed cost and does not subtract ITC value (if present).                                                                                                                                                                           |
 | `Production Tax Credit Electricity`                                                                                                             | Incentives → Production Tax Credit (PTC)               | `Federal` → `Amount ($/kWh)`                                                                                 | `Singleowner`                     | `ptc_fed_amount`                                             | .. N/A                                                                                                                                                                                                                                                                                                                                                      |
 | `Production Tax Credit Duration`                                                                                                                | Incentives → Production Tax Credit (PTC)               | `Federal` → `Term (years)`                                                                                   | `Singleowner`                     | `ptc_fed_term`                                               | .. N/A                                                                                                                                                                                                                                                                                                                                                      |
@@ -52,7 +53,6 @@ The following table describes how GEOPHIRES parameters are transformed into SAM 
 
 1. Only Electricity end-use is supported
 2. Add-ons with electricity and heat are not currently supported. (Add-ons CAPEX, OPEX, and profit are supported.)
-3. Carbon Revenue is not currently supported, but will be in future releases. See [tracking issue](https://github.com/NatLabRockies/GEOPHIRES-X/issues/458?title=SAM+Economic+Models+do+not+calculate+carbon+revenue) for details.
 
 ## Multiple Construction Years
 
@@ -122,6 +122,23 @@ Output Parameters:
 1. `Royalty Holder NPV`: The pre-tax Net Present Value of the royalty holder's income stream, calculated using the
    `Royalty Holder Discount Rate`. This is a pre-tax value because the model does not account for the royalty holder's
    specific tax liabilities.
+
+## Carbon Credits
+
+[Carbon Credits Revenue example web interface link](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue).
+
+Carbon credits revenue is included in `Capacity payment revenue ($)`.
+It is calculated according to the [CalculateCarbonRevenue function in Economics.py](https://github.com/NREL/GEOPHIRES-X/blob/dc7e54a81ac946f2f4f0f7a4f79cdfea7320f532/src/geophires_x/Economics.py#L249-L288).
+
+See relevant parameters and outputs in [GEOPHIRES Parameters documentation](parameters.html#economics):
+
+1. `Do Carbon Price Calculations`
+1. `Starting Carbon Credit Value`
+1. `Ending Carbon Credit Value`
+1. `Carbon Escalation Start Year`
+1. `Carbon Escalation Rate Per Year`
+1. `Current Grid CO2 production`
+1. `Total Avoided Carbon Emissions`
 
 ## Examples
 

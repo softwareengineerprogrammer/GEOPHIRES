@@ -1011,11 +1011,34 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
 
     ret['ibi_oth_amount'] = (econ.OtherIncentives.quantity() + econ.TotalGrant.quantity()).to('USD').magnitude
 
-    if model.economics.DoAddOnCalculations.value:
-        add_on_profit_per_year = np.sum(model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude)
-        add_on_profit_series = [add_on_profit_per_year] * model.surfaceplant.plant_lifetime.value
-        ret['cp_capacity_payment_amount'] = add_on_profit_series
+    ret = {**ret, **_get_capacity_payment_parameters(model)}
+
+    return ret
+
+
+def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
+    ret = {}
+
+    econ = model.economics
+
+    if econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value:
         ret['cp_capacity_payment_type'] = 1
+        ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+
+        if econ.DoAddOnCalculations.value:
+            add_on_profit_per_year_usd = np.sum(
+                model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
+            )
+            add_on_profit_usd_series = [add_on_profit_per_year_usd] * model.surfaceplant.plant_lifetime.value
+            for i, add_on_profit_usd in enumerate(add_on_profit_usd_series):
+                ret['cp_capacity_payment_amount'][i] += add_on_profit_usd
+
+        if econ.DoCarbonCalculations.value:
+            carbon_revenue_usd_series = (
+                econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
+            )
+            for i, carbon_revenue_usd in enumerate(carbon_revenue_usd_series):
+                ret['cp_capacity_payment_amount'][i] += carbon_revenue_usd
 
     return ret
 

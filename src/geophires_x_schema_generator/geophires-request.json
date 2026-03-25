@@ -1980,7 +1980,7 @@
       "maximum": null
     },
     "Do Carbon Price Calculations": {
-      "description": "Set to true if you want the Carbon Credit economics calculations to be made",
+      "description": "By default, carbon credit calculations are automatically enabled if carbon credit parameters are provided. Set this value to false to disable carbon credit calculations.",
       "type": "boolean",
       "units": null,
       "category": "Economics",
@@ -1989,7 +1989,7 @@
       "maximum": null
     },
     "Do S-DAC-GT Calculations": {
-      "description": "Set to true if you want the S-DAC-GT economics calculations to be made",
+      "description": "By default, S-DAC-GT economics calculations are automatically enabled if S-DAC-GT parameters are provided. Set this value to false to disable S-DAC-GT economics calculations.",
       "type": "boolean",
       "units": null,
       "category": "Economics",

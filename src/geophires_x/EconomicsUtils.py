@@ -42,7 +42,7 @@ def BuildPricingModel(
         Price[i] = StartPrice
         if i >= EscalationStartYear:
             # TODO: This is arguably an unwanted/incorrect interpretation of escalation start year, see
-            # https://github.com/NREL/GEOPHIRES-X/issues/340?title=Price+Escalation+Start+Year+seemingly+off+by+1
+            #   https://github.com/NREL/GEOPHIRES-X/issues/340?title=Price+Escalation+Start+Year+seemingly+off+by+1
             Price[i] = Price[i] + ((i - EscalationStartYear) * EscalationRate)
         if Price[i] > EndPrice:
             Price[i] = EndPrice

@@ -542,12 +542,13 @@ def ConvertUnits(ParamToModify, strUnit: str, model) -> str:
             ParamToModify.CurrentUnits = currType
             return strUnit
 
+        Factor = 1.0
+
         # First we need to deal the possibility that there is a suffix on the units (like /yr, kwh, or /tonne)
         # that will make it not be recognized by the currency conversion engine.
-        # generally, we will just strip the suffix off of a copy of the string that represents the units,
-        # then allow the conversion to happen. For now, we ignore the suffix.
-        # this has the consequence that we don't do any conversion based on that suffix, so units like EUR/MMBTU
-        # will trigger a conversion to USD/MMBTU, where MMBY+TU doesn't get converted to KW (or whatever)
+        # We strip the suffix off of a copy of the string that represents the units,
+        # derive the suffix conversion factor using pint, then
+        # then allow the currency conversion to happen.
         currSuff = prefSuff = ""
         elements = currType.split("/")
         if len(elements) > 1:
@@ -558,13 +559,16 @@ def ConvertUnits(ParamToModify, strUnit: str, model) -> str:
             prefType = elements[0]  # strip off the suffix, but save it
             prefSuff = "/" + elements[1]
 
+        if currSuff != prefSuff:
+            Factor *= 1/_ureg.Quantity(1, currSuff[1:]).to(prefSuff[1:]).magnitude
+
         # Let's try to deal with first the simple conversion where the required units have a prefix like M (m) or K (k)
         # that means a "million" or a "thousand", like MUSD (or KUSD), and the user provided USD (or KUSD) or KEUR, MEUR
         # we have to deal with the case that the M, m, K, or k are NOT prefixes, but rather are a part of the currency name.
         cc = CurrencyCodes()
         currFactor = prefFactor = 1.0
         currPrefix = prefPrefix = False
-        Factor = 1.0
+
         prefShort = prefType
         currShort = currType
         # if either of these returns a symbol, then we must have prefixes we need to deal with
@@ -582,7 +586,9 @@ def ConvertUnits(ParamToModify, strUnit: str, model) -> str:
             currFactor = currFactor / 1_000_000.0
         elif currPrefix and currType[0] in ['K', 'k']:
             currFactor = currFactor / 1000.0
-        Factor = currFactor * prefFactor
+
+        Factor *= currFactor * prefFactor
+
         if prefPrefix:
             prefShort = prefType[1:]
         if currPrefix:
@@ -594,7 +600,7 @@ def ConvertUnits(ParamToModify, strUnit: str, model) -> str:
 
             val = float(val) * Factor
             strUnit = str(val)
-            ParamToModify.CurrentUnits = currType
+            ParamToModify.CurrentUnits = f'{currType}{currSuff}'
             return strUnit
 
         try:
