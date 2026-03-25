@@ -8,7 +8,7 @@ GEOPHIRES v3 (2023-2026)
 3.12
 ^^^^
 
-3.12: `SAM Economic Models Carbon Credit Support <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/142>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.12.1>`__ | `documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#carbon-revenue>`__ | **Changed:** Note that inputs with SAM Economic Models and carbon price/credit parameters will now calculate carbon revenue instead of ignoring carbon parameters. See documentation for details.
+3.12: `SAM Economic Models Carbon Credit Support <https://github.com/NatLabRockies/GEOPHIRES-X/pull/474>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.12.1>`__ | `documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html#carbon-revenue>`__ | **Changed:** Note that inputs with SAM Economic Models and carbon price/credit parameters will now calculate carbon revenue instead of ignoring carbon parameters. See documentation for details.
 
 
 3.11
