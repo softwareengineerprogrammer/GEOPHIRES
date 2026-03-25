@@ -125,7 +125,7 @@ Output Parameters:
 
 ## Carbon Credits
 
-[Carbon Credits Revenue example web interface link](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue).
+[Carbon Credits Revenue example web interface link](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue)
 
 Carbon credits revenue is included in `Capacity payment revenue ($)`.
 It is calculated according to the [CalculateCarbonRevenue function in Economics.py](https://github.com/NREL/GEOPHIRES-X/blob/dc7e54a81ac946f2f4f0f7a4f79cdfea7320f532/src/geophires_x/Economics.py#L249-L288).
