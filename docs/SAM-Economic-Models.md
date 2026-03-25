@@ -125,19 +125,20 @@ Output Parameters:
 
 ## Carbon Credits
 
-Carbon credits revenue is included in `Capacity payment revenue ($)`.
-See [example_SAM-single-owner-PPA-6_carbon-revenue in the web interface](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue).
+[Carbon Credits Revenue example web interface link](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue).
 
-See also relevant parameters and outputs in [GEOPHIRES Parameters documentation](parameters.html#economics):
+Carbon credits revenue is included in `Capacity payment revenue ($)`.
+It is calculated according to the [CalculateCarbonRevenue function in Economics.py](https://github.com/NREL/GEOPHIRES-X/blob/dc7e54a81ac946f2f4f0f7a4f79cdfea7320f532/src/geophires_x/Economics.py#L249-L288).
+
+See relevant parameters and outputs in [GEOPHIRES Parameters documentation](parameters.html#economics):
 
 1. `Do Carbon Price Calculations`
 1. `Starting Carbon Credit Value`
-2. `Ending Carbon Credit Value`
-3. `Carbon Escalation Start Year`
-4. `Carbon Escalation Rate Per Year`
-5. `Current Grid CO2 production`
-6. `CO2 produced by Natural Gas`
-7. `Total Avoided Carbon Emissions`
+1. `Ending Carbon Credit Value`
+1. `Carbon Escalation Start Year`
+1. `Carbon Escalation Rate Per Year`
+1. `Current Grid CO2 production`
+1. `Total Avoided Carbon Emissions`
 
 ## Examples
 
