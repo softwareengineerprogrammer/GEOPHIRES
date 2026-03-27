@@ -909,7 +909,7 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
 
     ret['inflation_rate'] = econ.RINFL.quantity().to(convertible_unit('%')).magnitude
 
-    max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.value)
+    max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.quantity().to(convertible_unit('kWh')).magnitude)
 
     net_kwh_produced_series: Iterable | float | int = (
         m.surfaceplant.NetkWhProduced.quantity().to(convertible_unit('kWh')).magnitude
