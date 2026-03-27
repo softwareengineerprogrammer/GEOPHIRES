@@ -411,14 +411,15 @@ def validate_read_parameters(model: Model) -> None:
             f'{supported_description}.'
         )
 
-    if model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY:
-        raise ValueError(
-            _inv_msg(
-                model.surfaceplant.enduse_option.Name,
-                model.surfaceplant.enduse_option.value.value,
-                f'{EndUseOptions.ELECTRICITY.name} End-Use Option',
-            )
-        )
+    # FIXME WIP...
+    # if model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY:
+    #     raise ValueError(
+    #         _inv_msg(
+    #             model.surfaceplant.enduse_option.Name,
+    #             model.surfaceplant.enduse_option.value.value,
+    #             f'{EndUseOptions.ELECTRICITY.name} End-Use Option',
+    #         )
+    #     )
 
     gtr: floatParameter = model.economics.GTR
     if gtr.Provided:
@@ -909,11 +910,20 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
     ret['inflation_rate'] = econ.RINFL.quantity().to(convertible_unit('%')).magnitude
 
     max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.value)
-    degradation_total = [
-        (max_total_kWh_produced - it) / max_total_kWh_produced * 100 for it in m.surfaceplant.NetkWhProduced.value
-    ]
 
-    ret['degradation'] = degradation_total
+    net_kwh_produced_series: list[float] | float | int = (
+        m.surfaceplant.NetkWhProduced.quantity().to(convertible_unit('kWh')).magnitude
+    )
+
+    if isinstance(net_kwh_produced_series, list):
+        degradation_total = [
+            (max_total_kWh_produced - it) / max_total_kWh_produced * 100 for it in net_kwh_produced_series
+        ]
+        ret['degradation'] = degradation_total
+    else:
+        # Occurs for non-electricity end-use options
+        # net_kwh_produced_series = [net_kwh_produced_series] * m.surfaceplant.plant_lifetime.value
+        pass
 
     return ret
 
@@ -1021,24 +1031,45 @@ def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
 
     econ = model.economics
 
-    if econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value:
-        ret['cp_capacity_payment_type'] = 1
-        ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+    has_heat_end_use = model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY
 
-        if econ.DoAddOnCalculations.value:
-            add_on_profit_per_year_usd = np.sum(
-                model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
-            )
-            add_on_profit_usd_series = [add_on_profit_per_year_usd] * model.surfaceplant.plant_lifetime.value
-            for i, add_on_profit_usd in enumerate(add_on_profit_usd_series):
-                ret['cp_capacity_payment_amount'][i] += add_on_profit_usd
+    if not (econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value or has_heat_end_use):
+        return ret
 
-        if econ.DoCarbonCalculations.value:
-            carbon_revenue_usd_series = (
-                econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
-            )
-            for i, carbon_revenue_usd in enumerate(carbon_revenue_usd_series):
-                ret['cp_capacity_payment_amount'][i] += carbon_revenue_usd
+    ret['cp_capacity_payment_type'] = 1
+    ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+
+    if econ.DoAddOnCalculations.value:
+        add_on_profit_per_year_usd = np.sum(
+            model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
+        )
+        add_on_profit_usd_series = [add_on_profit_per_year_usd] * model.surfaceplant.plant_lifetime.value
+        for i, add_on_profit_usd in enumerate(add_on_profit_usd_series):
+            ret['cp_capacity_payment_amount'][i] += add_on_profit_usd
+
+    if econ.DoCarbonCalculations.value:
+        carbon_revenue_usd_series = (
+            econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
+        )
+        for i, carbon_revenue_usd in enumerate(carbon_revenue_usd_series):
+            ret['cp_capacity_payment_amount'][i] += carbon_revenue_usd
+
+    if has_heat_end_use:
+        # # FIXME WIP
+        # heat_revenue_musd_series: list[float] = CalculateRevenue(
+        #     # FIXME WIP unit conversions
+        #     model.surfaceplant.plant_lifetime.value,
+        #     model.surfaceplant.construction_years.value,
+        #     model.surfaceplant.HeatkWhProduced.value,
+        #     econ.HeatPrice.value
+        # )
+        # for i, heat_revenue_musd in enumerate(heat_revenue_musd_series):
+        #     ret['cp_capacity_payment_amount'][i] += heat_revenue_musd
+        heat_revenue_usd_series = (
+            econ.HeatRevenue.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
+        )
+        for i, heat_revenue_usd in enumerate(heat_revenue_usd_series):
+            ret['cp_capacity_payment_amount'][i] += heat_revenue_usd
 
     return ret
 

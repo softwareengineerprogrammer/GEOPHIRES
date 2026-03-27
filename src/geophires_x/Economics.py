@@ -215,19 +215,25 @@ def CalculateTotalRevenue(plantlifetime: int, ConstructionYears: int, CAPEX: flo
     return CashFlow, CummCashFlow
 
 
-def CalculateRevenue(plantlifetime: int, ConstructionYears: int, Energy, Price):
+def CalculateRevenue(plantlifetime: int, ConstructionYears: int, Energy: list[float], Price: list[float]) \
+        -> tuple[list[float], list[float]]:
     """
     CalculateRevenue calculates the revenue stream for the project.  It is used to calculate the revenue
     stream for the project.
     # note this doesn't account for OPEX
+
     :param plantlifetime: The lifetime of the project in years in years (not including construction years) in years
     :type plantlifetime: int
+
     :param ConstructionYears: The number of years of construction for the project in years
     :type ConstructionYears: int
+
     :param Energy: The energy production array for the project in kWh
     :type Energy: list
+
     :param Price: The price model array for the project in $/kWh
     :type Price: list
+
     :return: CashFlow: The annual cash flow for the project in MUSD and CummCashFlow: The cumulative cash flow for the
     project in MUSD
     :rtype: list
@@ -3525,7 +3531,7 @@ class Economics:
             Calculate cashflow and cumulative cash flow
 
             Note that these calculations are irrelevant and ignored for SAM economic models, except for
-            carbon calculations.
+            heat and carbon revenue calculations.
             """
 
             total_duration = model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value
