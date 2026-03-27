@@ -352,7 +352,11 @@ class SamEconomicsCalculations:
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-        backfill_lcoe_nominal()
+        try:
+            backfill_lcoe_nominal()
+        except ZeroDivisionError:
+            # FIXME WIP - indicates heat only end-use/surface application
+            pass
 
         def backfill_lppa_metrics() -> None:
             pv_of_ppa_revenue_row_index = _get_row_index_after(
@@ -393,7 +397,11 @@ class SamEconomicsCalculations:
                 *([None] * self._pre_revenue_years_count),
             ]
 
-        backfill_lppa_metrics()
+        try:
+            backfill_lppa_metrics()
+        except ZeroDivisionError:
+            # FIXME WIP - indicates heat only end-use/surface application
+            pass
 
         return ret
 
@@ -411,10 +419,10 @@ def validate_read_parameters(model: Model) -> None:
             f'{supported_description}.'
         )
 
-    if (
-        model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY
-        and not model.surfaceplant.enduse_option.value.name.startswith('COGENERATION')
-    ):
+    if model.surfaceplant.enduse_option.value not in (
+        EndUseOptions.ELECTRICITY,
+        EndUseOptions.HEAT,
+    ) and not model.surfaceplant.enduse_option.value.name.startswith('COGENERATION'):
         # FIXME WIP also support Direct-Use heat (requires getting PySAM to work with zero electricity generation)
 
         raise ValueError(
@@ -438,6 +446,7 @@ def validate_read_parameters(model: Model) -> None:
             f'{eir.Name} provided value ({eir.value}) will be ignored. (SAM Economics does not support {eir.Name}.)'
         )
 
+    # noinspection PyUnresolvedReferences
     econ: 'Economics' = model.economics
 
     econ.construction_capex_schedule.value = _validate_construction_capex_schedule(
@@ -927,7 +936,7 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
     else:
         # Occurs for non-electricity end-use options
         # net_kwh_produced_series = [net_kwh_produced_series] * m.surfaceplant.plant_lifetime.value
-        pass
+        ret['degradation'] = [100.0] * m.surfaceplant.plant_lifetime.value
 
     return ret
 
@@ -1153,4 +1162,9 @@ def _get_royalty_rate_schedule(model: Model) -> list[float]:
 
 
 def _get_max_total_generation_kW(model: Model) -> float:
-    return np.max(model.surfaceplant.ElectricityProduced.quantity().to(convertible_unit('kW')).magnitude)
+    max_total_kw = np.max(model.surfaceplant.ElectricityProduced.quantity().to(convertible_unit('kW')).magnitude)
+
+    # FIXME TEMP
+    max_total_kw = max(0.0001, max_total_kw)
+
+    return max_total_kw
