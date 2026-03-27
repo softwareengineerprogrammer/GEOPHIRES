@@ -21,6 +21,7 @@ from geophires_x.Parameter import ConvertUnitsBack, ConvertOutputUnits, LookupUn
 from geophires_x.OptionList import EndUseOptions, EconomicModel, ReservoirModel, FractureShape, ReservoirVolume, \
     PlantType
 from geophires_x.Parameter import Parameter
+from geophires_x.Units import EnergyUnit
 
 NL = '\n'
 
@@ -622,7 +623,14 @@ class Outputs:
                     f.write(f'      Average Net Heat Production:                      {np.average(model.surfaceplant.HeatProduced.value):10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
                     f.write(f'      Minimum Net Heat Production:                      {np.min(model.surfaceplant.HeatProduced.value):10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
                     f.write(f'      Initial Net Heat Production:                      {model.surfaceplant.HeatProduced.value[0]:10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
-                    f.write(f'      Average Annual Heat Production:                   {np.average(model.surfaceplant.HeatkWhProduced.value/1E6):10.2f} GWh' + NL)
+
+                    avg_annual_heat_production_display_units: EnergyUnit = EnergyUnit.GWH
+                    # TODO the average value should be its own output parameter instead of being calculated here
+                    avg_annual_heat_production_value = np.average(model.surfaceplant.HeatkWhProduced.quantity().to(
+                        # TODO this conversion should occur in ConvertOutputUnits instead
+                        avg_annual_heat_production_display_units
+                    ).magnitude)
+                    f.write(f'      Average Annual Heat Production:                   {avg_annual_heat_production_value:10.2f} {avg_annual_heat_production_display_units.value}\n')
 
                 if model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:
                     f.write(f'      Average Annual Heat Pump Electricity Use:         {np.average(model.surfaceplant.heat_pump_electricity_kwh_used.value / 1E6):10.2f} ' + 'GWh/year' + NL)

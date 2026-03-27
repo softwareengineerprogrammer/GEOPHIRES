@@ -591,9 +591,11 @@ class SurfacePlant:
         )
         self.HeatkWhProduced = self.OutputParameterDict[self.HeatkWhProduced.Name] = OutputParameter(
             Name="Heat Produced in kWh",
-            UnitType=Units.POWER,
-            PreferredUnits=PowerUnit.KW,
-            CurrentUnits=PowerUnit.KW
+            # display_name='Average Annual Heat Production',
+            UnitType=Units.ENERGY,
+            CurrentUnits=EnergyUnit.KWH,
+            # PreferredUnits=EnergyUnit.GWH,
+            PreferredUnits=EnergyUnit.KWH
         )
         self.Availability = self.OutputParameterDict[self.Availability.Name] = OutputParameter(
             Name="Geofluid Availability",
