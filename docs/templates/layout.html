@@ -39,12 +39,15 @@
     /* We also want the inverse behavior for links that are hardcoded to the fork repo pages. */
     ["softwareengineerprogrammer"].forEach((forkOrganizationName) => {
         ["GEOPHIRES"].forEach((forkRepositoryName) => {
-            if (locationHref.indexOf(`${forkOrganizationName}.github.io/${forkRepositoryName}`.toLowerCase()) !== -1
+            if (
+                locationHref.indexOf(`${forkOrganizationName}.github.io/${forkRepositoryName}`.toLowerCase()) !== -1
                 && (
                     docReferrer.indexOf(`https://github.com/NatLabRockies/${forkRepositoryName}-X`.toLowerCase()) !== -1
                     ||
-                    document.referrer?.toLowerCase().indexOf(`https://github.com/NREL/${forkRepositoryName}-X`.toLowerCase()) !== -1)
-            ) {
+                    docReferrer.indexOf(`https://github.com/NREL/${forkRepositoryName}-X`.toLowerCase()) !== -1
+                )
+                && docReferrer.indexOf('/pull/') === -1 // Links in main repo PR descriptions should not redirect
+        ) {
                 console.debug('Redirecting to main repo docs based on referrer:', document.referrer);
                 location.href = location?.href?.replace(
                     `${forkOrganizationName}.github.io/${forkRepositoryName}`,
