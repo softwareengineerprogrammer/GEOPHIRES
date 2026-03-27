@@ -1035,9 +1035,19 @@ def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
 
     econ = model.economics
 
-    has_heat_end_use = model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY
+    def _has_revenue_type(econ_revenue_output: OutputParameter) -> bool:
+        return isinstance(econ_revenue_output.value, Iterable) and any(it > 0 for it in econ_revenue_output.value)
 
-    if not (econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value or has_heat_end_use):
+    has_heat_revenue = _has_revenue_type(econ.HeatRevenue)
+    has_cooling_revenue = _has_revenue_type(econ.CoolingRevenue)
+
+    if not (
+        econ.DoAddOnCalculations.value
+        or econ.DoCarbonCalculations.value
+        or has_heat_revenue
+        or has_cooling_revenue
+        or has_cooling_revenue
+    ):
         return ret
 
     ret['cp_capacity_payment_type'] = 1
@@ -1058,22 +1068,16 @@ def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
         for i, carbon_revenue_usd in enumerate(carbon_revenue_usd_series):
             ret['cp_capacity_payment_amount'][i] += carbon_revenue_usd
 
-    if has_heat_end_use:
-        # # FIXME WIP
-        # heat_revenue_musd_series: list[float] = CalculateRevenue(
-        #     # FIXME WIP unit conversions
-        #     model.surfaceplant.plant_lifetime.value,
-        #     model.surfaceplant.construction_years.value,
-        #     model.surfaceplant.HeatkWhProduced.value,
-        #     econ.HeatPrice.value
-        # )
-        # for i, heat_revenue_musd in enumerate(heat_revenue_musd_series):
-        #     ret['cp_capacity_payment_amount'][i] += heat_revenue_musd
-        heat_revenue_usd_series = (
-            econ.HeatRevenue.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
-        )
-        for i, heat_revenue_usd in enumerate(heat_revenue_usd_series):
+    def _get_revenue_usd_series(econ_revenue_output: OutputParameter) -> Iterable[float]:
+        return econ_revenue_output.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
+
+    if has_heat_revenue:
+        for i, heat_revenue_usd in enumerate(_get_revenue_usd_series(econ.HeatRevenue)):
             ret['cp_capacity_payment_amount'][i] += heat_revenue_usd
+
+    if has_cooling_revenue:
+        for i, cooling_revenue_usd in enumerate(_get_revenue_usd_series(econ.CoolingRevenue)):
+            ret['cp_capacity_payment_amount'][i] += cooling_revenue_usd
 
     return ret
 
