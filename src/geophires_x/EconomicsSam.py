@@ -411,15 +411,19 @@ def validate_read_parameters(model: Model) -> None:
             f'{supported_description}.'
         )
 
-    # FIXME WIP...
-    # if model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY:
-    #     raise ValueError(
-    #         _inv_msg(
-    #             model.surfaceplant.enduse_option.Name,
-    #             model.surfaceplant.enduse_option.value.value,
-    #             f'{EndUseOptions.ELECTRICITY.name} End-Use Option',
-    #         )
-    #     )
+    if (
+        model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY
+        and not model.surfaceplant.enduse_option.value.name.startswith('COGENERATION')
+    ):
+        # FIXME WIP also support Direct-Use heat (requires getting PySAM to work with zero electricity generation)
+
+        raise ValueError(
+            _inv_msg(
+                model.surfaceplant.enduse_option.Name,
+                model.surfaceplant.enduse_option.value.value,
+                f'{EndUseOptions.ELECTRICITY.value} and Cogeneration End-Use Options',
+            )
+        )
 
     gtr: floatParameter = model.economics.GTR
     if gtr.Provided:
