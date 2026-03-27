@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from math import isnan
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from decimal import Decimal
 
@@ -911,11 +911,11 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
 
     max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.value)
 
-    net_kwh_produced_series: list[float] | float | int = (
+    net_kwh_produced_series: Iterable | float | int = (
         m.surfaceplant.NetkWhProduced.quantity().to(convertible_unit('kWh')).magnitude
     )
 
-    if isinstance(net_kwh_produced_series, list):
+    if isinstance(net_kwh_produced_series, Iterable):
         degradation_total = [
             (max_total_kWh_produced - it) / max_total_kWh_produced * 100 for it in net_kwh_produced_series
         ]
