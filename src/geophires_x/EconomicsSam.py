@@ -250,25 +250,32 @@ class SamEconomicsCalculations:
         _insert_blank_line_before('Salvage value ($)')
         _insert_blank_line_before('Capacity payment revenue ($)')
 
+        def _for_operational_years(_row: list[Any]) -> list[Any]:
+            return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
+
         for capacity_payment_revenue_source in self.capacity_payment_revenue_sources:
             if capacity_payment_revenue_source.amount_provided_label is not None:
                 _insert_row_before(
                     'REVENUE',
                     capacity_payment_revenue_source.amount_provided_label,
-                    [0, *capacity_payment_revenue_source.amount_provided],
+                    _for_operational_years(capacity_payment_revenue_source.amount_provided),
                 )
-                _insert_blank_line_before(capacity_payment_revenue_source.amount_provided_label)
+                # _insert_blank_line_before(capacity_payment_revenue_source.amount_provided_label)
+                _insert_blank_line_before('REVENUE')
 
             revenue_row_name = f'{capacity_payment_revenue_source.name} revenue ($)'
             _insert_row_before(
-                'Capacity payment revenue ($)', revenue_row_name, [0, *capacity_payment_revenue_source.revenue_usd]
+                'Capacity payment revenue ($)',
+                revenue_row_name,
+                _for_operational_years(capacity_payment_revenue_source.revenue_usd),
             )
 
             if capacity_payment_revenue_source.price_label is not None:
                 _insert_row_before(
                     revenue_row_name,
                     capacity_payment_revenue_source.price_label,
-                    [0, *capacity_payment_revenue_source.price],
+                    capacity_payment_revenue_source.price,
+                    # _for_operational_years(capacity_payment_revenue_source.price),
                 )
 
         return ret
@@ -1157,9 +1164,10 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
             CapacityPaymentRevenueSource(
                 name='Heat',
                 revenue_usd=_get_revenue_usd_series(econ.HeatRevenue),
-                price_label=f'Heat price ({econ.HeatPrice.CurrentUnits})',
+                price_label=f'Heat price ({econ.HeatPrice.CurrentUnits.value})',
                 price=econ.HeatPrice.value,
-                # FIXME WIP amount
+                amount_provided_label=f'Heat provided ({model.surfaceplant.HeatProduced.CurrentUnits.value})',
+                amount_provided=model.surfaceplant.HeatProduced.value,
             )
         )
 
