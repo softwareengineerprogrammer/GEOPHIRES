@@ -1150,7 +1150,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         carbon_revenue_source = CapacityPaymentRevenueSource(
             name='Carbon credits',  # TODO/WIP naming re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/476
             revenue_usd=carbon_revenue_usd_series,
-            price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits})',
+            price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits.value})',
             price=econ.CarbonPrice.value,
             # FIXME WIP amount
         )
@@ -1163,6 +1163,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         ret.append(
             CapacityPaymentRevenueSource(
                 name='Heat',
+                # FIXME WIP amount/price units are pre-existingly incorrect/out-of-sync
                 revenue_usd=_get_revenue_usd_series(econ.HeatRevenue),
                 price_label=f'Heat price ({econ.HeatPrice.CurrentUnits.value})',
                 price=econ.HeatPrice.value,
@@ -1176,7 +1177,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
             CapacityPaymentRevenueSource(
                 name='Cooling',
                 revenue_usd=_get_revenue_usd_series(econ.CoolingRevenue),
-                price_label=f'Cooling price ({econ.HeatPrice.CurrentUnits})',
+                price_label=f'Cooling price ({econ.HeatPrice.CurrentUnits.value})',
                 price=econ.CoolingPrice.value,
                 # FIXME WIP amount
             )
