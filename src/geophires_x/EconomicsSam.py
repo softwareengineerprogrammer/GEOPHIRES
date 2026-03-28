@@ -64,6 +64,18 @@ ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
 
 
 @dataclass
+class CapacityPaymentRevenueSource:
+    name: str
+    amount_provided_label: str | None
+    amount_provided: list[float] | None
+
+    price_label: str | None
+    price: list[float] | None
+
+    revenue_usd: list[float]
+
+
+@dataclass
 class SamEconomicsCalculations:
     _sam_cash_flow_profile_operational_years: list[list[Any]]
     """
@@ -102,6 +114,8 @@ class SamEconomicsCalculations:
     project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
 
     investment_tax_credit: OutputParameter = field(default_factory=investment_tax_credit_output_parameter)
+
+    capacity_payment_revenue_sources: list[CapacityPaymentRevenueSource] = field(default_factory=list)
 
     @property
     def _pre_revenue_years_count(self) -> int:
@@ -186,6 +200,8 @@ class SamEconomicsCalculations:
         if self._royalties_rate_schedule is not None:
             ret = self._insert_royalties_rate_schedule(ret)
 
+        ret = self._insert_capacity_payment_line_items(ret)
+
         ret = self._insert_calculated_levelized_metrics_line_items(ret)
 
         return ret
@@ -207,6 +223,50 @@ class SamEconomicsCalculations:
                 ],
             ],
         )
+
+        return ret
+
+    # noinspection PyMethodMayBeStatic
+    def _insert_capacity_payment_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
+        if len(self.capacity_payment_revenue_sources) == 0:
+            return cf_ret
+
+        # FIXME WIP
+        ret = cf_ret.copy()
+
+        def _get_row_index(row_name_: str) -> list[Any]:
+            return [it[0] for it in ret].index(row_name_)
+
+        def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any]) -> None:
+            ret.insert(
+                _get_row_index(before_row_name),
+                [row_name, *row_content],
+            )
+
+        def _insert_blank_line_before(before_row_name: str) -> None:
+            _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
+
+        _insert_blank_line_before('Salvage value ($)')
+        _insert_blank_line_before('Capacity payment revenue ($)')
+
+        for capacity_payment_revenue_source in self.capacity_payment_revenue_sources:
+            if capacity_payment_revenue_source.amount_provided_label is not None:
+                _insert_row_before(
+                    'REVENUE',
+                    capacity_payment_revenue_source.amount_provided_label,
+                    capacity_payment_revenue_source.amount_provided,
+                )
+                _insert_blank_line_before(capacity_payment_revenue_source.amount_provided_label)
+
+            revenue_row_name = f'{capacity_payment_revenue_source.name} revenue ($)'
+            _insert_row_before(
+                'Capacity payment revenue ($)', revenue_row_name, capacity_payment_revenue_source.revenue_usd
+            )
+
+            if capacity_payment_revenue_source.price_label is not None:
+                _insert_row_before(
+                    revenue_row_name, capacity_payment_revenue_source.price_label, capacity_payment_revenue_source.price
+                )
 
         return ret
 
@@ -626,6 +686,9 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
         _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
 
+    if _has_capacity_payment_revenue_sources(model):
+        sam_economics.capacity_payment_revenue_sources = _get_capacity_payment_revenue_sources(model)
+
     return sam_economics
 
 
@@ -1039,7 +1102,81 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     return ret
 
 
+def _has_capacity_payment_revenue_sources(model: Model) -> bool:
+    return len(_get_capacity_payment_revenue_sources(model)) > 0
+
+
+def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentRevenueSource]:
+    ret: list[CapacityPaymentRevenueSource] = []
+
+    econ = model.economics
+
+    def _has_revenue_type(econ_revenue_output: OutputParameter) -> bool:
+        return isinstance(econ_revenue_output.value, Iterable) and any(it > 0 for it in econ_revenue_output.value)
+
+    has_heat_revenue = _has_revenue_type(econ.HeatRevenue)
+    has_cooling_revenue = _has_revenue_type(econ.CoolingRevenue)
+    #
+    # if not (
+    #     econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value or has_heat_revenue or has_cooling_revenue
+    # ):
+    #     return ret
+
+    # ret['cp_capacity_payment_type'] = 1
+    # ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+
+    if econ.DoAddOnCalculations.value:
+        add_on_profit_per_year_usd = np.sum(
+            model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
+        )
+        add_on_profit_usd_series = [add_on_profit_per_year_usd] * model.surfaceplant.plant_lifetime.value
+        add_on_source = CapacityPaymentRevenueSource(name='Add-On Profit', revenue_usd=add_on_profit_usd_series)
+        ret.append(add_on_source)
+
+    if econ.DoCarbonCalculations.value:
+        carbon_revenue_usd_series = (
+            econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
+        )
+        carbon_revenue_source = CapacityPaymentRevenueSource(
+            name='Carbon credits',  # TODO/WIP naming re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/476
+            revenue_usd=carbon_revenue_usd_series,
+            price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits})',
+            price=econ.CarbonPrice.value,
+            # FIXME WIP amount
+        )
+        ret.append(carbon_revenue_source)
+
+    def _get_revenue_usd_series(econ_revenue_output: OutputParameter) -> Iterable[float]:
+        return econ_revenue_output.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
+
+    if has_heat_revenue:
+        ret.append(
+            CapacityPaymentRevenueSource(
+                name='Heat',
+                revenue_usd=_get_revenue_usd_series(econ.HeatRevenue),
+                price_label=f'Heat price ({econ.HeatPrice.CurrentUnits})',
+                price=econ.HeatPrice.value,
+                # FIXME WIP amount
+            )
+        )
+
+    if has_cooling_revenue:
+        ret.append(
+            CapacityPaymentRevenueSource(
+                name='Cooling',
+                revenue_usd=_get_revenue_usd_series(econ.CoolingRevenue),
+                price_label=f'Cooling price ({econ.HeatPrice.CurrentUnits})',
+                price=econ.CoolingPrice.value,
+                # FIXME WIP amount
+            )
+        )
+
+    return ret
+
+
 def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
+    # FIXME WIP TODO consolidate with _get_capacity_payment_revenue_sources
+
     ret = {}
 
     econ = model.economics
