@@ -1051,11 +1051,7 @@ def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
     has_cooling_revenue = _has_revenue_type(econ.CoolingRevenue)
 
     if not (
-        econ.DoAddOnCalculations.value
-        or econ.DoCarbonCalculations.value
-        or has_heat_revenue
-        or has_cooling_revenue
-        or has_cooling_revenue
+        econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value or has_heat_revenue or has_cooling_revenue
     ):
         return ret
 
