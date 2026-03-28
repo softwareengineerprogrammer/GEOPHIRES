@@ -3641,8 +3641,15 @@ class Economics:
             np.max(model.surfaceplant.NetElectricityProduced.value),
             model.surfaceplant.NetElectricityProduced.CurrentUnits
         ).to('kW')
-        capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
-        self.capex_total_per_kw.value = capex_total_per_kw_q.magnitude
+        try:
+            capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
+            self.capex_total_per_kw.value = capex_total_per_kw_q.magnitude
+        except Exception as e: # RuntimeError as re:
+            # FIXME WIP
+            if str(e) == 'divide by zero encountered in scalar divide':
+                self.capex_total_per_kw.value = float('inf')
+            else:
+                raise e
 
         self.CCap.value = (self.sam_economics_calculations.capex.quantity()
                            .to(self.CCap.CurrentUnits.value).magnitude)
