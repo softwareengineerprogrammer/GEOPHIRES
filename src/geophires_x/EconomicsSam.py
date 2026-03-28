@@ -66,13 +66,14 @@ ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
 @dataclass
 class CapacityPaymentRevenueSource:
     name: str
-    amount_provided_label: str | None
-    amount_provided: list[float] | None
-
-    price_label: str | None
-    price: list[float] | None
 
     revenue_usd: list[float]
+
+    amount_provided_label: str | None = None
+    amount_provided: list[float] | None = None
+
+    price_label: str | None = None
+    price: list[float] | None = None
 
 
 @dataclass
@@ -254,18 +255,20 @@ class SamEconomicsCalculations:
                 _insert_row_before(
                     'REVENUE',
                     capacity_payment_revenue_source.amount_provided_label,
-                    capacity_payment_revenue_source.amount_provided,
+                    [0, *capacity_payment_revenue_source.amount_provided],
                 )
                 _insert_blank_line_before(capacity_payment_revenue_source.amount_provided_label)
 
             revenue_row_name = f'{capacity_payment_revenue_source.name} revenue ($)'
             _insert_row_before(
-                'Capacity payment revenue ($)', revenue_row_name, capacity_payment_revenue_source.revenue_usd
+                'Capacity payment revenue ($)', revenue_row_name, [0, *capacity_payment_revenue_source.revenue_usd]
             )
 
             if capacity_payment_revenue_source.price_label is not None:
                 _insert_row_before(
-                    revenue_row_name, capacity_payment_revenue_source.price_label, capacity_payment_revenue_source.price
+                    revenue_row_name,
+                    capacity_payment_revenue_source.price_label,
+                    [0, *capacity_payment_revenue_source.price],
                 )
 
         return ret
