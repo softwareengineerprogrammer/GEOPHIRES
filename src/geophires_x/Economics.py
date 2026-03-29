@@ -215,19 +215,25 @@ def CalculateTotalRevenue(plantlifetime: int, ConstructionYears: int, CAPEX: flo
     return CashFlow, CummCashFlow
 
 
-def CalculateRevenue(plantlifetime: int, ConstructionYears: int, Energy, Price):
+def CalculateRevenue(plantlifetime: int, ConstructionYears: int, Energy: list[float], Price: list[float]) \
+        -> tuple[list[float], list[float]]:
     """
     CalculateRevenue calculates the revenue stream for the project.  It is used to calculate the revenue
     stream for the project.
     # note this doesn't account for OPEX
+
     :param plantlifetime: The lifetime of the project in years in years (not including construction years) in years
     :type plantlifetime: int
+
     :param ConstructionYears: The number of years of construction for the project in years
     :type ConstructionYears: int
+
     :param Energy: The energy production array for the project in kWh
     :type Energy: list
+
     :param Price: The price model array for the project in $/kWh
     :type Price: list
+
     :return: CashFlow: The annual cash flow for the project in MUSD and CummCashFlow: The cumulative cash flow for the
     project in MUSD
     :rtype: list
@@ -485,8 +491,13 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
                 model.surfaceplant.annual_heating_demand.value * discount_vector) * 1E2  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
     elif econ.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
-        # Designated as nominal (as opposed to real) in parameter tooltip text
-        LCOE = econ.sam_economics_calculations.lcoe_nominal.quantity().to(convertible_unit(econ.LCOE.CurrentUnits.value)).magnitude
+        if model.surfaceplant.enduse_option.value.has_electricity_component:
+            # Designated as nominal (as opposed to real) in parameter tooltip text
+            LCOE = econ.sam_economics_calculations.lcoe_nominal.quantity().to(
+                convertible_unit(econ.LCOE.CurrentUnits.value)).magnitude
+        else:
+            # FIXME WIP calculate LCOH/LCOC as applicable
+            pass
     else:
         # must be BICYCLE
         # average return on investment (tax and inflation adjusted)
@@ -3524,22 +3535,26 @@ class Economics:
             """
             Calculate cashflow and cumulative cash flow
 
-            Note that these calculations are irrelevant and ignored for SAM economic models, except for
-            carbon calculations.
+            Note that for SAM economic models, electricity revenue calculations are irrelevant and ignored.
             """
 
             total_duration = model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value
+
             self.ElecRevenue.value = [0.0] * total_duration
             self.ElecCummRevenue.value = [0.0] * total_duration
+
             self.HeatRevenue.value = [0.0] * total_duration
             self.HeatCummRevenue.value = [0.0] * total_duration
+
             self.CoolingRevenue.value = [0.0] * total_duration
             self.CoolingCummRevenue.value = [0.0] * total_duration
+
             self.CarbonRevenue.value = [0.0] * total_duration
             self.CarbonCummCashFlow.value = [0.0] * total_duration
+            self.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
+
             self.TotalRevenue.value = [0.0] * total_duration
             self.TotalCummRevenue.value = [0.0] * total_duration
-            self.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
 
             # Based on the style of the project, calculate the revenue & cumulative revenue
             if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
@@ -3625,13 +3640,10 @@ class Economics:
         self.capex_total.value = (self.sam_economics_calculations.capex.quantity()
                                   .to(self.capex_total.CurrentUnits.value).magnitude)
 
-        # TODO define this as an output of SurfacePlant rather than calculating it on-demand here and elsewhere
-        max_net_electricity_generation_kw = quantity(
-            np.max(model.surfaceplant.NetElectricityProduced.value),
-            model.surfaceplant.NetElectricityProduced.CurrentUnits
-        ).to('kW')
-        capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
-        self.capex_total_per_kw.value = capex_total_per_kw_q.magnitude
+        if model.surfaceplant.enduse_option.value.has_electricity_component:
+            max_net_electricity_generation_kw = model.surfaceplant.NetElectricityProducedMax.quantity().to('kW')
+            capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
+            self.capex_total_per_kw.value = capex_total_per_kw_q.magnitude
 
         self.CCap.value = (self.sam_economics_calculations.capex.quantity()
                            .to(self.CCap.CurrentUnits.value).magnitude)

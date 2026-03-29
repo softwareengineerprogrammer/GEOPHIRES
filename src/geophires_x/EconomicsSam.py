@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from math import isnan
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from decimal import Decimal
 
@@ -64,6 +64,19 @@ ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
 
 
 @dataclass
+class CapacityPaymentRevenueSource:
+    name: str
+
+    revenue_usd: list[float]
+
+    amount_provided_label: str | None = None
+    amount_provided: list[float] | None = None
+
+    price_label: str | None = None
+    price: list[float] | None = None
+
+
+@dataclass
 class SamEconomicsCalculations:
     _sam_cash_flow_profile_operational_years: list[list[Any]]
     """
@@ -102,6 +115,8 @@ class SamEconomicsCalculations:
     project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
 
     investment_tax_credit: OutputParameter = field(default_factory=investment_tax_credit_output_parameter)
+
+    capacity_payment_revenue_sources: list[CapacityPaymentRevenueSource] = field(default_factory=list)
 
     @property
     def _pre_revenue_years_count(self) -> int:
@@ -186,6 +201,8 @@ class SamEconomicsCalculations:
         if self._royalties_rate_schedule is not None:
             ret = self._insert_royalties_rate_schedule(ret)
 
+        ret = self._insert_capacity_payment_line_items(ret)
+
         ret = self._insert_calculated_levelized_metrics_line_items(ret)
 
         return ret
@@ -207,6 +224,59 @@ class SamEconomicsCalculations:
                 ],
             ],
         )
+
+        return ret
+
+    # noinspection PyMethodMayBeStatic
+    def _insert_capacity_payment_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
+        if len(self.capacity_payment_revenue_sources) == 0:
+            return cf_ret
+
+        ret: list[list[Any]] = cf_ret.copy()
+
+        def _get_row_index(row_name_: str) -> list[Any]:
+            return [it[0] for it in ret].index(row_name_)
+
+        def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any]) -> None:
+            ret.insert(
+                _get_row_index(before_row_name),
+                [row_name, *row_content],
+            )
+
+        def _insert_blank_line_before(before_row_name: str) -> None:
+            _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
+
+        revenue_row_name = 'REVENUE'
+        capacity_payment_revenue_row_name = 'Capacity payment revenue ($)'
+
+        _insert_blank_line_before('Salvage value ($)')
+        _insert_blank_line_before(capacity_payment_revenue_row_name)
+
+        def _for_operational_years(_row: list[Any]) -> list[Any]:
+            return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
+
+        for capacity_payment_revenue_source in self.capacity_payment_revenue_sources:
+            if capacity_payment_revenue_source.amount_provided_label is not None:
+                _insert_row_before(
+                    revenue_row_name,
+                    capacity_payment_revenue_source.amount_provided_label,
+                    _for_operational_years(capacity_payment_revenue_source.amount_provided),
+                )
+                _insert_blank_line_before(revenue_row_name)
+
+            revenue_row_name = f'{capacity_payment_revenue_source.name} revenue ($)'
+            _insert_row_before(
+                capacity_payment_revenue_row_name,
+                revenue_row_name,
+                _for_operational_years(capacity_payment_revenue_source.revenue_usd),
+            )
+
+            if capacity_payment_revenue_source.price_label is not None:
+                _insert_row_before(
+                    revenue_row_name,
+                    capacity_payment_revenue_source.price_label.replace('USD', '$'),
+                    capacity_payment_revenue_source.price,
+                )
 
         return ret
 
@@ -339,16 +409,25 @@ class SamEconomicsCalculations:
 
             lcoe_nominal_backfilled = []
             for _year in range(len(pv_of_annual_costs_backfilled_row_values_usd)):
-                lcoe_nominal_backfilled.append(
-                    pv_of_annual_costs_backfilled_row_values_usd[_year]
-                    * 100
-                    / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
-                )
+                entry: float | str = 'NaN'
+                if pv_of_electricity_to_grid_backfilled_row_kwh[_year] != 0:
+                    entry = (
+                        pv_of_annual_costs_backfilled_row_values_usd[_year]
+                        * 100
+                        / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
+                    )
+
+                lcoe_nominal_backfilled.append(entry)
 
             lcoe_nominal_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
             lcoe_nominal_row_index = _get_row_index(lcoe_nominal_row_name)
+
+            lcoe_nominal_backfilled_entry = lcoe_nominal_backfilled[0]
+            if isinstance(lcoe_nominal_backfilled_entry, float):
+                lcoe_nominal_backfilled_entry = round(lcoe_nominal_backfilled_entry, 2)
+
             ret[lcoe_nominal_row_index][1:] = [
-                round(lcoe_nominal_backfilled[0], 2),
+                lcoe_nominal_backfilled_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
@@ -382,14 +461,20 @@ class SamEconomicsCalculations:
             # ]
             # ret[_get_row_index('PPA price (cents/kWh)')][1:] = ppa_revenue_all_years
 
-            # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
-            first_year_lppa_cents_per_kwh = (
-                first_year_pv_of_ppa_revenue_usd * 100.0 / ret[_get_row_index(pv_of_annual_energy_row_name)][1]
-            )
+            first_year_lppa_cents_per_kwh: float | str = 'NaN'
+            first_year_pv_annual_energy = ret[_get_row_index(pv_of_annual_energy_row_name)][1]
+
+            if (
+                isinstance(first_year_pv_annual_energy, int) or isinstance(first_year_pv_annual_energy, float)
+            ) and first_year_pv_annual_energy != 0.0:
+                # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
+                first_year_lppa_cents_per_kwh = round(
+                    first_year_pv_of_ppa_revenue_usd * 100.0 / first_year_pv_annual_energy, 2
+                )
 
             lppa_row_name = 'LPPA Levelized PPA price nominal (cents/kWh)'
             ret[_get_row_index(lppa_row_name)][1:] = [
-                round(first_year_lppa_cents_per_kwh, 2),
+                first_year_lppa_cents_per_kwh,
                 *([None] * self._pre_revenue_years_count),
             ]
 
@@ -411,12 +496,15 @@ def validate_read_parameters(model: Model) -> None:
             f'{supported_description}.'
         )
 
-    if model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY:
+    if model.surfaceplant.enduse_option.value not in (
+        EndUseOptions.ELECTRICITY,
+        EndUseOptions.HEAT,
+    ) and not model.surfaceplant.enduse_option.value.name.startswith('COGENERATION'):
         raise ValueError(
             _inv_msg(
                 model.surfaceplant.enduse_option.Name,
                 model.surfaceplant.enduse_option.value.value,
-                f'{EndUseOptions.ELECTRICITY.name} End-Use Option',
+                f'{EndUseOptions.ELECTRICITY.value}, {EndUseOptions.HEAT.value}, ' f'and Cogeneration End-Use Options',
             )
         )
 
@@ -433,6 +521,7 @@ def validate_read_parameters(model: Model) -> None:
             f'{eir.Name} provided value ({eir.value}) will be ignored. (SAM Economics does not support {eir.Name}.)'
         )
 
+    # noinspection PyUnresolvedReferences
     econ: 'Economics' = model.economics
 
     econ.construction_capex_schedule.value = _validate_construction_capex_schedule(
@@ -611,6 +700,9 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.lcoe_nominal.value = sf(
         _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
+
+    if _has_capacity_payment_revenue_sources(model):
+        sam_economics.capacity_payment_revenue_sources = _get_capacity_payment_revenue_sources(model)
 
     return sam_economics
 
@@ -908,12 +1000,21 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
 
     ret['inflation_rate'] = econ.RINFL.quantity().to(convertible_unit('%')).magnitude
 
-    max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.value)
-    degradation_total = [
-        (max_total_kWh_produced - it) / max_total_kWh_produced * 100 for it in m.surfaceplant.NetkWhProduced.value
-    ]
+    max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.quantity().to(convertible_unit('kWh')).magnitude)
 
-    ret['degradation'] = degradation_total
+    net_kwh_produced_series: Iterable | float | int = (
+        m.surfaceplant.NetkWhProduced.quantity().to(convertible_unit('kWh')).magnitude
+    )
+
+    if isinstance(net_kwh_produced_series, Iterable):
+        degradation_total = [
+            (max_total_kWh_produced - it) / max_total_kWh_produced * 100 for it in net_kwh_produced_series
+        ]
+        ret['degradation'] = degradation_total
+    else:
+        # Occurs for non-electricity end-use options
+        # net_kwh_produced_series = [net_kwh_produced_series] * m.surfaceplant.plant_lifetime.value
+        ret['degradation'] = [100.0] * m.surfaceplant.plant_lifetime.value
 
     return ret
 
@@ -1016,29 +1117,98 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     return ret
 
 
-def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
-    ret = {}
+def _has_capacity_payment_revenue_sources(model: Model) -> bool:
+    return len(_get_capacity_payment_revenue_sources(model)) > 0
+
+
+def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentRevenueSource]:
+    ret: list[CapacityPaymentRevenueSource] = []
 
     econ = model.economics
 
-    if econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value:
-        ret['cp_capacity_payment_type'] = 1
-        ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+    def _has_revenue_type(econ_revenue_output: OutputParameter) -> bool:
+        return isinstance(econ_revenue_output.value, Iterable) and any(it > 0 for it in econ_revenue_output.value)
 
-        if econ.DoAddOnCalculations.value:
-            add_on_profit_per_year_usd = np.sum(
-                model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
-            )
-            add_on_profit_usd_series = [add_on_profit_per_year_usd] * model.surfaceplant.plant_lifetime.value
-            for i, add_on_profit_usd in enumerate(add_on_profit_usd_series):
-                ret['cp_capacity_payment_amount'][i] += add_on_profit_usd
+    has_heat_revenue = _has_revenue_type(econ.HeatRevenue)
+    has_cooling_revenue = _has_revenue_type(econ.CoolingRevenue)
+    #
+    # if not (
+    #     econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value or has_heat_revenue or has_cooling_revenue
+    # ):
+    #     return ret
 
-        if econ.DoCarbonCalculations.value:
-            carbon_revenue_usd_series = (
-                econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
+    # ret['cp_capacity_payment_type'] = 1
+    # ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+
+    if econ.DoAddOnCalculations.value:
+        add_on_profit_per_year_usd = np.sum(
+            model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
+        )
+        add_on_profit_usd_series = [round(add_on_profit_per_year_usd)] * model.surfaceplant.plant_lifetime.value
+        add_on_source = CapacityPaymentRevenueSource(name='Add-On Profit', revenue_usd=add_on_profit_usd_series)
+        ret.append(add_on_source)
+
+    if econ.DoCarbonCalculations.value:
+        carbon_revenue_usd_series = (
+            econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
+        )
+        carbon_revenue_source = CapacityPaymentRevenueSource(
+            name='Carbon credits',  # TODO/WIP naming re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/476
+            revenue_usd=[round(it) for it in carbon_revenue_usd_series],
+            price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits.value})',
+            price=econ.CarbonPrice.value,
+            amount_provided_label=f'Saved Carbon Production ({econ.CarbonThatWouldHaveBeenProducedAnnually.CurrentUnits.value})',
+            amount_provided=econ.CarbonThatWouldHaveBeenProducedAnnually.value[_pre_revenue_years_count(model) :],
+        )
+        ret.append(carbon_revenue_source)
+
+    def _get_revenue_usd_series(econ_revenue_output: OutputParameter) -> Iterable[float]:
+        return [
+            round(it)
+            for it in econ_revenue_output.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
+        ]
+
+    if has_heat_revenue:
+        ret.append(
+            CapacityPaymentRevenueSource(
+                name='Heat',
+                revenue_usd=_get_revenue_usd_series(econ.HeatRevenue),
+                price_label=f'Heat price ({econ.HeatPrice.CurrentUnits.value})',
+                price=econ.HeatPrice.value,
+                amount_provided_label=f'Heat provided ({model.surfaceplant.HeatkWhProduced.CurrentUnits.value})',
+                amount_provided=model.surfaceplant.HeatkWhProduced.value,
             )
-            for i, carbon_revenue_usd in enumerate(carbon_revenue_usd_series):
-                ret['cp_capacity_payment_amount'][i] += carbon_revenue_usd
+        )
+
+    if has_cooling_revenue:
+        ret.append(
+            CapacityPaymentRevenueSource(
+                name='Cooling',
+                revenue_usd=_get_revenue_usd_series(econ.CoolingRevenue),
+                price_label=f'Cooling price ({econ.CoolingPrice.CurrentUnits.value})',
+                price=econ.CoolingPrice.value,
+                amount_provided_label=f'Cooling provided ({model.surfaceplant.cooling_kWh_Produced.CurrentUnits.value})',
+                amount_provided=model.surfaceplant.cooling_kWh_Produced.value,
+            )
+        )
+
+    return ret
+
+
+def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
+    ret: dict[str, Any] = {}
+
+    capacity_payment_revenue_sources: list[CapacityPaymentRevenueSource] = _get_capacity_payment_revenue_sources(model)
+
+    if len(capacity_payment_revenue_sources) == 0:
+        return ret
+
+    ret['cp_capacity_payment_type'] = 1
+    ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+
+    for capacity_payment_revenue_source in capacity_payment_revenue_sources:
+        for i, revenue_usd in enumerate(capacity_payment_revenue_source.revenue_usd):
+            ret['cp_capacity_payment_amount'][i] += revenue_usd
 
     return ret
 
@@ -1114,4 +1284,9 @@ def _get_royalty_rate_schedule(model: Model) -> list[float]:
 
 
 def _get_max_total_generation_kW(model: Model) -> float:
-    return np.max(model.surfaceplant.ElectricityProduced.quantity().to(convertible_unit('kW')).magnitude)
+    max_total_kw = np.max(model.surfaceplant.ElectricityProduced.quantity().to(convertible_unit('kW')).magnitude)
+
+    # FIXME TEMP
+    max_total_kw = max(0.0001, max_total_kw)
+
+    return max_total_kw

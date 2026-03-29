@@ -550,6 +550,13 @@ class SurfacePlant:
             PreferredUnits=PowerUnit.MW,
             CurrentUnits=PowerUnit.MW
         )
+        self.NetElectricityProducedMax = self.OutputParameterDict[self.NetElectricityProducedMax.Name] = OutputParameter(
+            Name="Maximum Net Electricity Generation",
+            UnitType=Units.POWER,
+            PreferredUnits=PowerUnit.MW,
+            CurrentUnits=PowerUnit.MW
+        )
+
         self.TotalkWhProduced = self.OutputParameterDict[self.TotalkWhProduced.Name] = OutputParameter(
             Name="Total Electricity Generation",
             UnitType=Units.ENERGY,
@@ -591,9 +598,11 @@ class SurfacePlant:
         )
         self.HeatkWhProduced = self.OutputParameterDict[self.HeatkWhProduced.Name] = OutputParameter(
             Name="Heat Produced in kWh",
-            UnitType=Units.POWER,
-            PreferredUnits=PowerUnit.KW,
-            CurrentUnits=PowerUnit.KW
+            # display_name='Average Annual Heat Production',
+            UnitType=Units.ENERGY,
+            CurrentUnits=EnergyUnit.KWH,
+            # PreferredUnits=EnergyUnit.GWH,
+            PreferredUnits=EnergyUnit.KWH
         )
         self.Availability = self.OutputParameterDict[self.Availability.Name] = OutputParameter(
             Name="Geofluid Availability",
@@ -750,3 +759,6 @@ class SurfacePlant:
                 self.heat_to_power_conversion_efficiency.value = avg_efficiency
 
         self.enduse_option_output.value = self.enduse_option.value.value
+
+        self.NetElectricityProducedMax.value = np.max(self.NetElectricityProduced.quantity()).to(
+            self.NetElectricityProducedMax.CurrentUnits).magnitude

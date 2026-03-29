@@ -304,11 +304,11 @@ class EconomicsSamTestCase(BaseTestCase):
             if r_0(r) == name
         )[1:]
 
-    def test_only_electricity_end_use_supported(self):
-        with self.assertRaises(RuntimeError) as e:
-            self._get_result({'End-Use Option': 2})
+    def test_direct_use_heat_end_use_supported(self):
+        # import warnings
+        # warnings.filterwarnings('error', message='divide by zero', category=RuntimeWarning)
 
-        self.assertIn('Invalid End-Use Option (Direct-Use Heat)', str(e.exception))
+        self.assertIsNotNone(self._get_result({'End-Use Option': 2}))
 
     def test_multiple_construction_years(self):
         construction_years_2: GeophiresXResult = self._get_result(

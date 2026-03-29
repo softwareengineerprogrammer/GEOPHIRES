@@ -21,6 +21,7 @@ from geophires_x.Parameter import ConvertUnitsBack, ConvertOutputUnits, LookupUn
 from geophires_x.OptionList import EndUseOptions, EconomicModel, ReservoirModel, FractureShape, ReservoirVolume, \
     PlantType
 from geophires_x.Parameter import Parameter
+from geophires_x.Units import EnergyUnit
 
 NL = '\n'
 
@@ -221,7 +222,8 @@ class Outputs:
 
                 if is_sam_econ_model:
                     f.write(f'      {Outputs._field_label(econ.capex_total.display_name, 50)}{econ.capex_total.value:10.2f} {econ.capex_total.CurrentUnits.value}\n')
-                    f.write(f'      {Outputs._field_label(econ.capex_total_per_kw.display_name, 50)}{econ.capex_total_per_kw.value:10.0f} {econ.capex_total_per_kw.CurrentUnits.value}\n')
+                    if model.surfaceplant.enduse_option.value.has_electricity_component:
+                        f.write(f'      {Outputs._field_label(econ.capex_total_per_kw.display_name, 50)}{econ.capex_total_per_kw.value:10.0f} {econ.capex_total_per_kw.CurrentUnits.value}\n')
 
                 f.write(f'      Number of production wells:                    {model.wellbores.nprod.value:10.0f}'+NL)
                 f.write(f'      Number of injection wells:                     {model.wellbores.ninj.value:10.0f}'+NL)
@@ -596,17 +598,17 @@ class Outputs:
                 else:
                     f.write(f'      {econ.Coam.display_name}:            {econ.Coam.value:10.2f} {econ.Coam.CurrentUnits.value}\n')
 
-                f.write(NL)
-                f.write(NL)
-                f.write('                           ***SURFACE EQUIPMENT SIMULATION RESULTS***\n')
-                f.write(NL)
-                if model.surfaceplant.enduse_option.value in [EndUseOptions.ELECTRICITY, EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT, EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY, EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY, EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT, EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT, EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]: # there is an electricity componenent:
+                f.write('\n\n                           ***SURFACE EQUIPMENT SIMULATION RESULTS***\n')
+
+                if model.surfaceplant.enduse_option.value.has_electricity_component:
+                    sp = model.surfaceplant
+                    # FIXME switch to CurrentUnits instead of PreferredUnits
                     f.write(f'      Initial geofluid availability:                    {model.surfaceplant.Availability.value[0]:10.2f} ' + model.surfaceplant.Availability.PreferredUnits.value + NL)
                     f.write(f'      Maximum Total Electricity Generation:             {np.max(model.surfaceplant.ElectricityProduced.value):10.2f} ' + model.surfaceplant.ElectricityProduced.PreferredUnits.value + NL)
                     f.write(f'      Average Total Electricity Generation:             {np.average(model.surfaceplant.ElectricityProduced.value):10.2f} ' + model.surfaceplant.ElectricityProduced.PreferredUnits.value + NL)
                     f.write(f'      Minimum Total Electricity Generation:             {np.min(model.surfaceplant.ElectricityProduced.value):10.2f} ' + model.surfaceplant.ElectricityProduced.PreferredUnits.value + NL)
                     f.write(f'      Initial Total Electricity Generation:             {model.surfaceplant.ElectricityProduced.value[0]:10.2f} ' + model.surfaceplant.ElectricityProduced.PreferredUnits.value + NL)
-                    f.write(f'      Maximum Net Electricity Generation:               {np.max(model.surfaceplant.NetElectricityProduced.value):10.2f} ' + model.surfaceplant.NetElectricityProduced.PreferredUnits.value + NL)
+                    f.write(f'      {sp.NetElectricityProducedMax.display_name}:               {sp.NetElectricityProducedMax.value:10.2f} {sp.NetElectricityProducedMax.CurrentUnits.value}\n')
                     f.write(f'      Average Net Electricity Generation:               {np.average(model.surfaceplant.NetElectricityProduced.value):10.2f} ' + model.surfaceplant.NetElectricityProduced.PreferredUnits.value + NL)
                     f.write(f'      Minimum Net Electricity Generation:               {np.min(model.surfaceplant.NetElectricityProduced.value):10.2f} ' + model.surfaceplant.NetElectricityProduced.PreferredUnits.value + NL)
                     f.write(f'      Initial Net Electricity Generation:               {model.surfaceplant.NetElectricityProduced.value[0]:10.2f} ' + model.surfaceplant.NetElectricityProduced.PreferredUnits.value + NL)
@@ -622,7 +624,14 @@ class Outputs:
                     f.write(f'      Average Net Heat Production:                      {np.average(model.surfaceplant.HeatProduced.value):10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
                     f.write(f'      Minimum Net Heat Production:                      {np.min(model.surfaceplant.HeatProduced.value):10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
                     f.write(f'      Initial Net Heat Production:                      {model.surfaceplant.HeatProduced.value[0]:10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
-                    f.write(f'      Average Annual Heat Production:                   {np.average(model.surfaceplant.HeatkWhProduced.value/1E6):10.2f} GWh' + NL)
+
+                    avg_annual_heat_production_display_units: EnergyUnit = EnergyUnit.GWH
+                    # TODO the average value should be its own output parameter instead of being calculated here
+                    avg_annual_heat_production_value = np.average(model.surfaceplant.HeatkWhProduced.quantity().to(
+                        # TODO this conversion should occur in ConvertOutputUnits instead
+                        avg_annual_heat_production_display_units
+                    ).magnitude)
+                    f.write(f'      Average Annual Heat Production:                   {avg_annual_heat_production_value:10.2f} {avg_annual_heat_production_display_units.value}\n')
 
                 if model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:
                     f.write(f'      Average Annual Heat Pump Electricity Use:         {np.average(model.surfaceplant.heat_pump_electricity_kwh_used.value / 1E6):10.2f} ' + 'GWh/year' + NL)
