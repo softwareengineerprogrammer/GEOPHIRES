@@ -1179,9 +1179,10 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
             CapacityPaymentRevenueSource(
                 name='Cooling',
                 revenue_usd=_get_revenue_usd_series(econ.CoolingRevenue),
-                price_label=f'Cooling price ({econ.HeatPrice.CurrentUnits.value})',
+                price_label=f'Cooling price ({econ.CoolingPrice.CurrentUnits.value})',
                 price=econ.CoolingPrice.value,
-                # FIXME WIP amount
+                amount_provided_label=f'Cooling provided ({model.surfaceplant.cooling_kWh_Produced.CurrentUnits.value})',
+                amount_provided=model.surfaceplant.cooling_kWh_Produced.value,
             )
         )
 
