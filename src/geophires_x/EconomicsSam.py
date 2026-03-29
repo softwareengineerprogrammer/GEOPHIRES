@@ -1166,12 +1166,11 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         ret.append(
             CapacityPaymentRevenueSource(
                 name='Heat',
-                # FIXME WIP amount/price units are pre-existingly incorrect/out-of-sync
                 revenue_usd=_get_revenue_usd_series(econ.HeatRevenue),
                 price_label=f'Heat price ({econ.HeatPrice.CurrentUnits.value})',
                 price=econ.HeatPrice.value,
-                amount_provided_label=f'Heat provided ({model.surfaceplant.HeatProduced.CurrentUnits.value})',
-                amount_provided=model.surfaceplant.HeatProduced.value,
+                amount_provided_label=f'Heat provided ({model.surfaceplant.HeatkWhProduced.CurrentUnits.value})',
+                amount_provided=model.surfaceplant.HeatkWhProduced.value,
             )
         )
 
