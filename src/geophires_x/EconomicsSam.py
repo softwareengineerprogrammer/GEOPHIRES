@@ -247,8 +247,11 @@ class SamEconomicsCalculations:
         def _insert_blank_line_before(before_row_name: str) -> None:
             _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
 
+        revenue_row_name = 'REVENUE'
+        capacity_payment_revenue_row_name = 'Capacity payment revenue ($)'
+
         _insert_blank_line_before('Salvage value ($)')
-        _insert_blank_line_before('Capacity payment revenue ($)')
+        _insert_blank_line_before(capacity_payment_revenue_row_name)
 
         def _for_operational_years(_row: list[Any]) -> list[Any]:
             return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
@@ -256,16 +259,15 @@ class SamEconomicsCalculations:
         for capacity_payment_revenue_source in self.capacity_payment_revenue_sources:
             if capacity_payment_revenue_source.amount_provided_label is not None:
                 _insert_row_before(
-                    'REVENUE',
+                    revenue_row_name,
                     capacity_payment_revenue_source.amount_provided_label,
                     _for_operational_years(capacity_payment_revenue_source.amount_provided),
                 )
-                # _insert_blank_line_before(capacity_payment_revenue_source.amount_provided_label)
-                _insert_blank_line_before('REVENUE')
+                _insert_blank_line_before(revenue_row_name)
 
             revenue_row_name = f'{capacity_payment_revenue_source.name} revenue ($)'
             _insert_row_before(
-                'Capacity payment revenue ($)',
+                capacity_payment_revenue_row_name,
                 revenue_row_name,
                 _for_operational_years(capacity_payment_revenue_source.revenue_usd),
             )
@@ -273,9 +275,8 @@ class SamEconomicsCalculations:
             if capacity_payment_revenue_source.price_label is not None:
                 _insert_row_before(
                     revenue_row_name,
-                    capacity_payment_revenue_source.price_label,
+                    capacity_payment_revenue_source.price_label.replace('USD', '$'),
                     capacity_payment_revenue_source.price,
-                    # _for_operational_years(capacity_payment_revenue_source.price),
                 )
 
         return ret
