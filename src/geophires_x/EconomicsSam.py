@@ -461,22 +461,22 @@ class SamEconomicsCalculations:
             # ]
             # ret[_get_row_index('PPA price (cents/kWh)')][1:] = ppa_revenue_all_years
 
-            # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
-            first_year_lppa_cents_per_kwh = (
-                first_year_pv_of_ppa_revenue_usd * 100.0 / ret[_get_row_index(pv_of_annual_energy_row_name)][1]
-            )
+            first_year_lppa_cents_per_kwh: float | str = 'NaN'
+            first_year_pv_annual_energy = ret[_get_row_index(pv_of_annual_energy_row_name)][1]
+
+            if isinstance(first_year_pv_annual_energy, float) and first_year_pv_annual_energy != 0.0:
+                # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
+                first_year_lppa_cents_per_kwh = round(
+                    first_year_pv_of_ppa_revenue_usd * 100.0 / first_year_pv_annual_energy, 2
+                )
 
             lppa_row_name = 'LPPA Levelized PPA price nominal (cents/kWh)'
             ret[_get_row_index(lppa_row_name)][1:] = [
-                round(first_year_lppa_cents_per_kwh, 2),
+                first_year_lppa_cents_per_kwh,
                 *([None] * self._pre_revenue_years_count),
             ]
 
-        try:
-            backfill_lppa_metrics()
-        except ZeroDivisionError:
-            # FIXME WIP - indicates heat only end-use/surface application
-            pass
+        backfill_lppa_metrics()
 
         return ret
 
