@@ -1139,7 +1139,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         add_on_profit_per_year_usd = np.sum(
             model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
         )
-        add_on_profit_usd_series = [add_on_profit_per_year_usd] * model.surfaceplant.plant_lifetime.value
+        add_on_profit_usd_series = [round(add_on_profit_per_year_usd)] * model.surfaceplant.plant_lifetime.value
         add_on_source = CapacityPaymentRevenueSource(name='Add-On Profit', revenue_usd=add_on_profit_usd_series)
         ret.append(add_on_source)
 
@@ -1149,7 +1149,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         )
         carbon_revenue_source = CapacityPaymentRevenueSource(
             name='Carbon credits',  # TODO/WIP naming re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/476
-            revenue_usd=carbon_revenue_usd_series,
+            revenue_usd=[round(it) for it in carbon_revenue_usd_series],
             price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits.value})',
             price=econ.CarbonPrice.value,
             # FIXME WIP amount
@@ -1157,7 +1157,10 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         ret.append(carbon_revenue_source)
 
     def _get_revenue_usd_series(econ_revenue_output: OutputParameter) -> Iterable[float]:
-        return econ_revenue_output.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
+        return [
+            round(it)
+            for it in econ_revenue_output.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
+        ]
 
     if has_heat_revenue:
         ret.append(
