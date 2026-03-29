@@ -6,8 +6,8 @@ Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.12.1
  Simulation Date: 2026-03-29
- Simulation Time:  07:45
- Calculation Time:      1.776 sec
+ Simulation Time:  08:47
+ Calculation Time:      1.816 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -17,7 +17,6 @@ Simulation Metadata
       Average Cooling Production:                           237.93 MW
       Direct-Use Cooling Breakeven Price (LCOC):               0.00 USD/MMBTU
       Total CAPEX:                                          248.47 MUSD
-      Total CAPEX ($/kW):                                      inf USD/kW
       Number of production wells:                             6
       Number of injection wells:                              4
       Flowrate per production well:                         100.0 kg/sec
@@ -134,7 +133,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Maximum Net Heat Production:                          367.93 MW
       Average Net Heat Production:                          367.18 MW
       Minimum Net Heat Production:                          363.53 MW
@@ -352,11 +350,11 @@ Electricity to grid (kWh)                        	0          	0           	0    
 
 Present value of annual costs ($)                	269,177,011
 Present value of annual energy nominal (kWh)     	0
-LCOE Levelized cost of energy nominal (cents/kWh)	           	            	0.0
+LCOE Levelized cost of energy nominal (cents/kWh)	NaN
 
 Present value of PPA revenue ($)                 	0
 Present value of annual energy nominal (kWh)     	0
-LPPA Levelized PPA price nominal (cents/kWh)     	           	            	0.0
+LPPA Levelized PPA price nominal (cents/kWh)     	NaN
 
 PROJECT STATE INCOME TAXES
 EBITDA ($)                                       	           	            	0           	107,489,070  	107,872,854  	107,989,713  	108,058,809  	108,107,078  	108,139,943  	108,106,783  	107,650,210  	107,261,986  	107,826,436  	107,966,919  	108,044,041  	108,096,367  	108,133,857  	108,130,911  	107,851,113  	107,161,180  	107,764,680  	107,940,696  	108,027,814  	108,084,819  	108,125,998  	108,141,210  	107,980,842  	107,185,256  	107,672,230  	107,909,929  	108,009,834  	108,072,344  	232,348,003
