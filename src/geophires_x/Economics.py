@@ -3535,22 +3535,26 @@ class Economics:
             """
             Calculate cashflow and cumulative cash flow
 
-            Note that these calculations are irrelevant and ignored for SAM economic models, except for
-            heat and carbon revenue calculations.
+            Note that for SAM economic models, electricity revenue calculations are irrelevant and ignored.
             """
 
             total_duration = model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value
+
             self.ElecRevenue.value = [0.0] * total_duration
             self.ElecCummRevenue.value = [0.0] * total_duration
+
             self.HeatRevenue.value = [0.0] * total_duration
             self.HeatCummRevenue.value = [0.0] * total_duration
+
             self.CoolingRevenue.value = [0.0] * total_duration
             self.CoolingCummRevenue.value = [0.0] * total_duration
+
             self.CarbonRevenue.value = [0.0] * total_duration
             self.CarbonCummCashFlow.value = [0.0] * total_duration
+            self.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
+
             self.TotalRevenue.value = [0.0] * total_duration
             self.TotalCummRevenue.value = [0.0] * total_duration
-            self.CarbonThatWouldHaveBeenProducedTotal.value = 0.0
 
             # Based on the style of the project, calculate the revenue & cumulative revenue
             if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
