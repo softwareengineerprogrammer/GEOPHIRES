@@ -550,6 +550,13 @@ class SurfacePlant:
             PreferredUnits=PowerUnit.MW,
             CurrentUnits=PowerUnit.MW
         )
+        self.NetElectricityProducedMax = self.OutputParameterDict[self.NetElectricityProducedMax.Name] = OutputParameter(
+            Name="Maximum Net Electricity Generation",
+            UnitType=Units.POWER,
+            PreferredUnits=PowerUnit.MW,
+            CurrentUnits=PowerUnit.MW
+        )
+
         self.TotalkWhProduced = self.OutputParameterDict[self.TotalkWhProduced.Name] = OutputParameter(
             Name="Total Electricity Generation",
             UnitType=Units.ENERGY,
@@ -752,3 +759,6 @@ class SurfacePlant:
                 self.heat_to_power_conversion_efficiency.value = avg_efficiency
 
         self.enduse_option_output.value = self.enduse_option.value.value
+
+        self.NetElectricityProducedMax.value = np.max(self.NetElectricityProduced.quantity()).to(
+            self.NetElectricityProducedMax.CurrentUnits).magnitude

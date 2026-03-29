@@ -565,7 +565,11 @@
         "Average Total Electricity Generation": {},
         "Minimum Total Electricity Generation": {},
         "Initial Total Electricity Generation": {},
-        "Maximum Net Electricity Generation": {},
+        "Maximum Net Electricity Generation": {
+          "type": "number",
+          "description": "",
+          "units": "MW"
+        },
         "Average Net Electricity Generation": {},
         "Minimum Net Electricity Generation": {},
         "Initial Net Electricity Generation": {},

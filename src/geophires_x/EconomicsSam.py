@@ -464,7 +464,9 @@ class SamEconomicsCalculations:
             first_year_lppa_cents_per_kwh: float | str = 'NaN'
             first_year_pv_annual_energy = ret[_get_row_index(pv_of_annual_energy_row_name)][1]
 
-            if isinstance(first_year_pv_annual_energy, float) and first_year_pv_annual_energy != 0.0:
+            if (
+                isinstance(first_year_pv_annual_energy, int) or isinstance(first_year_pv_annual_energy, float)
+            ) and first_year_pv_annual_energy != 0.0:
                 # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
                 first_year_lppa_cents_per_kwh = round(
                     first_year_pv_of_ppa_revenue_usd * 100.0 / first_year_pv_annual_energy, 2

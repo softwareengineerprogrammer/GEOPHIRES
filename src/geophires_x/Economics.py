@@ -3640,20 +3640,10 @@ class Economics:
         self.capex_total.value = (self.sam_economics_calculations.capex.quantity()
                                   .to(self.capex_total.CurrentUnits.value).magnitude)
 
-        # TODO define this as an output of SurfacePlant rather than calculating it on-demand here and elsewhere
-        max_net_electricity_generation_kw = quantity(
-            np.max(model.surfaceplant.NetElectricityProduced.value),
-            model.surfaceplant.NetElectricityProduced.CurrentUnits
-        ).to('kW')
-        try:
+        if model.surfaceplant.enduse_option.value.has_electricity_component:
+            max_net_electricity_generation_kw = model.surfaceplant.NetElectricityProducedMax.quantity().to('kW')
             capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
             self.capex_total_per_kw.value = capex_total_per_kw_q.magnitude
-        except Exception as e: # RuntimeError as re:
-            # FIXME WIP
-            if str(e) == 'divide by zero encountered in scalar divide':
-                self.capex_total_per_kw.value = float('inf')
-            else:
-                raise e
 
         self.CCap.value = (self.sam_economics_calculations.capex.quantity()
                            .to(self.CCap.CurrentUnits.value).magnitude)
