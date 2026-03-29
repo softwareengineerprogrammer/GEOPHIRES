@@ -232,8 +232,7 @@ class SamEconomicsCalculations:
         if len(self.capacity_payment_revenue_sources) == 0:
             return cf_ret
 
-        # FIXME WIP
-        ret = cf_ret.copy()
+        ret: list[list[Any]] = cf_ret.copy()
 
         def _get_row_index(row_name_: str) -> list[Any]:
             return [it[0] for it in ret].index(row_name_)
@@ -494,13 +493,11 @@ def validate_read_parameters(model: Model) -> None:
         EndUseOptions.ELECTRICITY,
         EndUseOptions.HEAT,
     ) and not model.surfaceplant.enduse_option.value.name.startswith('COGENERATION'):
-        # FIXME WIP also support Direct-Use heat (requires getting PySAM to work with zero electricity generation)
-
         raise ValueError(
             _inv_msg(
                 model.surfaceplant.enduse_option.Name,
                 model.surfaceplant.enduse_option.value.value,
-                f'{EndUseOptions.ELECTRICITY.value} and Cogeneration End-Use Options',
+                f'{EndUseOptions.ELECTRICITY.value}, {EndUseOptions.HEAT.value}, ' f'and Cogeneration End-Use Options',
             )
         )
 
