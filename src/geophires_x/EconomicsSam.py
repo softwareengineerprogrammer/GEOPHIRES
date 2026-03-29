@@ -1152,7 +1152,8 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
             revenue_usd=[round(it) for it in carbon_revenue_usd_series],
             price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits.value})',
             price=econ.CarbonPrice.value,
-            # FIXME WIP amount
+            amount_provided_label=f'Saved Carbon Production ({econ.CarbonThatWouldHaveBeenProducedAnnually.CurrentUnits.value})',
+            amount_provided=econ.CarbonThatWouldHaveBeenProducedAnnually.value[_pre_revenue_years_count(model) :],
         )
         ret.append(carbon_revenue_source)
 
