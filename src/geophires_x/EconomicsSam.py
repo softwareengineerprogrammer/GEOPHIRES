@@ -409,24 +409,29 @@ class SamEconomicsCalculations:
 
             lcoe_nominal_backfilled = []
             for _year in range(len(pv_of_annual_costs_backfilled_row_values_usd)):
-                lcoe_nominal_backfilled.append(
-                    pv_of_annual_costs_backfilled_row_values_usd[_year]
-                    * 100
-                    / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
-                )
+                entry: float | str = 'NaN'
+                if pv_of_electricity_to_grid_backfilled_row_kwh[_year] != 0:
+                    entry = (
+                        pv_of_annual_costs_backfilled_row_values_usd[_year]
+                        * 100
+                        / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
+                    )
+
+                lcoe_nominal_backfilled.append(entry)
 
             lcoe_nominal_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
             lcoe_nominal_row_index = _get_row_index(lcoe_nominal_row_name)
+
+            lcoe_nominal_backfilled_entry = lcoe_nominal_backfilled[0]
+            if isinstance(lcoe_nominal_backfilled_entry, float):
+                lcoe_nominal_backfilled_entry = round(lcoe_nominal_backfilled_entry, 2)
+
             ret[lcoe_nominal_row_index][1:] = [
-                round(lcoe_nominal_backfilled[0], 2),
+                lcoe_nominal_backfilled_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-        try:
-            backfill_lcoe_nominal()
-        except ZeroDivisionError:
-            # FIXME WIP - indicates heat only end-use/surface application
-            pass
+        backfill_lcoe_nominal()
 
         def backfill_lppa_metrics() -> None:
             pv_of_ppa_revenue_row_index = _get_row_index_after(
