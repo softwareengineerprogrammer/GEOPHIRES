@@ -397,8 +397,8 @@ class SurfacePlant:
             PreferredUnits=EnergyCostUnit.DOLLARSPERKWH,
             CurrentUnits=EnergyCostUnit.DOLLARSPERKWH,
             ErrMessage="assume default electricity rate ($0.07/kWh)",
-            ToolTipText="Price of electricity to calculate pumping costs in direct-use heat only mode or revenue" +
-            " from electricity sales in CHP mode."
+            ToolTipText="Price of electricity to calculate pumping costs in direct-use heat only mode or revenue "
+                        "from electricity sales in CHP mode."
         )
         self.heat_price = self.ParameterDict[self.heat_price.Name] = floatParameter(
             "Heat Rate",
@@ -532,7 +532,7 @@ class SurfacePlant:
             CurrentUnits=EnergyFrequencyUnit.GWPERYEAR
         )
         self.PumpingkWh = self.OutputParameterDict[self.PumpingkWh.Name] = OutputParameter(
-            Name="annual electricity production",
+            Name="Annual Electricity Use for Pumping",
             UnitType=Units.ENERGYFREQUENCY,
             PreferredUnits=EnergyFrequencyUnit.KWPERYEAR,
             CurrentUnits=EnergyFrequencyUnit.KWPERYEAR
