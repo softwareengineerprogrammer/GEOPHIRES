@@ -499,7 +499,13 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
             # FIXME WIP calculate LCOH/LCOC as applicable
             pass
     else:
-        # must be BICYCLE
+        if econ.econmodel.value != EconomicModel.BICYCLE:
+            model.logger.error(
+                f'Unrecognized economic model: {econ.econmodel.value}. '
+                f'Treating as {EconomicModel.BICYCLE.value} for LCOE/LCOH/LCOC calculations.'
+            )
+            # Error is logged instead of raising an exception for backwards compatibility.
+
         # average return on investment (tax and inflation adjusted)
         i_ave = econ.FIB.value * econ.BIR.value * (1 - econ.CTR.value) + (1 - econ.FIB.value) * econ.EIR.value
         # capital recovery factor
