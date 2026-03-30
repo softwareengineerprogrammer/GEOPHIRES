@@ -439,6 +439,53 @@ class SamEconomicsCalculations:
 
         backfill_lcoe_nominal()
 
+        def backfill_lppa_metrics() -> None:
+            pv_of_ppa_revenue_row_index = _get_row_index_after(
+                'Present value of PPA revenue ($)', after_tax_lcoe_and_ppa_price_header_row_title
+            )
+            first_year_pv_of_ppa_revenue_usd = round(
+                npf.npv(
+                    self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                    ret[ppa_revenue_row_index][1:],
+                )
+            )
+            ret[pv_of_ppa_revenue_row_index][1:] = [
+                first_year_pv_of_ppa_revenue_usd,
+                *([None] * (self._pre_revenue_years_count - 1)),
+            ]
+
+            ppa_price_row_index = _get_row_index('PPA price (cents/kWh)')
+            year_0_ppa_price: float = ret[ppa_price_row_index][self._pre_revenue_years_count]
+            if year_0_ppa_price != 0.0:
+                # Shouldn't happen
+                _log.warning(f'PPA price in Year 0 ({year_0_ppa_price}) is not zero, this is unexpected.')
+
+            # TODO (maybe)
+            # ppa_revenue_all_years = [
+            #     *([year_0_ppa_price] * (self._pre_revenue_years_count - 1)),
+            #     *ret[ppa_price_row_index][self._pre_revenue_years_count :],
+            # ]
+            # ret[_get_row_index('PPA price (cents/kWh)')][1:] = ppa_revenue_all_years
+
+            first_year_lppa_cents_per_kwh: float | str = 'NaN'
+            first_year_pv_annual_energy = ret[_get_row_index(pv_of_annual_energy_row_name)][1]
+
+            if (
+                isinstance(first_year_pv_annual_energy, int) or isinstance(first_year_pv_annual_energy, float)
+            ) and first_year_pv_annual_energy != 0.0:
+                # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
+                first_year_lppa_cents_per_kwh = round(
+                    first_year_pv_of_ppa_revenue_usd * 100.0 / first_year_pv_annual_energy, 2
+                )
+
+            lppa_row_name = 'LPPA Levelized PPA price nominal (cents/kWh)'
+            ret[_get_row_index(lppa_row_name)][1:] = [
+                first_year_lppa_cents_per_kwh,
+                *([None] * self._pre_revenue_years_count),
+            ]
+
+        backfill_lppa_metrics()
+
         def backfill_lcoh_nominal() -> None:
             # WIP...
 
@@ -506,9 +553,29 @@ class SamEconomicsCalculations:
 
                 lcoh_nominal_backfilled.append(entry)
 
-            lcoh_nominal_row_name = 'LCOH Levelized cost of heating nominal ($/MMBTU)'
-            # FIXME WIP insert new row instead of backfilling non-existent LCOE row
-            lcoh_nominal_row_index = _get_row_index(lcoh_nominal_row_name)
+            lcoh_nominal_row_name = 'LCOH Levelized cost of heating nominal ($/kWh)'  # FIXME WIP unit
+
+            # Insert new row if LCOE row does not exist (yet)
+            lcoh_nominal_row_index = _get_row_index(lcoh_nominal_row_name, raise_exception_if_not_present=False)
+
+            def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any] | None) -> None:
+                if row_content is None:
+                    row_content = ['' for _it in ret[[it[0] for it in ret].index(before_row_name)]][1:]
+
+                ret.insert(
+                    [it[0] for it in ret].index(before_row_name),
+                    [row_name, *row_content],
+                )
+
+            def _insert_blank_line_before(before_row_name: str) -> None:
+                _insert_row_before(
+                    before_row_name, '', ['' for _it in ret[[it[0] for it in ret].index(before_row_name)]][1:]
+                )
+
+            if lcoh_nominal_row_index == -1:
+                _insert_row_before('PROJECT STATE INCOME TAXES', lcoh_nominal_row_name, None)
+                _insert_blank_line_before('PROJECT STATE INCOME TAXES')
+                lcoh_nominal_row_index = [it[0] for it in ret].index(lcoh_nominal_row_name)
 
             lcoh_nominal_backfilled_entry = lcoh_nominal_backfilled[0]
             if isinstance(lcoh_nominal_backfilled_entry, float):
@@ -520,53 +587,6 @@ class SamEconomicsCalculations:
             ]
 
         backfill_lcoh_nominal()
-
-        def backfill_lppa_metrics() -> None:
-            pv_of_ppa_revenue_row_index = _get_row_index_after(
-                'Present value of PPA revenue ($)', after_tax_lcoe_and_ppa_price_header_row_title
-            )
-            first_year_pv_of_ppa_revenue_usd = round(
-                npf.npv(
-                    self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                    ret[ppa_revenue_row_index][1:],
-                )
-            )
-            ret[pv_of_ppa_revenue_row_index][1:] = [
-                first_year_pv_of_ppa_revenue_usd,
-                *([None] * (self._pre_revenue_years_count - 1)),
-            ]
-
-            ppa_price_row_index = _get_row_index('PPA price (cents/kWh)')
-            year_0_ppa_price: float = ret[ppa_price_row_index][self._pre_revenue_years_count]
-            if year_0_ppa_price != 0.0:
-                # Shouldn't happen
-                _log.warning(f'PPA price in Year 0 ({year_0_ppa_price}) is not zero, this is unexpected.')
-
-            # TODO (maybe)
-            # ppa_revenue_all_years = [
-            #     *([year_0_ppa_price] * (self._pre_revenue_years_count - 1)),
-            #     *ret[ppa_price_row_index][self._pre_revenue_years_count :],
-            # ]
-            # ret[_get_row_index('PPA price (cents/kWh)')][1:] = ppa_revenue_all_years
-
-            first_year_lppa_cents_per_kwh: float | str = 'NaN'
-            first_year_pv_annual_energy = ret[_get_row_index(pv_of_annual_energy_row_name)][1]
-
-            if (
-                isinstance(first_year_pv_annual_energy, int) or isinstance(first_year_pv_annual_energy, float)
-            ) and first_year_pv_annual_energy != 0.0:
-                # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
-                first_year_lppa_cents_per_kwh = round(
-                    first_year_pv_of_ppa_revenue_usd * 100.0 / first_year_pv_annual_energy, 2
-                )
-
-            lppa_row_name = 'LPPA Levelized PPA price nominal (cents/kWh)'
-            ret[_get_row_index(lppa_row_name)][1:] = [
-                first_year_lppa_cents_per_kwh,
-                *([None] * self._pre_revenue_years_count),
-            ]
-
-        backfill_lppa_metrics()
 
         return ret
 
