@@ -286,8 +286,14 @@ class SamEconomicsCalculations:
 
         __row_names: list[str] = [it[0] for it in ret]
 
-        def _get_row_index(row_name_: str) -> int:
-            return __row_names.index(row_name_)
+        def _get_row_index(row_name_: str, raise_exception_if_not_present: bool = True) -> int:
+            try:
+                return __row_names.index(row_name_)
+            except ValueError as ve:
+                if raise_exception_if_not_present:
+                    raise ve
+                else:
+                    return -1
 
         def _get_row_indexes(row_name_: str, after_row_name: str | None = None) -> list[int]:
             after_criteria_met: bool = True if after_row_name is None else False
@@ -432,6 +438,88 @@ class SamEconomicsCalculations:
             ]
 
         backfill_lcoe_nominal()
+
+        def backfill_lcoh_nominal() -> None:
+            # WIP...
+
+            heat_provided_kwh_row_name = 'Heat provided (kWh)'
+            heat_provided_kwh_row_index = _get_row_index(
+                heat_provided_kwh_row_name, raise_exception_if_not_present=False
+            )
+            if heat_provided_kwh_row_index == -1:
+                return  # No heat provided row, nothing to do
+
+            heat_provided = cf_ret[heat_provided_kwh_row_index].copy()
+            heat_provided_backfilled = [0 if it == '' else (int(it) if is_int(it) else it) for it in heat_provided[1:]]
+
+            # TODO/WIP maybe duplicate heat provided row after after_tax_lcoe_and_ppa_price_header_row_title to mirror
+            #   electricity convention
+            # heat_provided_kwh_row_index = _get_row_index_after(
+            #     heat_provided_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
+            # )
+
+            ret[heat_provided_kwh_row_index][1:] = heat_provided_backfilled
+
+            # <Back>fill PV of heat provided
+            heat_provided_backfilled_pv_processed = heat_provided_backfilled.copy()
+            pv_of_heat_provided_backfilled_kwh = []
+            for year_ in range(self._pre_revenue_years_count):
+                pv_at_year_ = abs(
+                    round(
+                        npf.npv(
+                            self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                            heat_provided_backfilled_pv_processed,
+                        )
+                    )
+                )
+
+                pv_of_heat_provided_backfilled_kwh.append(pv_at_year_)
+
+                heat_provided_at_year = heat_provided_backfilled_pv_processed.pop(0)
+                heat_provided_backfilled_pv_processed[0] = (
+                    heat_provided_backfilled_pv_processed[0] + heat_provided_at_year
+                )
+
+            # FIXME WIP TODO
+            # pv_of_annual_energy_row_name = 'Present value of annual energy nominal (kWh)'
+            # for pv_of_annual_energy_row_index in _get_row_indexes(pv_of_annual_energy_row_name):
+            #     ret[pv_of_annual_energy_row_index][1:] = [
+            #         pv_of_electricity_to_grid_backfilled_kwh[0],
+            #         *([''] * (self._pre_revenue_years_count - 1)),
+            #     ]
+
+            # pv_of_electricity_to_grid_backfilled_row_kwh = pv_of_electricity_to_grid_backfilled_kwh
+            pv_of_heat_provided_backfilled_row_kwh = pv_of_heat_provided_backfilled_kwh
+            pv_of_annual_costs_backfilled_row_values_usd = pv_of_annual_costs_backfilled_row[
+                1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
+            ]
+
+            lcoh_nominal_backfilled = []
+            for _year in range(len(pv_of_annual_costs_backfilled_row_values_usd)):
+                entry: float | str = 'NaN'
+                if pv_of_heat_provided_backfilled_row_kwh[_year] != 0:
+                    entry = (
+                        pv_of_annual_costs_backfilled_row_values_usd[_year]
+                        * 100
+                        / pv_of_heat_provided_backfilled_row_kwh[_year]
+                    )
+
+                lcoh_nominal_backfilled.append(entry)
+
+            lcoh_nominal_row_name = 'LCOH Levelized cost of heating nominal ($/MMBTU)'
+            # FIXME WIP insert new row instead of backfilling non-existent LCOE row
+            lcoh_nominal_row_index = _get_row_index(lcoh_nominal_row_name)
+
+            lcoh_nominal_backfilled_entry = lcoh_nominal_backfilled[0]
+            if isinstance(lcoh_nominal_backfilled_entry, float):
+                lcoh_nominal_backfilled_entry = round(lcoh_nominal_backfilled_entry, 2)
+
+            ret[lcoh_nominal_row_index][1:] = [
+                lcoh_nominal_backfilled_entry,
+                *([None] * (self._pre_revenue_years_count - 1)),
+            ]
+
+        backfill_lcoh_nominal()
 
         def backfill_lppa_metrics() -> None:
             pv_of_ppa_revenue_row_index = _get_row_index_after(
