@@ -2155,6 +2155,14 @@ class Economics:
                         'included in the base Total CAPEX.',
         )
 
+        self.chp_percent_cost_allocation_for_electrical_plant = self.OutputParameterDict[self.chp_percent_cost_allocation_for_electrical_plant.Name] = OutputParameter(
+            Name='CHP: Percent cost allocation for electrical plant',
+            UnitType=Units.PERCENT,
+            PreferredUnits=PercentUnit.PERCENT,
+            CurrentUnits=PercentUnit.PERCENT,
+            ToolTipText=self.CAPEX_heat_electricity_plant_ratio.ToolTipText,
+        )
+
         # noinspection SpellCheckingInspection
         self.Coam = self.OutputParameterDict[self.Coam.Name] = OutputParameter(
             Name="Total O&M Cost",
@@ -2414,6 +2422,7 @@ class Economics:
         self.jobs_created = self.OutputParameterDict[self.jobs_created.Name] = OutputParameter(
             Name="Estimated Jobs Created",
             UnitType=Units.NONE,
+            # TODO tooltip text derived from corresponding input parameter
         )
 
         # Results for the Royalty Holder
@@ -3746,6 +3755,14 @@ class Economics:
                 self.Cwell.value /
                 (model.wellbores.nprod.value + model.wellbores.ninj.value)
             )
+
+        if all(hasattr(self, it) for it in ['CAPEX_heat_electricity_plant_ratio',
+                                            'chp_percent_cost_allocation_for_electrical_plant']):
+            self.chp_percent_cost_allocation_for_electrical_plant.value = (
+                self.CAPEX_heat_electricity_plant_ratio.quantity()
+                .to(convertible_unit(self.chp_percent_cost_allocation_for_electrical_plant.CurrentUnits)).magnitude
+            )
+
 
     @property
     def has_production_based_royalties(self):

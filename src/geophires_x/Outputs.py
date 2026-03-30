@@ -190,33 +190,33 @@ class Outputs:
                 f.write(NL)
                 f.write(f'      {model.surfaceplant.enduse_option_output.display_name}: '
                         f'{model.surfaceplant.enduse_option_output.value}\n')
+
                 if model.surfaceplant.plant_type.value in [PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP, PlantType.DISTRICT_HEATING]:
                     f.write('      Surface Application: ' + str(model.surfaceplant.plant_type.value.value) + NL)
+
                 if model.surfaceplant.enduse_option.value in [EndUseOptions.ELECTRICITY, EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT, EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY, EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY, EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT, EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT, EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]: # there is an electricity component
                     f.write(f'      Average Net Electricity Production:               {np.average(model.surfaceplant.NetElectricityProduced.value):10.2f} ' + model.surfaceplant.NetElectricityProduced.CurrentUnits.value + NL)
-                if model.surfaceplant.enduse_option.value is not EndUseOptions.ELECTRICITY:
+
+                if model.surfaceplant.enduse_option.value.has_direct_use_heat_component:
                     # there is a direct-use component
-                    f.write(f'      Average Direct-Use Heat Production:               {np.average(model.surfaceplant.HeatProduced.value):10.2f} '+ model.surfaceplant.HeatProduced.CurrentUnits.value + NL)
+                    f.write(f'      Average Direct-Use Heat Production:               {np.average(model.surfaceplant.HeatProduced.value):10.2f} {model.surfaceplant.HeatProduced.CurrentUnits.value}\n')
+
                 if model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
                     f.write(f'      Annual District Heating Demand:                   {np.average(model.surfaceplant.annual_heating_demand.value):10.2f} ' + model.surfaceplant.annual_heating_demand.CurrentUnits.value + NL)
                     f.write(f'      Average Annual Geothermal Heat Production:        {sum(model.surfaceplant.dh_geothermal_heating.value * 24) / model.surfaceplant.plant_lifetime.value / 1e3:10.2f} ' + model.surfaceplant.annual_heating_demand.CurrentUnits.value + NL)
                     f.write(f'      Average Annual Peaking Fuel Heat Production:      {sum(model.surfaceplant.dh_natural_gas_heating.value * 24) / model.surfaceplant.plant_lifetime.value / 1e3:10.2f} ' + model.surfaceplant.annual_heating_demand.CurrentUnits.value + NL)
+
                 if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                     f.write(f'      Average Cooling Production:                       {np.average(model.surfaceplant.cooling_produced.value):10.2f} ' + model.surfaceplant.cooling_produced.CurrentUnits.value + NL)
 
-                if model.surfaceplant.enduse_option.value in [EndUseOptions.ELECTRICITY]:
+                if model.surfaceplant.enduse_option.value.has_electricity_component:
                     f.write(f'      {model.economics.LCOE.display_name}:                      {model.economics.LCOE.value:10.2f} {model.economics.LCOE.CurrentUnits.value}\n')
                 elif model.surfaceplant.enduse_option.value in [EndUseOptions.HEAT] and \
                         model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER]:
                     f.write(f'      {model.economics.LCOH.display_name}:            {model.economics.LCOH.value:10.2f} {model.economics.LCOH.CurrentUnits.value}\n')
                 elif model.surfaceplant.enduse_option.value in [EndUseOptions.HEAT] and model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                     f.write(f'      {model.economics.LCOC.display_name}:         {model.economics.LCOC.value:10.2f} {model.economics.LCOC.CurrentUnits.value}\n')
-                elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
-                                                              EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
-                                                              EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
-                                                              EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
-                                                              EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY,
-                                                              EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
+                elif model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
                     f.write(f'      {model.economics.LCOE.display_name}:                      {model.economics.LCOE.value:10.2f} {model.economics.LCOE.CurrentUnits.value}\n')
                     f.write(f'      {model.economics.LCOH.display_name}:           {model.economics.LCOH.value:10.2f} {model.economics.LCOH.CurrentUnits.value}\n')
 
@@ -319,13 +319,8 @@ class Outputs:
                 project_payback_period_label = Outputs._field_label(model.economics.ProjectPaybackPeriod.display_name, 56)
                 f.write(f'      {project_payback_period_label}{project_payback_period_display}\n')
 
-                if model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
-                                                              EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
-                                                              EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
-                                                              EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
-                                                              EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY,
-                                                              EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
-                    f.write(f'      CHP: Percent cost allocation for electrical plant: {model.economics.CAPEX_heat_electricity_plant_ratio.value*100.0:10.2f} %\n')
+                if model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
+                    f.write(f'      {econ.chp_percent_cost_allocation_for_electrical_plant.display_name}: {econ.chp_percent_cost_allocation_for_electrical_plant.value:10.2f} {econ.chp_percent_cost_allocation_for_electrical_plant.CurrentUnits}\n')
 
                 if model.surfaceplant.enduse_option.value in [EndUseOptions.ELECTRICITY]:
                     f.write(f'      Estimated Jobs Created:                                 {model.economics.jobs_created.value}\n')
@@ -351,6 +346,7 @@ class Outputs:
                 f.write(f'      {model.wellbores.redrill.display_name}:                    {model.wellbores.redrill.value:10.0f}\n')
                 if model.surfaceplant.enduse_option.value in [EndUseOptions.ELECTRICITY, EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT, EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY, EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY, EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT, EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT, EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
                     f.write('      Power plant type:                                       ' + str(model.surfaceplant.plant_type.value.value) + NL)
+
                 f.write(NL)
                 f.write(NL)
                 f.write('                         ***RESOURCE CHARACTERISTICS***\n')

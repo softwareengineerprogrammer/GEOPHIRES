@@ -47,6 +47,10 @@ class EndUseOptions(GeophiresInputEnum):
     def has_electricity_component(self) -> bool:
         return self == self.ELECTRICITY or self.is_cogeneration_end_use_option
 
+    @property
+    def has_direct_use_heat_component(self) -> bool:
+        return self == self.HEAT or self.is_cogeneration_end_use_option
+
     @staticmethod
     def from_input_string(input_string: str) -> 'EndUseOptions':
         """
