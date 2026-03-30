@@ -209,7 +209,7 @@ class Outputs:
                 if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                     f.write(f'      Average Cooling Production:                       {np.average(model.surfaceplant.cooling_produced.value):10.2f} ' + model.surfaceplant.cooling_produced.CurrentUnits.value + NL)
 
-                if model.surfaceplant.enduse_option.value.has_electricity_component:
+                if model.surfaceplant.enduse_option.value in [EndUseOptions.ELECTRICITY]:
                     f.write(f'      {model.economics.LCOE.display_name}:                      {model.economics.LCOE.value:10.2f} {model.economics.LCOE.CurrentUnits.value}\n')
                 elif model.surfaceplant.enduse_option.value in [EndUseOptions.HEAT] and \
                         model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER]:
@@ -320,7 +320,7 @@ class Outputs:
                 f.write(f'      {project_payback_period_label}{project_payback_period_display}\n')
 
                 if model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
-                    f.write(f'      {econ.chp_percent_cost_allocation_for_electrical_plant.display_name}: {econ.chp_percent_cost_allocation_for_electrical_plant.value:10.2f} {econ.chp_percent_cost_allocation_for_electrical_plant.CurrentUnits}\n')
+                    f.write(f'      {econ.chp_percent_cost_allocation_for_electrical_plant.display_name}: {econ.chp_percent_cost_allocation_for_electrical_plant.value:10.2f} {econ.chp_percent_cost_allocation_for_electrical_plant.CurrentUnits.value}\n')
 
                 if model.surfaceplant.enduse_option.value in [EndUseOptions.ELECTRICITY]:
                     f.write(f'      Estimated Jobs Created:                                 {model.economics.jobs_created.value}\n')
