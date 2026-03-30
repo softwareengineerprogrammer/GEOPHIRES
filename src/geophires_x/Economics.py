@@ -371,6 +371,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
     :return: LCOE: The levelized cost of electricity and LCOH: The levelized cost of heat and LCOC: The levelized cost of cooling
     :rtype: tuple[float, float, float]
     """
+
     LCOE = LCOH = LCOC = 0.0
     CCap_elec = (econ.CCap.value * econ.CAPEX_heat_electricity_plant_ratio.value)
     Coam_elec = (econ.Coam.value * econ.CAPEX_heat_electricity_plant_ratio.value)
@@ -412,12 +413,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
                 model.surfaceplant.HeatkWhProduced.value) * 1E8  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
         # co-gen
-        elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
+        elif model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
             capex_elec_plus_infl, capex_heat_plus_infl = _construction_inflation_cost_elec_heat()
             LCOE = (econ.FCR.value * capex_elec_plus_infl + Coam_elec) / np.average(model.surfaceplant.NetkWhProduced.value) * 1E8  # cents/kWh
             LCOH = (econ.FCR.value * capex_heat_plus_infl + Coam_heat + econ.averageannualpumpingcosts.value) / np.average(model.surfaceplant.HeatkWhProduced.value) * 1E8  # cents/kWh
@@ -436,6 +432,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
             LCOH = (econ.FCR.value * capex_total_plus_infl
                     + econ.Coam.value + econ.averageannualpumpingcosts.value + econ.averageannualngcost.value) / model.surfaceplant.annual_heating_demand.value * 1E2  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
+
     elif econ.econmodel.value == EconomicModel.STANDARDIZED_LEVELIZED_COST:
         discount_vector = 1. / np.power(1 + econ.discountrate.value,
                                        np.linspace(0, model.surfaceplant.plant_lifetime.value - 1,
@@ -456,12 +453,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
             LCOH = LCOH * 2.931  # $/MMBTU
 
         # co-gen
-        elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
+        elif model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
             capex_elec_plus_infl, capex_heat_plus_infl = _construction_inflation_cost_elec_heat()
 
             LCOE = (capex_elec_plus_infl + np.sum(Coam_elec * discount_vector)) / np.sum(model.surfaceplant.NetkWhProduced.value * discount_vector) * 1E8  # cents/kWh
@@ -490,6 +482,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
                  econ.annualngcost.value) * discount_vector)) / np.sum(
                 model.surfaceplant.annual_heating_demand.value * discount_vector) * 1E2  # cents/kWh
             LCOH = LCOH * 2.931  # $/Million Btu
+
     elif econ.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
         if model.surfaceplant.enduse_option.value.has_electricity_component:
             # Designated as nominal (as opposed to real) in parameter tooltip text
@@ -498,6 +491,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
         else:
             # FIXME WIP calculate LCOH/LCOC as applicable
             pass
+
     else:
         if econ.econmodel.value != EconomicModel.BICYCLE:
             model.logger.error(
@@ -530,12 +524,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
             LCOH = (NPV_cap + NPV_oandm + NPV_fc + NPV_it + NPV_grt - NPV_itc) / np.sum(model.surfaceplant.HeatkWhProduced.value * inflation_vector * discount_vector) * 1E8
             LCOH = LCOH * 2.931  # $/MMBTU
         # co-gen
-        elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY,
-                                                        EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT,
-                                                        EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:
+        elif model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
             capex_elec_plus_infl, capex_heat_plus_infl = _construction_inflation_cost_elec_heat()
 
             NPVcap_elec = np.sum(capex_elec_plus_infl * CRF * discount_vector)
