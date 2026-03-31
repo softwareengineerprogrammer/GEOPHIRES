@@ -267,16 +267,18 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
         .magnitude
     )
 
+    if _has_capacity_payment_revenue_sources(model):
+        sam_economics.capacity_payment_revenue_sources = _get_capacity_payment_revenue_sources(model)
+
     # Note that this calculation is order-dependent on sam_economics.nominal_discount_rate
     sam_economics.lcoe_nominal.value = sf(
         _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
+
+    # Note that this calculation is order-dependent on sam_economics.capacity_payment_revenue_sources
     sam_economics.lcoh_nominal.value = sf(
         _get_lcoh_nominal_usd_per_mmbtu(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
-
-    if _has_capacity_payment_revenue_sources(model):
-        sam_economics.capacity_payment_revenue_sources = _get_capacity_payment_revenue_sources(model)
 
     return sam_economics
 

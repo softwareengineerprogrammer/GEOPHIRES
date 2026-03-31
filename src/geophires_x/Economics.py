@@ -490,9 +490,18 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
             # Designated as nominal (as opposed to real) in parameter tooltip text
             LCOE = econ.sam_economics_calculations.lcoe_nominal.quantity().to(
                 convertible_unit(econ.LCOE.CurrentUnits.value)).magnitude
-        else:
-            # FIXME WIP calculate LCOH/LCOC as applicable
-            pass
+
+        if model.surfaceplant.enduse_option.value.has_direct_use_heat_component:
+            if econ.sam_economics_calculations.lcoh_nominal.value is not None:
+                # Designated as nominal (as opposed to real) in parameter tooltip text
+                LCOH = econ.sam_economics_calculations.lcoh_nominal.quantity().to(
+                    convertible_unit(econ.LCOH.CurrentUnits.value)).magnitude
+            else:
+                # FIXME TODO probably should not happen; relevant to
+                #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/452?title=Deduplicate+calls+to+calculate_pre_revenue_costs_and_cashflow
+                pass
+
+        # FIXME WIP LCOC
 
     else:
         if econ.econmodel.value != EconomicModel.BICYCLE:
