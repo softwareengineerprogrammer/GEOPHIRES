@@ -16,7 +16,8 @@ from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter,
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
-    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl
+    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl, \
+    lcoh_output_parameter
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
@@ -1934,13 +1935,7 @@ class Economics:
             CurrentUnits=EnergyCostUnit.CENTSSPERKWH,
             ToolTipText="For SAM economic models, this is the nominal LCOE value (as opposed to real)."
         )
-        self.LCOH = self.OutputParameterDict[self.LCOH.Name] = OutputParameter(
-            Name="LCOH",
-            display_name='Direct-Use heat breakeven price (LCOH)',
-            UnitType=Units.ENERGYCOST,
-            PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,  # $/MMBTU
-            CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU
-        )
+        self.LCOH = self.OutputParameterDict[self.LCOH.Name] = lcoh_output_parameter()
 
         stimulation_contingency_and_indirect_costs_tooltip = (
             f'plus {self.contingency_percentage.quantity().to(convertible_unit("%")).magnitude:g}% contingency '

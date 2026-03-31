@@ -271,6 +271,9 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.lcoe_nominal.value = sf(
         _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
+    sam_economics.lcoh_nominal.value = sf(
+        _get_lcoh_nominal_usd_per_mmbtu(single_owner, sam_economics.sam_cash_flow_profile, model)
+    )
 
     if _has_capacity_payment_revenue_sources(model):
         sam_economics.capacity_payment_revenue_sources = _get_capacity_payment_revenue_sources(model)
@@ -296,6 +299,23 @@ def _get_lcoe_nominal_cents_per_kwh(
 ) -> float:
     lcoe_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
     ret = _cash_flow_profile_row(sam_cash_flow_profile, lcoe_row_name)[0]
+
+    # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
+
+    return ret
+
+
+# noinspection PyUnusedLocal
+def _get_lcoh_nominal_usd_per_mmbtu(
+    single_owner: Singleowner, sam_cash_flow_profile: list[list[Any]], model: Model
+) -> float | None:
+    lcoh_nominal_row_name = 'LCOH Levelized cost of heating nominal ($/MMBTU)'  # FIXME WIP unit
+    try:
+        lcoh_row = _cash_flow_profile_row(sam_cash_flow_profile, lcoh_nominal_row_name)
+    except StopIteration:
+        return None
+
+    ret = lcoh_row[0]
 
     # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
 
