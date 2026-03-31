@@ -2753,6 +2753,16 @@ class Economics:
             convertible_unit(self.accrued_financing_during_construction_percentage.CurrentUnits)
         ).magnitude
 
+        if not self.CAPEX_heat_electricity_plant_ratio.Provided:
+            def _set_ratio(frac: float) -> None:
+                self.CAPEX_heat_electricity_plant_ratio.value = quantity(frac, 'dimensionless').to(
+                    convertible_unit(self.CAPEX_heat_electricity_plant_ratio.CurrentUnits)).magnitude
+
+            if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
+                _set_ratio(1.0)
+            elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
+                _set_ratio(0.0)
+
         model.logger.info(f'complete {__class__!s}: {sys._getframe().f_code.co_name}')
 
     def sync_interest_rate(self, model):
