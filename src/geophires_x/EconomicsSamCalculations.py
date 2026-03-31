@@ -9,9 +9,18 @@ import numpy_financial as npf
 
 from geophires_x.EconomicsSamCashFlow import _SAM_CASH_FLOW_NAN_STR
 from geophires_x.EconomicsSamPreRevenue import PreRevenueCostsAndCashflow, _AFTER_TAX_NET_CASH_FLOW_ROW_NAME
-from geophires_x.EconomicsUtils import overnight_capital_cost_output_parameter, total_capex_parameter_output_parameter, \
-    royalty_cost_output_parameter, after_tax_irr_parameter, nominal_discount_rate_parameter, wacc_output_parameter, \
-    moic_parameter, project_vir_parameter, project_payback_period_parameter, investment_tax_credit_output_parameter
+from geophires_x.EconomicsUtils import (
+    overnight_capital_cost_output_parameter,
+    total_capex_parameter_output_parameter,
+    royalty_cost_output_parameter,
+    after_tax_irr_parameter,
+    nominal_discount_rate_parameter,
+    wacc_output_parameter,
+    moic_parameter,
+    project_vir_parameter,
+    project_payback_period_parameter,
+    investment_tax_credit_output_parameter,
+)
 from geophires_x.GeoPHIRESUtils import is_float, quantity, is_int
 from geophires_x.Parameter import OutputParameter
 from geophires_x.Units import Units, EnergyCostUnit, CurrencyUnit, convertible_unit
@@ -490,9 +499,12 @@ class SamEconomicsCalculations:
 
             # pv_of_electricity_to_grid_backfilled_row_kwh = pv_of_electricity_to_grid_backfilled_kwh
             pv_of_heat_provided_backfilled_row_kwh = pv_of_heat_provided_backfilled_kwh
-            pv_of_annual_heat_costs_backfilled_row_values_usd = [it * (1.-self.electricity_plant_frac_of_capex) for it in pv_of_annual_costs_backfilled_row[
-                1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
-            ]]
+            pv_of_annual_heat_costs_backfilled_row_values_usd = [
+                it * (1.0 - self.electricity_plant_frac_of_capex)
+                for it in pv_of_annual_costs_backfilled_row[
+                    1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
+                ]
+            ]
 
             lcoh_nominal_backfilled = []
             for _year in range(len(pv_of_annual_heat_costs_backfilled_row_values_usd)):
@@ -500,13 +512,12 @@ class SamEconomicsCalculations:
                 if pv_of_heat_provided_backfilled_row_kwh[_year] != 0:
                     entry = (
                         pv_of_annual_heat_costs_backfilled_row_values_usd[_year]
-                        * 100
                         / pv_of_heat_provided_backfilled_row_kwh[_year]
                     )
 
                 lcoh_nominal_backfilled.append(entry)
 
-            def _get_ret_row_index(row_name:str, raise_exception_if_not_present:bool=True) -> int:
+            def _get_ret_row_index(row_name: str, raise_exception_if_not_present: bool = True) -> int:
                 try:
                     return [it[0] for it in ret].index(row_name)
                 except ValueError as ve:
@@ -525,10 +536,7 @@ class SamEconomicsCalculations:
                 )
 
             def _insert_blank_line_before(before_row_name: str) -> None:
-                _insert_row_before(
-                    before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:]
-                )
-
+                _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
 
             lcoh_nominal_row_name = 'LCOH Levelized cost of heating nominal ($/kWh)'  # FIXME WIP unit
             # Insert new row if LCOE row does not exist (yet)
@@ -549,8 +557,10 @@ class SamEconomicsCalculations:
             ]
 
             pv_annual_heat_costs_row_name = 'Present value of annual heat costs ($)'
-            # Insert new row if LCOE row does not exist (yet)
-            pv_annual_heat_costs_row_index = _get_ret_row_index(pv_annual_heat_costs_row_name, raise_exception_if_not_present=False)
+            # Insert new row if PV of heat costs row does not exist (yet)
+            pv_annual_heat_costs_row_index = _get_ret_row_index(
+                pv_annual_heat_costs_row_name, raise_exception_if_not_present=False
+            )
 
             if pv_annual_heat_costs_row_index == -1:
                 _insert_row_before(lcoh_nominal_row_name, pv_annual_heat_costs_row_name, None)
@@ -558,10 +568,32 @@ class SamEconomicsCalculations:
 
             pv_annual_heat_costs_entry = pv_of_annual_heat_costs_backfilled_row_values_usd[0]
             if isinstance(pv_annual_heat_costs_entry, float):
-                pv_annual_heat_costs_entry = round(pv_annual_heat_costs_entry, 2)
+                pv_annual_heat_costs_entry = int(round(pv_annual_heat_costs_entry, 2))
 
             ret[pv_annual_heat_costs_row_index][1:] = [
                 pv_annual_heat_costs_entry,
+                *([None] * (self._pre_revenue_years_count - 1)),
+            ]
+
+            # ===
+
+            pv_of_annual_heat_provided_row_name = 'Present value of annual heat provided (kWh)'  # FIXME WIP units
+            # pv_of_heat_provided_backfilled_row_kwh
+            # Insert new row if PV of heat provided row does not exist (yet)
+            pv_of_annual_heat_provided_row_index = _get_ret_row_index(
+                pv_of_annual_heat_provided_row_name, raise_exception_if_not_present=False
+            )
+
+            if pv_of_annual_heat_provided_row_index == -1:
+                _insert_row_before(lcoh_nominal_row_name, pv_of_annual_heat_provided_row_name, None)
+                pv_of_annual_heat_provided_row_index = _get_ret_row_index(pv_of_annual_heat_provided_row_name)
+
+            pv_annual_heat_provided_entry = pv_of_heat_provided_backfilled_row_kwh[0]
+            if isinstance(pv_annual_heat_provided_entry, float):
+                pv_annual_heat_provided_entry = int(round(pv_annual_heat_provided_entry, 2))
+
+            ret[pv_of_annual_heat_provided_row_index][1:] = [
+                pv_annual_heat_provided_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
