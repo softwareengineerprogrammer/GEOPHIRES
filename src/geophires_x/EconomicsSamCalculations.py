@@ -575,10 +575,7 @@ class SamEconomicsCalculations:
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-            # ===
-
             pv_of_annual_heat_provided_row_name = 'Present value of annual heat provided (kWh)'  # FIXME WIP units
-            # pv_of_heat_provided_backfilled_row_kwh
             # Insert new row if PV of heat provided row does not exist (yet)
             pv_of_annual_heat_provided_row_index = _get_ret_row_index(
                 pv_of_annual_heat_provided_row_name, raise_exception_if_not_present=False
