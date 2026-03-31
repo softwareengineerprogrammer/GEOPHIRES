@@ -205,6 +205,9 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics: SamEconomicsCalculations = SamEconomicsCalculations(
         _sam_cash_flow_profile_operational_years=cash_flow_operational_years,
         pre_revenue_costs_and_cash_flow=calculate_pre_revenue_costs_and_cashflow(model),
+        electricity_plant_frac_of_capex=model.economics.CAPEX_heat_electricity_plant_ratio.quantity()
+        .to('dimensionless')
+        .magnitude,
     )
 
     sam_economics.overnight_capital_cost.value = (
