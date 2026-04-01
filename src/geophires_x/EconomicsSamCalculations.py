@@ -354,6 +354,18 @@ class SamEconomicsCalculations:
             *([''] * (self._pre_revenue_years_count - 1)),
         ]
 
+        if self.electricity_plant_frac_of_capex < 1.0:
+            # WIP - maybe should always include this?
+            pv_of_annual_energy_costs_row_name = 'Present value of annual energy costs ($)'
+            # pv_of_annual_energy_costs_row_index = _get_row_index(pv_of_annual_costs_row_name)
+            _insert_row_before(
+                'Present value of annual energy nominal (kWh)',
+                pv_of_annual_energy_costs_row_name,
+                [
+                    pv_of_annual_costs_backfilled[0] * self.electricity_plant_frac_of_capex,
+                ],
+            )
+
         # Backfill PV of electricity to grid
         electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
         pv_of_electricity_to_grid_backfilled_kwh = []
