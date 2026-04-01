@@ -355,10 +355,9 @@ class SamEconomicsCalculations:
         ]
 
         pv_of_annual_energy_costs_row_name = 'Present value of annual energy costs ($)'
-        pv_of_annual_energy_costs_at_year_0_usd = (
-            pv_of_annual_costs_backfilled[0] * self.electricity_plant_frac_of_capex
+        pv_of_annual_energy_costs_at_year_0_usd = int(
+            round(pv_of_annual_costs_backfilled[0] * self.electricity_plant_frac_of_capex)
         )
-        # pv_of_annual_energy_costs_row_index = _get_row_index(pv_of_annual_costs_row_name)
         _insert_row_before(
             'Present value of annual energy nominal (kWh)',
             pv_of_annual_energy_costs_row_name,
