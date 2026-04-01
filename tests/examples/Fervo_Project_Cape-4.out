@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.11.18
- Simulation Date: 2026-02-27
- Simulation Time:  13:15
- Calculation Time:      1.787 sec
+ GEOPHIRES Version: 3.12.1
+ Simulation Date: 2026-04-01
+ Simulation Time:  10:35
+ Calculation Time:      1.765 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -98,13 +98,13 @@ Simulation Metadata
 
                           ***CAPITAL COSTS (M$)***
 
+         Exploration costs:                                  30.00 MUSD
          Drilling and completion costs:                     467.75 MUSD
          Drilling and completion costs per well:              3.96 MUSD
          Stimulation costs:                                 542.80 MUSD
          Surface power plant costs:                        1504.05 MUSD
          Field gathering system costs:                       56.44 MUSD
          Total surface equipment costs:                    1560.49 MUSD
-         Exploration costs:                                  30.00 MUSD
          Overnight Capital Cost:                           2601.04 MUSD
          Inflation costs during construction:                59.82 MUSD
       Total CAPEX:                                         2660.87 MUSD
@@ -120,7 +120,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Initial geofluid availability:                          0.19 MW/(kg/s)
       Maximum Total Electricity Generation:                 614.60 MW
       Average Total Electricity Generation:                 610.21 MW
@@ -334,6 +333,8 @@ PPA revenue ($)                                  	0             	398,360,985  	4
 Electricity to grid (kWh)                        	0             	4,193,273,525	4,219,573,970	4,227,516,388	4,232,001,035	4,233,245,126	4,225,570,913	4,194,325,606	4,114,710,394	4,101,737,992	4,212,547,398	4,224,519,385	4,230,441,060	4,233,667,186	4,231,750,368	4,214,888,525	4,163,207,043	4,055,985,743	4,194,671,056	4,220,853,770	4,228,811,003	4,233,321,393	4,234,588,146	4,226,928,684	4,195,686,141	4,116,056,232	4,103,061,353	4,213,834,812	4,225,738,401	4,231,569,184	4,234,649,495
 
 Present value of annual costs ($)                	2,298,728,919
+
+Present value of annual energy costs ($)         	2,298,728,919
 Present value of annual energy nominal (kWh)     	28,355,365,264
 LCOE Levelized cost of energy nominal (cents/kWh)	8.11
 
