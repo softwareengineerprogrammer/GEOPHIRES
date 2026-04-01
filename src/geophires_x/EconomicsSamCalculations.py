@@ -474,10 +474,17 @@ class SamEconomicsCalculations:
 
         backfill_lppa_metrics()
 
-        def backfill_lcoh_nominal() -> None:
-            # WIP...
+        def backfill_lcoh_nominal(
+            # WIP: parameterizing for re-use with LCOC...
+            heat_provided_kwh_row_name: str = 'Heat provided (kWh)',
+            lcoh_heat_provided_unit: str = 'MMBTU',  # FIXME TODO should be derived from LCOH preferred units
+            lcoh_nominal_row_base_name=f'LCOH Levelized cost of heating nominal',
+            pv_annual_heat_costs_row_name='Present value of annual heat costs ($)',
+            pv_of_annual_heat_provided_row_base_name=f'Present value of annual heat provided',
+        ) -> None:
 
-            heat_provided_kwh_row_name = 'Heat provided (kWh)'
+            lcoh_nominal_row_name = f'{lcoh_nominal_row_base_name} ($/{lcoh_heat_provided_unit})'
+
             heat_provided_kwh_row_index = _get_row_index(
                 heat_provided_kwh_row_name, raise_exception_if_not_present=False
             )
@@ -523,8 +530,6 @@ class SamEconomicsCalculations:
                 ]
             ]
 
-            lcoh_heat_provided_unit: str = 'MMBTU'  # FIXME TODO should be derived from LCOH preferred units
-
             lcoh_nominal_backfilled = []
             for _year in range(len(pv_of_annual_heat_costs_backfilled_row_values_usd)):
                 entry: float | str = 'NaN'
@@ -538,7 +543,6 @@ class SamEconomicsCalculations:
 
                 lcoh_nominal_backfilled.append(entry)
 
-            lcoh_nominal_row_name = f'LCOH Levelized cost of heating nominal ($/{lcoh_heat_provided_unit})'
             # Insert new row if LCOE row does not exist (yet)
             lcoh_nominal_row_index = _get_row_index(lcoh_nominal_row_name, raise_exception_if_not_present=False)
 
@@ -556,7 +560,6 @@ class SamEconomicsCalculations:
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-            pv_annual_heat_costs_row_name = 'Present value of annual heat costs ($)'
             # Insert new row if PV of heat costs row does not exist (yet)
             pv_annual_heat_costs_row_index = _get_row_index(
                 pv_annual_heat_costs_row_name, raise_exception_if_not_present=False
@@ -577,7 +580,7 @@ class SamEconomicsCalculations:
 
             pv_of_annual_heat_provided_unit: str = lcoh_heat_provided_unit
             pv_of_annual_heat_provided_row_name = (
-                f'Present value of annual heat provided ' f'({pv_of_annual_heat_provided_unit})'
+                f'{pv_of_annual_heat_provided_row_base_name} ({pv_of_annual_heat_provided_unit})'
             )
             # Insert new row if PV of heat provided row does not exist (yet)
             pv_of_annual_heat_provided_row_index = _get_row_index(
