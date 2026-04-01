@@ -395,22 +395,21 @@ class SamEconomicsCalculations:
             ]
 
         def backfill_lcoe_nominal() -> None:
-            # FIXME WIP TODO adjust according to CAPEX_heat_electricity_plant_ratio
             pv_of_electricity_to_grid_backfilled_row_kwh = pv_of_electricity_to_grid_backfilled_kwh
-            pv_of_annual_costs_backfilled_row_values_usd = pv_of_annual_costs_backfilled_row[
-                1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
+            pv_of_annual_energy_costs_usd = [
+                it * self.electricity_plant_frac_of_capex
+                for it in pv_of_annual_costs_backfilled_row[
+                    1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
+                ]
             ]
 
             lcoe_nominal_backfilled = []
-            for _year in range(len(pv_of_annual_costs_backfilled_row_values_usd)):
+            for _year in range(len(pv_of_annual_energy_costs_usd)):
                 entry: float | str = 'NaN'
                 if pv_of_electricity_to_grid_backfilled_row_kwh[_year] != 0:
-                    pv_annual_costs_usd = (
-                        pv_of_annual_energy_costs_at_year_0_usd
-                        if _year == 0
-                        else pv_of_annual_costs_backfilled_row_values_usd[_year]
-                    )  # FIXME WIP technically inconsistent...
-                    entry = pv_annual_costs_usd * 100 / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
+                    entry = (
+                        pv_of_annual_energy_costs_usd[_year] * 100 / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
+                    )
 
                 lcoe_nominal_backfilled.append(entry)
 
