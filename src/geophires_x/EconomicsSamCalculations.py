@@ -248,11 +248,8 @@ class SamEconomicsCalculations:
     def _insert_calculated_levelized_metrics_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
         ret = cf_ret.copy()
 
-        # __row_names: list[str] = [it[0] for it in ret]
-
         def _get_row_index(row_name_: str, raise_exception_if_not_present: bool = True) -> int:
             try:
-                # return __row_names.index(row_name_)
                 return [it[0] for it in ret].index(row_name_)
             except ValueError as ve:
                 if raise_exception_if_not_present:
@@ -274,6 +271,18 @@ class SamEconomicsCalculations:
 
         def _get_row_index_after(row_name_: str, after_row_name: str) -> int:
             return _get_row_indexes(row_name_, after_row_name=after_row_name)[0]
+
+        def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any] | None) -> None:
+            if row_content is None:
+                row_content = ['' for _it in ret[_get_row_index(before_row_name)]][1:]
+
+            ret.insert(
+                _get_row_index(before_row_name),
+                [row_name, *row_content],
+            )
+
+        def _insert_blank_line_before(before_row_name: str) -> None:
+            _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
 
         after_tax_lcoe_and_ppa_price_header_row_title = 'AFTER-TAX LCOE AND PPA PRICE'
 
@@ -515,18 +524,6 @@ class SamEconomicsCalculations:
                     )
 
                 lcoh_nominal_backfilled.append(entry)
-
-            def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any] | None) -> None:
-                if row_content is None:
-                    row_content = ['' for _it in ret[_get_row_index(before_row_name)]][1:]
-
-                ret.insert(
-                    _get_row_index(before_row_name),
-                    [row_name, *row_content],
-                )
-
-            def _insert_blank_line_before(before_row_name: str) -> None:
-                _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
 
             lcoh_nominal_row_name = f'LCOH Levelized cost of heating nominal ($/{lcoh_heat_provided_unit})'
             # Insert new row if LCOE row does not exist (yet)
