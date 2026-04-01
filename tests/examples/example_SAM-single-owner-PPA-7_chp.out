@@ -5,17 +5,17 @@
 Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.12.1
- Simulation Date: 2026-03-29
- Simulation Time:  07:57
- Calculation Time:      1.767 sec
+ Simulation Date: 2026-04-01
+ Simulation Time:  09:30
+ Calculation Time:      1.914 sec
 
                            ***SUMMARY OF RESULTS***
 
       End-Use Option: Cogeneration Topping Cycle, Heat sales considered as extra income
       Average Net Electricity Production:                    45.52 MW
       Average Direct-Use Heat Production:                    48.48 MW
-      Electricity breakeven price:                           10.31 cents/kWh
-      Direct-Use heat breakeven price (LCOH):                 0.00 USD/MMBTU
+      Electricity breakeven price:                            9.11 cents/kWh
+      Direct-Use heat breakeven price (LCOH):                 3.30 USD/MMBTU
       Total CAPEX:                                          278.39 MUSD
       Total CAPEX ($/kW):                                     6082 USD/kW
       Number of production wells:                             6
@@ -133,7 +133,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Initial geofluid availability:                          0.19 MW/(kg/s)
       Maximum Total Electricity Generation:                  53.91 MW
       Average Total Electricity Generation:                  53.66 MW
@@ -257,7 +256,7 @@ Electricity to grid (kWh)                        	             	            	0.0
 Electricity from grid (kWh)                      	             	            	0.0         	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0        	0.0
 Electricity to grid net (kWh)                    	             	            	0.0         	355,751,460	358,716,621	359,623,206	360,159,877	360,535,044	360,790,225	360,526,265	356,942,824	353,998,346	358,376,482	359,470,874	360,081,204	360,502,187	360,807,119	360,791,234	358,596,676	353,274,794	357,979,310	359,338,506	360,012,245	360,453,369	360,772,049	360,887,459	359,622,350	353,442,225	357,267,784	359,100,476	359,872,541	360,356,079	360,689,873
 
-Heat provided (kWh)                              	             	            	0           	381,460,384	382,187,913	382,409,441	382,540,424	382,631,925	382,694,226	382,631,365	381,765,853	381,029,906	382,099,920	382,366,229	382,512,427	382,611,622	382,682,690	382,677,104	382,146,699	380,838,811	381,982,851	382,316,520	382,481,666	382,589,730	382,667,792	382,696,629	382,392,624	380,884,452	381,807,596	382,258,195	382,447,583	382,566,081	382,647,840
+Heat provided (kWh)                              	0            	0           	0           	381,460,384	382,187,913	382,409,441	382,540,424	382,631,925	382,694,226	382,631,365	381,765,853	381,029,906	382,099,920	382,366,229	382,512,427	382,611,622	382,682,690	382,677,104	382,146,699	380,838,811	381,982,851	382,316,520	382,481,666	382,589,730	382,667,792	382,696,629	382,392,624	380,884,452	381,807,596	382,258,195	382,447,583	382,566,081	382,647,840
 
 REVENUE
 PPA price (cents/kWh)                            	             	            	0.0         	9.50       	9.50       	9.56       	9.61       	9.67       	9.73       	9.79       	9.84       	9.90       	9.96       	10.01      	10.07      	10.13      	10.18      	10.24      	10.30      	10.36      	10.41      	10.47      	10.53      	10.58      	10.64      	10.70      	10.75      	10.81      	10.87      	10.93      	10.98      	11.04      	11.10
@@ -358,12 +357,18 @@ PPA revenue ($)                                  	0            	0           	0  
 Electricity to grid (kWh)                        	0            	0           	0           	355,751,460	358,716,621	359,623,206	360,159,877	360,535,044	360,790,225	360,526,265	356,942,824	353,998,346	358,376,482	359,470,874	360,081,204	360,502,187	360,807,119	360,791,234	358,596,676	353,274,794	357,979,310	359,338,506	360,012,245	360,453,369	360,772,049	360,887,459	359,622,350	353,442,225	357,267,784	359,100,476	359,872,541	360,356,079	360,689,873
 
 Present value of annual costs ($)                	183,347,724
+
+Present value of annual energy costs ($)         	162,019,394
 Present value of annual energy nominal (kWh)     	1,777,787,001
-LCOE Levelized cost of energy nominal (cents/kWh)	10.31
+LCOE Levelized cost of energy nominal (cents/kWh)	9.11
 
 Present value of PPA revenue ($)                 	174,295,914
 Present value of annual energy nominal (kWh)     	1,777,787,001
 LPPA Levelized PPA price nominal (cents/kWh)     	9.80
+
+Present value of annual heat costs ($)           	21,328,329
+Present value of annual heat provided (MMBTU)    	6,462,235
+LCOH Levelized cost of heating nominal ($/MMBTU) 	3.30
 
 PROJECT STATE INCOME TAXES
 EBITDA ($)                                       	             	            	0           	27,897,285 	28,197,163 	28,493,812 	28,753,668 	28,997,529 	29,229,416 	29,407,666 	29,238,845 	29,132,431 	29,796,847 	30,117,361 	30,387,375 	30,637,734 	30,876,051 	31,079,945 	31,046,339 	30,666,961 	31,386,763 	31,741,448 	32,021,317 	32,275,910 	32,517,227 	32,735,934 	32,797,990 	32,297,136 	32,937,439 	33,352,569 	33,646,779 	33,908,246 	173,345,930

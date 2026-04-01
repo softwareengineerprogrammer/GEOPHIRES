@@ -165,9 +165,11 @@ class GeophiresMonteCarloTestCase(unittest.TestCase):
             # changes), then it probably means the expected range or settings file need to be adjusted to 'guarantee'
             # the results can be confidently asserted. (Such as in
             # https://github.com/NREL/GEOPHIRES-X/pull/178/commits/ec4db42fca5a90715ceb5143e18315d5f3d782b7)
-            # Failure 2025-04-17, noting here in comment but not changing value for now:
+            # Failure 2025-04-17:
             #   https://github.com/softwareengineerprogrammer/GEOPHIRES/actions/runs/14523599534/job/40750024435?pr=69
-            self.assertLess(json_result['Producible Electricity']['median'], 1000)
+            # Failure 2026-03-01:
+            #  https://github.com/softwareengineerprogrammer/GEOPHIRES/actions/runs/23811699882/job/69400186074?pr=144
+            self.assertLess(json_result['Producible Electricity']['median'], 1005)
             self.assertGreater(json_result['Producible Electricity']['median'], 20)
 
     def test_hip_ra_x_monte_carlo(self):

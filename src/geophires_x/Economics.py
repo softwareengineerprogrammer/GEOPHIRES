@@ -9,13 +9,15 @@ from pint.facets.plain import PlainQuantity
 
 import geophires_x.Model as Model
 from geophires_x import EconomicsSam
-from geophires_x.EconomicsSam import calculate_sam_economics, SamEconomicsCalculations
+from geophires_x.EconomicsSam import calculate_sam_economics
+from geophires_x.EconomicsSamCalculations import SamEconomicsCalculations
 from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter, nominal_discount_rate_parameter, \
     real_discount_rate_parameter, after_tax_irr_parameter, moic_parameter, project_vir_parameter, \
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
-    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl
+    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl, \
+    lcoh_output_parameter, lcoc_output_parameter
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
@@ -488,9 +490,21 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
             # Designated as nominal (as opposed to real) in parameter tooltip text
             LCOE = econ.sam_economics_calculations.lcoe_nominal.quantity().to(
                 convertible_unit(econ.LCOE.CurrentUnits.value)).magnitude
-        else:
-            # FIXME WIP calculate LCOH/LCOC as applicable
-            pass
+
+        if model.surfaceplant.enduse_option.value.has_direct_use_heat_component:
+            if econ.sam_economics_calculations.lcoh_nominal.value is not None:
+                # Designated as nominal (as opposed to real) in parameter tooltip text
+                LCOH = econ.sam_economics_calculations.lcoh_nominal.quantity().to(
+                    convertible_unit(econ.LCOH.CurrentUnits.value)).magnitude
+            else:
+                # FIXME TODO probably should not happen; relevant to
+                #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/452?title=Deduplicate+calls+to+calculate_pre_revenue_costs_and_cashflow
+                pass
+
+        if econ.sam_economics_calculations.lcoc_nominal.value is not None:
+            # Designated as nominal (as opposed to real) in parameter tooltip text
+            LCOC = econ.sam_economics_calculations.lcoc_nominal.quantity().to(
+                convertible_unit(econ.LCOC.CurrentUnits.value)).magnitude
 
     else:
         if econ.econmodel.value != EconomicModel.BICYCLE:
@@ -1917,13 +1931,7 @@ class Economics:
             CurrentUnits=CostPerMassUnit.DOLLARSPERLB
         )
 
-        self.LCOC = self.OutputParameterDict[self.LCOC.Name] = OutputParameter(
-            Name="LCOC",
-            display_name='Direct-Use Cooling Breakeven Price (LCOC)',
-            UnitType=Units.ENERGYCOST,
-            PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,
-            CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU
-        )
+        self.LCOC = self.OutputParameterDict[self.LCOC.Name] = lcoc_output_parameter()
 
         self.LCOE = self.OutputParameterDict[self.LCOE.Name] = OutputParameter(
             Name="LCOE",
@@ -1933,13 +1941,7 @@ class Economics:
             CurrentUnits=EnergyCostUnit.CENTSSPERKWH,
             ToolTipText="For SAM economic models, this is the nominal LCOE value (as opposed to real)."
         )
-        self.LCOH = self.OutputParameterDict[self.LCOH.Name] = OutputParameter(
-            Name="LCOH",
-            display_name='Direct-Use heat breakeven price (LCOH)',
-            UnitType=Units.ENERGYCOST,
-            PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,  # $/MMBTU
-            CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU
-        )
+        self.LCOH = self.OutputParameterDict[self.LCOH.Name] = lcoh_output_parameter()
 
         stimulation_contingency_and_indirect_costs_tooltip = (
             f'plus {self.contingency_percentage.quantity().to(convertible_unit("%")).magnitude:g}% contingency '
@@ -2752,6 +2754,16 @@ class Economics:
         self.accrued_financing_during_construction_percentage.value = self.inflrateconstruction.quantity().to(
             convertible_unit(self.accrued_financing_during_construction_percentage.CurrentUnits)
         ).magnitude
+
+        if not self.CAPEX_heat_electricity_plant_ratio.Provided:
+            def _set_ratio(frac: float) -> None:
+                self.CAPEX_heat_electricity_plant_ratio.value = quantity(frac, 'dimensionless').to(
+                    convertible_unit(self.CAPEX_heat_electricity_plant_ratio.CurrentUnits)).magnitude
+
+            if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
+                _set_ratio(1.0)
+            elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
+                _set_ratio(0.0)
 
         model.logger.info(f'complete {__class__!s}: {sys._getframe().f_code.co_name}')
 

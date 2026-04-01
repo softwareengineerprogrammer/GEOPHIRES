@@ -25,11 +25,11 @@ from geophires_x.EconomicsSam import (
     get_sam_cash_flow_profile_tabulated_output,
     _ppa_pricing_model,
     _get_fed_and_state_tax_rates,
-    SamEconomicsCalculations,
     _get_royalty_rate_schedule,
     _validate_construction_capex_schedule,
     _calculate_nominal_discount_rate_from_real_and_inflation_pct,
 )
+from geophires_x.EconomicsSamCalculations import SamEconomicsCalculations
 from geophires_x.GeoPHIRESUtils import sig_figs, quantity, is_float
 
 # noinspection PyProtectedMember

@@ -5,9 +5,9 @@
 Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.12.1
- Simulation Date: 2026-03-29
- Simulation Time:  08:47
- Calculation Time:      1.816 sec
+ Simulation Date: 2026-04-01
+ Simulation Time:  10:16
+ Calculation Time:      1.783 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -15,7 +15,7 @@ Simulation Metadata
       Surface Application: Absorption Chiller
       Average Direct-Use Heat Production:                   367.18 MW
       Average Cooling Production:                           237.93 MW
-      Direct-Use Cooling Breakeven Price (LCOC):               0.00 USD/MMBTU
+      Direct-Use Cooling Breakeven Price (LCOC):               8.49 USD/MMBTU
       Total CAPEX:                                          248.47 MUSD
       Number of production wells:                             6
       Number of injection wells:                              4
@@ -248,7 +248,7 @@ Electricity to grid (kWh)                        	           	            	0.0  
 Electricity from grid (kWh)                      	           	            	0.0         	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0
 Electricity to grid net (kWh)                    	           	            	0.0         	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0          	0.0
 
-Cooling provided (kWh/yr)                        	           	            	0           	1,869,641,058	1,875,500,352	1,877,284,464	1,878,339,361	1,879,076,288	1,879,578,043	1,879,071,780	1,872,101,213	1,866,174,120	1,874,791,681	1,876,936,451	1,878,113,889	1,878,912,769	1,879,485,128	1,879,440,147	1,875,168,427	1,864,635,099	1,873,848,846	1,876,536,111	1,877,866,147	1,878,736,464	1,879,365,149	1,879,597,391	1,877,149,026	1,865,002,674	1,872,437,395	1,876,066,382	1,877,591,655	1,878,546,001	1,879,204,462
+Cooling provided (kWh/yr)                        	0          	0           	0           	1,869,641,058	1,875,500,352	1,877,284,464	1,878,339,361	1,879,076,288	1,879,578,043	1,879,071,780	1,872,101,213	1,866,174,120	1,874,791,681	1,876,936,451	1,878,113,889	1,878,912,769	1,879,485,128	1,879,440,147	1,875,168,427	1,864,635,099	1,873,848,846	1,876,536,111	1,877,866,147	1,878,736,464	1,879,365,149	1,879,597,391	1,877,149,026	1,865,002,674	1,872,437,395	1,876,066,382	1,877,591,655	1,878,546,001	1,879,204,462
 
 REVENUE
 PPA price (cents/kWh)                            	           	            	0.0         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50         	5.50
@@ -349,12 +349,18 @@ PPA revenue ($)                                  	0          	0           	0    
 Electricity to grid (kWh)                        	0          	0           	0           	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0            	0
 
 Present value of annual costs ($)                	269,177,011
+
+Present value of annual energy costs ($)         	0
 Present value of annual energy nominal (kWh)     	0
 LCOE Levelized cost of energy nominal (cents/kWh)	NaN
 
 Present value of PPA revenue ($)                 	0
 Present value of annual energy nominal (kWh)     	0
 LPPA Levelized PPA price nominal (cents/kWh)     	NaN
+
+Present value of annual cooling costs ($)        	269,177,011
+Present value of annual cooling provided (MMBTU) 	31,712,370
+LCOC Levelized cost of cooling nominal ($/MMBTU) 	8.49
 
 PROJECT STATE INCOME TAXES
 EBITDA ($)                                       	           	            	0           	107,489,070  	107,872,854  	107,989,713  	108,058,809  	108,107,078  	108,139,943  	108,106,783  	107,650,210  	107,261,986  	107,826,436  	107,966,919  	108,044,041  	108,096,367  	108,133,857  	108,130,911  	107,851,113  	107,161,180  	107,764,680  	107,940,696  	108,027,814  	108,084,819  	108,125,998  	108,141,210  	107,980,842  	107,185,256  	107,672,230  	107,909,929  	108,009,834  	108,072,344  	232,348,003
