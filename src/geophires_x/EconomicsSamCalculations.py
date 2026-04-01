@@ -474,56 +474,57 @@ class SamEconomicsCalculations:
 
         backfill_lppa_metrics()
 
-        def backfill_lcoh_nominal(
-            # WIP: parameterizing for re-use with LCOC...
-            heat_provided_kwh_row_name: str = 'Heat provided (kWh)',
-            lcoh_heat_provided_unit: str = 'MMBTU',  # FIXME TODO should be derived from LCOH preferred units
-            lcoh_nominal_row_base_name=f'LCOH Levelized cost of heating nominal',
-            pv_annual_heat_costs_row_name='Present value of annual heat costs ($)',
-            pv_of_annual_heat_provided_row_base_name=f'Present value of annual heat provided',
+        def insert_non_electricity_levelized_metrics(
+            amount_provided_kwh_row_name: str,  # = 'Heat provided (kWh)',
+            amount_provided_unit: str,  # = 'MMBTU',
+            levelized_cost_nominal_row_base_name: str,  # =f'LCOH Levelized cost of heating nominal',
+            pv_annual_non_elec_type_costs_row_name: str,  # ='Present value of annual heat costs ($)',
+            pv_of_annual_amount_provided_row_base_name: str,  # =f'Present value of annual heat provided',
         ) -> None:
 
-            lcoh_nominal_row_name = f'{lcoh_nominal_row_base_name} ($/{lcoh_heat_provided_unit})'
+            lcoh_nominal_row_name = f'{levelized_cost_nominal_row_base_name} ($/{amount_provided_unit})'
 
-            heat_provided_kwh_row_index = _get_row_index(
-                heat_provided_kwh_row_name, raise_exception_if_not_present=False
+            amount_provided_kwh_row_index = _get_row_index(
+                amount_provided_kwh_row_name, raise_exception_if_not_present=False
             )
-            if heat_provided_kwh_row_index == -1:
+            if amount_provided_kwh_row_index == -1:
                 return  # No heat provided row, nothing to do
 
-            heat_provided = cf_ret[heat_provided_kwh_row_index].copy()
-            heat_provided_backfilled = [0 if it == '' else (int(it) if is_int(it) else it) for it in heat_provided[1:]]
+            amount_provided = cf_ret[amount_provided_kwh_row_index].copy()
+            amount_provided_backfilled = [
+                0 if it == '' else (int(it) if is_int(it) else it) for it in amount_provided[1:]
+            ]
 
-            # TODO/WIP maybe duplicate heat provided row after after_tax_lcoe_and_ppa_price_header_row_title to mirror
+            # TODO/WIP maybe duplicate amount provided row after after_tax_lcoe_and_ppa_price_header_row_title to mirror
             #   electricity convention
-            # heat_provided_kwh_row_index = _get_row_index_after(
-            #     heat_provided_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
+            # amount_provided_kwh_row_index = _get_row_index_after(
+            #     amount_provided_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
             # )
 
-            ret[heat_provided_kwh_row_index][1:] = heat_provided_backfilled
+            ret[amount_provided_kwh_row_index][1:] = amount_provided_backfilled
 
             # <Back>fill PV of heat provided
-            heat_provided_backfilled_pv_processed = heat_provided_backfilled.copy()
-            pv_of_heat_provided_backfilled_kwh = []
+            amount_provided_backfilled_pv_processed = amount_provided_backfilled.copy()
+            pv_of_amount_provided_backfilled_kwh = []
             for year_ in range(self._pre_revenue_years_count):
                 pv_at_year_ = abs(
                     round(
                         npf.npv(
                             self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                            heat_provided_backfilled_pv_processed,
+                            amount_provided_backfilled_pv_processed,
                         )
                     )
                 )
 
-                pv_of_heat_provided_backfilled_kwh.append(pv_at_year_)
+                pv_of_amount_provided_backfilled_kwh.append(pv_at_year_)
 
-                heat_provided_at_year = heat_provided_backfilled_pv_processed.pop(0)
-                heat_provided_backfilled_pv_processed[0] = (
-                    heat_provided_backfilled_pv_processed[0] + heat_provided_at_year
+                amount_provided_at_year = amount_provided_backfilled_pv_processed.pop(0)
+                amount_provided_backfilled_pv_processed[0] = (
+                    amount_provided_backfilled_pv_processed[0] + amount_provided_at_year
                 )
 
-            pv_of_heat_provided_backfilled_row_kwh = pv_of_heat_provided_backfilled_kwh
-            pv_of_annual_heat_costs_backfilled_row_values_usd = [
+            pv_of_amount_provided_backfilled_row_kwh = pv_of_amount_provided_backfilled_kwh
+            pv_of_annual_non_elec_type_costs_backfilled_row_values_usd = [
                 it * (1.0 - self.electricity_plant_frac_of_capex)
                 for it in pv_of_annual_costs_backfilled_row[
                     1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
@@ -531,80 +532,94 @@ class SamEconomicsCalculations:
             ]
 
             lcoh_nominal_backfilled = []
-            for _year in range(len(pv_of_annual_heat_costs_backfilled_row_values_usd)):
+            for _year in range(len(pv_of_annual_non_elec_type_costs_backfilled_row_values_usd)):
                 entry: float | str = 'NaN'
-                if pv_of_heat_provided_backfilled_row_kwh[_year] != 0:
+                if pv_of_amount_provided_backfilled_row_kwh[_year] != 0:
                     entry = (
-                        pv_of_annual_heat_costs_backfilled_row_values_usd[_year]
-                        / quantity(pv_of_heat_provided_backfilled_row_kwh[_year], 'kWh')
-                        .to(lcoh_heat_provided_unit)
+                        pv_of_annual_non_elec_type_costs_backfilled_row_values_usd[_year]
+                        / quantity(pv_of_amount_provided_backfilled_row_kwh[_year], 'kWh')
+                        .to(amount_provided_unit)
                         .magnitude
                     )
 
                 lcoh_nominal_backfilled.append(entry)
 
             # Insert new row if LCOE row does not exist (yet)
-            lcoh_nominal_row_index = _get_row_index(lcoh_nominal_row_name, raise_exception_if_not_present=False)
+            levelized_cost_nominal_row_index = _get_row_index(
+                lcoh_nominal_row_name, raise_exception_if_not_present=False
+            )
 
-            if lcoh_nominal_row_index == -1:
+            if levelized_cost_nominal_row_index == -1:
                 _insert_row_before('PROJECT STATE INCOME TAXES', lcoh_nominal_row_name, None)
                 _insert_blank_line_before('PROJECT STATE INCOME TAXES')
-                lcoh_nominal_row_index = _get_row_index(lcoh_nominal_row_name)
+                levelized_cost_nominal_row_index = _get_row_index(lcoh_nominal_row_name)
 
-            lcoh_nominal_backfilled_entry = lcoh_nominal_backfilled[0]
-            if isinstance(lcoh_nominal_backfilled_entry, float):
-                lcoh_nominal_backfilled_entry = round(lcoh_nominal_backfilled_entry, 2)
+            levelized_cost_nominal_backfilled_entry = lcoh_nominal_backfilled[0]
+            if isinstance(levelized_cost_nominal_backfilled_entry, float):
+                levelized_cost_nominal_backfilled_entry = round(levelized_cost_nominal_backfilled_entry, 2)
 
-            ret[lcoh_nominal_row_index][1:] = [
-                lcoh_nominal_backfilled_entry,
+            ret[levelized_cost_nominal_row_index][1:] = [
+                levelized_cost_nominal_backfilled_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
             # Insert new row if PV of heat costs row does not exist (yet)
-            pv_annual_heat_costs_row_index = _get_row_index(
-                pv_annual_heat_costs_row_name, raise_exception_if_not_present=False
+            pv_annual_non_elec_type_costs_row_index = _get_row_index(
+                pv_annual_non_elec_type_costs_row_name, raise_exception_if_not_present=False
             )
 
-            if pv_annual_heat_costs_row_index == -1:
-                _insert_row_before(lcoh_nominal_row_name, pv_annual_heat_costs_row_name, None)
-                pv_annual_heat_costs_row_index = _get_row_index(pv_annual_heat_costs_row_name)
+            if pv_annual_non_elec_type_costs_row_index == -1:
+                _insert_row_before(lcoh_nominal_row_name, pv_annual_non_elec_type_costs_row_name, None)
+                pv_annual_non_elec_type_costs_row_index = _get_row_index(pv_annual_non_elec_type_costs_row_name)
 
-            pv_annual_heat_costs_entry = pv_of_annual_heat_costs_backfilled_row_values_usd[0]
-            if isinstance(pv_annual_heat_costs_entry, float):
-                pv_annual_heat_costs_entry = int(round(pv_annual_heat_costs_entry, 2))
+            pv_annual_non_elec_type_costs_entry = pv_of_annual_non_elec_type_costs_backfilled_row_values_usd[0]
+            if isinstance(pv_annual_non_elec_type_costs_entry, float):
+                pv_annual_non_elec_type_costs_entry = int(round(pv_annual_non_elec_type_costs_entry, 2))
 
-            ret[pv_annual_heat_costs_row_index][1:] = [
-                pv_annual_heat_costs_entry,
+            ret[pv_annual_non_elec_type_costs_row_index][1:] = [
+                pv_annual_non_elec_type_costs_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-            pv_of_annual_heat_provided_unit: str = lcoh_heat_provided_unit
-            pv_of_annual_heat_provided_row_name = (
-                f'{pv_of_annual_heat_provided_row_base_name} ({pv_of_annual_heat_provided_unit})'
+            pv_of_annual_amount_provided_unit: str = amount_provided_unit
+            pv_of_annual_amount_provided_row_name = (
+                f'{pv_of_annual_amount_provided_row_base_name} ({pv_of_annual_amount_provided_unit})'
             )
             # Insert new row if PV of heat provided row does not exist (yet)
-            pv_of_annual_heat_provided_row_index = _get_row_index(
-                pv_of_annual_heat_provided_row_name, raise_exception_if_not_present=False
+            pv_of_annual_amount_provided_row_index = _get_row_index(
+                pv_of_annual_amount_provided_row_name, raise_exception_if_not_present=False
             )
 
-            if pv_of_annual_heat_provided_row_index == -1:
-                _insert_row_before(lcoh_nominal_row_name, pv_of_annual_heat_provided_row_name, None)
-                pv_of_annual_heat_provided_row_index = _get_row_index(pv_of_annual_heat_provided_row_name)
+            if pv_of_annual_amount_provided_row_index == -1:
+                _insert_row_before(lcoh_nominal_row_name, pv_of_annual_amount_provided_row_name, None)
+                pv_of_annual_amount_provided_row_index = _get_row_index(pv_of_annual_amount_provided_row_name)
 
-            pv_annual_heat_provided_entry = pv_of_heat_provided_backfilled_row_kwh[0]
-            if any(isinstance(pv_annual_heat_provided_entry, it) for it in [int, float]):
-                pv_annual_heat_provided_entry = int(
+            pv_annual_amount_provided_entry = pv_of_amount_provided_backfilled_row_kwh[0]
+            if any(isinstance(pv_annual_amount_provided_entry, it) for it in [int, float]):
+                pv_annual_amount_provided_entry = int(
                     round(
-                        quantity(pv_annual_heat_provided_entry, 'kWh').to(pv_of_annual_heat_provided_unit).magnitude, 2
+                        quantity(pv_annual_amount_provided_entry, 'kWh')
+                        .to(pv_of_annual_amount_provided_unit)
+                        .magnitude,
+                        2,
                     )
                 )
 
-            ret[pv_of_annual_heat_provided_row_index][1:] = [
-                pv_annual_heat_provided_entry,
+            ret[pv_of_annual_amount_provided_row_index][1:] = [
+                pv_annual_amount_provided_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-        backfill_lcoh_nominal()
+        def insert_lcoh_metrics():
+            insert_non_electricity_levelized_metrics(
+                amount_provided_kwh_row_name='Heat provided (kWh)',
+                amount_provided_unit='MMBTU',  # TODO maybe should be derived from LCOH preferred units
+                levelized_cost_nominal_row_base_name=f'LCOH Levelized cost of heating nominal',
+                pv_annual_non_elec_type_costs_row_name='Present value of annual heat costs ($)',
+                pv_of_annual_amount_provided_row_base_name=f'Present value of annual heat provided',
+            )
+
+        insert_lcoh_metrics()
 
         return ret
 
