@@ -482,7 +482,7 @@ class SamEconomicsCalculations:
             pv_of_annual_amount_provided_row_base_name: str,  # =f'Present value of annual heat provided',
         ) -> None:
 
-            lcoh_nominal_row_name = f'{levelized_cost_nominal_row_base_name} ($/{amount_provided_unit})'
+            levelized_cost_nominal_row_name = f'{levelized_cost_nominal_row_base_name} ($/{amount_provided_unit})'
 
             amount_provided_kwh_row_index = _get_row_index(
                 amount_provided_kwh_row_name, raise_exception_if_not_present=False
@@ -546,13 +546,13 @@ class SamEconomicsCalculations:
 
             # Insert new row if LCOE row does not exist (yet)
             levelized_cost_nominal_row_index = _get_row_index(
-                lcoh_nominal_row_name, raise_exception_if_not_present=False
+                levelized_cost_nominal_row_name, raise_exception_if_not_present=False
             )
 
             if levelized_cost_nominal_row_index == -1:
-                _insert_row_before('PROJECT STATE INCOME TAXES', lcoh_nominal_row_name, None)
+                _insert_row_before('PROJECT STATE INCOME TAXES', levelized_cost_nominal_row_name, None)
                 _insert_blank_line_before('PROJECT STATE INCOME TAXES')
-                levelized_cost_nominal_row_index = _get_row_index(lcoh_nominal_row_name)
+                levelized_cost_nominal_row_index = _get_row_index(levelized_cost_nominal_row_name)
 
             levelized_cost_nominal_backfilled_entry = lcoh_nominal_backfilled[0]
             if isinstance(levelized_cost_nominal_backfilled_entry, float):
@@ -569,7 +569,7 @@ class SamEconomicsCalculations:
             )
 
             if pv_annual_non_elec_type_costs_row_index == -1:
-                _insert_row_before(lcoh_nominal_row_name, pv_annual_non_elec_type_costs_row_name, None)
+                _insert_row_before(levelized_cost_nominal_row_name, pv_annual_non_elec_type_costs_row_name, None)
                 pv_annual_non_elec_type_costs_row_index = _get_row_index(pv_annual_non_elec_type_costs_row_name)
 
             pv_annual_non_elec_type_costs_entry = pv_of_annual_non_elec_type_costs_backfilled_row_values_usd[0]
@@ -591,7 +591,7 @@ class SamEconomicsCalculations:
             )
 
             if pv_of_annual_amount_provided_row_index == -1:
-                _insert_row_before(lcoh_nominal_row_name, pv_of_annual_amount_provided_row_name, None)
+                _insert_row_before(levelized_cost_nominal_row_name, pv_of_annual_amount_provided_row_name, None)
                 pv_of_annual_amount_provided_row_index = _get_row_index(pv_of_annual_amount_provided_row_name)
 
             pv_annual_amount_provided_entry = pv_of_amount_provided_backfilled_row_kwh[0]
@@ -620,6 +620,17 @@ class SamEconomicsCalculations:
             )
 
         insert_lcoh_metrics()
+
+        def insert_lcoc_metrics():
+            insert_non_electricity_levelized_metrics(
+                amount_provided_kwh_row_name='Cooling provided (kWh/yr)',  # FIXME WIP should not have /yr suffix
+                amount_provided_unit='MMBTU',  # TODO maybe should be derived from LCOC preferred units
+                levelized_cost_nominal_row_base_name=f'LCOC Levelized cost of cooling nominal',
+                pv_annual_non_elec_type_costs_row_name='Present value of annual cooling costs ($)',
+                pv_of_annual_amount_provided_row_base_name=f'Present value of annual cooling provided',
+            )
+
+        insert_lcoc_metrics()
 
         return ret
 
