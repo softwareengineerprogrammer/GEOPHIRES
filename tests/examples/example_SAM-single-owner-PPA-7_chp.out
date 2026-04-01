@@ -5,16 +5,16 @@
 Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.12.1
- Simulation Date: 2026-03-31
- Simulation Time:  10:50
- Calculation Time:      1.794 sec
+ Simulation Date: 2026-04-01
+ Simulation Time:  09:30
+ Calculation Time:      1.914 sec
 
                            ***SUMMARY OF RESULTS***
 
       End-Use Option: Cogeneration Topping Cycle, Heat sales considered as extra income
       Average Net Electricity Production:                    45.52 MW
       Average Direct-Use Heat Production:                    48.48 MW
-      Electricity breakeven price:                           10.31 cents/kWh
+      Electricity breakeven price:                            9.11 cents/kWh
       Direct-Use heat breakeven price (LCOH):                 3.30 USD/MMBTU
       Total CAPEX:                                          278.39 MUSD
       Total CAPEX ($/kW):                                     6082 USD/kW
@@ -357,8 +357,10 @@ PPA revenue ($)                                  	0            	0           	0  
 Electricity to grid (kWh)                        	0            	0           	0           	355,751,460	358,716,621	359,623,206	360,159,877	360,535,044	360,790,225	360,526,265	356,942,824	353,998,346	358,376,482	359,470,874	360,081,204	360,502,187	360,807,119	360,791,234	358,596,676	353,274,794	357,979,310	359,338,506	360,012,245	360,453,369	360,772,049	360,887,459	359,622,350	353,442,225	357,267,784	359,100,476	359,872,541	360,356,079	360,689,873
 
 Present value of annual costs ($)                	183,347,724
+
+Present value of annual energy costs ($)         	162,019,394
 Present value of annual energy nominal (kWh)     	1,777,787,001
-LCOE Levelized cost of energy nominal (cents/kWh)	10.31
+LCOE Levelized cost of energy nominal (cents/kWh)	9.11
 
 Present value of PPA revenue ($)                 	174,295,914
 Present value of annual energy nominal (kWh)     	1,777,787,001

@@ -5,9 +5,9 @@
 Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.12.1
- Simulation Date: 2026-03-29
- Simulation Time:  07:11
- Calculation Time:      1.794 sec
+ Simulation Date: 2026-04-01
+ Simulation Time:  09:30
+ Calculation Time:      1.807 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -127,7 +127,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Initial geofluid availability:                          0.19 MW/(kg/s)
       Maximum Total Electricity Generation:                1133.37 MW
       Average Total Electricity Generation:                1116.10 MW
@@ -344,6 +343,8 @@ PPA revenue ($)                                  	0             	0           	0 
 Electricity to grid (kWh)                        	0             	0           	0           	0             	0             	8,035,707,655	8,108,092,907	8,130,203,812	8,143,267,897	8,152,067,897	8,156,358,121	8,150,003,674	8,116,991,743	8,028,382,759	7,843,666,580	7,518,270,834	7,445,442,088	8,078,449,130	8,118,499,225	8,136,677,558	8,148,326,058	8,156,155,157	8,158,273,437	8,145,703,332	8,098,282,159	7,982,744,033	7,756,064,902	7,374,923,287	7,729,462,517	8,100,349,077	8,128,679,747	8,143,798,107	8,153,799,727	8,159,882,531	8,158,712,200
 
 Present value of annual costs ($)                	2,847,750,635
+
+Present value of annual energy costs ($)         	2,847,750,635
 Present value of annual energy nominal (kWh)     	30,166,877,246
 LCOE Levelized cost of energy nominal (cents/kWh)	9.44
 
