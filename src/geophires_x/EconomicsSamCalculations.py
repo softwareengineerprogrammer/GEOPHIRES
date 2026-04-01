@@ -248,11 +248,12 @@ class SamEconomicsCalculations:
     def _insert_calculated_levelized_metrics_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
         ret = cf_ret.copy()
 
-        __row_names: list[str] = [it[0] for it in ret]
+        # __row_names: list[str] = [it[0] for it in ret]
 
         def _get_row_index(row_name_: str, raise_exception_if_not_present: bool = True) -> int:
             try:
-                return __row_names.index(row_name_)
+                # return __row_names.index(row_name_)
+                return [it[0] for it in ret].index(row_name_)
             except ValueError as ve:
                 if raise_exception_if_not_present:
                     raise ve
@@ -262,7 +263,7 @@ class SamEconomicsCalculations:
         def _get_row_indexes(row_name_: str, after_row_name: str | None = None) -> list[int]:
             after_criteria_met: bool = True if after_row_name is None else False
             indexes = []
-            for idx, _row_name_ in enumerate(__row_names):
+            for idx, _row_name_ in enumerate([it[0] for it in ret]):
                 if _row_name_ == after_row_name:
                     after_criteria_met = True
 
@@ -515,21 +516,12 @@ class SamEconomicsCalculations:
 
                 lcoh_nominal_backfilled.append(entry)
 
-            def _get_ret_row_index(row_name: str, raise_exception_if_not_present: bool = True) -> int:
-                try:
-                    return [it[0] for it in ret].index(row_name)
-                except ValueError as ve:
-                    if raise_exception_if_not_present:
-                        raise ve
-                    else:
-                        return -1
-
             def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any] | None) -> None:
                 if row_content is None:
-                    row_content = ['' for _it in ret[_get_ret_row_index(before_row_name)]][1:]
+                    row_content = ['' for _it in ret[_get_row_index(before_row_name)]][1:]
 
                 ret.insert(
-                    _get_ret_row_index(before_row_name),
+                    _get_row_index(before_row_name),
                     [row_name, *row_content],
                 )
 
@@ -543,7 +535,7 @@ class SamEconomicsCalculations:
             if lcoh_nominal_row_index == -1:
                 _insert_row_before('PROJECT STATE INCOME TAXES', lcoh_nominal_row_name, None)
                 _insert_blank_line_before('PROJECT STATE INCOME TAXES')
-                lcoh_nominal_row_index = _get_ret_row_index(lcoh_nominal_row_name)
+                lcoh_nominal_row_index = _get_row_index(lcoh_nominal_row_name)
 
             lcoh_nominal_backfilled_entry = lcoh_nominal_backfilled[0]
             if isinstance(lcoh_nominal_backfilled_entry, float):
@@ -556,13 +548,13 @@ class SamEconomicsCalculations:
 
             pv_annual_heat_costs_row_name = 'Present value of annual heat costs ($)'
             # Insert new row if PV of heat costs row does not exist (yet)
-            pv_annual_heat_costs_row_index = _get_ret_row_index(
+            pv_annual_heat_costs_row_index = _get_row_index(
                 pv_annual_heat_costs_row_name, raise_exception_if_not_present=False
             )
 
             if pv_annual_heat_costs_row_index == -1:
                 _insert_row_before(lcoh_nominal_row_name, pv_annual_heat_costs_row_name, None)
-                pv_annual_heat_costs_row_index = _get_ret_row_index(pv_annual_heat_costs_row_name)
+                pv_annual_heat_costs_row_index = _get_row_index(pv_annual_heat_costs_row_name)
 
             pv_annual_heat_costs_entry = pv_of_annual_heat_costs_backfilled_row_values_usd[0]
             if isinstance(pv_annual_heat_costs_entry, float):
@@ -578,13 +570,13 @@ class SamEconomicsCalculations:
                 f'Present value of annual heat provided ' f'({pv_of_annual_heat_provided_unit})'
             )
             # Insert new row if PV of heat provided row does not exist (yet)
-            pv_of_annual_heat_provided_row_index = _get_ret_row_index(
+            pv_of_annual_heat_provided_row_index = _get_row_index(
                 pv_of_annual_heat_provided_row_name, raise_exception_if_not_present=False
             )
 
             if pv_of_annual_heat_provided_row_index == -1:
                 _insert_row_before(lcoh_nominal_row_name, pv_of_annual_heat_provided_row_name, None)
-                pv_of_annual_heat_provided_row_index = _get_ret_row_index(pv_of_annual_heat_provided_row_name)
+                pv_of_annual_heat_provided_row_index = _get_row_index(pv_of_annual_heat_provided_row_name)
 
             pv_annual_heat_provided_entry = pv_of_heat_provided_backfilled_row_kwh[0]
             if any(isinstance(pv_annual_heat_provided_entry, it) for it in [int, float]):
