@@ -60,6 +60,16 @@ def lcoh_output_parameter() -> OutputParameter:
     )
 
 
+def lcoc_output_parameter() -> OutputParameter:
+    return OutputParameter(
+        Name="LCOC",
+        display_name='Direct-Use Cooling Breakeven Price (LCOC)',
+        UnitType=Units.ENERGYCOST,
+        PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,
+        CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU,
+    )
+
+
 _SAM_EM_MOIC_RETURNS_TAX_QUALIFIER = 'after-tax'
 
 

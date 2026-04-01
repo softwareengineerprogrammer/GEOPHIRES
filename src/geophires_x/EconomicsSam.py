@@ -275,9 +275,24 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
         _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
 
-    # Note that this calculation is order-dependent on sam_economics.capacity_payment_revenue_sources
+    # Note that LCOH & LCOC calculations are order-dependent on sam_economics.capacity_payment_revenue_sources
     sam_economics.lcoh_nominal.value = sf(
-        _get_lcoh_nominal_usd_per_mmbtu(single_owner, sam_economics.sam_cash_flow_profile, model)
+        _get_levelized_cost_non_electricity_type_nominal_usd_per_mmbtu(
+            single_owner,
+            sam_economics.sam_cash_flow_profile,
+            model,
+            levelized_cost_nominal_row_name='LCOH Levelized cost of heating nominal ($/MMBTU)',  # FIXME WIP unit
+        )
+    )
+
+    sam_economics.lcoc_nominal.value = sf(
+        _get_levelized_cost_non_electricity_type_nominal_usd_per_mmbtu(
+            single_owner,
+            sam_economics.sam_cash_flow_profile,
+            model,
+            levelized_cost_nominal_row_name='LCOC Levelized cost of cooling nominal ($/MMBTU)',
+            # FIXME WIP unit
+        )
     )
 
     return sam_economics
@@ -308,16 +323,18 @@ def _get_lcoe_nominal_cents_per_kwh(
 
 
 # noinspection PyUnusedLocal
-def _get_lcoh_nominal_usd_per_mmbtu(
-    single_owner: Singleowner, sam_cash_flow_profile: list[list[Any]], model: Model
+def _get_levelized_cost_non_electricity_type_nominal_usd_per_mmbtu(
+    single_owner: Singleowner,
+    sam_cash_flow_profile: list[list[Any]],
+    model: Model,
+    levelized_cost_nominal_row_name: str,
 ) -> float | None:
-    lcoh_nominal_row_name = 'LCOH Levelized cost of heating nominal ($/MMBTU)'  # FIXME WIP unit
     try:
-        lcoh_row = _cash_flow_profile_row(sam_cash_flow_profile, lcoh_nominal_row_name)
+        levelized_cost_row = _cash_flow_profile_row(sam_cash_flow_profile, levelized_cost_nominal_row_name)
     except StopIteration:
         return None
 
-    ret = lcoh_row[0]
+    ret = levelized_cost_row[0]
 
     # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
 

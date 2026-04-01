@@ -21,6 +21,7 @@ from geophires_x.EconomicsUtils import (
     project_payback_period_parameter,
     investment_tax_credit_output_parameter,
     lcoh_output_parameter,
+    lcoc_output_parameter,
 )
 from geophires_x.GeoPHIRESUtils import is_float, quantity, is_int
 from geophires_x.Parameter import OutputParameter
@@ -55,6 +56,7 @@ class SamEconomicsCalculations:
     )
 
     lcoh_nominal: OutputParameter = field(default_factory=lcoh_output_parameter)
+    lcoc_nominal: OutputParameter = field(default_factory=lcoc_output_parameter)
 
     overnight_capital_cost: OutputParameter = field(default_factory=overnight_capital_cost_output_parameter)
 

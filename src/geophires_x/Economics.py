@@ -17,7 +17,7 @@ from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter,
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
     _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl, \
-    lcoh_output_parameter
+    lcoh_output_parameter, lcoc_output_parameter
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
@@ -501,7 +501,10 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
                 #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/452?title=Deduplicate+calls+to+calculate_pre_revenue_costs_and_cashflow
                 pass
 
-        # FIXME WIP LCOC
+        if econ.sam_economics_calculations.lcoc_nominal.value is not None:
+            # Designated as nominal (as opposed to real) in parameter tooltip text
+            LCOC = econ.sam_economics_calculations.lcoc_nominal.quantity().to(
+                convertible_unit(econ.LCOC.CurrentUnits.value)).magnitude
 
     else:
         if econ.econmodel.value != EconomicModel.BICYCLE:
@@ -1928,13 +1931,7 @@ class Economics:
             CurrentUnits=CostPerMassUnit.DOLLARSPERLB
         )
 
-        self.LCOC = self.OutputParameterDict[self.LCOC.Name] = OutputParameter(
-            Name="LCOC",
-            display_name='Direct-Use Cooling Breakeven Price (LCOC)',
-            UnitType=Units.ENERGYCOST,
-            PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,
-            CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU
-        )
+        self.LCOC = self.OutputParameterDict[self.LCOC.Name] = lcoc_output_parameter()
 
         self.LCOE = self.OutputParameterDict[self.LCOE.Name] = OutputParameter(
             Name="LCOE",
