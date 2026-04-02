@@ -17,10 +17,8 @@ Electricity Escalation Rate Per Year, 0.00057, -- calibrated to reach 10 cents/k
 Ending Electricity Sale Price, 0.15, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
 Electricity Escalation Start Year, 1
 
-# FIXME WIP use only applicable heat sale parameter(s)
 Starting Heat Sale Price, 1.68
-Ending Heat Sale Price, 100
-Heat Rate, .0168
+Ending Heat Sale Price, 100, -- Note that this parameter has no effect unless escalation is applied and ending heat sale price is reached.
 
 Discount Rate, 0.12
 Fraction of Investment in Bonds, .6, -- Based on fraction of CAPEX with $1 billion in sponsor equity per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
@@ -55,7 +53,7 @@ End-Use Option, 31, -- CHP: Cogeneration topping cycle A power plant is followed
 Power Plant Type, 2, -- Supercritical ORC
 AddOn Nickname 1, Absorption Chiller
 AddOn CAPEX 1, 562
-AddOn Profit Gained 1, 0, -- note that revenue is modeled as heat sales, not add-on profit.
+AddOn Profit Gained 1, 0, -- Note that revenue is modeled as heat sales, not add-on profit.
 AddOn OPEX 1, 0
 
 Plant Lifetime, 30
