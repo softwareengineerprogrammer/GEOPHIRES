@@ -51,7 +51,13 @@ Construction CAPEX Schedule, 0.0268, 0.0268, 0.0268, 0.4597, 0.4597, -- 3-year d
 # *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
 # *************************************************
 End-Use Option, 31, -- CHP: Cogeneration topping cycle A power plant is followed by a direct-use heat application in series. Heat at high temperatures from the geothermal fluid is first converted into electricity. Any remaining heat in the geothermal fluid after leaving the power plant is supplied to a low-temperature direct-use heat application.
+
 Power Plant Type, 2, -- Supercritical ORC
+AddOn Nickname 1, Absorption Chiller
+AddOn CAPEX 1, 562
+AddOn Profit Gained 1, 0, -- note that revenue is modeled as heat sales, not add-on profit.
+AddOn OPEX 1, 0
+
 Plant Lifetime, 30
 
 Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
