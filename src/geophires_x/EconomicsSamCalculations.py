@@ -246,7 +246,6 @@ class SamEconomicsCalculations:
 
         return ret
 
-    # noinspection DuplicatedCode
     def _insert_calculated_levelized_metrics_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
         ret = cf_ret.copy()
 
@@ -286,9 +285,21 @@ class SamEconomicsCalculations:
         def _insert_blank_line_before(before_row_name: str) -> None:
             _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
 
+        def _calculate_pv_year_0(cash_flow_array: list) -> int:
+            """Calculate the absolute present value at Year 0 for a cash flow array using npf.npv."""
+            return abs(
+                round(
+                    npf.npv(
+                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
+                        cash_flow_array,
+                    )
+                )
+            )
+
         after_tax_lcoe_and_ppa_price_header_row_title = 'AFTER-TAX LCOE AND PPA PRICE'
 
-        # Backfill annual costs
+        # --- Backfill annual costs ---
+        # Pre-revenue years use after-tax net cash flow; operational years use SAM's annual costs.
         annual_costs_usd_row_name = 'Annual costs ($)'
         annual_costs = cf_ret[_get_row_index(annual_costs_usd_row_name)].copy()
         after_tax_net_cash_flow_usd = cf_ret[_get_row_index('After-tax net cash flow ($)')]
@@ -324,42 +335,19 @@ class SamEconomicsCalculations:
         )
         ret[electricity_to_grid_kwh_row_index][1:] = electricity_to_grid_backfilled
 
-        pv_of_annual_costs_backfilled_row_name = 'Present value of annual costs ($)'
-
-        # Backfill PV of annual costs
-        annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
-        pv_of_annual_costs_backfilled = []
-        for year in range(self._pre_revenue_years_count):
-            pv_at_year = abs(
-                round(
-                    npf.npv(
-                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                        annual_costs_backfilled_pv_processed,
-                    )
-                )
-            )
-
-            pv_of_annual_costs_backfilled.append(pv_at_year)
-
-            cost_at_year = annual_costs_backfilled_pv_processed.pop(0)
-            annual_costs_backfilled_pv_processed[0] = annual_costs_backfilled_pv_processed[0] + cost_at_year
-
-        pv_of_annual_costs_backfilled_row = [
-            *[pv_of_annual_costs_backfilled_row_name],
-            *pv_of_annual_costs_backfilled,
-        ]
+        # --- PV of annual costs at Year 0 ---
+        pv_costs_year_0 = _calculate_pv_year_0(annual_costs_backfilled)
 
         pv_of_annual_costs_row_name = 'Present value of annual costs ($)'
         pv_of_annual_costs_row_index = _get_row_index(pv_of_annual_costs_row_name)
         ret[pv_of_annual_costs_row_index][1:] = [
-            pv_of_annual_costs_backfilled[0],
+            pv_costs_year_0,
             *([''] * (self._pre_revenue_years_count - 1)),
         ]
 
+        # --- PV of annual energy costs (electrical portion) ---
         pv_of_annual_energy_costs_row_name = 'Present value of annual energy costs ($)'
-        pv_of_annual_energy_costs_at_year_0_usd = int(
-            round(pv_of_annual_costs_backfilled[0] * self.electricity_plant_frac_of_capex)
-        )
+        pv_of_annual_energy_costs_at_year_0_usd = int(round(pv_costs_year_0 * self.electricity_plant_frac_of_capex))
         _insert_row_before(
             'Present value of annual energy nominal (kWh)',
             pv_of_annual_energy_costs_row_name,
@@ -369,66 +357,38 @@ class SamEconomicsCalculations:
         )
         _insert_blank_line_before(pv_of_annual_energy_costs_row_name)
 
-        # Backfill PV of electricity to grid
-        electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
-        pv_of_electricity_to_grid_backfilled_kwh = []
-        for year in range(self._pre_revenue_years_count):
-            pv_at_year = abs(
-                round(
-                    npf.npv(
-                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                        electricity_to_grid_backfilled_pv_processed,
-                    )
-                )
-            )
-
-            pv_of_electricity_to_grid_backfilled_kwh.append(pv_at_year)
-
-            electricity_to_grid_at_year = electricity_to_grid_backfilled_pv_processed.pop(0)
-            electricity_to_grid_backfilled_pv_processed[0] = (
-                electricity_to_grid_backfilled_pv_processed[0] + electricity_to_grid_at_year
-            )
+        # --- PV of electricity to grid at Year 0 ---
+        pv_electricity_to_grid_year_0_kwh = _calculate_pv_year_0(electricity_to_grid_backfilled)
 
         pv_of_annual_energy_row_name = 'Present value of annual energy nominal (kWh)'
         for pv_of_annual_energy_row_index in _get_row_indexes(pv_of_annual_energy_row_name):
             ret[pv_of_annual_energy_row_index][1:] = [
-                pv_of_electricity_to_grid_backfilled_kwh[0],
+                pv_electricity_to_grid_year_0_kwh,
                 *([''] * (self._pre_revenue_years_count - 1)),
             ]
 
+        # --- LCOE nominal ---
         def backfill_lcoe_nominal() -> None:
-            pv_of_electricity_to_grid_backfilled_row_kwh = pv_of_electricity_to_grid_backfilled_kwh
-            pv_of_annual_energy_costs_usd = [
-                it * self.electricity_plant_frac_of_capex
-                for it in pv_of_annual_costs_backfilled_row[
-                    1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
-                ]
-            ]
+            pv_energy_costs_year_0_usd = pv_costs_year_0 * self.electricity_plant_frac_of_capex
 
-            lcoe_nominal_backfilled = []
-            for _year in range(len(pv_of_annual_energy_costs_usd)):
-                entry: float | str = 'NaN'
-                if pv_of_electricity_to_grid_backfilled_row_kwh[_year] != 0:
-                    entry = (
-                        pv_of_annual_energy_costs_usd[_year] * 100 / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
-                    )
-
-                lcoe_nominal_backfilled.append(entry)
+            lcoe_nominal_entry: float | str = 'NaN'
+            if pv_electricity_to_grid_year_0_kwh != 0:
+                lcoe_nominal_entry = pv_energy_costs_year_0_usd * 100 / pv_electricity_to_grid_year_0_kwh
 
             lcoe_nominal_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
             lcoe_nominal_row_index = _get_row_index(lcoe_nominal_row_name)
 
-            lcoe_nominal_backfilled_entry = lcoe_nominal_backfilled[0]
-            if isinstance(lcoe_nominal_backfilled_entry, float):
-                lcoe_nominal_backfilled_entry = round(lcoe_nominal_backfilled_entry, 2)
+            if isinstance(lcoe_nominal_entry, float):
+                lcoe_nominal_entry = round(lcoe_nominal_entry, 2)
 
             ret[lcoe_nominal_row_index][1:] = [
-                lcoe_nominal_backfilled_entry,
+                lcoe_nominal_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
         backfill_lcoe_nominal()
 
+        # --- LPPA metrics ---
         def backfill_lppa_metrics() -> None:
             pv_of_ppa_revenue_row_index = _get_row_index_after(
                 'Present value of PPA revenue ($)', after_tax_lcoe_and_ppa_price_header_row_title
@@ -476,6 +436,7 @@ class SamEconomicsCalculations:
 
         backfill_lppa_metrics()
 
+        # --- Non-electricity levelized metrics (LCOH, LCOC) ---
         def insert_non_electricity_levelized_metrics(
             amount_provided_kwh_row_name: str,  # = 'Heat provided (kWh)',
             amount_provided_unit: str,  # = 'MMBTU',
@@ -505,48 +466,21 @@ class SamEconomicsCalculations:
 
             ret[amount_provided_kwh_row_index][1:] = amount_provided_backfilled
 
-            # <Back>fill PV of heat provided
-            amount_provided_backfilled_pv_processed = amount_provided_backfilled.copy()
-            pv_of_amount_provided_backfilled_kwh = []
-            for year_ in range(self._pre_revenue_years_count):
-                pv_at_year_ = abs(
-                    round(
-                        npf.npv(
-                            self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                            amount_provided_backfilled_pv_processed,
-                        )
-                    )
+            # PV of amount provided (e.g. heat) at Year 0
+            pv_amount_provided_year_0_kwh = _calculate_pv_year_0(amount_provided_backfilled)
+
+            # Thermal portion of PV of annual costs at Year 0
+            pv_non_elec_costs_year_0_usd = pv_costs_year_0 * (1.0 - self.electricity_plant_frac_of_capex)
+
+            # Levelized cost = thermal costs / amount provided (converted to target unit)
+            levelized_cost_nominal_entry: float | str = 'NaN'
+            if pv_amount_provided_year_0_kwh != 0:
+                levelized_cost_nominal_entry = (
+                    pv_non_elec_costs_year_0_usd
+                    / quantity(pv_amount_provided_year_0_kwh, 'kWh').to(amount_provided_unit).magnitude
                 )
 
-                pv_of_amount_provided_backfilled_kwh.append(pv_at_year_)
-
-                amount_provided_at_year = amount_provided_backfilled_pv_processed.pop(0)
-                amount_provided_backfilled_pv_processed[0] = (
-                    amount_provided_backfilled_pv_processed[0] + amount_provided_at_year
-                )
-
-            pv_of_amount_provided_backfilled_row_kwh = pv_of_amount_provided_backfilled_kwh
-            pv_of_annual_non_elec_type_costs_backfilled_row_values_usd = [
-                it * (1.0 - self.electricity_plant_frac_of_capex)
-                for it in pv_of_annual_costs_backfilled_row[
-                    1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
-                ]
-            ]
-
-            lcoh_nominal_backfilled = []
-            for _year in range(len(pv_of_annual_non_elec_type_costs_backfilled_row_values_usd)):
-                entry: float | str = 'NaN'
-                if pv_of_amount_provided_backfilled_row_kwh[_year] != 0:
-                    entry = (
-                        pv_of_annual_non_elec_type_costs_backfilled_row_values_usd[_year]
-                        / quantity(pv_of_amount_provided_backfilled_row_kwh[_year], 'kWh')
-                        .to(amount_provided_unit)
-                        .magnitude
-                    )
-
-                lcoh_nominal_backfilled.append(entry)
-
-            # Insert new row if LCOE row does not exist (yet)
+            # Insert new row if levelized cost row does not exist (yet)
             levelized_cost_nominal_row_index = _get_row_index(
                 levelized_cost_nominal_row_name, raise_exception_if_not_present=False
             )
@@ -556,16 +490,15 @@ class SamEconomicsCalculations:
                 _insert_blank_line_before('PROJECT STATE INCOME TAXES')
                 levelized_cost_nominal_row_index = _get_row_index(levelized_cost_nominal_row_name)
 
-            levelized_cost_nominal_backfilled_entry = lcoh_nominal_backfilled[0]
-            if isinstance(levelized_cost_nominal_backfilled_entry, float):
-                levelized_cost_nominal_backfilled_entry = round(levelized_cost_nominal_backfilled_entry, 2)
+            if isinstance(levelized_cost_nominal_entry, float):
+                levelized_cost_nominal_entry = round(levelized_cost_nominal_entry, 2)
 
             ret[levelized_cost_nominal_row_index][1:] = [
-                levelized_cost_nominal_backfilled_entry,
+                levelized_cost_nominal_entry,
                 *([None] * (self._pre_revenue_years_count - 1)),
             ]
 
-            # Insert new row if PV of heat costs row does not exist (yet)
+            # Insert new row if PV of non-electricity costs row does not exist (yet)
             pv_annual_non_elec_type_costs_row_index = _get_row_index(
                 pv_annual_non_elec_type_costs_row_name, raise_exception_if_not_present=False
             )
@@ -574,7 +507,7 @@ class SamEconomicsCalculations:
                 _insert_row_before(levelized_cost_nominal_row_name, pv_annual_non_elec_type_costs_row_name, None)
                 pv_annual_non_elec_type_costs_row_index = _get_row_index(pv_annual_non_elec_type_costs_row_name)
 
-            pv_annual_non_elec_type_costs_entry = pv_of_annual_non_elec_type_costs_backfilled_row_values_usd[0]
+            pv_annual_non_elec_type_costs_entry = pv_non_elec_costs_year_0_usd
             if isinstance(pv_annual_non_elec_type_costs_entry, float):
                 pv_annual_non_elec_type_costs_entry = int(round(pv_annual_non_elec_type_costs_entry, 2))
 
@@ -587,7 +520,7 @@ class SamEconomicsCalculations:
             pv_of_annual_amount_provided_row_name = (
                 f'{pv_of_annual_amount_provided_row_base_name} ({pv_of_annual_amount_provided_unit})'
             )
-            # Insert new row if PV of heat provided row does not exist (yet)
+            # Insert new row if PV of amount provided row does not exist (yet)
             pv_of_annual_amount_provided_row_index = _get_row_index(
                 pv_of_annual_amount_provided_row_name, raise_exception_if_not_present=False
             )
@@ -596,7 +529,7 @@ class SamEconomicsCalculations:
                 _insert_row_before(levelized_cost_nominal_row_name, pv_of_annual_amount_provided_row_name, None)
                 pv_of_annual_amount_provided_row_index = _get_row_index(pv_of_annual_amount_provided_row_name)
 
-            pv_annual_amount_provided_entry = pv_of_amount_provided_backfilled_row_kwh[0]
+            pv_annual_amount_provided_entry = pv_amount_provided_year_0_kwh
             if any(isinstance(pv_annual_amount_provided_entry, it) for it in [int, float]):
                 pv_annual_amount_provided_entry = int(
                     round(
