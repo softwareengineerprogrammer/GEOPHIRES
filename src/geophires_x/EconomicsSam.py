@@ -701,14 +701,6 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
 
     has_heat_revenue = _has_revenue_type(econ.HeatRevenue)
     has_cooling_revenue = _has_revenue_type(econ.CoolingRevenue)
-    #
-    # if not (
-    #     econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value or has_heat_revenue or has_cooling_revenue
-    # ):
-    #     return ret
-
-    # ret['cp_capacity_payment_type'] = 1
-    # ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
 
     if econ.DoAddOnCalculations.value:
         add_on_profit_per_year_usd = np.sum(
@@ -718,6 +710,12 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         add_on_source = CapacityPaymentRevenueSource(name='Add-On Profit', revenue_usd=add_on_profit_usd_series)
         ret.append(add_on_source)
 
+    def _price_vector(price_value: list[float]) -> list[float | str]:
+        return [
+            *(['' if it == 0.0 else it for it in price_value[: _pre_revenue_years_count(model) - 1]]),
+            *price_value[_pre_revenue_years_count(model) - 1 :],
+        ]
+
     if econ.DoCarbonCalculations.value:
         carbon_revenue_usd_series = (
             econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
@@ -726,7 +724,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
             name='Carbon credits',  # TODO/WIP naming re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/476
             revenue_usd=[round(it) for it in carbon_revenue_usd_series],
             price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits.value})',
-            price=econ.CarbonPrice.value,
+            price=_price_vector(econ.CarbonPrice.value),
             amount_provided_label=f'Saved Carbon Production ({econ.CarbonThatWouldHaveBeenProducedAnnually.CurrentUnits.value})',
             amount_provided=econ.CarbonThatWouldHaveBeenProducedAnnually.value[_pre_revenue_years_count(model) :],
         )
@@ -744,7 +742,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
                 name='Heat',
                 revenue_usd=_get_revenue_usd_series(econ.HeatRevenue),
                 price_label=f'Heat price ({econ.HeatPrice.CurrentUnits.value})',
-                price=econ.HeatPrice.value,
+                price=_price_vector(econ.HeatPrice.value),
                 amount_provided_label=f'Heat provided ({model.surfaceplant.HeatkWhProduced.CurrentUnits.value})',
                 amount_provided=model.surfaceplant.HeatkWhProduced.value,
             )
@@ -756,7 +754,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
                 name='Cooling',
                 revenue_usd=_get_revenue_usd_series(econ.CoolingRevenue),
                 price_label=f'Cooling price ({econ.CoolingPrice.CurrentUnits.value})',
-                price=econ.CoolingPrice.value,
+                price=_price_vector(econ.CoolingPrice.value),
                 amount_provided_label=f'Cooling provided ({model.surfaceplant.cooling_kWh_Produced.CurrentUnits.value})',
                 amount_provided=model.surfaceplant.cooling_kWh_Produced.value,
             )
