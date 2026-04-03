@@ -854,7 +854,20 @@ def _get_royalty_rate_schedule(model: Model) -> list[float]:
 def _get_max_total_generation_kW(model: Model) -> float:
     max_total_kw = np.max(model.surfaceplant.ElectricityProduced.quantity().to(convertible_unit('kW')).magnitude)
 
-    # FIXME TEMP
-    max_total_kw = max(0.0001, max_total_kw)
+    if not model.surfaceplant.enduse_option.value.has_electricity_component:
+        # SAM requires a non-zero nameplate capacity, so we must provide a value even if there is no electricity
+        # component. The stub value is both accepted/processed by SAM and results in
+        # zero electricity production/revenue in the cash flow due to rounding.
+        # This logic should be revisited if SAM adds support for combined energy-heat models per
+        # https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/142#pullrequestreview-3999949844
+        non_electricity_end_use_stub_value = 0.0001
+
+        max_total_kw = max(non_electricity_end_use_stub_value, max_total_kw)
+        if max_total_kw != non_electricity_end_use_stub_value:
+            # Shouldn't happen
+            model.logger.warning(
+                f'Unexpected non-zero maximum total electricity generation for heat end-use option: {max_total_kw} kW. '
+                f'This may be a result of an internal bug in GEOPHIRES or an invalid parameter configuration.'
+            )
 
     return max_total_kw
