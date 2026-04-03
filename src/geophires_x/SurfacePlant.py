@@ -664,6 +664,7 @@ class SurfacePlant:
                         end_use_option = EndUseOptions.from_input_string(ParameterReadIn.sValue)
                         ParameterToModify.value = end_use_option
                         if end_use_option == EndUseOptions.HEAT:
+                            # TODO https://github.com/NatLabRockies/GEOPHIRES-X/issues/477?title=Validate+surface+application+for+direct-use+heat-only+end+use+(ORC/flash+plants+are+not+applicable)
                             self.plant_type.value = PlantType.INDUSTRIAL
                     elif ParameterToModify.Name == 'Power Plant Type':
                         ParameterToModify.value = PlantType.from_input_string(ParameterReadIn.sValue)
