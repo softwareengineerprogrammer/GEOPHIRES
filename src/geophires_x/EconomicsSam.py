@@ -48,7 +48,7 @@ from geophires_x.EconomicsSamPreRevenue import (
     adjust_phased_schedule_to_new_length,
 )
 from geophires_x.GeoPHIRESUtils import is_float, is_int, sig_figs, quantity
-from geophires_x.OptionList import EconomicModel, EndUseOptions
+from geophires_x.OptionList import EconomicModel, EndUseOptions, PlantType
 from geophires_x.Parameter import Parameter, OutputParameter, floatParameter, listParameter
 from geophires_x.Units import convertible_unit
 
@@ -64,15 +64,35 @@ def validate_read_parameters(model: Model) -> None:
             f'{supported_description}.'
         )
 
-    if model.surfaceplant.enduse_option.value not in (
-        EndUseOptions.ELECTRICITY,
-        EndUseOptions.HEAT,
-    ) and not model.surfaceplant.enduse_option.value.name.startswith('COGENERATION'):
+    if (
+        model.surfaceplant.enduse_option.value
+        not in (
+            EndUseOptions.ELECTRICITY,
+            EndUseOptions.HEAT,
+        )
+        and not model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option
+    ):
         raise ValueError(
             _inv_msg(
                 model.surfaceplant.enduse_option.Name,
                 model.surfaceplant.enduse_option.value.value,
                 f'{EndUseOptions.ELECTRICITY.value}, {EndUseOptions.HEAT.value}, ' f'and Cogeneration End-Use Options',
+            )
+        )
+
+    supported_plant_types = [
+        PlantType.SUB_CRITICAL_ORC,
+        PlantType.SUPER_CRITICAL_ORC,
+        PlantType.SINGLE_FLASH,
+        PlantType.DOUBLE_FLASH,
+        PlantType.INDUSTRIAL,  # FIXME WIP - ensure correct support including Average Reservoir Pumping Cost
+    ]
+    if model.surfaceplant.plant_type.value not in supported_plant_types:
+        raise ValueError(
+            _inv_msg(
+                model.surfaceplant.plant_type.Name,
+                model.surfaceplant.plant_type.value.value,
+                ', '.join(map(lambda x: x.value, supported_plant_types)),
             )
         )
 
