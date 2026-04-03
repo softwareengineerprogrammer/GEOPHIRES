@@ -534,8 +534,8 @@ class SurfacePlant:
         self.PumpingkWh = self.OutputParameterDict[self.PumpingkWh.Name] = OutputParameter(
             Name="Annual Electricity Use for Pumping",
             UnitType=Units.ENERGYFREQUENCY,
-            PreferredUnits=EnergyFrequencyUnit.KWPERYEAR,
-            CurrentUnits=EnergyFrequencyUnit.KWPERYEAR
+            PreferredUnits=EnergyFrequencyUnit.KWhPERYEAR,
+            CurrentUnits=EnergyFrequencyUnit.KWhPERYEAR
         )
         self.ElectricityProduced = self.OutputParameterDict[self.ElectricityProduced.Name] = OutputParameter(
             Name="Total Electricity Production",

@@ -580,7 +580,7 @@ class Outputs:
                     f.write(f'         {model.economics.Coamwater.display_name}:                                   {model.economics.Coamwater.value:10.2f} {model.economics.Coamwater.CurrentUnits.value}\n')
 
                     if model.surfaceplant.plant_type.value in [PlantType.INDUSTRIAL, PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP, PlantType.DISTRICT_HEATING]:
-                        f.write(f'         Average Reservoir Pumping Cost:                {model.economics.averageannualpumpingcosts.value:10.2f} {model.economics.averageannualpumpingcosts.CurrentUnits.value}\n')
+                        f.write(f'         {econ.averageannualpumpingcosts.display_name}:                {econ.averageannualpumpingcosts.value:10.2f} {econ.averageannualpumpingcosts.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                         f.write(f'         Absorption Chiller O&M Cost:                   {model.economics.chilleropex.value:10.2f} {model.economics.chilleropex.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:

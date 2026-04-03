@@ -85,6 +85,7 @@ def validate_read_parameters(model: Model) -> None:
         PlantType.SUPER_CRITICAL_ORC,
         PlantType.SINGLE_FLASH,
         PlantType.DOUBLE_FLASH,
+        PlantType.ABSORPTION_CHILLER,
         PlantType.INDUSTRIAL,  # FIXME WIP - ensure correct support including Average Reservoir Pumping Cost
     ]
     if model.surfaceplant.plant_type.value not in supported_plant_types:
@@ -658,6 +659,17 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     ]
     for year_index in range(model.surfaceplant.plant_lifetime.value):
         opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
+
+    if model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
+        # FIXME WIP evaluate using SAM's native electricity purchase mechanisms instead
+        # For pure direct-use, pumping is a grid purchase.
+        # Create an annual array adding the specific year's pumping cost to the base O&M.
+        elec_rate_usd_per_kwh = model.surfaceplant.electricity_cost_to_buy.quantity().to('USD/kWh').magnitude
+        annual_pumping_kwh = model.surfaceplant.PumpingkWh.quantity().to('kWh/year').magnitude
+        opex_by_year_usd = [
+            opex_by_year_usd[year_index] + annual_pumping_kwh[year_index] * elec_rate_usd_per_kwh
+            for year_index in range(model.surfaceplant.plant_lifetime.value)
+        ]
 
     ret['om_fixed'] = opex_by_year_usd
 

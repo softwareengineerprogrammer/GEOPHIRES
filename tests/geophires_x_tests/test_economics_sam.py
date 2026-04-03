@@ -319,6 +319,7 @@ class EconomicsSamTestCase(BaseTestCase):
             PlantType.SUPER_CRITICAL_ORC,
             PlantType.SINGLE_FLASH,
             PlantType.DOUBLE_FLASH,
+            PlantType.ABSORPTION_CHILLER,
             PlantType.INDUSTRIAL,
         ]
 

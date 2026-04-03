@@ -531,7 +531,11 @@
           "description": "O&M Make-up Water costs. Default correlation: Assumes $3.50/1,000 gallons of water. Provide Water Cost Adjustment Factor to multiply the default correlation.",
           "units": "MUSD/yr"
         },
-        "Average Reservoir Pumping Cost": {},
+        "Average Reservoir Pumping Cost": {
+          "type": "number",
+          "description": "Average Annual Pumping Costs",
+          "units": "MUSD/yr"
+        },
         "Absorption Chiller O&M Cost": {},
         "Average Heat Pump Electricity Cost": {},
         "Annual District Heating O&M Cost": {
