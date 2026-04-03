@@ -1,4 +1,4 @@
-# Example: SAM Single Owner PPA Economic Model: Direct-Use Heat
+# Example: SAM Single Owner PPA Economic Model: Combined Heat and Power (CHP)
 # See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
@@ -98,7 +98,7 @@ Injectivity Index, 1.38
 Productivity Index, 1.13
 
 Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
-Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature
+Injection Temperature, 47.5
 Injection Wellbore Temperature Gain, 3
 
 Maximum Drawdown, 0.0025
