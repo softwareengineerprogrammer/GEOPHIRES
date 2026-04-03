@@ -661,9 +661,11 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
         opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
 
     if model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
-        # FIXME WIP evaluate using SAM's native electricity purchase mechanisms instead
         # For pure direct-use, pumping is a grid purchase.
         # Create an annual array adding the specific year's pumping cost to the base O&M.
+        # TODO evaluate eventually migrating to SAM's native electricity purchase mechanisms instead
+        #  (would require refactoring GEOPHIRES generation internals to support negative production...)
+
         elec_rate_usd_per_kwh = model.surfaceplant.electricity_cost_to_buy.quantity().to('USD/kWh').magnitude
         annual_pumping_kwh = model.surfaceplant.PumpingkWh.quantity().to('kWh/year').magnitude
         opex_by_year_usd = [
