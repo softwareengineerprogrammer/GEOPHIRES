@@ -3382,8 +3382,10 @@ class Economics:
         # calculate average annual pumping costs in case no electricity is provided
         if model.surfaceplant.plant_type.value in [PlantType.INDUSTRIAL, PlantType.ABSORPTION_CHILLER,
                                                    PlantType.HEAT_PUMP, PlantType.DISTRICT_HEATING]:
-            self.averageannualpumpingcosts.value = np.average(
-                model.surfaceplant.PumpingkWh.value) * model.surfaceplant.electricity_cost_to_buy.value / 1E6  # M$/year
+            self.averageannualpumpingcosts.value = (np.average(
+                model.surfaceplant.PumpingkWh.quantity()) * model.surfaceplant.electricity_cost_to_buy.quantity()).to(
+                self.averageannualpumpingcosts.CurrentUnits.value
+            ).magnitude
 
         if not self.oamtotalfixed.Valid:
             # labor cost
