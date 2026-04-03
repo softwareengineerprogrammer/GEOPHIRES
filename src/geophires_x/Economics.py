@@ -2140,7 +2140,7 @@ class Economics:
             CurrentUnits=CurrencyUnit.MDOLLARS,
         )
         self.capex_total = self.OutputParameterDict[self.capex_total.Name] = total_capex_parameter_output_parameter()
-        self.capex_total_per_kw = self.OutputParameterDict[self.capex_total_per_kw.Name] = OutputParameter(
+        self.capex_total_per_kwe = self.OutputParameterDict[self.capex_total_per_kwe.Name] = OutputParameter(
             Name="Total CAPEX ($/kW)",
             UnitType=Units.ENERGYCOST,
             PreferredUnits=EnergyCostUnit.DOLLARSPERKW,
@@ -2150,6 +2150,26 @@ class Economics:
                         'This metric is calculated based on the maximum net electricity generation of the facility. '
                         'It reflects all direct and indirect costs, contingency, and applicable cost escalations '
                         'included in the base Total CAPEX.',
+        )
+        self.capex_allocated_per_kwe = self.OutputParameterDict[self.capex_allocated_per_kwe.Name] = OutputParameter(
+            Name="Allocated CAPEX ($/kWe)",
+            UnitType=Units.ENERGYCOST,
+            PreferredUnits=EnergyCostUnit.DOLLARSPERKW,
+            CurrentUnits=EnergyCostUnit.DOLLARSPERKW,
+            ToolTipText='The portion of total capital expenditure (CAPEX) allocated specifically '
+                        'to electricity generation, normalized per kilowatt of net electrical capacity (kWe). '
+                        'In cogeneration (CHP) scenarios, this is calculated by multiplying the Total CAPEX by the '
+                        'electrical plant cost allocation ratio, divided by the maximum net electricity generation.'
+        )
+        self.capex_allocated_per_kwth = self.OutputParameterDict[self.capex_allocated_per_kwth.Name] =OutputParameter(
+            Name="Allocated CAPEX ($/kWth)",
+            UnitType=Units.ENERGYCOST,
+            PreferredUnits=EnergyCostUnit.DOLLARSPERKW,
+            CurrentUnits=EnergyCostUnit.DOLLARSPERKW,
+            ToolTipText='The portion of total capital expenditure (CAPEX) allocated specifically to direct-use heat '
+                        'production, normalized per kilowatt of net thermal capacity (kWth). In cogeneration (CHP) '
+                        'scenarios, this is calculated by multiplying the Total CAPEX by the thermal plant cost '
+                        'allocation ratio (1 minus the electrical ratio), divided by the maximum net heat production.'
         )
 
         self.chp_percent_cost_allocation_for_electrical_plant = self.OutputParameterDict[self.chp_percent_cost_allocation_for_electrical_plant.Name] = OutputParameter(
@@ -3656,10 +3676,37 @@ class Economics:
         self.capex_total.value = (self.sam_economics_calculations.capex.quantity()
                                   .to(self.capex_total.CurrentUnits.value).magnitude)
 
-        if model.surfaceplant.enduse_option.value.has_electricity_component:
+        def _calculate_capex_per_kw_outputs() -> None:
             max_net_electricity_generation_kw = model.surfaceplant.NetElectricityProducedMax.quantity().to('kW')
-            capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
-            self.capex_total_per_kw.value = capex_total_per_kw_q.magnitude
+
+            if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY:
+                capex_total_per_kw_q = self.capex_total.quantity().to('USD') / max_net_electricity_generation_kw
+                self.capex_total_per_kwe.value = capex_total_per_kw_q.to(
+                    self.capex_total_per_kwe.CurrentUnits.value).magnitude
+
+            elif model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
+                capex_allocated_per_kwe_q = (
+                        self.capex_total.quantity().to('USD') *
+                        self.CAPEX_heat_electricity_plant_ratio.quantity().to('dimensionless').magnitude /
+                        max_net_electricity_generation_kw
+                )
+                self.capex_allocated_per_kwe.value = capex_allocated_per_kwe_q.to(
+                    self.capex_allocated_per_kwe.CurrentUnits.value).magnitude
+
+
+                capex_allocated_per_kwth_q = (
+                        self.capex_total.quantity().to('USD') *
+                        (1. - self.CAPEX_heat_electricity_plant_ratio.quantity().to('dimensionless').magnitude) /
+                        model.surfaceplant.HeatProducedMax.quantity().to('kW')
+                )
+                self.capex_allocated_per_kwth.value = capex_allocated_per_kwth_q.to(
+                    self.capex_allocated_per_kwth.CurrentUnits.value).magnitude
+
+            elif model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
+                pass  # TODO add corresponding output parameter
+
+
+        _calculate_capex_per_kw_outputs()
 
         self.CCap.value = (self.sam_economics_calculations.capex.quantity()
                            .to(self.CCap.CurrentUnits.value).magnitude)

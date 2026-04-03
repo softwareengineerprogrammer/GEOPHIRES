@@ -5,9 +5,9 @@
 Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.12.1
- Simulation Date: 2026-04-02
- Simulation Time:  12:58
- Calculation Time:      1.784 sec
+ Simulation Date: 2026-04-03
+ Simulation Time:  09:28
+ Calculation Time:      2.361 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -17,7 +17,8 @@ Simulation Metadata
       Electricity breakeven price:                            9.11 cents/kWh
       Direct-Use heat breakeven price (LCOH):                 3.30 USD/MMBTU
       Total CAPEX:                                          278.39 MUSD
-      Total CAPEX ($/kW):                                     6082 USD/kW
+      Allocated CAPEX ($/kWe):                                5374 USD/kW
+      Allocated CAPEX ($/kWth):                                667 USD/kW
       Number of production wells:                             6
       Number of injection wells:                              4
       Flowrate per production well:                         100.0 kg/sec

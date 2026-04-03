@@ -32,6 +32,16 @@
           "description": "The total capital expenditure (CAPEX) required to construct the plant, normalized per kilowatt of capacity. This metric is calculated based on the maximum net electricity generation of the facility. It reflects all direct and indirect costs, contingency, and applicable cost escalations included in the base Total CAPEX.",
           "units": "USD/kW"
         },
+        "Allocated CAPEX ($/kWe)": {
+          "type": "number",
+          "description": "The portion of total capital expenditure (CAPEX) allocated specifically to electricity generation, normalized per kilowatt of net electrical capacity (kWe). In cogeneration (CHP) scenarios, this is calculated by multiplying the Total CAPEX by the electrical plant cost allocation ratio, divided by the maximum net electricity generation.",
+          "units": "USD/kW"
+        },
+        "Allocated CAPEX ($/kWth)": {
+          "type": "number",
+          "description": "The portion of total capital expenditure (CAPEX) allocated specifically to direct-use heat production, normalized per kilowatt of net thermal capacity (kWth). In cogeneration (CHP) scenarios, this is calculated by multiplying the Total CAPEX by the thermal plant cost allocation ratio (1 minus the electrical ratio), divided by the maximum net heat production.",
+          "units": "USD/kW"
+        },
         "Average Direct-Use Heat Production": {},
         "Direct-Use heat breakeven price": {},
         "Direct-Use heat breakeven price (LCOH)": {
@@ -579,7 +589,11 @@
         "Initial Net Electricity Generation": {},
         "Average Annual Total Electricity Generation": {},
         "Average Annual Net Electricity Generation": {},
-        "Maximum Net Heat Production": {},
+        "Maximum Net Heat Production": {
+          "type": "number",
+          "description": "Heat Produced in MW",
+          "units": "MW"
+        },
         "Average Net Heat Production": {},
         "Minimum Net Heat Production": {},
         "Initial Net Heat Production": {},

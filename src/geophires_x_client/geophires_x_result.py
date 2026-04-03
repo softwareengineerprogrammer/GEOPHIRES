@@ -45,6 +45,8 @@ class GeophiresXResult:
                 'Electricity breakeven price',
                 'Total CAPEX',
                 'Total CAPEX ($/kW)',
+                'Allocated CAPEX ($/kWe)',
+                'Allocated CAPEX ($/kWth)',
                 'Average Direct-Use Heat Production',
                 'Direct-Use heat breakeven price',
                 'Direct-Use heat breakeven price (LCOH)',

@@ -222,8 +222,15 @@ class Outputs:
 
                 if is_sam_econ_model:
                     f.write(f'      {Outputs._field_label(econ.capex_total.display_name, 50)}{econ.capex_total.value:10.2f} {econ.capex_total.CurrentUnits.value}\n')
-                    if model.surfaceplant.enduse_option.value.has_electricity_component:
-                        f.write(f'      {Outputs._field_label(econ.capex_total_per_kw.display_name, 50)}{econ.capex_total_per_kw.value:10.0f} {econ.capex_total_per_kw.CurrentUnits.value}\n')
+
+                    capex_per_kw_output_params: list[OutputParameter] = [econ.capex_total_per_kwe] \
+                        if model.surfaceplant.enduse_option.value == EndUseOptions.ELECTRICITY \
+                        else [econ.capex_allocated_per_kwe, econ.capex_allocated_per_kwth] \
+                        if model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option \
+                        else []  # TODO add heat-only CAPEX per kWth output parameter
+
+                    for capex_per_kw_output_param in capex_per_kw_output_params:
+                        f.write(f'      {Outputs._field_label(capex_per_kw_output_param.display_name, 50)}{capex_per_kw_output_param.value:10.0f} {capex_per_kw_output_param.CurrentUnits.value}\n')
 
                 f.write(f'      Number of production wells:                    {model.wellbores.nprod.value:10.0f}'+NL)
                 f.write(f'      Number of injection wells:                     {model.wellbores.ninj.value:10.0f}'+NL)
@@ -621,8 +628,8 @@ class Outputs:
                         f.write(f'      Initial pumping power/net installed power:        {(ipp_nip*100):10.2f} %\n')
 
                 if model.surfaceplant.enduse_option.value.has_direct_use_heat_component or model.surfaceplant.plant_type.value in [PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP]:
+                    f.write(f'      {model.surfaceplant.HeatProducedMax.display_name}:                      {model.surfaceplant.HeatProducedMax.value:10.2f} {model.surfaceplant.HeatProduced.CurrentUnits.value}\n')
                     # FIXME should be CurrentUnits instead of PreferredUnits
-                    f.write(f'      Maximum Net Heat Production:                      {np.max(model.surfaceplant.HeatProduced.value):10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
                     f.write(f'      Average Net Heat Production:                      {np.average(model.surfaceplant.HeatProduced.value):10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
                     f.write(f'      Minimum Net Heat Production:                      {np.min(model.surfaceplant.HeatProduced.value):10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)
                     f.write(f'      Initial Net Heat Production:                      {model.surfaceplant.HeatProduced.value[0]:10.2f} ' + model.surfaceplant.HeatProduced.PreferredUnits.value + NL)

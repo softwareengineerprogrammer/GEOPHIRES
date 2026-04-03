@@ -596,6 +596,12 @@ class SurfacePlant:
             PreferredUnits=PowerUnit.MW,
             CurrentUnits=PowerUnit.MW
         )
+        self.HeatProducedMax = self.OutputParameterDict[self.HeatProduced.Name] = OutputParameter(
+            Name="Maximum Net Heat Production",
+            UnitType=Units.POWER,
+            PreferredUnits=PowerUnit.MW,
+            CurrentUnits=PowerUnit.MW
+        )
         self.HeatkWhProduced = self.OutputParameterDict[self.HeatkWhProduced.Name] = OutputParameter(
             Name="Heat Produced in kWh",
             # display_name='Average Annual Heat Production',
@@ -762,3 +768,7 @@ class SurfacePlant:
 
         self.NetElectricityProducedMax.value = np.max(self.NetElectricityProduced.quantity()).to(
             self.NetElectricityProducedMax.CurrentUnits).magnitude
+
+        if model.surfaceplant.enduse_option.value.has_direct_use_heat_component or model.surfaceplant.plant_type.value in [
+            PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP]:
+            self.HeatProducedMax.value = np.max(model.surfaceplant.HeatProduced.value)
