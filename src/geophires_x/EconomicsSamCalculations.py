@@ -126,7 +126,7 @@ class SamEconomicsCalculations:
         for construction_row in reversed(construction_rows):
             ret.insert(1, construction_row)
 
-        def _get_row_index(row_name_: str) -> list[Any]:
+        def _get_row_index(row_name_: str) -> int:
             return [it[0] for it in ret].index(row_name_)
 
         def _get_row(row_name__: str) -> list[Any]:
@@ -179,7 +179,7 @@ class SamEconomicsCalculations:
     def _insert_royalties_rate_schedule(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
         ret = cf_ret.copy()
 
-        def _get_row_index(row_name_: str) -> list[Any]:
+        def _get_row_index(row_name_: str) -> int:
             return [it[0] for it in ret].index(row_name_)
 
         ret.insert(
@@ -203,7 +203,7 @@ class SamEconomicsCalculations:
 
         ret: list[list[Any]] = cf_ret.copy()
 
-        def _get_row_index(row_name_: str) -> list[Any]:
+        def _get_row_index(row_name_: str) -> int:
             return [it[0] for it in ret].index(row_name_)
 
         def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any]) -> None:
