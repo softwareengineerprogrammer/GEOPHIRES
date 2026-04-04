@@ -212,7 +212,7 @@ class SamEconomicsCalculations:
         def _insert_blank_line_before(before_row_name: str) -> None:
             _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
 
-        revenue_row_name = 'REVENUE'
+        revenue_category_row_name = 'REVENUE'
         capacity_payment_revenue_row_name = 'Capacity payment revenue ($)'
 
         _insert_blank_line_before('Salvage value ($)')
@@ -222,15 +222,13 @@ class SamEconomicsCalculations:
             return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
 
         for i, capacity_payment_revenue_source in enumerate(self.capacity_payment_revenue_sources):
-            # FIXME WIP does not work correctly for multiple sources yet
-
             if capacity_payment_revenue_source.amount_provided_label is not None:
                 _insert_row_before(
-                    revenue_row_name,
+                    revenue_category_row_name,
                     capacity_payment_revenue_source.amount_provided_label,
                     _for_operational_years(capacity_payment_revenue_source.amount_provided),
                 )
-                _insert_blank_line_before(revenue_row_name)
+                _insert_blank_line_before(revenue_category_row_name)
 
             revenue_row_name = f'{capacity_payment_revenue_source.name} revenue ($)'
             _insert_row_before(
