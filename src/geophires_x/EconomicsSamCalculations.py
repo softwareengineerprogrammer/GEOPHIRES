@@ -618,13 +618,22 @@ class SamEconomicsCalculations:
 
         ret = cf_ret.copy()
 
-        def _get_row_index(row_name_: str) -> list[Any]:
+        def _get_row_index(row_name_: str) -> int:
             return [it[0] for it in ret].index(row_name_)
 
-        elec_from_grid_idx = _get_row_index('Electricity from grid (kWh)')
-        ret.pop(elec_from_grid_idx)
+        def _remove_line_item(row_name_: str) -> None:
+            idx = _get_row_index(row_name_)
+            row = ret[idx]
+            if any(it != '' and (is_float(it) and float(it) != 0.0) for it in row[1:]):
+                raise RuntimeError(
+                    f'Line item "{row[0]}" has non-zero values. '
+                    f'This is unexpected and probably indicates an internal error or bug.'
+                )
 
-        ret.pop(_get_row_index('Electricity purchase ($)'))
+            ret.pop(idx)
+
+        for line_item in ['Electricity from grid (kWh)', 'Electricity purchase ($)']:
+            _remove_line_item(line_item)
 
         return ret
 
