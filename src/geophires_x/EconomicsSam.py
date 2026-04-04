@@ -783,13 +783,22 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         )
 
     if has_cooling_revenue:
+        # cooling_kWh_Produced's default preferred units are kWh/yr.
+        # The /yr is redundant when displaying on an annualized basis.
+        # TODO there are various degrees of increased sophistication with which this adjustment could be performed,
+        #  e.g. adding a derived property to CurrencyFrequencyUnit instead of manually splitting the string,
+        #  re-interpolating the revenue vector if it's not annualized, etc.
+        cooling_provided_unit = model.surfaceplant.cooling_kWh_Produced.CurrentUnits.value
+        if (cooling_provided_unit if cooling_provided_unit is not None else '').endswith('/yr'):
+            cooling_provided_unit = cooling_provided_unit.split('/yr')[0]
+
         ret.append(
             CapacityPaymentRevenueSource(
                 name='Cooling',
                 revenue_usd=_get_revenue_usd_series(econ.CoolingRevenue),
                 price_label=f'Cooling price ({econ.CoolingPrice.CurrentUnits.value})',
                 price=_price_vector(econ.CoolingPrice.value),
-                amount_provided_label=f'Cooling provided ({model.surfaceplant.cooling_kWh_Produced.CurrentUnits.value})',
+                amount_provided_label=f'Cooling provided ({cooling_provided_unit})',
                 amount_provided=model.surfaceplant.cooling_kWh_Produced.value,
             )
         )

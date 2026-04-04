@@ -453,11 +453,11 @@ class SamEconomicsCalculations:
 
         # --- Non-electricity levelized metrics (LCOH, LCOC) ---
         def insert_non_electricity_levelized_metrics(
-            amount_provided_kwh_row_name: str,  # = 'Heat provided (kWh)',
-            amount_provided_unit: str,  # = 'MMBTU',
-            levelized_cost_nominal_row_base_name: str,  # =f'LCOH Levelized cost of heating nominal',
-            pv_annual_non_elec_type_costs_row_name: str,  # ='Present value of annual heat costs ($)',
-            pv_of_annual_amount_provided_row_base_name: str,  # =f'Present value of annual heat provided',
+            amount_provided_kwh_row_name: str,  # e.g. 'Heat provided (kWh)'
+            amount_provided_unit: str,  # e.g. 'MMBTU'
+            levelized_cost_nominal_row_base_name: str,  # e.g. 'LCOH Levelized cost of heating nominal'
+            pv_annual_non_elec_type_costs_row_name: str,  # e.g. 'Present value of annual heat costs ($)'
+            pv_of_annual_amount_provided_row_base_name: str,  # e.g. 'Present value of annual heat provided'
         ) -> None:
 
             levelized_cost_nominal_row_name = f'{levelized_cost_nominal_row_base_name} ($/{amount_provided_unit})'
@@ -473,7 +473,7 @@ class SamEconomicsCalculations:
                 0 if it == '' else (int(it) if is_int(it) else it) for it in amount_provided[1:]
             ]
 
-            # TODO/WIP maybe duplicate amount provided row after after_tax_lcoe_and_ppa_price_header_row_title to mirror
+            # TODO maybe duplicate amount provided row after after_tax_lcoe_and_ppa_price_header_row_title to mirror
             #   electricity convention
             # amount_provided_kwh_row_index = _get_row_index_after(
             #     amount_provided_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
@@ -573,7 +573,8 @@ class SamEconomicsCalculations:
 
         def insert_lcoc_metrics():
             insert_non_electricity_levelized_metrics(
-                amount_provided_kwh_row_name='Cooling provided (kWh/yr)',  # FIXME WIP should not have /yr suffix
+                # See relevant TODO in geophires_x.EconomicsSam._get_capacity_payment_revenue_sources re: unit
+                amount_provided_kwh_row_name='Cooling provided (kWh)',
                 amount_provided_unit='MMBTU',  # TODO maybe should be derived from LCOC preferred units
                 levelized_cost_nominal_row_base_name=f'LCOC Levelized cost of cooling nominal',
                 pv_annual_non_elec_type_costs_row_name='Present value of annual cooling costs ($)',
