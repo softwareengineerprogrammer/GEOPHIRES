@@ -221,7 +221,9 @@ class SamEconomicsCalculations:
         def _for_operational_years(_row: list[Any]) -> list[Any]:
             return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
 
-        for capacity_payment_revenue_source in self.capacity_payment_revenue_sources:
+        for i, capacity_payment_revenue_source in enumerate(self.capacity_payment_revenue_sources):
+            # FIXME WIP does not work correctly for multiple sources yet
+
             if capacity_payment_revenue_source.amount_provided_label is not None:
                 _insert_row_before(
                     revenue_row_name,
@@ -243,6 +245,18 @@ class SamEconomicsCalculations:
                     capacity_payment_revenue_source.price_label.replace('USD', '$'),
                     capacity_payment_revenue_source.price,
                 )
+
+            if len(self.capacity_payment_revenue_sources) > 1 and i < len(self.capacity_payment_revenue_sources) - 1:
+                _insert_row_before(
+                    capacity_payment_revenue_row_name,
+                    'plus:',
+                    ['' for _it in ret[_get_row_index(revenue_row_name)]][1:],
+                )
+
+        if len(self.capacity_payment_revenue_sources) > 0:
+            _insert_row_before(
+                capacity_payment_revenue_row_name, 'equals:', ['' for _it in ret[_get_row_index(revenue_row_name)]][1:]
+            )
 
         return ret
 
