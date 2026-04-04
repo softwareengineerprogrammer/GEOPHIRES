@@ -171,6 +171,9 @@ class SamEconomicsCalculations:
 
         ret = self._insert_calculated_levelized_metrics_line_items(ret)
 
+        if self._may_consume_grid_electricity:
+            ret = self._adjust_electricity_line_items_for_possible_grid_electricity_consumption(ret)
+
         return ret
 
     def _insert_royalties_rate_schedule(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
@@ -578,6 +581,50 @@ class SamEconomicsCalculations:
             )
 
         insert_lcoc_metrics()
+
+        return ret
+
+    @property
+    def _may_consume_grid_electricity(self) -> bool:
+        """
+        TODO/WIP maybe should be passed in explicitly instead of this potentially fragile derivation/assumption
+        """
+
+        try:
+            elec_to_grid_kwh_index = [it[0] for it in self._sam_cash_flow_profile_operational_years].index(
+                'Electricity to grid (kWh)'
+            )
+        except ValueError:
+            # Shouldn't happen (unless SAM financial engine stops including the line item, which would be
+            # backwards-incompatible)
+            return False
+
+        return all(
+            float(it) == 0.0 if is_float(it) else it == ''
+            for it in self._sam_cash_flow_profile_operational_years[elec_to_grid_kwh_index][1:]
+        )
+
+    # noinspection PyMethodMayBeStatic
+    def _adjust_electricity_line_items_for_possible_grid_electricity_consumption(
+        self, cf_ret: list[list[Any]]
+    ) -> list[list[Any]]:
+        """
+        Remove electricity line items that are not parameterized into SAM, to avoid inaccurately displaying the
+        default 0 values. For example, direct-use heat end-use requires pumping power that comes from grid electricity.
+        The cost of this electricity is accounted for in GEOPHIRES OPEX calculations, prior to SAM calculations.
+
+        TODO to parameterize relevant factors into SAM and don't remove their line items
+        """
+
+        ret = cf_ret.copy()
+
+        def _get_row_index(row_name_: str) -> list[Any]:
+            return [it[0] for it in ret].index(row_name_)
+
+        elec_from_grid_idx = _get_row_index('Electricity from grid (kWh)')
+        ret.pop(elec_from_grid_idx)
+
+        ret.pop(_get_row_index('Electricity purchase ($)'))
 
         return ret
 
