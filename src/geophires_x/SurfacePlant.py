@@ -596,7 +596,7 @@ class SurfacePlant:
             PreferredUnits=PowerUnit.MW,
             CurrentUnits=PowerUnit.MW
         )
-        self.HeatProducedMax = self.OutputParameterDict[self.HeatProduced.Name] = OutputParameter(
+        self.HeatProducedMax = self.OutputParameterDict[self.HeatProducedMax.Name] = OutputParameter(
             Name="Maximum Net Heat Production",
             UnitType=Units.POWER,
             PreferredUnits=PowerUnit.MW,
