@@ -1887,11 +1887,11 @@ class Economics:
         )
 
         # local variable initialization
-        self.CAPEX_cost_electricity_plant = 0.0
-        self.CAPEX_cost_heat_plant = 0.0
+        self.CAPEX_cost_electricity_plant_musd = 0.0  # TODO should be proper output parameter
+        self.CAPEX_cost_heat_plant_musd = 0.0  # TODO should be proper output parameter
         self.OPEX_cost_electricity_plant = 0.0
         self.OPEX_cost_heat_plant = 0.0
-        self.CAPEX_heat_electricity_plant_ratio.value = 0.0
+        # self.CAPEX_heat_electricity_plant_ratio.value = 0.0
         self.Claborcorrelation = 0.0
         self.Cpumps = 0.0
         self.annualelectricityincome = 0.0
@@ -3271,9 +3271,18 @@ class Economics:
                                           np.max(model.surfaceplant.ElectricityProduced.value) * 1000. / 1E6)
 
             if self.ccplantfixed.Valid:
-                self.Cplant.value = self.ccplantfixed.value
-                self.CAPEX_cost_electricity_plant = self.Cplant.value * self.CAPEX_heat_electricity_plant_ratio.value
-                self.CAPEX_cost_heat_plant = self.Cplant.value * (1.0 - self.CAPEX_heat_electricity_plant_ratio.value)
+                self.Cplant.value = self.ccplantfixed.value  # TODO unit conversion
+
+                # TODO compute self.CAPEX_heat_electricity_plant_ratio.Valid property instead
+                is_cogen_plant_capex_ratio_valid: bool = self.CAPEX_heat_electricity_plant_ratio.Provided \
+                                                         and self.CAPEX_heat_electricity_plant_ratio.value != -1
+
+                if not is_cogen_plant_capex_ratio_valid:
+                    # TODO enhance message user-friendliness
+                    raise RuntimeError(f'{self.CAPEX_heat_electricity_plant_ratio.Name} is required.')
+
+                self.CAPEX_cost_electricity_plant_musd = self.Cplant.quantity().to('MUSD').magnitude * self.CAPEX_heat_electricity_plant_ratio.value
+                self.CAPEX_cost_heat_plant_musd = self.Cplant.quantity().to('MUSD').magnitude * (1.0 - self.CAPEX_heat_electricity_plant_ratio.value)
             else:
                 if self.Power_plant_cost_per_kWe.Provided:
                     nameplate_capacity_kW = np.max(model.surfaceplant.ElectricityProduced.quantity().to('kW'))
@@ -3286,16 +3295,16 @@ class Economics:
                     direct_plant_cost_MUSD = self.ccplantadjfactor.value * self.Cplantcorrelation * 1.02 * 1.10
 
                 self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * direct_plant_cost_MUSD
-                self.CAPEX_cost_electricity_plant = self.Cplant.value
+                self.CAPEX_cost_electricity_plant_musd = self.Cplant.quantity().to('MUSD').magnitude
 
-        # add direct-use plant cost of co-gen system to Cplant (only of no total Cplant was provided)
+        # add direct-use plant cost of co-gen system to Cplant (only if no total Cplant was provided)
         if not self.ccplantfixed.Valid:
             if model.surfaceplant.enduse_option.value in [
                 # enduse_option = 3*: cogen topping cycle
                 EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
                 EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT
             ]:
-                self.CAPEX_cost_heat_plant = (
+                self.CAPEX_cost_heat_plant_musd = (
                     self._indirect_cost_factor
                     * self._contingency_factor
                     * self.ccplantadjfactor.value
@@ -3308,16 +3317,18 @@ class Economics:
                 EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
                 EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY
             ]:
-                self.CAPEX_cost_heat_plant = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
+                self.CAPEX_cost_heat_plant_musd = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
                     model.surfaceplant.HeatProduced.value / model.surfaceplant.enduse_efficiency_factor.value) * 1000.
             elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY,
                                                             EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT]:  # cogen parallel cycle
-                self.CAPEX_cost_heat_plant = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
+                self.CAPEX_cost_heat_plant_musd = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
                     model.surfaceplant.HeatProduced.value / model.surfaceplant.enduse_efficiency_factor.value) * 1000.
 
-            self.Cplant.value = self.Cplant.value + self.CAPEX_cost_heat_plant
-            if not self.CAPEX_heat_electricity_plant_ratio.Provided:
-                self.CAPEX_heat_electricity_plant_ratio.value = self.CAPEX_cost_electricity_plant/self.Cplant.value
+            self.Cplant.value = self.Cplant.value + quantity(self.CAPEX_cost_heat_plant_musd, 'MUSD').to(self.Cplant.CurrentUnits.value).magnitude
+
+        if not self.CAPEX_heat_electricity_plant_ratio.Provided and self.CAPEX_heat_electricity_plant_ratio.value == -1:
+            self.CAPEX_heat_electricity_plant_ratio.value = (self.CAPEX_cost_electricity_plant_musd /
+                                                             self.Cplant.quantity().to('MUSD').magnitude)
 
     def calculate_total_capital_costs(self, model: Model) -> None:
         if not self.totalcapcost.Valid:
