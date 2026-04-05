@@ -741,7 +741,7 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
             model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
         )
         add_on_profit_usd_series = [round(add_on_profit_per_year_usd)] * model.surfaceplant.plant_lifetime.value
-        add_on_source = CapacityPaymentRevenueSource(name='Add-On Profit', revenue_usd=add_on_profit_usd_series)
+        add_on_source = CapacityPaymentRevenueSource(name='Add-On', revenue_usd=add_on_profit_usd_series)
         ret.append(add_on_source)
 
     def _price_vector(price_value: list[float]) -> list[float | str]:
