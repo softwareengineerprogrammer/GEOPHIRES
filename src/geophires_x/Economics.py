@@ -2152,7 +2152,7 @@ class Economics:
                         'included in the base Total CAPEX.',
         )
         self.capex_allocated_per_kwe = self.OutputParameterDict[self.capex_allocated_per_kwe.Name] = OutputParameter(
-            Name="Allocated CAPEX ($/kWe)",
+            Name="Electricity CAPEX ($/kWe)",
             UnitType=Units.ENERGYCOST,
             PreferredUnits=EnergyCostUnit.DOLLARSPERKW,
             CurrentUnits=EnergyCostUnit.DOLLARSPERKW,
@@ -2161,8 +2161,8 @@ class Economics:
                         'In cogeneration (CHP) scenarios, this is calculated by multiplying the Total CAPEX by the '
                         'electrical plant cost allocation ratio, divided by the maximum net electricity generation.'
         )
-        self.capex_allocated_per_kwth = self.OutputParameterDict[self.capex_allocated_per_kwth.Name] =OutputParameter(
-            Name="Allocated CAPEX ($/kWth)",
+        self.capex_allocated_per_kwth = self.OutputParameterDict[self.capex_allocated_per_kwth.Name] = OutputParameter(
+            Name="Heat CAPEX ($/kWth)",
             UnitType=Units.ENERGYCOST,
             PreferredUnits=EnergyCostUnit.DOLLARSPERKW,
             CurrentUnits=EnergyCostUnit.DOLLARSPERKW,
