@@ -3087,7 +3087,7 @@ class Economics:
                         self._indirect_cost_factor
                         * self._contingency_factor
                         * np.max(model.surfaceplant.cooling_produced.value)
-                        * 1000 / 3.517 * 2500 / 1e6 # $2,500/ton of cooling.
+                        * 1000 / 3.517 * 2500 / 1e6  # $2,500/ton of cooling.
                     )
 
                 # now add chiller cost to surface plant cost
@@ -3125,7 +3125,10 @@ class Economics:
                 self.Cplant.value += self.peakingboilercost.value
 
 
-        else:  # all other options have power plant
+        else:
+            # all other options have power plant
+            # TODO migrate relevant constants/calculations below to their respective classes
+
             if model.surfaceplant.plant_type.value == PlantType.SUB_CRITICAL_ORC:
                 MaxProducedTemperature = np.max(model.surfaceplant.TenteringPP.value)
                 if MaxProducedTemperature < 150.:
@@ -3287,8 +3290,11 @@ class Economics:
 
         # add direct-use plant cost of co-gen system to Cplant (only of no total Cplant was provided)
         if not self.ccplantfixed.Valid:
-            if model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
-                                                          EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT]:  # enduse_option = 3: cogen topping cycle
+            if model.surfaceplant.enduse_option.value in [
+                # enduse_option = 3*: cogen topping cycle
+                EndUseOptions.COGENERATION_TOPPING_EXTRA_ELECTRICITY,
+                EndUseOptions.COGENERATION_TOPPING_EXTRA_HEAT
+            ]:
                 self.CAPEX_cost_heat_plant = (
                     self._indirect_cost_factor
                     * self._contingency_factor
@@ -3297,8 +3303,11 @@ class Economics:
                     * np.max(model.surfaceplant.HeatProduced.value / model.surfaceplant.enduse_efficiency_factor.value)
                     * 1000.
                 )
-            elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
-                                                            EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY]:  # enduse_option = 4: cogen bottoming cycle
+            elif model.surfaceplant.enduse_option.value in [
+                # enduse_option = 4*: cogen bottoming cycle
+                EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
+                EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY
+            ]:
                 self.CAPEX_cost_heat_plant = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
                     model.surfaceplant.HeatProduced.value / model.surfaceplant.enduse_efficiency_factor.value) * 1000.
             elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY,
