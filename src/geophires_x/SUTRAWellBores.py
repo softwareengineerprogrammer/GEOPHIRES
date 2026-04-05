@@ -103,20 +103,6 @@ class SUTRAWellBores(WellBores):
                         'pressure drop in the reservoir between injection well and production well (see docs)',
         )
 
-        self.Tinj = self.ParameterDict[self.Tinj.Name] = floatParameter(
-            "Injection Temperature",
-            value=70.0,
-            DefaultValue=70.0,
-            Min=0.0,
-            Max=200.0,
-            UnitType=Units.TEMPERATURE,
-            PreferredUnits=TemperatureUnit.CELSIUS,
-            CurrentUnits=TemperatureUnit.CELSIUS,
-            Required=True,
-            ErrMessage="assume default injection temperature (70 deg.C)",
-            ToolTipText="Constant geofluid injection temperature at injection wellhead.",
-        )
-
         # local variable initiation
         sclass = str(__class__).replace("<class \'", "")
         self.MyClass = sclass.replace("\'>", "")

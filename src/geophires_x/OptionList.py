@@ -39,6 +39,18 @@ class EndUseOptions(GeophiresInputEnum):
     COGENERATION_PARALLEL_EXTRA_HEAT = 51, f'Cogeneration Parallel Cycle, {_EXTRA_HEAT_SNIPPET}'
     COGENERATION_PARALLEL_EXTRA_ELECTRICITY = 52, f'Cogeneration Parallel Cycle, {_EXTRA_ELECTRICITY_SNIPPET}'
 
+    @property
+    def is_cogeneration_end_use_option(self) -> bool:
+        return self.name.startswith('COGENERATION')
+
+    @property
+    def has_electricity_component(self) -> bool:
+        return self == self.ELECTRICITY or self.is_cogeneration_end_use_option
+
+    @property
+    def has_direct_use_heat_component(self) -> bool:
+        return self == self.HEAT or self.is_cogeneration_end_use_option
+
     @staticmethod
     def from_input_string(input_string: str) -> 'EndUseOptions':
         """

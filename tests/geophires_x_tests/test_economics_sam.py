@@ -12,6 +12,7 @@ import numpy_financial as npf
 import pandas as pd
 from pint.facets.plain import PlainQuantity
 
+from geophires_x.OptionList import PlantType
 from geophires_x.Parameter import listParameter
 
 from base_test_case import BaseTestCase
@@ -25,11 +26,12 @@ from geophires_x.EconomicsSam import (
     get_sam_cash_flow_profile_tabulated_output,
     _ppa_pricing_model,
     _get_fed_and_state_tax_rates,
-    SamEconomicsCalculations,
     _get_royalty_rate_schedule,
     _validate_construction_capex_schedule,
     _calculate_nominal_discount_rate_from_real_and_inflation_pct,
+    validate_read_parameters,
 )
+from geophires_x.EconomicsSamCalculations import SamEconomicsCalculations
 from geophires_x.GeoPHIRESUtils import sig_figs, quantity, is_float
 
 # noinspection PyProtectedMember
@@ -304,11 +306,33 @@ class EconomicsSamTestCase(BaseTestCase):
             if r_0(r) == name
         )[1:]
 
-    def test_only_electricity_end_use_supported(self):
-        with self.assertRaises(RuntimeError) as e:
-            self._get_result({'End-Use Option': 2})
+    def test_direct_use_heat_end_use_supported(self):
+        # import warnings
+        # warnings.filterwarnings('error', message='divide by zero', category=RuntimeWarning)
 
-        self.assertIn('Invalid End-Use Option (Direct-Use Heat)', str(e.exception))
+        self.assertIsNotNone(self._get_result({'End-Use Option': 2}))
+
+    def test_supported_plant_types(self):
+        m: Model = self._new_model(self._egs_test_file_path(), {'Print Output to Console': 1})
+        supported_plant_types = [
+            PlantType.SUB_CRITICAL_ORC,
+            PlantType.SUPER_CRITICAL_ORC,
+            PlantType.SINGLE_FLASH,
+            PlantType.DOUBLE_FLASH,
+            PlantType.ABSORPTION_CHILLER,
+            PlantType.INDUSTRIAL,
+        ]
+
+        for plant_type in supported_plant_types:
+            m.surfaceplant.plant_type.value = plant_type
+
+            validate_read_parameters(m)  # should not raise an exception
+
+        for plant_type in [it for it in PlantType if it not in supported_plant_types]:
+            m.surfaceplant.plant_type.value = plant_type
+
+            with self.assertRaises(ValueError):
+                validate_read_parameters(m)
 
     def test_multiple_construction_years(self):
         construction_years_2: GeophiresXResult = self._get_result(

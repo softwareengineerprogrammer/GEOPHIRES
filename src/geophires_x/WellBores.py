@@ -874,7 +874,32 @@ class WellBores:
             CurrentUnits=TemperatureUnit.CELSIUS,
             Required=True,
             ErrMessage="assume default injection temperature (70 deg.C)",
-            ToolTipText="Constant geofluid injection temperature at injection wellhead."
+            ToolTipText="Constant geofluid injection temperature at injection wellhead. "
+                        "This is the temperature to which the geofluid is cooled before being reinjected into "
+                        "the reservoir. It directly affects total heat extraction: "
+                        "HeatExtracted = flow_rate * cp * (ProducedTemperature - InjectionTemperature). "
+                        "For direct-use heat end-use options (including heat pump, absorption chiller, and district "
+                        "heating), this parameter directly controls how much thermal energy is extracted from the "
+                        "geofluid for the surface application. A lower injection temperature means more heat is "
+                        "extracted. "
+                        "For end-use options with a power plant (electricity, CHP), the model calculates a "
+                        "reinjection temperature from power plant correlations representing the thermodynamic "
+                        "optimum exhaust temperature. If the provided injection temperature exceeds the "
+                        "model-calculated reinjection temperature, the provided value is ignored and the "
+                        "model-calculated value is used instead (a warning will be logged). "
+                        "For pure electricity end-use, the injection temperature does not affect electricity "
+                        "production; it only affects heat extraction accounting and First Law Efficiency reporting. "
+                        "Providing an injection temperature lower than the model-calculated reinjection temperature "
+                        "represents additional thermal losses between the power plant and the injection wellhead "
+                        "(e.g. surface piping losses). "
+                        "For CHP topping cycle configurations, providing an injection temperature lower than the "
+                        "model-calculated reinjection temperature is necessary to model direct-use heat extraction; "
+                        "the difference between the reinjection temperature and the injection temperature determines "
+                        "the heat available for the direct-use application. If not provided (or if the default "
+                        "exceeds the model-calculated reinjection temperature), the direct-use heat component will "
+                        "be approximately zero."
+                        # TODO re-assess tooltip text when FGEM is incorporated
+                        #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/395?title=FGEM/flexible+geothermal+systems
         )
         self.Phydrostatic = self.ParameterDict[self.Phydrostatic.Name] = floatParameter(
             "Reservoir Hydrostatic Pressure",

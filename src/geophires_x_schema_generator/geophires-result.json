@@ -32,6 +32,16 @@
           "description": "The total capital expenditure (CAPEX) required to construct the plant, normalized per kilowatt of capacity. This metric is calculated based on the maximum net electricity generation of the facility. It reflects all direct and indirect costs, contingency, and applicable cost escalations included in the base Total CAPEX.",
           "units": "USD/kW"
         },
+        "Electricity CAPEX ($/kWe)": {
+          "type": "number",
+          "description": "The portion of total capital expenditure (CAPEX) allocated specifically to electricity generation, normalized per kilowatt of net electrical capacity (kWe). In cogeneration (CHP) scenarios, this is calculated by multiplying the Total CAPEX by the electrical plant cost allocation ratio, divided by the maximum net electricity generation.",
+          "units": "USD/kW"
+        },
+        "Heat CAPEX ($/kWth)": {
+          "type": "number",
+          "description": "The portion of total capital expenditure (CAPEX) allocated specifically to direct-use heat production, normalized per kilowatt of net thermal capacity (kWth). In cogeneration (CHP) scenarios, this is calculated by multiplying the Total CAPEX by the thermal plant cost allocation ratio (1 minus the electrical ratio), divided by the maximum net heat production.",
+          "units": "USD/kW"
+        },
         "Average Direct-Use Heat Production": {},
         "Direct-Use heat breakeven price": {},
         "Direct-Use heat breakeven price (LCOH)": {
@@ -152,7 +162,11 @@
           "description": "The time at which cumulative cash flow reaches zero. For projects that never pay back, the calculated value will be \"N/A\". For SAM Economic Models, this is Simple Payback Period (SPB): the time at which cumulative non-discounted cash flow reaches zero, calculated using non-discounted after-tax net cash flow. See https://samrepo.nrelcloud.org/help/mtf_payback.html for important considerations regarding the limitations of this metric.",
           "units": "yr"
         },
-        "CHP: Percent cost allocation for electrical plant": {},
+        "CHP: Percent cost allocation for electrical plant": {
+          "type": "number",
+          "description": "CHP Electrical Plant Cost Allocation Ratio (cost electrical plant/total CAPEX)",
+          "units": "%"
+        },
         "Estimated Jobs Created": {
           "type": "number",
           "description": "",
@@ -517,7 +531,11 @@
           "description": "O&M Make-up Water costs. Default correlation: Assumes $3.50/1,000 gallons of water. Provide Water Cost Adjustment Factor to multiply the default correlation.",
           "units": "MUSD/yr"
         },
-        "Average Reservoir Pumping Cost": {},
+        "Average Reservoir Pumping Cost": {
+          "type": "number",
+          "description": "Average Annual Pumping Costs",
+          "units": "MUSD/yr"
+        },
         "Absorption Chiller O&M Cost": {},
         "Average Heat Pump Electricity Cost": {},
         "Annual District Heating O&M Cost": {
@@ -565,13 +583,21 @@
         "Average Total Electricity Generation": {},
         "Minimum Total Electricity Generation": {},
         "Initial Total Electricity Generation": {},
-        "Maximum Net Electricity Generation": {},
+        "Maximum Net Electricity Generation": {
+          "type": "number",
+          "description": "",
+          "units": "MW"
+        },
         "Average Net Electricity Generation": {},
         "Minimum Net Electricity Generation": {},
         "Initial Net Electricity Generation": {},
         "Average Annual Total Electricity Generation": {},
         "Average Annual Net Electricity Generation": {},
-        "Maximum Net Heat Production": {},
+        "Maximum Net Heat Production": {
+          "type": "number",
+          "description": "",
+          "units": "MW"
+        },
         "Average Net Heat Production": {},
         "Minimum Net Heat Production": {},
         "Initial Net Heat Production": {},

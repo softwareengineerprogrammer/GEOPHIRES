@@ -34,6 +34,16 @@ class EndUseOptionsTestCase(BaseTestCase):
         self.assertEqual(str(EndUseOptions.HEAT), 'EndUseOptions.HEAT')
         self.assertEqual(str(EndUseOptions.ELECTRICITY), 'EndUseOptions.ELECTRICITY')
 
+    def test_is_cogeneration_and_has_electricity_component(self):
+        self.assertTrue(EndUseOptions.ELECTRICITY.has_electricity_component)
+        self.assertFalse(EndUseOptions.ELECTRICITY.is_cogeneration_end_use_option)
+
+        self.assertFalse(EndUseOptions.HEAT.has_electricity_component)
+        self.assertFalse(EndUseOptions.HEAT.is_cogeneration_end_use_option)
+
+        self.assertTrue(EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY.has_electricity_component)
+        self.assertTrue(EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY.is_cogeneration_end_use_option)
+
 
 class WellDrillingCostCorrelationTestCase(BaseTestCase):
 
