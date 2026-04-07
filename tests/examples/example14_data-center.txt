@@ -3,7 +3,8 @@
 # This example models a 1 GWe Enhanced Geothermal System (EGS) to power a hyperscale data center.
 # Based on the techno-economic analysis by Project InnerSpace (Yusifov & Enriquez, 2025), the simulation incorporates direct
 # cooling via an absorption chiller, yielding an estimated $107 million in annual operating cost savings over the 30-year project lifespan.
-# The absorption chiller is modeled as cogenerated heat, with heat sales yielding revenue equivalent to the estimated savings.
+# The absorption chiller is thermodynamically modeled as cogenerated heat, with heat sales yielding revenue equivalent to the estimated savings.
+# The absorption chiller CAPEX of $562M is modeled via an add-on.
 #
 # Reference: Yusifov, M., & Enriquez, N. (2025, July). From Core to Code: Powering the AI Revolution with Geothermal Energy. Project InnerSpace & Future Ventures. https://projectinnerspace.org/resources/Powering-the-AI-Revolution.pdf
 
