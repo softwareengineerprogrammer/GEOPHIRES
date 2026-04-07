@@ -2131,14 +2131,6 @@ class Economics:
                         'length and can be manually added by the user to the pipeline distribution costs.'
         )
 
-        self.surface_equipment_costs_total = self.OutputParameterDict[self.surface_equipment_costs_total.Name] = OutputParameter(
-            Name='Total surface equipment costs',
-            UnitType=Units.CURRENCY,
-            PreferredUnits=CurrencyUnit.MDOLLARS,
-            CurrentUnits=CurrencyUnit.MDOLLARS,
-            ToolTipText=f'{self.Cplant.Name} plus {self.Cgath.Name}.'
-        )
-
         self.Cpiping = self.OutputParameterDict[self.Cpiping.Name] = OutputParameter(
             Name="Transmission pipeline costs",
             display_name='Transmission pipeline cost',
@@ -2146,6 +2138,15 @@ class Economics:
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
         )
+
+        self.surface_equipment_costs_total = self.OutputParameterDict[self.surface_equipment_costs_total.Name] = OutputParameter(
+            Name='Total surface equipment costs',
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.MDOLLARS,
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText=f'{self.Cplant.Name} plus {self.Cgath.Name} plus {self.Cpiping.Name}.'
+        )
+
         self.Coamwater = self.OutputParameterDict[self.Coamwater.Name] = OutputParameter(
             Name="O&M Make-up Water costs",
             display_name='Water costs',
@@ -3415,6 +3416,7 @@ class Economics:
             else:
                 self.dhdistrictcost.value = 0
 
+            # TODO unit conversions
             self.CCap.value = self.Cexpl.value + self.Cwell.value + self.Cstim.value + self.Cgath.value + self.Cplant.value + self.Cpiping.value + self.dhdistrictcost.value
         else:
             self.CCap.value = self.totalcapcost.value
@@ -3882,8 +3884,9 @@ class Economics:
                 .to(convertible_unit(self.chp_percent_cost_allocation_for_electrical_plant.CurrentUnits)).magnitude
             )
 
-        if all(hasattr(self, it) for it in ['Cplant', 'Cgath']):
-            self.surface_equipment_costs_total.value = (self.Cplant.quantity() + self.Cgath.quantity()).to(
+        if all(hasattr(self, it) for it in ['Cplant', 'Cgath', 'Cpiping']):
+            self.surface_equipment_costs_total.value = (
+                    self.Cplant.quantity() + self.Cgath.quantity() + self.Cpiping.quantity()).to(
                 self.surface_equipment_costs_total.CurrentUnits).magnitude
 
 

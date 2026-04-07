@@ -472,7 +472,7 @@
         },
         "Total surface equipment costs": {
           "type": "number",
-          "description": "Surface Plant cost plus Field gathering system cost.",
+          "description": "Surface Plant cost plus Field gathering system cost plus Transmission pipeline costs.",
           "units": "MUSD"
         },
         "Investment Tax Credit": {
