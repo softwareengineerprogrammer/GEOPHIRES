@@ -2076,14 +2076,16 @@ class Economics:
                         'estimate the surface equipment cost for geothermal district-heating systems.'
         )
 
-        self.CAPEX_cost_electricity_plant = self.OutputParameterDict[self.CAPEX_cost_electricity_plant.Name] = OutputParameter(
-            Name="Electricity Plant cost",  # WIP...
+        self.CAPEX_cost_electrical_plant = self.OutputParameterDict[self.CAPEX_cost_electrical_plant.Name] = OutputParameter(
+            Name='Electrical Plant cost',
+            display_name='of which Electrical Plant Cost',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
         )
         self.CAPEX_cost_heat_plant= self.OutputParameterDict[self.CAPEX_cost_heat_plant.Name] = OutputParameter(
-            Name="Heat Plant cost",  # WIP...
+            Name='Heat Plant cost',
+            display_name='of which Heat Plant Cost',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
@@ -2507,7 +2509,7 @@ class Economics:
 
     @property
     def CAPEX_cost_electricity_plant_musd(self) -> float:
-        return self.CAPEX_cost_electricity_plant.quantity().to('MUSD').magnitude
+        return self.CAPEX_cost_electrical_plant.quantity().to('MUSD').magnitude
 
     @property
     def CAPEX_cost_heat_plant_musd(self) -> float:
@@ -3315,7 +3317,7 @@ class Economics:
                     # TODO enhance message user-friendliness
                     raise RuntimeError(f'{self.CAPEX_heat_electricity_plant_ratio.Name} is required.')
 
-                self.CAPEX_cost_electricity_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_electricity_plant.CurrentUnits).magnitude * self.CAPEX_heat_electricity_plant_ratio.quantity().to('dimensionless').magnitude
+                self.CAPEX_cost_electrical_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_electrical_plant.CurrentUnits).magnitude * self.CAPEX_heat_electricity_plant_ratio.quantity().to('dimensionless').magnitude
                 self.CAPEX_cost_heat_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_heat_plant.CurrentUnits).magnitude * (1.0 - self.CAPEX_heat_electricity_plant_ratio.quantity().to('dimensionless').magnitude)
             else:
                 if self.Power_plant_cost_per_kWe.Provided:
@@ -3329,7 +3331,7 @@ class Economics:
                     direct_plant_cost_MUSD = self.ccplantadjfactor.value * self.Cplantcorrelation * 1.02 * 1.10
 
                 self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * direct_plant_cost_MUSD
-                self.CAPEX_cost_electricity_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_electricity_plant.CurrentUnits).magnitude
+                self.CAPEX_cost_electrical_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_electrical_plant.CurrentUnits).magnitude
 
         # add direct-use plant cost of co-gen system to Cplant (only if no total Cplant was provided)
         if not self.ccplantfixed.Valid:

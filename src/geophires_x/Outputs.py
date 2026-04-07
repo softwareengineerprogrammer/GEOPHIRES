@@ -496,6 +496,10 @@ class Outputs:
                     f.write(f'         {econ.Cstim.display_name}:                             {econ.Cstim.value:10.2f} {econ.Cstim.CurrentUnits.value}\n')
 
                     f.write(f'         {econ.Cplant.display_name}:                     {econ.Cplant.value:10.2f} {econ.Cplant.CurrentUnits.value}\n')
+                    if model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
+                        f.write(f'            {econ.CAPEX_cost_electrical_plant.display_name}:             {econ.CAPEX_cost_electrical_plant.value:10.2f} {econ.CAPEX_cost_electrical_plant.CurrentUnits.value}\n')
+                        f.write(f'            {econ.CAPEX_cost_heat_plant.display_name}:                   {econ.CAPEX_cost_heat_plant.value:10.2f} {econ.CAPEX_cost_heat_plant.CurrentUnits.value}\n')
+
                     if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                         f.write(f'            of which Absorption Chiller Cost:           {econ.chillercapex.value:10.2f} {econ.chillercapex.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:

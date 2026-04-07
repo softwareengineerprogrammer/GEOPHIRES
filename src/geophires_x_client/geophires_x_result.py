@@ -263,6 +263,8 @@ class GeophiresXResult:
                 'Stimulation costs',
                 'Stimulation costs (for redrilling)',
                 'Surface power plant costs',
+                'of which Electrical Plant Cost',
+                'of which Heat Plant Cost',
                 'of which Absorption Chiller Cost',
                 'of which Heat Pump Cost',
                 'of which Peaking Boiler Cost',
