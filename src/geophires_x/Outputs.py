@@ -497,11 +497,12 @@ class Outputs:
 
                     f.write(f'         {econ.Cplant.display_name}:                     {econ.Cplant.value:10.2f} {econ.Cplant.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
-                        f.write(f'            of which Absorption Chiller Cost:           {model.economics.chillercapex.value:10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
+                        f.write(f'            of which Absorption Chiller Cost:           {econ.chillercapex.value:10.2f} {econ.chillercapex.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:
-                        f.write(f'            of which Heat Pump Cost:                    {model.economics.heatpumpcapex.value:10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
+                        f.write(f'            of which Heat Pump Cost:                    {econ.heatpumpcapex.value:10.2f} {econ.Cplant.heatpumpcapex.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
-                        f.write(f'            of which Peaking Boiler Cost:               {model.economics.peakingboilercost.value:10.2f} ' + model.economics.peakingboilercost.CurrentUnits.value + NL)
+                        f.write(f'            of which Peaking Boiler Cost:               {econ.peakingboilercost.value:10.2f} {econ.peakingboilercost.CurrentUnits.value}\n')
+
                     f.write(f'         {model.economics.Cgath.display_name}:                  {model.economics.Cgath.value:10.2f} {model.economics.Cgath.CurrentUnits.value}\n')
 
                     if model.surfaceplant.piping_length.value > 0:

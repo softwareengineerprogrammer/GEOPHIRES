@@ -2191,13 +2191,16 @@ class Economics:
                         f'make-up water, pumping O&M costs, '
                         f'and average royalty costs (both production-based and supplemental payments).'
         )
+
+        # noinspection SpellCheckingInspection
         self.averageannualpumpingcosts = self.OutputParameterDict[self.averageannualpumpingcosts.Name] = OutputParameter(
-            Name="Average Annual Pumping Costs",
+            Name='Average Annual Pumping Costs',
             display_name='Average Reservoir Pumping Cost',
             UnitType=Units.CURRENCYFREQUENCY,
             PreferredUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR,
             CurrentUnits=CurrencyFrequencyUnit.MDOLLARSPERYEAR
         )
+
         # heat pump
         self.averageannualheatpumpelectricitycost = self.OutputParameterDict[
             self.averageannualheatpumpelectricitycost.Name] = OutputParameter(
