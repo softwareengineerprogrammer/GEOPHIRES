@@ -511,7 +511,7 @@ class Outputs:
                     if model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
                         f.write(f'         District Heating System Cost:                  {model.economics.dhdistrictcost.value:10.2f} {model.economics.dhdistrictcost.CurrentUnits.value}\n')
 
-                    f.write(f'         Total surface equipment costs:                 {(model.economics.Cplant.value+model.economics.Cgath.value):10.2f} ' + model.economics.Cplant.CurrentUnits.value + NL)
+                    f.write(f'         {econ.surface_equipment_costs_total.display_name}:                 {econ.surface_equipment_costs_total.value:10.2f} {econ.surface_equipment_costs_total.CurrentUnits.value}\n')
 
                 if model.economics.totalcapcost.Valid and model.wellbores.redrill.value > 0:
                     f.write(f'         Drilling and completion costs (for redrilling):{econ.Cwell.value:10.2f} {econ.Cwell.CurrentUnits.value}\n')

@@ -2115,6 +2115,15 @@ class Economics:
                         'user or a district-heating system. These costs are estimated at $750 per meter pipeline '
                         'length and can be manually added by the user to the pipeline distribution costs.'
         )
+
+        self.surface_equipment_costs_total = self.OutputParameterDict[self.surface_equipment_costs_total.Name] = OutputParameter(
+            Name='Total surface equipment costs',
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.MDOLLARS,
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText=f'{self.Cplant.Name} plus {self.Cgath.Name}.'
+        )
+
         self.Cpiping = self.OutputParameterDict[self.Cpiping.Name] = OutputParameter(
             Name="Transmission pipeline costs",
             display_name='Transmission pipeline cost',
@@ -3842,6 +3851,9 @@ class Economics:
                 self.CAPEX_heat_electricity_plant_ratio.quantity()
                 .to(convertible_unit(self.chp_percent_cost_allocation_for_electrical_plant.CurrentUnits)).magnitude
             )
+
+        self.surface_equipment_costs_total.value = (self.Cplant.quantity() + self.Cgath.quantity()).to(
+            self.surface_equipment_costs_total.CurrentUnits).magnitude
 
 
     @property
