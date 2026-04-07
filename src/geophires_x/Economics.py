@@ -3852,8 +3852,9 @@ class Economics:
                 .to(convertible_unit(self.chp_percent_cost_allocation_for_electrical_plant.CurrentUnits)).magnitude
             )
 
-        self.surface_equipment_costs_total.value = (self.Cplant.quantity() + self.Cgath.quantity()).to(
-            self.surface_equipment_costs_total.CurrentUnits).magnitude
+        if all(hasattr(self, it) for it in ['Cplant', 'Cgath']):
+            self.surface_equipment_costs_total.value = (self.Cplant.quantity() + self.Cgath.quantity()).to(
+                self.surface_equipment_costs_total.CurrentUnits).magnitude
 
 
     @property

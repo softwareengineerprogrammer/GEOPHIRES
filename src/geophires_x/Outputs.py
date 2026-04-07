@@ -499,7 +499,7 @@ class Outputs:
                     if model.surfaceplant.plant_type.value == PlantType.ABSORPTION_CHILLER:
                         f.write(f'            of which Absorption Chiller Cost:           {econ.chillercapex.value:10.2f} {econ.chillercapex.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.HEAT_PUMP:
-                        f.write(f'            of which Heat Pump Cost:                    {econ.heatpumpcapex.value:10.2f} {econ.Cplant.heatpumpcapex.value}\n')
+                        f.write(f'            of which Heat Pump Cost:                    {econ.heatpumpcapex.value:10.2f} {econ.heatpumpcapex.CurrentUnits.value}\n')
                     if model.surfaceplant.plant_type.value == PlantType.DISTRICT_HEATING:
                         f.write(f'            of which Peaking Boiler Cost:               {econ.peakingboilercost.value:10.2f} {econ.peakingboilercost.CurrentUnits.value}\n')
 
