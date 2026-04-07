@@ -1345,6 +1345,40 @@ class EconomicsSamTestCase(BaseTestCase):
 
         self.assertEqual(lcoe_row[0], round(pv_annual_costs_row[0] * 100 / pv_annual_energy_row[0], 2))
 
+    def test_example14_chp_output(self):
+        r: GeophiresXResult = GeophiresXResult(self._get_test_file_path('../examples/example14_data-center.out'))
+
+        capex_vus = r.result['CAPITAL COSTS (M$)']
+
+        surface_power_plant_costs_vu = capex_vus['Surface power plant costs']
+
+        self.assertEqual('MUSD', surface_power_plant_costs_vu['unit'])
+
+        self.assertAlmostEqual(4225, surface_power_plant_costs_vu['value'], places=0)
+
+        self.assertEqual(
+            surface_power_plant_costs_vu['value'],
+            sum(capex_vus[it]['value'] for it in ['of which Electrical Plant Cost', 'of which Heat Plant Cost']),
+        )
+
+        self.assertAlmostEqual(
+            capex_vus['Total surface equipment costs']['value'],
+            sum(
+                capex_vus[it]['value']
+                for it in ['Surface power plant costs', 'Transmission pipeline cost', 'Field gathering system costs']
+            ),
+            places=1,
+        )
+
+        opex_vus = r.result['OPERATING AND MAINTENANCE COSTS (M$/yr)']
+        total_opex_field_name = 'Total operating and maintenance costs'
+
+        self.assertAlmostEqual(
+            opex_vus[total_opex_field_name]['value'],
+            sum(v['value'] if v is not None and k != total_opex_field_name else 0 for k, v in opex_vus.items()),
+            places=1,
+        )
+
     @staticmethod
     def _new_model(
         input_file: Path,
