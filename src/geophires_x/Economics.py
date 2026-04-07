@@ -3093,6 +3093,8 @@ class Economics:
                     (model.wellbores.nprod.value + model.wellbores.ninj.value) * 750 * 500. + self.Cpumps) / 1E6
 
     def calculate_plant_costs(self, model: Model) -> None:
+        direct_use_heat_default_cost_musd_per_kwth = 250E-6  # TODO parameterize
+
         # plant costs
         if (model.surfaceplant.enduse_option.value == EndUseOptions.HEAT
             and model.surfaceplant.plant_type.value not in [PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP, PlantType.DISTRICT_HEATING]):  # direct-use
@@ -3102,7 +3104,7 @@ class Economics:
                 self.Cplant.value = (self._indirect_cost_factor
                                      * self._contingency_factor
                                      * self.ccplantadjfactor.value
-                                     * 250E-6
+                                     * direct_use_heat_default_cost_musd_per_kwth
                                      * np.max(model.surfaceplant.HeatExtracted.value)
                                      * 1000.)
 
@@ -3115,7 +3117,7 @@ class Economics:
                 self.Cplant.value = (self._indirect_cost_factor
                                      * self._contingency_factor
                                      * self.ccplantadjfactor.value
-                                     * 250E-6
+                                     * direct_use_heat_default_cost_musd_per_kwth
                                      * np.max(model.surfaceplant.HeatExtracted.value)
                                      * 1000.)
                 if self.chillercapex.value == -1:  # no value provided by user, use built-in correlation ($2500/ton)
@@ -3135,7 +3137,7 @@ class Economics:
                 self.Cplant.value = self.ccplantfixed.value
             else:
                 # this is for the direct-use part all the way up to the heat pump
-                self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
+                self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * direct_use_heat_default_cost_musd_per_kwth * np.max(
                     model.surfaceplant.HeatExtracted.value) * 1000.
                 if self.heatpumpcapex.value == -1:  # no value provided by user, use built-in correlation ($150/kWth)
                     self.heatpumpcapex.value = self._indirect_cost_factor * self._contingency_factor * np.max(
@@ -3149,7 +3151,7 @@ class Economics:
             if self.ccplantfixed.Valid:
                 self.Cplant.value = self.ccplantfixed.value
             else:
-                self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
+                self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * direct_use_heat_default_cost_musd_per_kwth * np.max(
                     model.surfaceplant.HeatExtracted.value) * 1000.
 
                 # add 65$/KW for peaking boiler
@@ -3344,7 +3346,7 @@ class Economics:
                     self._indirect_cost_factor
                     * self._contingency_factor
                     * self.ccplantadjfactor.value
-                    * 250E-6
+                    * direct_use_heat_default_cost_musd_per_kwth
                     * np.max(model.surfaceplant.HeatProduced.value / model.surfaceplant.enduse_efficiency_factor.value)
                     * 1000.,
                     'MUSD'
@@ -3354,11 +3356,14 @@ class Economics:
                 EndUseOptions.COGENERATION_BOTTOMING_EXTRA_HEAT,
                 EndUseOptions.COGENERATION_BOTTOMING_EXTRA_ELECTRICITY
             ]:
-                self.CAPEX_cost_heat_plant.value = quantity(self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
+                self.CAPEX_cost_heat_plant.value = quantity(self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * direct_use_heat_default_cost_musd_per_kwth * np.max(
                     model.surfaceplant.HeatProduced.value / model.surfaceplant.enduse_efficiency_factor.value) * 1000., 'MUSD').to(self.CAPEX_cost_heat_plant.CurrentUnits).magnitude
-            elif model.surfaceplant.enduse_option.value in [EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY,
-                                                            EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT]:  # cogen parallel cycle
-                self.CAPEX_cost_heat_plant.value = quantity(self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * 250E-6 * np.max(
+            elif model.surfaceplant.enduse_option.value in [
+                # cogen parallel cycle
+                EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY,
+                EndUseOptions.COGENERATION_PARALLEL_EXTRA_HEAT
+            ]:
+                self.CAPEX_cost_heat_plant.value = quantity(self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * direct_use_heat_default_cost_musd_per_kwth * np.max(
                     model.surfaceplant.HeatProduced.value / model.surfaceplant.enduse_efficiency_factor.value) * 1000., 'MUSD').to(self.CAPEX_cost_heat_plant.CurrentUnits).magnitude
 
             self.Cplant.value = self.Cplant.value + quantity(self.CAPEX_cost_heat_plant_musd, 'MUSD').to(self.Cplant.CurrentUnits.value).magnitude

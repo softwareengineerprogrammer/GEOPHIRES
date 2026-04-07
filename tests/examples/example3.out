@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.9.47
- Simulation Date: 2025-07-31
- Simulation Time:  08:57
- Calculation Time:      0.124 sec
+ GEOPHIRES Version: 3.12.1
+ Simulation Date: 2026-04-07
+ Simulation Time:  10:46
+ Calculation Time:      0.154 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -91,13 +91,15 @@ Simulation Metadata
 
                           ***CAPITAL COSTS (M$)***
 
+         Exploration costs:                                   4.64 MUSD
          Drilling and completion costs:                      27.29 MUSD
          Drilling and completion costs per well:              4.55 MUSD
          Stimulation costs:                                   4.53 MUSD
          Surface power plant costs:                          64.05 MUSD
+            of which Electrical Plant Cost:                  59.87 MUSD
+            of which Heat Plant Cost:                         4.17 MUSD
          Field gathering system costs:                        3.17 MUSD
          Total surface equipment costs:                      67.22 MUSD
-         Exploration costs:                                   4.64 MUSD
       Total capital costs:                                  103.68 MUSD
 
 
@@ -110,7 +112,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Initial geofluid availability:                          0.23 MW/(kg/s)
       Maximum Total Electricity Generation:                  21.16 MW
       Average Total Electricity Generation:                  19.70 MW

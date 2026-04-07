@@ -32,8 +32,7 @@ Property Tax Rate, 0
 One-time Flat License Fees Etc, 100, -- Permitting & Land Acquisition = $100M
 Exploration Capital Cost, 500
 
-Surface Plant Capital Cost Adjustment Factor, 1.56, -- Yields $4.225B power plant cost + $562M absorption chiller in conjunction with CHP Electrical Plant Cost Allocation Ratio value
-CHP Electrical Plant Cost Allocation Ratio, 0.883
+Surface Plant Capital Cost Adjustment Factor, 1.3782, -- $4.225B power plant cost
 
 Well Drilling Cost Correlation, 3, -- VERTICAL_LARGE (2025 NREL Geothermal Drilling Cost Curve Update)
 Well Drilling and Completion Capital Cost Adjustment Factor, 0.713, -- Based on $12,257,861.64/well with 46% drilling cost ratio
@@ -52,6 +51,11 @@ Construction CAPEX Schedule, 0.0268, 0.0268, 0.0268, 0.4597, 0.4597, -- 3-year d
 End-Use Option, 31, -- CHP: Cogeneration topping cycle A power plant is followed by a direct-use heat application in series. Heat at high temperatures from the geothermal fluid is first converted into electricity. Any remaining heat in the geothermal fluid after leaving the power plant is supplied to a low-temperature direct-use heat application.
 
 Power Plant Type, 2, -- Supercritical ORC
+AddOn Nickname 1, Absorption Chiller
+AddOn CAPEX 1, 562
+AddOn Profit Gained 1, 0, -- note that revenue is modeled as heat sales, not add-on profit.
+AddOn OPEX 1, 0
+
 Plant Lifetime, 30
 
 Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten)
