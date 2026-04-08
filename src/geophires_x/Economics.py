@@ -3121,12 +3121,15 @@ class Economics:
                                      * direct_use_heat_default_cost_musd_per_kwth
                                      * np.max(model.surfaceplant.HeatExtracted.value)
                                      * 1000.)
+
                 if self.chillercapex.value == -1:  # no value provided by user, use built-in correlation ($2500/ton)
+                    cooling_default_cost_usd_per_ton = 2500  # $2,500/ton of cooling. TODO parameterize
+
                     self.chillercapex.value = (
                         self._indirect_cost_factor
                         * self._contingency_factor
                         * np.max(model.surfaceplant.cooling_produced.value)
-                        * 1000 / 3.517 * 2500 / 1e6  # $2,500/ton of cooling.
+                        * 1000 / 3.517 * cooling_default_cost_usd_per_ton / 1e6
                     )
 
                 # now add chiller cost to surface plant cost
@@ -3140,9 +3143,11 @@ class Economics:
                 # this is for the direct-use part all the way up to the heat pump
                 self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * self.ccplantadjfactor.value * direct_use_heat_default_cost_musd_per_kwth * np.max(
                     model.surfaceplant.HeatExtracted.value) * 1000.
+
                 if self.heatpumpcapex.value == -1:  # no value provided by user, use built-in correlation ($150/kWth)
+                    heat_pump_default_cost_usd_per_kw = 150  # $150/kW - TODO parameterize
                     self.heatpumpcapex.value = self._indirect_cost_factor * self._contingency_factor * np.max(
-                        model.surfaceplant.HeatProduced.value) * 1000 * 150 / 1e6  # $150/kW - TODO parameterize
+                        model.surfaceplant.HeatProduced.value) * 1000 * heat_pump_default_cost_usd_per_kw / 1e6
 
                 # now add heat pump cost to surface plant cost
                 self.Cplant.value += self.heatpumpcapex.value
