@@ -142,6 +142,17 @@ See relevant parameters and outputs in [GEOPHIRES Parameters documentation](para
 1. `Current Grid CO2 production`
 1. `Total Avoided Carbon Emissions`
 
+## End Uses and Surface Applications
+
+SAM Economic Models support a variety of geothermal end-use options and surface applications, extending beyond pure electricity generation to include:
+
+* **Electricity**
+* **Direct-Use Heat**
+* **Cogeneration** (Combined Heat and Power; CHP)
+* **Cooling** (Absorption Chiller)
+
+For detailed information on how these different configurations are modeled financially—including cash flow reporting adjustments, CHP cost allocation methodologies, and configuration-specific examples—see the [SAM Economic Models: End Uses and Surface Applications documentation](SAM-EM_End-Uses-and-Surface-Applications.html).
+
 ## Examples
 
 1. [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) | [Case Study Documentation](Fervo_Project_Cape-5.html)
@@ -152,8 +163,9 @@ See relevant parameters and outputs in [GEOPHIRES Parameters documentation](para
 1. [Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
 1. [Carbon Credits](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue)
 1. [Cogeneration (Combined Heat and Power; CHP)](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-7_chp)
-1. [Direct-Use Heat](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-8_cooling)
-1. [Cooling (Absorption Chiller)](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-8_cooling)
+1. [CHP with Carbon Credits](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-7b_chp-cc)
+1. [Direct-Use Heat](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-8_heat)
+1. [Cooling (Absorption Chiller)](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-9_cooling)
 1. [SAM Single Owner PPA: 400 MWe BICYCLE Comparison](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-2)
 
 ## Re-creating SAM Economic Model Results in the SAM Desktop Application
