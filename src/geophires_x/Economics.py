@@ -3325,8 +3325,13 @@ class Economics:
                     # TODO enhance message user-friendliness
                     raise RuntimeError(f'{self.CAPEX_heat_electricity_plant_ratio.Name} is required.')
 
-                self.CAPEX_cost_electrical_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_electrical_plant.CurrentUnits).magnitude * self.CAPEX_heat_electricity_plant_ratio.quantity().to('dimensionless').magnitude
-                self.CAPEX_cost_heat_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_heat_plant.CurrentUnits).magnitude * (1.0 - self.CAPEX_heat_electricity_plant_ratio.quantity().to('dimensionless').magnitude)
+                self.CAPEX_cost_electrical_plant.value = self.Cplant.quantity(
+                    self.CAPEX_cost_electrical_plant.CurrentUnits).magnitude * \
+                    self.CAPEX_heat_electricity_plant_ratio.quantity('dimensionless').magnitude
+
+                self.CAPEX_cost_heat_plant.value = self.Cplant.quantity(
+                    self.CAPEX_cost_heat_plant.CurrentUnits).magnitude * \
+                    (1.0 - self.CAPEX_heat_electricity_plant_ratio.quantity('dimensionless').magnitude)
             else:
                 if self.Power_plant_cost_per_kWe.Provided:
                     nameplate_capacity_kW = np.max(model.surfaceplant.ElectricityProduced.quantity().to('kW'))
