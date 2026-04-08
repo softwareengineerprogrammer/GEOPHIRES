@@ -34,9 +34,9 @@ _JSON_PARAMETER_TYPE_OBJECT = 'object'
 
 class HasQuantity(ABC):
 
-    def quantity(self) -> PlainQuantity:
+    def quantity(self, as_units: str | Enum | None = None) -> PlainQuantity:
         """
-        TODO add optional argument to specify units to convert to.
+        :param as_units: Optional units to convert to. If None, will use current units.
 
         :rtype: pint.registry.Quantity - note type annotation uses PlainQuantity due to issues with python 3.8 failing
             to import the Quantity TypeAlias
@@ -51,7 +51,14 @@ class HasQuantity(ABC):
         if isinstance(quant_val, Iterable):
             quant_val = [float(it) for it in quant_val]
 
-        return _ureg.Quantity(quant_val, str(self.CurrentUnits.value))
+        base_q = _ureg.Quantity(quant_val, str(convertible_unit(self.CurrentUnits.value)))
+        if as_units is None:
+            return base_q
+
+        if isinstance(as_units, Enum):
+            return base_q.to(convertible_unit(as_units.value))
+
+        return base_q.to(convertible_unit(as_units))
 
 
 @dataclass
