@@ -36,10 +36,13 @@ class HasQuantity(ABC):
 
     def quantity(self) -> PlainQuantity:
         """
+        TODO add optional argument to specify units to convert to.
+
         :rtype: pint.registry.Quantity - note type annotation uses PlainQuantity due to issues with python 3.8 failing
             to import the Quantity TypeAlias
         """
 
+        # noinspection PyUnresolvedReferences
         quant_val = self.value
 
         if isinstance(quant_val, str):
