@@ -21,6 +21,7 @@ See [SAM Economic Models documentation](SAM-Economic-Models.html#examples) for a
 
 Direct-use heat configurations evaluate pure thermal energy extraction, reporting financial viability via the nominal
 Levelized Cost of Heat (LCOH) in $/MMBTU.
+Heat revenue is modeled as capacity payment revenue and included as the `Heat revenue ($)` cash flow line item.
 
 ### Grid Electricity Consumption and Cash Flow Reporting
 
@@ -62,9 +63,9 @@ Analysts should be aware of this proportional scaling approximation when evaluat
 ## Absorption Chiller (Cooling)
 
 Cooling applications via absorption chillers are supported, providing a nominal Levelized Cost of Cooling (LCOC) in
-$/MMBTU. Like Direct-Use Heat, parasitic electricity requirements are factored into the baseline OPEX prior to
+$/MMBTU. Cooling revenue is modeled as capacity payment revenue and included as the `Cooling revenue ($)` cash flow line item.
+Like Direct-Use Heat, parasitic electricity requirements are factored into the baseline OPEX prior to
 SAM execution.
-
 
 ### Examples:
 
