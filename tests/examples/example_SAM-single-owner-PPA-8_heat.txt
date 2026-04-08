@@ -7,10 +7,9 @@ Economic Model, 5, -- SAM Single Owner PPA
 
 Inflation Rate, .027, -- US inflation as of December 2025
 
-Starting Electricity Sale Price, 0.095
-Electricity Escalation Rate Per Year, 0.00057
-Ending Electricity Sale Price, 1, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
-Electricity Escalation Start Year, 1
+Starting Heat Sale Price, 0.0123
+Ending Heat Sale Price, 0.0359
+Heat Escalation Rate Per Year, 0.01
 
 Fraction of Investment in Bonds, .7
 Discount Rate, 0.12
