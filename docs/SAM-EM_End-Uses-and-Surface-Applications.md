@@ -1,6 +1,6 @@
 # SAM Economic Models: End Uses and Surface Applications
 
-SAM Economic Models support a variety of geothermal end-use options and surface applications.
+[SAM Economic Models](SAM-Economic-Models.html) support a variety of geothermal end-use options and surface applications.
 
 See the [Theoretical Basis for GEOPHIRES End-use options documentation](Theoretical-Basis-for-GEOPHIRES.html#enduse-options)
 for details on the underlying physical simulation mechanics.
@@ -10,7 +10,7 @@ for details on the underlying physical simulation mechanics.
 For pure electricity generation configurations, SAM Economic Models calculate standard project finance metrics,
 including a nominal Levelized Cost of Electricity (LCOE).
 
-## Examples:
+### Examples:
 
 1. [example_SAM-single-owner-PPA](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA)
 1. [example_SAM-single-owner-PPA-2](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-2)
