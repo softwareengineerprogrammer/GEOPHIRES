@@ -144,23 +144,13 @@ See relevant parameters and outputs in [GEOPHIRES Parameters documentation](para
 
 ## Examples
 
-### Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
-
-[Web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5)
-
-Documentation: [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](Fervo_Project_Cape-4.html).
-
-### SAM Single Owner PPA
-
+1. [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5). [Case Study Documentation](Fervo_Project_Cape-5.html).
 1. [SAM Single Owner PPA: 50 MWe](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA)
-2. [SAM Single Owner PPA: 50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
-3. [SAM Single Owner PPA: 50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
-4. [SAM Economic Model: Royalty Schedule & Supplemental Payments](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b)
-4. [SAM Economic Model Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
-
-### SAM Single Owner PPA: 400 MWe BICYCLE Comparison
-
-[Web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-2)
+1. [SAM Single Owner PPA: 50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
+1. [SAM Single Owner PPA: 50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
+1. [SAM Economic Model: Royalty Schedule & Supplemental Payments](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b)
+1. [SAM Economic Model Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
+1. [SAM Single Owner PPA: 400 MWe BICYCLE Comparison](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-2)
 
 ## Re-creating SAM Economic Model Results in the SAM Desktop Application
 
