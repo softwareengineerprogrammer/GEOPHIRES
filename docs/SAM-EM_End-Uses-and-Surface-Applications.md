@@ -30,8 +30,11 @@ In GEOPHIRES, pure direct-use heat and cooling configurations
 typically require parasitic pumping power purchased from the grid. The cost of this grid electricity is calculated
 and fully accounted for within GEOPHIRES' baseline OPEX calculations prior to executing the SAM financial engine.
 
-The specific cash flow line items for `Electricity from grid (kWh)` and `Electricity purchase ($)` are intentionally
-removed from the final SAM cash flow profile report for these end-uses. {# TODO/WIP: 'to avoid potential confusion with the equivalent unused SAM mechanisms' #}
+Because these costs are injected directly into the fixed O&M parameters passed to SAM, SAM's native grid-purchase
+mechanisms are bypassed. Consequently, the specific cash flow line items for `Electricity from grid (kWh)`
+and `Electricity purchase ($)` are intentionally removed from the final SAM cash flow profile report.
+This prevents the display of default zero values, which could otherwise mislead analysts into assuming parasitic power
+costs were omitted.
 
 ### Examples:
 
