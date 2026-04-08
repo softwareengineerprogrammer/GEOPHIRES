@@ -53,7 +53,7 @@ The following table describes how GEOPHIRES parameters are transformed into SAM 
 
 ### Limitations
 
-1. The following power plant types/surface applications are not supported: Heat Pump, District Heating, and Reservoir Thermal Energy Storage (SUTRA). Subcritical ORC, Supercritical ORC, Single Flash, Double Flash, and Industrial heat power plant types are supported.
+1. The following power plant types/surface applications are not supported: Heat Pump, District Heating, and Reservoir Thermal Energy Storage (SUTRA). Subcritical ORC, Supercritical ORC, Single Flash, Double Flash, Industrial heat, and Absorption Chiller power plant types are supported.
 2. Add-ons with electricity and heat are not currently supported. (Add-ons CAPEX, OPEX, and profit are supported.)
 
 ## Multiple Construction Years
