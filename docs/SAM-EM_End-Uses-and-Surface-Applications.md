@@ -13,11 +13,9 @@ including a nominal Levelized Cost of Electricity (LCOE).
 ### Examples:
 
 1. [example_SAM-single-owner-PPA](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA)
-1. [example_SAM-single-owner-PPA-2](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-2)
-1. [example_SAM-single-owner-PPA-3](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-3)
-1. [example_SAM-single-owner-PPA-4](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-4)
-1. [example_SAM-single-owner-PPA-5](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-5)
 1. [example_SAM-single-owner-PPA-6_carbon-revenue](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue)
+
+See [SAM Economic Models documentation](SAM-Economic-Models.html#examples) for additional electricity examples.
 
 ## Direct-Use Heat
 

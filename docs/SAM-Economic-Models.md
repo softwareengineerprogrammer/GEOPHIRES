@@ -144,12 +144,16 @@ See relevant parameters and outputs in [GEOPHIRES Parameters documentation](para
 
 ## Examples
 
-1. [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5). [Case Study Documentation](Fervo_Project_Cape-5.html).
+1. [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) | [Case Study Documentation](Fervo_Project_Cape-5.html)
 1. [SAM Single Owner PPA: 50 MWe](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA)
-1. [SAM Single Owner PPA: 50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
-1. [SAM Single Owner PPA: 50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
-1. [SAM Economic Model: Royalty Schedule & Supplemental Payments](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b)
-1. [SAM Economic Model Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
+1. [50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
+1. [50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
+1. [Royalty Schedule & Supplemental Payments](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b)
+1. [Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
+1. [Carbon Credits](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue)
+1. [Cogeneration (Combined Heat and Power; CHP)](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-7_chp)
+1. [Direct-Use Heat](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-8_cooling)
+1. [Cooling (Absorption Chiller)](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-8_cooling)
 1. [SAM Single Owner PPA: 400 MWe BICYCLE Comparison](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-2)
 
 ## Re-creating SAM Economic Model Results in the SAM Desktop Application
