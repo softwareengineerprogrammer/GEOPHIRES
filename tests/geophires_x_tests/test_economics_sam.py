@@ -1345,7 +1345,7 @@ class EconomicsSamTestCase(BaseTestCase):
 
         self.assertEqual(lcoe_row[0], round(pv_annual_costs_row[0] * 100 / pv_annual_energy_row[0], 2))
 
-    def test_example14_chp_output(self):
+    def test_chp_output(self):
         r: GeophiresXResult = GeophiresXResult(self._get_test_file_path('../examples/example14_data-center.out'))
 
         capex_vus = r.result['CAPITAL COSTS (M$)']
@@ -1378,6 +1378,17 @@ class EconomicsSamTestCase(BaseTestCase):
             sum(v['value'] if v is not None and k != total_opex_field_name else 0 for k, v in opex_vus.items()),
             places=1,
         )
+
+    def test_chp_fixed_plant_cost_requires_electrical_plant_cost_allocation_ratio(self):
+        with self.assertRaises(RuntimeError) as re:
+            GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('../examples/example_SAM-single-owner-PPA-7_chp.txt'),
+                    params={'Surface Plant Capital Cost': 200},
+                )
+            )
+
+        self.assertIn('CHP Electrical Plant Cost Allocation Ratio is required', str(re.exception))
 
     @staticmethod
     def _new_model(
