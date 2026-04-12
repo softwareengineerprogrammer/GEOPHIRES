@@ -5,6 +5,9 @@
 # The absorption chiller is thermodynamically modeled as cogenerated heat, with heat sales yielding revenue equivalent to Yusifov & Enriquez's estimated savings.
 # The absorption chiller CAPEX of $562M is modeled via an add-on.
 #
+# For further context on SAM Economic Models Combined Heat and Power (CHP) / cogeneration conventions, see:
+# https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-EM_End-Uses-and-Surface-Applications.html
+#
 # Reference: Yusifov, M., & Enriquez, N. (2025, July). From Core to Code: Powering the AI Revolution with Geothermal Energy. Project InnerSpace & Future Ventures. https://projectinnerspace.org/resources/Powering-the-AI-Revolution.pdf
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
