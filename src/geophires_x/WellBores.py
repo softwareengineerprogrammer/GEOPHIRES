@@ -895,9 +895,11 @@ class WellBores:
                         "For CHP topping cycle configurations, providing an injection temperature lower than the "
                         "model-calculated reinjection temperature is necessary to model direct-use heat extraction; "
                         "the difference between the reinjection temperature and the injection temperature determines "
-                        "the heat available for the direct-use application. If not provided (or if the default "
-                        "exceeds the model-calculated reinjection temperature), the direct-use heat component will "
-                        "be approximately zero."
+                        "the heat available for the direct-use application. Because the direct-use application sits "
+                        "downstream of the power plant, altering this parameter directly impacts heat production but "
+                        "does not affect electricity generation. If not provided (or if the default "
+                        "exceeds the model-calculated reinjection temperature), the resulting direct-use heat "
+                        "production will be marginal."
                         # TODO re-assess tooltip text when FGEM is incorporated
                         #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/395?title=FGEM/flexible+geothermal+systems
         )

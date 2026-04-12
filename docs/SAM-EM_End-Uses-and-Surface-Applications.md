@@ -54,6 +54,13 @@ If the electrical power plant has a high O&M burden and the direct-use heat comp
 applying the CAPEX ratio to the total PV will artificially inflate the LCOH and artificially lower the LCOE.
 Analysts should be aware of this proportional scaling approximation when evaluating granular CHP OPEX profiles.
 
+### Injection Temperature and CHP Topping Cycles
+
+In GEOPHIRES, adjusting the `Injection Temperature` for a Cogeneration Topping Cycle will affect the amount of direct-use heat produced, but it will **not** affect electricity production.
+
+This is the physically correct behavior. In a topping cycle, the geofluid flows sequentially: it first passes through the power plant (which extracts heat to generate electricity and rejects the fluid at a calculated thermodynamic exhaust temperature), and then passes through the direct-use application (which extracts the residual heat down to the user-defined `Injection Temperature`).
+
+Because the power plant sits upstream, its electricity production is governed entirely by the production temperature and its own exhaust temperature. Lowering the `Injection Temperature` simply increases the temperature delta across the downstream direct-use application, yielding more heat without altering the upstream power cycle.
 
 ### Examples:
 
