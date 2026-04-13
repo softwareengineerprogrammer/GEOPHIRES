@@ -27,6 +27,10 @@ Geothermal_district_heating_system_with_peaking_boilers.png
 regenerate-schemas.sh
 requirements_2025-08-11.txt
 
+tests/examples/example_SAM-single-owner-PPA-7_chp_cash-flow.csv
+tests/examples/example_SAM-single-owner-PPA-8_heat_cash-flow.csv
+tests/examples/example_SAM-single-owner-PPA-9_cooling_cash-flow.csv
+
 # C extensions
 *.so
 
