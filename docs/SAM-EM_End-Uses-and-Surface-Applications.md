@@ -66,6 +66,9 @@ Because the power plant sits upstream, its electricity production is governed en
 
 1. [example_SAM-single-owner-PPA-7_chp](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7_chp)
 1. [example_SAM-single-owner-PPA-7b_chp-cc](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7b_chp-cc)
+1. [example_SAM-single-owner-PPA-7c](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7c)
+1. [example_SAM-single-owner-PPA-7d_chp-bottoming](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-bottoming)
+1. [example_SAM-single-owner-PPA-7e_chp-parallel](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-parallel)
 
 ## Absorption Chiller (Cooling)
 

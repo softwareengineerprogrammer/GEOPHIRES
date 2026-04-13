@@ -1,4 +1,4 @@
-# Example: SAM Single Owner PPA Economic Model: Combined Heat and Power (CHP): Cogeneration Topping Cycle
+# Example: SAM Single Owner PPA Economic Model: Combined Heat and Power (CHP): Cogeneration Parallel Cycle
 # See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-EM_End-Uses-and-Surface-Applications.html
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
@@ -40,7 +40,8 @@ Field Gathering System Capital Cost Adjustment Factor, 0.35
 # *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
 # *************************************************
 
-End-Use Option, 31, -- CHP Topping Cycle with electricity as the main product
+End-Use Option, 51, -- CHP Parallel Cycle with electricity as the main product
+CHP Fraction, 0.666, -- 2/3 of geofluid flow rate going to do direct-use heat application in CHP parallel cycle
 Power Plant Type, 1, -- Subcritical ORC
 
 Plant Lifetime, 30
