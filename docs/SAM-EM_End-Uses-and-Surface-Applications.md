@@ -12,8 +12,8 @@ including a nominal Levelized Cost of Electricity (LCOE).
 
 ### Examples:
 
-1. [example_SAM-single-owner-PPA](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA)
-1. [example_SAM-single-owner-PPA-6_carbon-revenue](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue)
+1. [example_SAM-single-owner-PPA](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA): 50 MWe
+1. [example_SAM-single-owner-PPA-6_carbon-revenue](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue): Electricity with Carbon Credits
 
 See [SAM Economic Models documentation](SAM-Economic-Models.html#examples) for additional electricity examples.
 
@@ -37,7 +37,7 @@ costs were omitted.
 
 ### Examples:
 
-1. [example_SAM-single-owner-PPA-8_heat](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-8_heat)
+1. [example_SAM-single-owner-PPA-8_heat](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-8_heat): Direct-Use Heat
 
 ## Cogeneration
 
@@ -64,11 +64,11 @@ Because the power plant sits upstream, its electricity production is governed en
 
 ### Examples:
 
-1. [example_SAM-single-owner-PPA-7_chp](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7_chp)
-1. [example_SAM-single-owner-PPA-7b_chp-cc](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7b_chp-cc)
-1. [example_SAM-single-owner-PPA-7c](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7c)
-1. [example_SAM-single-owner-PPA-7d_chp-bottoming](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-bottoming)
-1. [example_SAM-single-owner-PPA-7e_chp-parallel](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-parallel)
+1. [example_SAM-single-owner-PPA-7_chp](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7_chp): Combined Heat and Power (CHP): Cogeneration Topping Cycle
+1. [example_SAM-single-owner-PPA-7b_chp-cc](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7b_chp-cc): Combined Heat and Power (CHP): Carbon Credits
+1. [example_SAM-single-owner-PPA-7c](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7c): Combined Heat and Power (CHP): Carbon Credits with fixed Surface Plant Capital Cost
+1. [example_SAM-single-owner-PPA-7d_chp-bottoming](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-bottoming): Combined Heat and Power (CHP): Cogeneration Bottoming Cycle
+1. [example_SAM-single-owner-PPA-7e_chp-parallel](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-parallel): Combined Heat and Power (CHP): Cogeneration Parallel Cycle
 
 ## Absorption Chiller (Cooling)
 
@@ -79,7 +79,7 @@ SAM execution.
 
 ### Examples:
 
-1. [example_SAM-single-owner-PPA-9_cooling](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-9_cooling)
+1. [example_SAM-single-owner-PPA-9_cooling](https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-9_cooling): Cooling (Direct-Use Heat with Absorption Chiller Surface Application)
 
 ## Limitations
 
