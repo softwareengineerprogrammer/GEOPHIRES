@@ -348,6 +348,34 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SAM-single-owner-PPA-6_carbon-revenue.txt <tests/examples/example_SAM-single-owner-PPA-6_carbon-revenue.txt>`__
      - `.out <tests/examples/example_SAM-single-owner-PPA-6_carbon-revenue.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue>`__
+   * - SAM Single Owner PPA: CHP
+     - `example_SAM-single-owner-PPA-7_chp.txt <tests/examples/example_SAM-single-owner-PPA-7_chp.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-7_chp.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7_chp>`__
+   * - SAM Single Owner PPA: CHP with Carbon Credits
+     - `example_SAM-single-owner-PPA-7b_chp-cc.txt <tests/examples/example_SAM-single-owner-PPA-7b_chp-cc.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-7b_chp-cc.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7b_chp-cc>`__
+   * - SAM Single Owner PPA: CHP with Surface Plant Capital Cost
+     - `example_SAM-single-owner-PPA-7c.txt <tests/examples/example_SAM-single-owner-PPA-7c.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-7c.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7c>`__
+   * - SAM Single Owner PPA: CHP: Bottoming Cycle
+     - `example_SAM-single-owner-PPA-7d_chp-bottoming.txt <tests/examples/example_SAM-single-owner-PPA-7d_chp-bottoming.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-7d_chp-bottoming.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-bottoming>`__
+   * - SAM Single Owner PPA: CHP: Parallel Cycle
+     - `example_SAM-single-owner-PPA-7e_chp-parallel.txt <tests/examples/example_SAM-single-owner-PPA-7e_chp-parallel.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-7e_chp-parallel.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7e_chp-parallel>`__
+   * - SAM Single Owner PPA: Direct-Use Heat
+     - `example_SAM-single-owner-PPA-8_heat.txt <tests/examples/example_SAM-single-owner-PPA-8_heat.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-8_heat.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-8_heat>`__
+   * - SAM Single Owner PPA: Cooling
+     - `example_SAM-single-owner-PPA-9_cooling.txt <tests/examples/example_SAM-single-owner-PPA-9_cooling.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA-9_cooling.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-9_cooling>`__
 .. raw:: html
 
    <embed>
