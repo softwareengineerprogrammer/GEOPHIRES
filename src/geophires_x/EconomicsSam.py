@@ -86,7 +86,7 @@ def validate_read_parameters(model: Model) -> None:
         PlantType.SINGLE_FLASH,
         PlantType.DOUBLE_FLASH,
         PlantType.ABSORPTION_CHILLER,
-        PlantType.INDUSTRIAL,  # FIXME WIP - ensure correct support including Average Reservoir Pumping Cost
+        PlantType.INDUSTRIAL,
     ]
     if model.surfaceplant.plant_type.value not in supported_plant_types:
         raise ValueError(
@@ -302,7 +302,7 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
             single_owner,
             sam_economics.sam_cash_flow_profile,
             model,
-            levelized_cost_nominal_row_name='LCOH Levelized cost of heating nominal ($/MMBTU)',  # FIXME WIP unit
+            levelized_cost_nominal_row_name='LCOH Levelized cost of heating nominal ($/MMBTU)',
         )
     )
 
@@ -312,7 +312,6 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
             sam_economics.sam_cash_flow_profile,
             model,
             levelized_cost_nominal_row_name='LCOC Levelized cost of cooling nominal ($/MMBTU)',
-            # FIXME WIP unit
         )
     )
 

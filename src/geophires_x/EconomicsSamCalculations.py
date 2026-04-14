@@ -585,7 +585,7 @@ class SamEconomicsCalculations:
     @property
     def _may_consume_grid_electricity(self) -> bool:
         """
-        TODO/WIP maybe should be passed in explicitly instead of this potentially fragile derivation/assumption
+        TODO maybe should be passed in explicitly instead of this potentially fragile derivation/assumption
         """
 
         try:

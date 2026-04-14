@@ -497,7 +497,7 @@ def CalculateLCOELCOHLCOC(econ, model: Model) -> tuple[float, float, float]:
                 LCOH = econ.sam_economics_calculations.lcoh_nominal.quantity().to(
                     convertible_unit(econ.LCOH.CurrentUnits.value)).magnitude
             else:
-                # FIXME TODO probably should not happen; relevant to
+                # TODO probably should not happen; relevant to
                 #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/452?title=Deduplicate+calls+to+calculate_pre_revenue_costs_and_cashflow
                 pass
 
