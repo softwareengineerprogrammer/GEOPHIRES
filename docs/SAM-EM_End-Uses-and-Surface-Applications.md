@@ -30,8 +30,8 @@ typically require parasitic pumping power purchased from the grid. The cost of t
 and fully accounted for within GEOPHIRES' baseline OPEX calculations prior to executing the SAM financial engine.
 
 Because these costs are injected directly into the fixed O&M parameters passed to SAM, SAM's native grid-purchase
-mechanisms are bypassed. Consequently, the specific cash flow line items for `Electricity from grid (kWh)`
-and `Electricity purchase ($)` are intentionally removed from the final SAM cash flow profile report.
+mechanisms are bypassed. Consequently, the specific cash flow line items for `Electricity from grid (kWh)`,
+`Electricity to grid net (kWh)`, and `Electricity purchase ($)` are intentionally removed from the final SAM cash flow profile report.
 This prevents the display of default zero values, which could otherwise mislead analysts into assuming parasitic power
 costs were omitted.
 
