@@ -307,9 +307,6 @@ class EconomicsSamTestCase(BaseTestCase):
         )[1:]
 
     def test_direct_use_heat_end_use_supported(self):
-        # import warnings
-        # warnings.filterwarnings('error', message='divide by zero', category=RuntimeWarning)
-
         self.assertIsNotNone(self._get_result({'End-Use Option': 2}))
 
     def test_supported_plant_types(self):

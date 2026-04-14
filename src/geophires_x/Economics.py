@@ -1889,7 +1889,6 @@ class Economics:
         # local variable initialization
         self.OPEX_cost_electricity_plant = 0.0  # TODO should be proper output parameter
         self.OPEX_cost_heat_plant = 0.0  # TODO should be proper output parameter
-        # self.CAPEX_heat_electricity_plant_ratio.value = 0.0
         self.Claborcorrelation = 0.0
         self.Cpumps = 0.0
         self.annualelectricityincome = 0.0

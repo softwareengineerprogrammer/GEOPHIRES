@@ -337,8 +337,6 @@ def _get_lcoe_nominal_cents_per_kwh(
     lcoe_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
     ret = _cash_flow_profile_row(sam_cash_flow_profile, lcoe_row_name)[0]
 
-    # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
-
     return ret
 
 
@@ -355,8 +353,6 @@ def _get_levelized_cost_non_electricity_type_nominal_usd_per_mmbtu(
         return None
 
     ret = levelized_cost_row[0]
-
-    # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
 
     return ret
 
@@ -603,7 +599,6 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
         ret['degradation'] = degradation_total
     else:
         # Occurs for non-electricity end-use options
-        # net_kwh_produced_series = [net_kwh_produced_series] * m.surfaceplant.plant_lifetime.value
         ret['degradation'] = [100.0] * m.surfaceplant.plant_lifetime.value
 
     return ret
