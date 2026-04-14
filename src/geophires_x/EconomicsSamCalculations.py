@@ -630,7 +630,7 @@ class SamEconomicsCalculations:
 
             ret.pop(idx)
 
-        for line_item in ['Electricity from grid (kWh)', 'Electricity purchase ($)']:
+        for line_item in ['Electricity from grid (kWh)', 'Electricity to grid net (kWh)', 'Electricity purchase ($)']:
             _remove_line_item(line_item)
 
         return ret
