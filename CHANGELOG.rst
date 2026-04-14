@@ -5,6 +5,11 @@ Changelog
 GEOPHIRES v3 (2023-2026)
 ------------------------
 
+3.13
+^^^^
+
+3.13: `SAM-EM: Support all End-Use Options (Direct-Use Heat and CHP/Cogeneration) and Absorption Chiller Surface Application <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/143>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.0>`__ | `documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-EM_End-Uses-and-Surface-Applications.html>`__
+
 3.12
 ^^^^
 
