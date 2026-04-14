@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from geophires_x.GeoPHIRESUtils import is_float, is_int
 from geophires_x.Parameter import OutputParameter, SCHEDULE_DSL_MULTIPLIER_SYMBOL
-from geophires_x.Units import Units, PercentUnit, TimeUnit, CurrencyUnit, CurrencyFrequencyUnit
+from geophires_x.Units import Units, PercentUnit, TimeUnit, CurrencyUnit, CurrencyFrequencyUnit, EnergyCostUnit
 
 CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME = 'Construction CAPEX Schedule'
 
@@ -48,6 +48,26 @@ def BuildPricingModel(
             Price[i] = EndPrice
         Price[i] = Price[i] + PTCAddition[i]
     return Price
+
+
+def lcoh_output_parameter() -> OutputParameter:
+    return OutputParameter(
+        Name="LCOH",
+        display_name='Direct-Use heat breakeven price (LCOH)',
+        UnitType=Units.ENERGYCOST,
+        PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,  # $/MMBTU
+        CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU,
+    )
+
+
+def lcoc_output_parameter() -> OutputParameter:
+    return OutputParameter(
+        Name="LCOC",
+        display_name='Direct-Use Cooling Breakeven Price (LCOC)',
+        UnitType=Units.ENERGYCOST,
+        PreferredUnits=EnergyCostUnit.DOLLARSPERMMBTU,
+        CurrentUnits=EnergyCostUnit.DOLLARSPERMMBTU,
+    )
 
 
 _SAM_EM_MOIC_RETURNS_TAX_QUALIFIER = 'after-tax'

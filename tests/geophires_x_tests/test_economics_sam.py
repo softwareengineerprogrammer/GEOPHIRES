@@ -12,6 +12,7 @@ import numpy_financial as npf
 import pandas as pd
 from pint.facets.plain import PlainQuantity
 
+from geophires_x.OptionList import PlantType
 from geophires_x.Parameter import listParameter
 
 from base_test_case import BaseTestCase
@@ -25,11 +26,12 @@ from geophires_x.EconomicsSam import (
     get_sam_cash_flow_profile_tabulated_output,
     _ppa_pricing_model,
     _get_fed_and_state_tax_rates,
-    SamEconomicsCalculations,
     _get_royalty_rate_schedule,
     _validate_construction_capex_schedule,
     _calculate_nominal_discount_rate_from_real_and_inflation_pct,
+    validate_read_parameters,
 )
+from geophires_x.EconomicsSamCalculations import SamEconomicsCalculations
 from geophires_x.GeoPHIRESUtils import sig_figs, quantity, is_float
 
 # noinspection PyProtectedMember
@@ -304,11 +306,30 @@ class EconomicsSamTestCase(BaseTestCase):
             if r_0(r) == name
         )[1:]
 
-    def test_only_electricity_end_use_supported(self):
-        with self.assertRaises(RuntimeError) as e:
-            self._get_result({'End-Use Option': 2})
+    def test_direct_use_heat_end_use_supported(self):
+        self.assertIsNotNone(self._get_result({'End-Use Option': 2}))
 
-        self.assertIn('Invalid End-Use Option (Direct-Use Heat)', str(e.exception))
+    def test_supported_plant_types(self):
+        m: Model = self._new_model(self._egs_test_file_path(), {'Print Output to Console': 1})
+        supported_plant_types = [
+            PlantType.SUB_CRITICAL_ORC,
+            PlantType.SUPER_CRITICAL_ORC,
+            PlantType.SINGLE_FLASH,
+            PlantType.DOUBLE_FLASH,
+            PlantType.ABSORPTION_CHILLER,
+            PlantType.INDUSTRIAL,
+        ]
+
+        for plant_type in supported_plant_types:
+            m.surfaceplant.plant_type.value = plant_type
+
+            validate_read_parameters(m)  # should not raise an exception
+
+        for plant_type in [it for it in PlantType if it not in supported_plant_types]:
+            m.surfaceplant.plant_type.value = plant_type
+
+            with self.assertRaises(ValueError):
+                validate_read_parameters(m)
 
     def test_multiple_construction_years(self):
         construction_years_2: GeophiresXResult = self._get_result(
@@ -1320,6 +1341,51 @@ class EconomicsSamTestCase(BaseTestCase):
             self.assertEqual(1, len(row))
 
         self.assertEqual(lcoe_row[0], round(pv_annual_costs_row[0] * 100 / pv_annual_energy_row[0], 2))
+
+    def test_chp_output(self):
+        r: GeophiresXResult = GeophiresXResult(self._get_test_file_path('../examples/example14_data-center.out'))
+
+        capex_vus = r.result['CAPITAL COSTS (M$)']
+
+        surface_power_plant_costs_vu = capex_vus['Surface power plant costs']
+
+        self.assertEqual('MUSD', surface_power_plant_costs_vu['unit'])
+
+        self.assertAlmostEqual(4225, surface_power_plant_costs_vu['value'], places=0)
+
+        self.assertEqual(
+            surface_power_plant_costs_vu['value'],
+            sum(capex_vus[it]['value'] for it in ['of which Electrical Plant Cost', 'of which Heat Plant Cost']),
+        )
+
+        self.assertAlmostEqual(
+            capex_vus['Total surface equipment costs']['value'],
+            sum(
+                capex_vus[it]['value']
+                for it in ['Surface power plant costs', 'Transmission pipeline cost', 'Field gathering system costs']
+            ),
+            places=1,
+        )
+
+        opex_vus = r.result['OPERATING AND MAINTENANCE COSTS (M$/yr)']
+        total_opex_field_name = 'Total operating and maintenance costs'
+
+        self.assertAlmostEqual(
+            opex_vus[total_opex_field_name]['value'],
+            sum(v['value'] if v is not None and k != total_opex_field_name else 0 for k, v in opex_vus.items()),
+            places=1,
+        )
+
+    def test_chp_fixed_plant_cost_requires_electrical_plant_cost_allocation_ratio(self):
+        with self.assertRaises(RuntimeError) as re:
+            GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('../examples/example_SAM-single-owner-PPA-7_chp.txt'),
+                    params={'Surface Plant Capital Cost': 200},
+                )
+            )
+
+        self.assertIn('CHP Electrical Plant Cost Allocation Ratio is required', str(re.exception))
 
     @staticmethod
     def _new_model(

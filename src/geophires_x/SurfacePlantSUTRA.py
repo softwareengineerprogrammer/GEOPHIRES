@@ -102,6 +102,7 @@ class SurfacePlantSUTRA(SurfacePlant):
 
         self.PumpingkWh = self.OutputParameterDict[self.PumpingkWh.Name] = OutputParameter(
             Name="Annual Pumping Electricity Required",
+            display_name='Annual Electricity Use for Pumping',
             UnitType=Units.ENERGYFREQUENCY,
             PreferredUnits=EnergyFrequencyUnit.KWhPERYEAR,
             CurrentUnits=EnergyFrequencyUnit.KWhPERYEAR

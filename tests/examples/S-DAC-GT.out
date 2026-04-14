@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.9.7
- Simulation Date: 2025-05-15
- Simulation Time:  10:13
- Calculation Time:      0.099 sec
+ GEOPHIRES Version: 3.12.1
+ Simulation Date: 2026-04-07
+ Simulation Time:  10:46
+ Calculation Time:      0.135 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -26,7 +26,7 @@ Simulation Metadata
                            ***ECONOMIC PARAMETERS***
 
       Economic Model = BICYCLE
-      Accrued financing during construction:                  0.00 %
+      Accrued financing during construction:                 0.00 %
       Project lifetime:                                      30 yr
       Capacity factor:                                       90.0 %
       Project NPV:                                         -82.17 MUSD
@@ -66,7 +66,7 @@ Simulation Metadata
       m/A Drawdown Parameter:                                 0.00002 1/year
       Bottom-hole temperature:                              232.00 degC
       Reservoir volume calculated with fracture separation and number of fractures as input
-      Number of fractures:                                   12.00
+      Number of fractures:                                    12
       Fracture separation:                                   80.00 meter
       Reservoir volume:                               176000000 m**3
       Reservoir hydrostatic pressure:                         29019.48 kPa
@@ -90,13 +90,15 @@ Simulation Metadata
 
                           ***CAPITAL COSTS (M$)***
 
+         Exploration costs:                                   4.42 MUSD
          Drilling and completion costs:                      25.55 MUSD
          Drilling and completion costs per well:              4.26 MUSD
          Stimulation costs:                                   4.53 MUSD
          Surface power plant costs:                          64.90 MUSD
+            of which Electrical Plant Cost:                  59.87 MUSD
+            of which Heat Plant Cost:                         5.03 MUSD
          Field gathering system costs:                        3.16 MUSD
          Total surface equipment costs:                      68.06 MUSD
-         Exploration costs:                                   4.42 MUSD
       Total capital costs:                                  102.56 MUSD
 
 
@@ -109,7 +111,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Initial geofluid availability:                          0.23 MW/(kg/s)
       Maximum Total Electricity Generation:                  21.16 MW
       Average Total Electricity Generation:                  19.80 MW

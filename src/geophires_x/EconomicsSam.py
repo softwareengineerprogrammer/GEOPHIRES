@@ -3,11 +3,10 @@ from __future__ import annotations
 import json
 import logging
 import os
-from dataclasses import dataclass, field
 from functools import lru_cache
 from math import isnan
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from decimal import Decimal
 
@@ -29,377 +28,31 @@ from pint.facets.plain import PlainQuantity
 from tabulate import tabulate
 
 from geophires_x import Model as Model
+from geophires_x.EconomicsSamCalculations import (
+    SamEconomicsCalculations,
+    CapacityPaymentRevenueSource,
+    ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY,
+    _after_tax_net_cash_flow_all_years,
+    _net_cash_flow_all_years,
+)
 from geophires_x.EconomicsSamCashFlow import (
     _calculate_sam_economics_cash_flow_operational_years,
-    _SAM_CASH_FLOW_NAN_STR,
 )
 from geophires_x.EconomicsUtils import (
     BuildPricingModel,
-    wacc_output_parameter,
-    nominal_discount_rate_parameter,
-    after_tax_irr_parameter,
-    moic_parameter,
-    project_vir_parameter,
-    project_payback_period_parameter,
-    total_capex_parameter_output_parameter,
-    royalty_cost_output_parameter,
-    overnight_capital_cost_output_parameter,
     _SAM_EM_MOIC_RETURNS_TAX_QUALIFIER,
-    investment_tax_credit_output_parameter,
 )
 from geophires_x.EconomicsSamPreRevenue import (
-    _AFTER_TAX_NET_CASH_FLOW_ROW_NAME,
     PreRevenueCostsAndCashflow,
     calculate_pre_revenue_costs_and_cashflow,
     adjust_phased_schedule_to_new_length,
 )
 from geophires_x.GeoPHIRESUtils import is_float, is_int, sig_figs, quantity
-from geophires_x.OptionList import EconomicModel, EndUseOptions
+from geophires_x.OptionList import EconomicModel, EndUseOptions, PlantType
 from geophires_x.Parameter import Parameter, OutputParameter, floatParameter, listParameter
-from geophires_x.Units import convertible_unit, EnergyCostUnit, CurrencyUnit, Units
+from geophires_x.Units import convertible_unit
 
 _log = logging.getLogger(__name__)
-
-ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY = 'O&M production-based expense ($)'
-
-
-@dataclass
-class SamEconomicsCalculations:
-    _sam_cash_flow_profile_operational_years: list[list[Any]]
-    """
-    Operational cash flow profile from SAM financial engine
-    """
-
-    pre_revenue_costs_and_cash_flow: PreRevenueCostsAndCashflow
-
-    lcoe_nominal: OutputParameter = field(
-        default_factory=lambda: OutputParameter(
-            UnitType=Units.ENERGYCOST,
-            CurrentUnits=EnergyCostUnit.CENTSSPERKWH,
-        )
-    )
-
-    overnight_capital_cost: OutputParameter = field(default_factory=overnight_capital_cost_output_parameter)
-
-    capex: OutputParameter = field(default_factory=total_capex_parameter_output_parameter)
-
-    _royalties_rate_schedule: list[float] | None = None
-    royalties_opex: OutputParameter = field(default_factory=royalty_cost_output_parameter)
-
-    project_npv: OutputParameter = field(
-        default_factory=lambda: OutputParameter(
-            UnitType=Units.CURRENCY,
-            CurrentUnits=CurrencyUnit.MDOLLARS,
-        )
-    )
-
-    after_tax_irr: OutputParameter = field(default_factory=after_tax_irr_parameter)
-    nominal_discount_rate: OutputParameter = field(default_factory=nominal_discount_rate_parameter)
-    wacc: OutputParameter = field(default_factory=wacc_output_parameter)
-    moic: OutputParameter = field(default_factory=moic_parameter)
-    project_vir: OutputParameter = field(default_factory=project_vir_parameter)
-
-    project_payback_period: OutputParameter = field(default_factory=project_payback_period_parameter)
-
-    investment_tax_credit: OutputParameter = field(default_factory=investment_tax_credit_output_parameter)
-
-    @property
-    def _pre_revenue_years_count(self) -> int:
-        return len(
-            self.pre_revenue_costs_and_cash_flow.pre_revenue_cash_flow_profile_dict[_AFTER_TAX_NET_CASH_FLOW_ROW_NAME]
-        )
-
-    @property
-    def sam_cash_flow_profile(self) -> list[list[Any]]:
-        ret: list[list[Any]] = self._sam_cash_flow_profile_operational_years.copy()
-        col_count = len(self._sam_cash_flow_profile_operational_years[0])
-
-        # TODO support/insert calendar year line item https://github.com/NREL/GEOPHIRES-X/issues/439
-
-        pre_revenue_years_to_insert = self._pre_revenue_years_count - 1
-
-        construction_rows: list[list[Any]] = [
-            ['CONSTRUCTION'] + [''] * (len(self._sam_cash_flow_profile_operational_years[0]) - 1)
-        ]
-
-        for row_index in range(len(self._sam_cash_flow_profile_operational_years)):
-            pre_revenue_row_content = [''] * pre_revenue_years_to_insert
-            insert_index = 1
-
-            if row_index == 0:
-                for pre_revenue_year in range(pre_revenue_years_to_insert):
-                    negative_year_index: int = self._pre_revenue_years_count - 1 - pre_revenue_year
-                    pre_revenue_row_content[pre_revenue_year] = f'Year -{negative_year_index}'
-
-                for _, row_ in enumerate(self.pre_revenue_costs_and_cash_flow.pre_revenue_cash_flow_profile):
-                    pre_revenue_row = row_.copy()
-                    pre_revenue_row.extend([''] * (col_count - len(pre_revenue_row)))
-                    construction_rows.append(pre_revenue_row)
-
-            #  TODO zero-vectors for non-construction years e.g. Debt principal payment ($)
-
-            adjusted_row = [ret[row_index][0]] + pre_revenue_row_content + ret[row_index][insert_index:]
-            ret[row_index] = adjusted_row
-
-        construction_rows.append([''] * len(self._sam_cash_flow_profile_operational_years[0]))
-        for construction_row in reversed(construction_rows):
-            ret.insert(1, construction_row)
-
-        def _get_row_index(row_name_: str) -> list[Any]:
-            return [it[0] for it in ret].index(row_name_)
-
-        def _get_row(row_name__: str) -> list[Any]:
-            for r in ret:
-                if r[0] == row_name__:
-                    return r[1:]
-
-            raise ValueError(f'Could not find row with name {row_name__}')
-
-        after_tax_cash_flow: list[float] = (
-            self.pre_revenue_costs_and_cash_flow.pre_revenue_cash_flow_profile_dict[_AFTER_TAX_NET_CASH_FLOW_ROW_NAME]
-            + _get_row('Total after-tax returns ($)')[self._pre_revenue_years_count :]
-        )
-        after_tax_cash_flow = [float(it) for it in after_tax_cash_flow if is_float(it)]
-        irr_row_name = 'After-tax cumulative IRR (%)'
-        ret.insert(
-            _get_row_index(irr_row_name), ['After-tax net cash flow ($)', *[int(it) for it in after_tax_cash_flow]]
-        )
-
-        npv_usd = []
-        irr_pct = []
-        for year in range(len(after_tax_cash_flow)):
-            npv_usd.append(
-                round(
-                    npf.npv(
-                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                        after_tax_cash_flow[: year + 1],
-                    )
-                )
-            )
-
-            year_irr = npf.irr(after_tax_cash_flow[: year + 1]) * 100.0
-            irr_pct.append(year_irr if not isnan(year_irr) else _SAM_CASH_FLOW_NAN_STR)
-
-        ret[_get_row_index('After-tax cumulative NPV ($)')] = ['After-tax cumulative NPV ($)'] + npv_usd
-        ret[_get_row_index('After-tax cumulative IRR (%)')] = [irr_row_name] + irr_pct
-
-        if self._royalties_rate_schedule is not None:
-            ret = self._insert_royalties_rate_schedule(ret)
-
-        ret = self._insert_calculated_levelized_metrics_line_items(ret)
-
-        return ret
-
-    def _insert_royalties_rate_schedule(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
-        ret = cf_ret.copy()
-
-        def _get_row_index(row_name_: str) -> list[Any]:
-            return [it[0] for it in ret].index(row_name_)
-
-        ret.insert(
-            _get_row_index(ROYALTIES_OPEX_CASH_FLOW_LINE_ITEM_KEY),
-            [
-                *['Royalty rate (%)'],
-                *([''] * (self._pre_revenue_years_count)),
-                *[
-                    quantity(it, 'dimensionless').to(convertible_unit('percent')).magnitude
-                    for it in self._royalties_rate_schedule
-                ],
-            ],
-        )
-
-        return ret
-
-    # noinspection DuplicatedCode
-    def _insert_calculated_levelized_metrics_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
-        ret = cf_ret.copy()
-
-        __row_names: list[str] = [it[0] for it in ret]
-
-        def _get_row_index(row_name_: str) -> int:
-            return __row_names.index(row_name_)
-
-        def _get_row_indexes(row_name_: str, after_row_name: str | None = None) -> list[int]:
-            after_criteria_met: bool = True if after_row_name is None else False
-            indexes = []
-            for idx, _row_name_ in enumerate(__row_names):
-                if _row_name_ == after_row_name:
-                    after_criteria_met = True
-
-                if _row_name_ == row_name_ and after_criteria_met:
-                    indexes.append(idx)
-
-            return indexes
-
-        def _get_row_index_after(row_name_: str, after_row_name: str) -> int:
-            return _get_row_indexes(row_name_, after_row_name=after_row_name)[0]
-
-        after_tax_lcoe_and_ppa_price_header_row_title = 'AFTER-TAX LCOE AND PPA PRICE'
-
-        # Backfill annual costs
-        annual_costs_usd_row_name = 'Annual costs ($)'
-        annual_costs = cf_ret[_get_row_index(annual_costs_usd_row_name)].copy()
-        after_tax_net_cash_flow_usd = cf_ret[_get_row_index('After-tax net cash flow ($)')]
-
-        annual_costs_backfilled = [
-            *after_tax_net_cash_flow_usd[1 : (self._pre_revenue_years_count + 1)],
-            *annual_costs[(self._pre_revenue_years_count + 1) :],
-        ]
-
-        ret[_get_row_index(annual_costs_usd_row_name)][1:] = annual_costs_backfilled
-
-        ppa_revenue_row_name = 'PPA revenue ($)'
-        ppa_revenue_row_index = _get_row_index_after(
-            ppa_revenue_row_name, after_tax_lcoe_and_ppa_price_header_row_title
-        )
-        year_0_ppa_revenue: float = ret[ppa_revenue_row_index][self._pre_revenue_years_count]
-        if year_0_ppa_revenue != 0.0:
-            # Shouldn't happen
-            _log.warning(f'PPA revenue in Year 0 ({year_0_ppa_revenue}) is not zero, this is unexpected.')
-
-        ret[ppa_revenue_row_index][1 : self._pre_revenue_years_count] = [year_0_ppa_revenue] * (
-            self._pre_revenue_years_count - 1
-        )
-
-        electricity_to_grid_kwh_row_name = 'Electricity to grid (kWh)'
-        electricity_to_grid = cf_ret[_get_row_index(electricity_to_grid_kwh_row_name)].copy()
-        electricity_to_grid_backfilled = [
-            0 if it == '' else (int(it) if is_int(it) else it) for it in electricity_to_grid[1:]
-        ]
-
-        electricity_to_grid_kwh_row_index = _get_row_index_after(
-            electricity_to_grid_kwh_row_name, after_tax_lcoe_and_ppa_price_header_row_title
-        )
-        ret[electricity_to_grid_kwh_row_index][1:] = electricity_to_grid_backfilled
-
-        pv_of_annual_costs_backfilled_row_name = 'Present value of annual costs ($)'
-
-        # Backfill PV of annual costs
-        annual_costs_backfilled_pv_processed = annual_costs_backfilled.copy()
-        pv_of_annual_costs_backfilled = []
-        for year in range(self._pre_revenue_years_count):
-            pv_at_year = abs(
-                round(
-                    npf.npv(
-                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                        annual_costs_backfilled_pv_processed,
-                    )
-                )
-            )
-
-            pv_of_annual_costs_backfilled.append(pv_at_year)
-
-            cost_at_year = annual_costs_backfilled_pv_processed.pop(0)
-            annual_costs_backfilled_pv_processed[0] = annual_costs_backfilled_pv_processed[0] + cost_at_year
-
-        pv_of_annual_costs_backfilled_row = [
-            *[pv_of_annual_costs_backfilled_row_name],
-            *pv_of_annual_costs_backfilled,
-        ]
-
-        pv_of_annual_costs_row_name = 'Present value of annual costs ($)'
-        pv_of_annual_costs_row_index = _get_row_index(pv_of_annual_costs_row_name)
-        ret[pv_of_annual_costs_row_index][1:] = [
-            pv_of_annual_costs_backfilled[0],
-            *([''] * (self._pre_revenue_years_count - 1)),
-        ]
-
-        # Backfill PV of electricity to grid
-        electricity_to_grid_backfilled_pv_processed = electricity_to_grid_backfilled.copy()
-        pv_of_electricity_to_grid_backfilled_kwh = []
-        for year in range(self._pre_revenue_years_count):
-            pv_at_year = abs(
-                round(
-                    npf.npv(
-                        self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                        electricity_to_grid_backfilled_pv_processed,
-                    )
-                )
-            )
-
-            pv_of_electricity_to_grid_backfilled_kwh.append(pv_at_year)
-
-            electricity_to_grid_at_year = electricity_to_grid_backfilled_pv_processed.pop(0)
-            electricity_to_grid_backfilled_pv_processed[0] = (
-                electricity_to_grid_backfilled_pv_processed[0] + electricity_to_grid_at_year
-            )
-
-        pv_of_annual_energy_row_name = 'Present value of annual energy nominal (kWh)'
-        for pv_of_annual_energy_row_index in _get_row_indexes(pv_of_annual_energy_row_name):
-            ret[pv_of_annual_energy_row_index][1:] = [
-                pv_of_electricity_to_grid_backfilled_kwh[0],
-                *([''] * (self._pre_revenue_years_count - 1)),
-            ]
-
-        def backfill_lcoe_nominal() -> None:
-            pv_of_electricity_to_grid_backfilled_row_kwh = pv_of_electricity_to_grid_backfilled_kwh
-            pv_of_annual_costs_backfilled_row_values_usd = pv_of_annual_costs_backfilled_row[
-                1 if isinstance(pv_of_annual_costs_backfilled_row[0], str) else 0 :
-            ]
-
-            lcoe_nominal_backfilled = []
-            for _year in range(len(pv_of_annual_costs_backfilled_row_values_usd)):
-                lcoe_nominal_backfilled.append(
-                    pv_of_annual_costs_backfilled_row_values_usd[_year]
-                    * 100
-                    / pv_of_electricity_to_grid_backfilled_row_kwh[_year]
-                )
-
-            lcoe_nominal_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
-            lcoe_nominal_row_index = _get_row_index(lcoe_nominal_row_name)
-            ret[lcoe_nominal_row_index][1:] = [
-                round(lcoe_nominal_backfilled[0], 2),
-                *([None] * (self._pre_revenue_years_count - 1)),
-            ]
-
-        backfill_lcoe_nominal()
-
-        def backfill_lppa_metrics() -> None:
-            pv_of_ppa_revenue_row_index = _get_row_index_after(
-                'Present value of PPA revenue ($)', after_tax_lcoe_and_ppa_price_header_row_title
-            )
-            first_year_pv_of_ppa_revenue_usd = round(
-                npf.npv(
-                    self.nominal_discount_rate.quantity().to('dimensionless').magnitude,
-                    ret[ppa_revenue_row_index][1:],
-                )
-            )
-            ret[pv_of_ppa_revenue_row_index][1:] = [
-                first_year_pv_of_ppa_revenue_usd,
-                *([None] * (self._pre_revenue_years_count - 1)),
-            ]
-
-            ppa_price_row_index = _get_row_index('PPA price (cents/kWh)')
-            year_0_ppa_price: float = ret[ppa_price_row_index][self._pre_revenue_years_count]
-            if year_0_ppa_price != 0.0:
-                # Shouldn't happen
-                _log.warning(f'PPA price in Year 0 ({year_0_ppa_price}) is not zero, this is unexpected.')
-
-            # TODO (maybe)
-            # ppa_revenue_all_years = [
-            #     *([year_0_ppa_price] * (self._pre_revenue_years_count - 1)),
-            #     *ret[ppa_price_row_index][self._pre_revenue_years_count :],
-            # ]
-            # ret[_get_row_index('PPA price (cents/kWh)')][1:] = ppa_revenue_all_years
-
-            # Note: expected to be same in all pre-revenue years since both price and revenue are zero until COD
-            first_year_lppa_cents_per_kwh = (
-                first_year_pv_of_ppa_revenue_usd * 100.0 / ret[_get_row_index(pv_of_annual_energy_row_name)][1]
-            )
-
-            lppa_row_name = 'LPPA Levelized PPA price nominal (cents/kWh)'
-            ret[_get_row_index(lppa_row_name)][1:] = [
-                round(first_year_lppa_cents_per_kwh, 2),
-                *([None] * self._pre_revenue_years_count),
-            ]
-
-        backfill_lppa_metrics()
-
-        return ret
-
-    @property
-    def sam_after_tax_net_cash_flow_all_years(self) -> list[float]:
-        return _after_tax_net_cash_flow_all_years(self.sam_cash_flow_profile, self._pre_revenue_years_count)
 
 
 def validate_read_parameters(model: Model) -> None:
@@ -411,12 +64,36 @@ def validate_read_parameters(model: Model) -> None:
             f'{supported_description}.'
         )
 
-    if model.surfaceplant.enduse_option.value != EndUseOptions.ELECTRICITY:
+    if (
+        model.surfaceplant.enduse_option.value
+        not in (
+            EndUseOptions.ELECTRICITY,
+            EndUseOptions.HEAT,
+        )
+        and not model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option
+    ):
         raise ValueError(
             _inv_msg(
                 model.surfaceplant.enduse_option.Name,
                 model.surfaceplant.enduse_option.value.value,
-                f'{EndUseOptions.ELECTRICITY.name} End-Use Option',
+                f'{EndUseOptions.ELECTRICITY.value}, {EndUseOptions.HEAT.value}, ' f'and Cogeneration End-Use Options',
+            )
+        )
+
+    supported_plant_types = [
+        PlantType.SUB_CRITICAL_ORC,
+        PlantType.SUPER_CRITICAL_ORC,
+        PlantType.SINGLE_FLASH,
+        PlantType.DOUBLE_FLASH,
+        PlantType.ABSORPTION_CHILLER,
+        PlantType.INDUSTRIAL,
+    ]
+    if model.surfaceplant.plant_type.value not in supported_plant_types:
+        raise ValueError(
+            _inv_msg(
+                model.surfaceplant.plant_type.Name,
+                model.surfaceplant.plant_type.value.value,
+                ', '.join(map(lambda x: x.value, supported_plant_types)),
             )
         )
 
@@ -433,6 +110,7 @@ def validate_read_parameters(model: Model) -> None:
             f'{eir.Name} provided value ({eir.value}) will be ignored. (SAM Economics does not support {eir.Name}.)'
         )
 
+    # noinspection PyUnresolvedReferences
     econ: 'Economics' = model.economics
 
     econ.construction_capex_schedule.value = _validate_construction_capex_schedule(
@@ -548,6 +226,9 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics: SamEconomicsCalculations = SamEconomicsCalculations(
         _sam_cash_flow_profile_operational_years=cash_flow_operational_years,
         pre_revenue_costs_and_cash_flow=calculate_pre_revenue_costs_and_cashflow(model),
+        electricity_plant_frac_of_capex=model.economics.CAPEX_heat_electricity_plant_ratio.quantity()
+        .to('dimensionless')
+        .magnitude,
     )
 
     sam_economics.overnight_capital_cost.value = (
@@ -607,52 +288,34 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
         .magnitude
     )
 
+    if _has_capacity_payment_revenue_sources(model):
+        sam_economics.capacity_payment_revenue_sources = _get_capacity_payment_revenue_sources(model)
+
     # Note that this calculation is order-dependent on sam_economics.nominal_discount_rate
     sam_economics.lcoe_nominal.value = sf(
         _get_lcoe_nominal_cents_per_kwh(single_owner, sam_economics.sam_cash_flow_profile, model)
     )
 
-    return sam_economics
-
-
-def _after_tax_net_cash_flow_all_years(cash_flow: list[list[Any]], pre_revenue_years_count: int) -> list[float]:
-    return _net_cash_flow_all_years(cash_flow, pre_revenue_years_count, tax_qualifier='after-tax')
-
-
-def _net_cash_flow_all_years(
-    cash_flow: list[list[Any]], pre_revenue_years_count: int, tax_qualifier='after-tax'
-) -> list[float]:
-    if tax_qualifier not in ['after-tax', 'pre-tax']:
-        raise ValueError(f'Invalid tax qualifier: {tax_qualifier}')
-
-    def _get_row(row_name__: str) -> list[Any]:
-        for r in cash_flow:
-            if r[0] == row_name__:
-                return r[1:]
-
-        raise ValueError(f'Could not find row with name {row_name__}')
-
-    def _construction_returns_row(_construction_tax_qualifier: str) -> list[Any]:
-        returns_row_name = (
-            f'Total {_construction_tax_qualifier} returns [construction] ($)'
-            if tax_qualifier == 'pre-tax'
-            else f'After-tax net cash flow [construction] ($)'
+    # Note that LCOH & LCOC calculations are order-dependent on sam_economics.capacity_payment_revenue_sources
+    sam_economics.lcoh_nominal.value = sf(
+        _get_levelized_cost_non_electricity_type_nominal_usd_per_mmbtu(
+            single_owner,
+            sam_economics.sam_cash_flow_profile,
+            model,
+            levelized_cost_nominal_row_name='LCOH Levelized cost of heating nominal ($/MMBTU)',
         )
-        return _get_row(returns_row_name)
+    )
 
-    try:
-        construction_returns_row = _construction_returns_row(tax_qualifier)
-    except ValueError as ve:
-        if tax_qualifier == 'pre-tax':
-            # TODO log warning
-            construction_returns_row = _construction_returns_row('after-tax')
-        else:
-            raise ve
+    sam_economics.lcoc_nominal.value = sf(
+        _get_levelized_cost_non_electricity_type_nominal_usd_per_mmbtu(
+            single_owner,
+            sam_economics.sam_cash_flow_profile,
+            model,
+            levelized_cost_nominal_row_name='LCOC Levelized cost of cooling nominal ($/MMBTU)',
+        )
+    )
 
-    return [
-        *[float(it) for it in construction_returns_row if is_float(it)],
-        *[float(it) for it in _get_row(f'Total {tax_qualifier} returns ($)')[pre_revenue_years_count:] if is_float(it)],
-    ]
+    return sam_economics
 
 
 def _get_project_npv_musd(single_owner: Singleowner, cash_flow: list[list[Any]], model: Model) -> float:
@@ -674,7 +337,22 @@ def _get_lcoe_nominal_cents_per_kwh(
     lcoe_row_name = 'LCOE Levelized cost of energy nominal (cents/kWh)'
     ret = _cash_flow_profile_row(sam_cash_flow_profile, lcoe_row_name)[0]
 
-    # model.logger.info(f'Single Owner LCOE nominal (cents/kWh): {single_owner.Outputs.lcoe_nom}');
+    return ret
+
+
+# noinspection PyUnusedLocal
+def _get_levelized_cost_non_electricity_type_nominal_usd_per_mmbtu(
+    single_owner: Singleowner,
+    sam_cash_flow_profile: list[list[Any]],
+    model: Model,
+    levelized_cost_nominal_row_name: str,
+) -> float | None:
+    try:
+        levelized_cost_row = _cash_flow_profile_row(sam_cash_flow_profile, levelized_cost_nominal_row_name)
+    except StopIteration:
+        return None
+
+    ret = levelized_cost_row[0]
 
     return ret
 
@@ -908,12 +586,20 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
 
     ret['inflation_rate'] = econ.RINFL.quantity().to(convertible_unit('%')).magnitude
 
-    max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.value)
-    degradation_total = [
-        (max_total_kWh_produced - it) / max_total_kWh_produced * 100 for it in m.surfaceplant.NetkWhProduced.value
-    ]
+    max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.quantity().to(convertible_unit('kWh')).magnitude)
 
-    ret['degradation'] = degradation_total
+    net_kwh_produced_series: Iterable | float | int = (
+        m.surfaceplant.NetkWhProduced.quantity().to(convertible_unit('kWh')).magnitude
+    )
+
+    if isinstance(net_kwh_produced_series, Iterable):
+        degradation_total = [
+            (max_total_kWh_produced - it) / max_total_kWh_produced * 100 for it in net_kwh_produced_series
+        ]
+        ret['degradation'] = degradation_total
+    else:
+        # Occurs for non-electricity end-use options
+        ret['degradation'] = [100.0] * m.surfaceplant.plant_lifetime.value
 
     return ret
 
@@ -968,6 +654,19 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     for year_index in range(model.surfaceplant.plant_lifetime.value):
         opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
 
+    if model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
+        # For pure direct-use, pumping is a grid purchase.
+        # Create an annual array adding the specific year's pumping cost to the base O&M.
+        # TODO evaluate eventually migrating to SAM's native electricity purchase mechanisms instead
+        #  (would require refactoring GEOPHIRES generation internals to support negative production...)
+
+        elec_rate_usd_per_kwh = model.surfaceplant.electricity_cost_to_buy.quantity().to('USD/kWh').magnitude
+        annual_pumping_kwh = model.surfaceplant.PumpingkWh.quantity().to('kWh/year').magnitude
+        opex_by_year_usd = [
+            opex_by_year_usd[year_index] + annual_pumping_kwh[year_index] * elec_rate_usd_per_kwh
+            for year_index in range(model.surfaceplant.plant_lifetime.value)
+        ]
+
     ret['om_fixed'] = opex_by_year_usd
 
     # GEOPHIRES assumes O&M fixed costs are not affected by inflation
@@ -1016,29 +715,105 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     return ret
 
 
-def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
-    ret = {}
+def _has_capacity_payment_revenue_sources(model: Model) -> bool:
+    return len(_get_capacity_payment_revenue_sources(model)) > 0
+
+
+def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentRevenueSource]:
+    ret: list[CapacityPaymentRevenueSource] = []
 
     econ = model.economics
 
-    if econ.DoAddOnCalculations.value or econ.DoCarbonCalculations.value:
-        ret['cp_capacity_payment_type'] = 1
-        ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+    def _has_revenue_type(econ_revenue_output: OutputParameter) -> bool:
+        return isinstance(econ_revenue_output.value, Iterable) and any(it > 0 for it in econ_revenue_output.value)
 
-        if econ.DoAddOnCalculations.value:
-            add_on_profit_per_year_usd = np.sum(
-                model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
-            )
-            add_on_profit_usd_series = [add_on_profit_per_year_usd] * model.surfaceplant.plant_lifetime.value
-            for i, add_on_profit_usd in enumerate(add_on_profit_usd_series):
-                ret['cp_capacity_payment_amount'][i] += add_on_profit_usd
+    has_heat_revenue = _has_revenue_type(econ.HeatRevenue)
+    has_cooling_revenue = _has_revenue_type(econ.CoolingRevenue)
 
-        if econ.DoCarbonCalculations.value:
-            carbon_revenue_usd_series = (
-                econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
+    if econ.DoAddOnCalculations.value:
+        add_on_profit_per_year_usd = np.sum(
+            model.addeconomics.AddOnProfitGainedPerYear.quantity().to('USD/yr').magnitude
+        )
+        add_on_profit_usd_series = [round(add_on_profit_per_year_usd)] * model.surfaceplant.plant_lifetime.value
+        add_on_source = CapacityPaymentRevenueSource(name='Add-On', revenue_usd=add_on_profit_usd_series)
+        ret.append(add_on_source)
+
+    def _price_vector(price_value: list[float]) -> list[float | str]:
+        return [
+            *(['' if it == 0.0 else it for it in price_value[: _pre_revenue_years_count(model) - 1]]),
+            *price_value[_pre_revenue_years_count(model) - 1 :],
+        ]
+
+    if econ.DoCarbonCalculations.value:
+        carbon_revenue_usd_series = (
+            econ.CarbonRevenue.quantity().to('USD/yr').magnitude[_pre_revenue_years_count(model) :]
+        )
+        carbon_revenue_source = CapacityPaymentRevenueSource(
+            name='Carbon credits',  # TODO/WIP naming re: https://github.com/NatLabRockies/GEOPHIRES-X/issues/476
+            revenue_usd=[round(it) for it in carbon_revenue_usd_series],
+            price_label=f'Carbon price ({econ.CarbonPrice.CurrentUnits.value})',
+            price=_price_vector(econ.CarbonPrice.value),
+            amount_provided_label=f'Saved Carbon Production ({econ.CarbonThatWouldHaveBeenProducedAnnually.CurrentUnits.value})',
+            amount_provided=econ.CarbonThatWouldHaveBeenProducedAnnually.value[_pre_revenue_years_count(model) :],
+        )
+        ret.append(carbon_revenue_source)
+
+    def _get_revenue_usd_series(econ_revenue_output: OutputParameter) -> Iterable[float]:
+        return [
+            round(it)
+            for it in econ_revenue_output.quantity().to('USD/year').magnitude[_pre_revenue_years_count(model) :]
+        ]
+
+    if has_heat_revenue:
+        ret.append(
+            CapacityPaymentRevenueSource(
+                name='Heat',
+                revenue_usd=_get_revenue_usd_series(econ.HeatRevenue),
+                price_label=f'Heat price ({econ.HeatPrice.CurrentUnits.value})',
+                price=_price_vector(econ.HeatPrice.value),
+                amount_provided_label=f'Heat provided ({model.surfaceplant.HeatkWhProduced.CurrentUnits.value})',
+                amount_provided=model.surfaceplant.HeatkWhProduced.value,
             )
-            for i, carbon_revenue_usd in enumerate(carbon_revenue_usd_series):
-                ret['cp_capacity_payment_amount'][i] += carbon_revenue_usd
+        )
+
+    if has_cooling_revenue:
+        # cooling_kWh_Produced's default preferred units are kWh/yr.
+        # The /yr is redundant when displaying on an annualized basis.
+        # TODO there are various degrees of increased sophistication with which this adjustment could be performed,
+        #  e.g. adding a derived property to CurrencyFrequencyUnit instead of manually splitting the string,
+        #  re-interpolating the revenue vector if it's not annualized, etc.
+        cooling_provided_unit = model.surfaceplant.cooling_kWh_Produced.CurrentUnits.value
+        if (cooling_provided_unit if cooling_provided_unit is not None else '').endswith('/yr'):
+            cooling_provided_unit = cooling_provided_unit.split('/yr')[0]
+
+        ret.append(
+            CapacityPaymentRevenueSource(
+                name='Cooling',
+                revenue_usd=_get_revenue_usd_series(econ.CoolingRevenue),
+                price_label=f'Cooling price ({econ.CoolingPrice.CurrentUnits.value})',
+                price=_price_vector(econ.CoolingPrice.value),
+                amount_provided_label=f'Cooling provided ({cooling_provided_unit})',
+                amount_provided=model.surfaceplant.cooling_kWh_Produced.value,
+            )
+        )
+
+    return ret
+
+
+def _get_capacity_payment_parameters(model: Model) -> dict[str, Any]:
+    ret: dict[str, Any] = {}
+
+    capacity_payment_revenue_sources: list[CapacityPaymentRevenueSource] = _get_capacity_payment_revenue_sources(model)
+
+    if len(capacity_payment_revenue_sources) == 0:
+        return ret
+
+    ret['cp_capacity_payment_type'] = 1
+    ret['cp_capacity_payment_amount'] = [0.0] * model.surfaceplant.plant_lifetime.value
+
+    for capacity_payment_revenue_source in capacity_payment_revenue_sources:
+        for i, revenue_usd in enumerate(capacity_payment_revenue_source.revenue_usd):
+            ret['cp_capacity_payment_amount'][i] += revenue_usd
 
     return ret
 
@@ -1114,4 +889,22 @@ def _get_royalty_rate_schedule(model: Model) -> list[float]:
 
 
 def _get_max_total_generation_kW(model: Model) -> float:
-    return np.max(model.surfaceplant.ElectricityProduced.quantity().to(convertible_unit('kW')).magnitude)
+    max_total_kw = np.max(model.surfaceplant.ElectricityProduced.quantity().to(convertible_unit('kW')).magnitude)
+
+    if not model.surfaceplant.enduse_option.value.has_electricity_component:
+        # SAM requires a non-zero nameplate capacity, so we must provide a value even if there is no electricity
+        # component. The stub value is both accepted/processed by SAM and results in
+        # zero electricity production/revenue in the cash flow due to rounding.
+        # This logic should be revisited if SAM adds support for combined energy-heat models per
+        # https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/142#pullrequestreview-3999949844
+        non_electricity_end_use_stub_value = 0.0001
+
+        max_total_kw = max(non_electricity_end_use_stub_value, max_total_kw)
+        if max_total_kw != non_electricity_end_use_stub_value:
+            # Shouldn't happen
+            model.logger.warning(
+                f'Unexpected non-zero maximum total electricity generation for heat end-use option: {max_total_kw} kW. '
+                f'This may be a result of an internal bug in GEOPHIRES or an invalid parameter configuration.'
+            )
+
+    return max_total_kw

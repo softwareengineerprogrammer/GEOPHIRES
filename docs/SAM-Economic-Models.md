@@ -34,6 +34,8 @@ The following table describes how GEOPHIRES parameters are transformed into SAM 
 | `Starting Electricity Sale Price`, `Ending Electricity Sale Price`, `Electricity Escalation Rate Per Year`, `Electricity Escalation Start Year` | Revenue                                                | `PPA price`                                                                                                  | `Singleowner`                     | `ppa_price_input`                                            | GEOPHIRES's pricing model is used to create a PPA price schedule that is passed to SAM.                                                                                                                                                                                                                                                                     |
 | `Total AddOn Profit Gained`                                                                                                                     | Revenue → Capacity Payments                            | `Fixed amount`, `Capacity payment amount`                                                                    | `Singleowner`                     | `cp_capacity_payment_type = 1`, `cp_capacity_payment_amount` |                                                                                                                                                                                                                                                                                                                                                             |
 | `Starting Carbon Credit Value`, `Ending Carbon Credit Value`, `Carbon Escalation Rate Per Year`, `Carbon Escalation Start Year`                 | Revenue → Capacity Payments                            | `Fixed amount`, `Capacity payment amount`                                                                    | `Singleowner`                     | `cp_capacity_payment_type = 1`, `cp_capacity_payment_amount` |                                                                                                                                                                                                                                                                                                                                                             |
+| `Starting Heat Sale Price`, `Ending Heat Sale Price`, `Heat Escalation Rate Per Year`, `Heat Escalation Start Year`                             | Revenue → Capacity Payments                            | `Fixed amount`, `Capacity payment amount`                                                                    | `Singleowner`                     | `cp_capacity_payment_type = 1`, `cp_capacity_payment_amount` |                                                                                                                                                                                                                                                                                                                                                             |
+| `Starting Cooling Sale Price`, `Ending Cooling Sale Price`, `Cooling Escalation Rate Per Year`, `Cooling Escalation Start Year`                 | Revenue → Capacity Payments                            | `Fixed amount`, `Capacity payment amount`                                                                    | `Singleowner`                     | `cp_capacity_payment_type = 1`, `cp_capacity_payment_amount` |                                                                                                                                                                                                                                                                                                                                                             |
 | `Investment Tax Credit Rate`                                                                                                                    | Incentives → Investment Tax Credit (ITC)               | `Federal` → `Percentage (%)`                                                                                 | `Singleowner`                     | `itc_fed_percent`                                            | Note that unlike the BICYCLE Economic Model's `Total capital costs`, SAM Economic Model's `Total CAPEX` is the total installed cost and does not subtract ITC value (if present).                                                                                                                                                                           |
 | `Production Tax Credit Electricity`                                                                                                             | Incentives → Production Tax Credit (PTC)               | `Federal` → `Amount ($/kWh)`                                                                                 | `Singleowner`                     | `ptc_fed_amount`                                             | .. N/A                                                                                                                                                                                                                                                                                                                                                      |
 | `Production Tax Credit Duration`                                                                                                                | Incentives → Production Tax Credit (PTC)               | `Federal` → `Term (years)`                                                                                   | `Singleowner`                     | `ptc_fed_term`                                               | .. N/A                                                                                                                                                                                                                                                                                                                                                      |
@@ -51,7 +53,7 @@ The following table describes how GEOPHIRES parameters are transformed into SAM 
 
 ### Limitations
 
-1. Only Electricity end-use is supported
+1. The following power plant types/surface applications are not supported: Heat Pump, District Heating, and Reservoir Thermal Energy Storage (SUTRA). Subcritical ORC, Supercritical ORC, Single Flash, Double Flash, Industrial heat, and Absorption Chiller power plant types are supported.
 2. Add-ons with electricity and heat are not currently supported. (Add-ons CAPEX, OPEX, and profit are supported.)
 
 ## Multiple Construction Years
@@ -140,25 +142,31 @@ See relevant parameters and outputs in [GEOPHIRES Parameters documentation](para
 1. `Current Grid CO2 production`
 1. `Total Avoided Carbon Emissions`
 
+## End Uses and Surface Applications
+
+SAM Economic Models support a variety of geothermal end-use options and surface applications, extending beyond pure electricity generation to include:
+
+* **Electricity**
+* **Direct-Use Heat**
+* **Cogeneration** (Combined Heat and Power; CHP)
+* **Cooling** (Absorption Chiller)
+
+For detailed information on how these different configurations are modeled financially—including cash flow reporting adjustments, CHP cost allocation methodologies, and configuration-specific examples—see the [SAM Economic Models: End Uses and Surface Applications documentation](SAM-EM_End-Uses-and-Surface-Applications.html).
+
 ## Examples
 
-### Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station
-
-[Web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5)
-
-Documentation: [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](Fervo_Project_Cape-4.html).
-
-### SAM Single Owner PPA
-
+1. [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) | [Case Study Documentation](Fervo_Project_Cape-5.html)
 1. [SAM Single Owner PPA: 50 MWe](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA)
-2. [SAM Single Owner PPA: 50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
-3. [SAM Single Owner PPA: 50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
-4. [SAM Economic Model: Royalty Schedule & Supplemental Payments](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b)
-4. [SAM Economic Model Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
-
-### SAM Single Owner PPA: 400 MWe BICYCLE Comparison
-
-[Web interface link](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-2)
+1. [50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
+1. [50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
+1. [Royalty Schedule & Supplemental Payments](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4b)
+1. [Multiple Construction Years](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-5)
+1. [Carbon Credits](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue)
+1. [Cogeneration (Combined Heat and Power; CHP)](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-7_chp)
+1. [CHP with Carbon Credits](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-7b_chp-cc)
+1. [Direct-Use Heat](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-8_heat)
+1. [Cooling (Absorption Chiller)](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-9_cooling)
+1. [SAM Single Owner PPA: 400 MWe BICYCLE Comparison](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-2)
 
 ## Re-creating SAM Economic Model Results in the SAM Desktop Application
 

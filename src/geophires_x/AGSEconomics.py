@@ -62,6 +62,8 @@ class AGSEconomics(Economics.Economics):
             Required=True,
             ErrMessage="assume default Operation & Maintenance cost of surface plant expressed as fraction of total surface plant capital cost (0.015)"
         )
+
+        # TODO migrate to parent class and integrate for CHP
         self.Direct_use_heat_cost_per_kWth = self.ParameterDict[
             self.Direct_use_heat_cost_per_kWth.Name] = floatParameter(
             "Capital Cost for Surface Plant for Direct-use System",
