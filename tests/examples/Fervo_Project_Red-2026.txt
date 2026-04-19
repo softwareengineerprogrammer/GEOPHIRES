@@ -1,0 +1,85 @@
+# Case Study: Fervo Project Red (2026 Update)
+# Based on GEOPHIRES example Fervo_Norbeck_Latimer_2023 (https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Norbeck_Latimer_2023)
+# with 2026 updates derived from https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+# Paper references are to "Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal System." (Norbeck & Latimer, 2023) (https://doi.org/10.31223/X52X0B).
+
+Reservoir Model, 1
+Reservoir Volume Option, 1
+
+Reservoir Density, 2800, -- per the paper phyllite + quartzite + diorite + granodiorite
+Reservoir Depth, 7600 feet, -- per the paper
+Reservoir Heat Capacity, 1000, -- [J/kg/K]
+Reservoir Thermal Conductivity, 2.7
+
+Number of Fractures, 100, -- per the paper
+Fracture Shape, 4, -- per the paper
+Fracture Height, 160, -- per the paper
+Fracture Width, 160, -- per the paper (distance between wellbores assumes a dipole flow field)
+Fracture Separation, 10 meter
+
+Number of Segments, 1
+Gradient 1, 71.11, -- 175°C BHT at 7,600 ft TVD
+
+Plant Outlet Pressure, 1500 psi, -- per the paper
+
+Number of Injection Wells, 1
+Number of Production Wells, 1
+
+Well Geometry Configuration, 4
+Has Nonvertical Section, True
+Multilaterals Cased, True
+Number of Multilateral Sections, 2, -- Two parallel horizontal sections
+Nonvertical Length per Multilateral Section, 3250 feet, -- per the paper
+
+Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
+Horizontal Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
+
+Production Flow Rate per Well, 36, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+Production Wellhead Pressure, 225 psi, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+
+Production Well Diameter, 4.276, -- Assumed ID for 5 inch casing size per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+Injection Well Diameter, 4.276, -- See Production Well Diameter
+
+Well Separation, 365 feet, -- per the paper
+
+Injection Temperature, 75, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/. Note that this value is overridden by the lower model-calculated optimum injection temperature.
+Injection Wellbore Temperature Gain, 3, -- [degC]
+Ramey Production Wellbore Model, 1
+
+Injectivity Index, 0.6, -- Calibrated to yield ~0.7 MW Average Pumping Power
+Productivity Index, 0.491, -- See Injectivity Index
+
+Water Loss Fraction, 0.3, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+
+Utilization Factor, .9
+Maximum Drawdown, 1, -- no redrilling considered
+
+Ambient Temperature, 10.27
+Surface Temperature, 10.27
+
+End-Use Option, 1, -- electricity as the main product
+Plant Lifetime, 2, -- 614 days of operation from April 2023 to April 2026
+Power Plant Type, 2, -- supercritical binary cycle
+
+End-Use Efficiency Factor, .9
+Circulation Pump Efficiency, 0.80, -- per the paper
+
+Economic Model, 3, -- BICYCLE Levelized Cost Model
+
+Starting Electricity Sale Price, 0.15
+Ending Electricity Sale Price, 1.00, -- essentially no limit as the rate can rise continuously with inflation
+Electricity Escalation Rate Per Year, 0.004053223, -- End up being about 2% inflation
+Electricity Escalation Start Year, 1
+
+Fraction of Investment in Bonds, .5, -- Required for BICYCLE model
+Combined Income Tax Rate, .3, -- Required for BICYCLE model
+Gross Revenue Tax Rate, 0, -- Required for BICYCLE model
+Inflated Bond Interest Rate, .05, -- Required for BICYCLE model
+Inflated Equity Interest Rate, .08, -- Required for BICYCLE model
+Inflation Rate, .02, -- Required for BICYCLE model
+Investment Tax Credit Rate, 0, -- Required for BICYCLE model
+Inflation Rate During Construction, 0.05
+Property Tax Rate, 0, -- Required for BICYCLE model
+
+Print Output to Console, 1
+Time steps per year, 12
