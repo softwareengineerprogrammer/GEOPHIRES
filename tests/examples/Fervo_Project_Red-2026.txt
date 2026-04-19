@@ -31,7 +31,7 @@ Production Wellhead Pressure, 225 psi, -- per https://fervoenergy.com/enhanced-g
 Production Well Diameter, 4.276, -- Assumed ID for 5 inch casing size per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 Injection Well Diameter, 4.276, -- See Production Well Diameter
 Well Separation, 365 feet, -- per the paper
-Injection Temperature, 75, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+Injection Temperature, 75, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/. Note that this value is overridden by the lower model-calculated optimum injection temperature.
 Injection Wellbore Temperature Gain, 3, -- [degC]
 Injectivity Index, 0.6, -- Calibrated to yield ~0.7 MW Average Pumping Power
 Productivity Index, 0.491, -- See Injectivity Index
