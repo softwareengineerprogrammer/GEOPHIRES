@@ -1,6 +1,7 @@
 # Case Study: Fervo Project Red (2026 Update)
 # Based on GEOPHIRES example Fervo_Norbeck_Latimer_2023 (https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Norbeck_Latimer_2023)
 # with 2026 updates derived from https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+# Paper references are to "Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal System." (Norbeck & Latimer, 2023) (https://doi.org/10.31223/X52X0B).
 
 Reservoir Model, 1
 Reservoir Volume Option, 1
@@ -29,12 +30,12 @@ Production Flow Rate per Well, 41, -- =650 gpm per the paper - per the paper the
 Production Well Diameter, 7, -- per the paper
 Injection Well Diameter, 7, -- per the paper
 Well Separation, 365 feet, -- per the paper
-Injection Temperature, 75, -- per the paper 75 to 125 degF
+Injection Temperature, 75, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 Injection Wellbore Temperature Gain, 3, -- [degC]
 Reservoir Impedance, 0.30, -- per paper, matching pumping power report 500-1000 kW
 Ramey Production Wellbore Model, 1
 Utilization Factor, .9
-Water Loss Fraction, 0.3
+Water Loss Fraction, 0.3, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 Maximum Drawdown, 1, -- no redrilling considered
 Ambient Temperature, 8 degC, -- per the paper. Published ambient is 10.27 degC
 Surface Temperature, 8 degC, -- per the paper. Published ambient is 10.27 degC
