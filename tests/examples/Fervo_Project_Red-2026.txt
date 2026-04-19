@@ -26,7 +26,8 @@ Number of Multilateral Sections, 2, -- Two parallel horizontal sections
 Nonvertical Length per Multilateral Section, 3250 feet, -- per the paper
 Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
 Horizontal Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
-Production Flow Rate per Well, 41, -- =650 gpm per the paper - per the paper the maximum flow rate was 63 L/s but the range was 550-750 gpm
+Production Flow Rate per Well, 36, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+Production Wellhead Pressure, 225 psi, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 Production Well Diameter, 7, -- per the paper
 Injection Well Diameter, 7, -- per the paper
 Well Separation, 365 feet, -- per the paper
@@ -40,7 +41,7 @@ Maximum Drawdown, 1, -- no redrilling considered
 Ambient Temperature, 8 degC, -- per the paper. Published ambient is 10.27 degC
 Surface Temperature, 8 degC, -- per the paper. Published ambient is 10.27 degC
 End-Use Option, 1, -- electricity as the main product
-Plant Lifetime, 10
+Plant Lifetime, 2, -- 614 days of operation from April 2023 to April 2026
 Power Plant Type, 2, -- supercritical binary cycle
 End-Use Efficiency Factor, .9
 Circulation Pump Efficiency, 0.80, -- per the paper
