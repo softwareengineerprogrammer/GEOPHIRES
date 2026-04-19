@@ -18,8 +18,7 @@ Fracture Width, 160, -- per the paper (distance between wellbores assumes a dipo
 Fracture Separation, 10 meter
 
 Number of Segments, 1
-Gradient 1, 74
-# Gradient 1, 78, -- 191°C BHT at 7,600 ft TVD
+Gradient 1, 71.11, -- 175°C BHT at 7,600 ft TVD
 
 Plant Outlet Pressure, 1500 psi, -- per the paper
 
