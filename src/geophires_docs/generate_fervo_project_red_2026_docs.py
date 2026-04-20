@@ -239,6 +239,8 @@ def _generate_production_temperature_comparison_graph(
     output_path_stem: Path,
     steady_state_start_years: float = _STEADY_STATE_START_YEARS,
     geophires_data: pd.Series | None = None,
+    fervo_modeled_stats_caption: str = '',
+    geophires_modeled_stats_caption: str = '',
 ) -> None:
     df_prod = pd.read_csv(production_csv_path)
     df_model = pd.read_csv(model_csv_path)
@@ -294,7 +296,7 @@ def _generate_production_temperature_comparison_graph(
         color='black',
         linestyle='--',
         linewidth=1.5,
-        label='Fervo-Modeled Temperature' if geophires_data is not None else 'Modeled output',
+        label=f'\nFervo-Modeled Temperature{fervo_modeled_stats_caption}',
     )
 
     if geophires_data is not None:
@@ -309,7 +311,7 @@ def _generate_production_temperature_comparison_graph(
             #     (1, 3),
             # ),  # loosely dotted - https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
             # linewidth=7,
-            label='GEOPHIRES-Modeled Temperature (Gringarten)',
+            label=f'GEOPHIRES-Modeled Temperature (Gringarten){geophires_modeled_stats_caption}',
         )
 
     ax.set_xlabel('Time (Years)', fontsize=12)
@@ -424,10 +426,14 @@ def generate_fervo_project_red_2026_docs():
     r2_g = 1 - (ss_res_g / ss_tot) if ss_tot != 0 else 0.0
 
     _log.info(f'--- STATISTICAL ALIGNMENT (Steady-State > {_STEADY_STATE_START_YEARS} Years) ---')
-    _log.info(f'FERVO:      RMSE={rmse_f:.2f}°C, R²={r2_f:.4f}, Bias={bias_f:.2f}°C')
-    _log.info(f'GEOPHIRES:  RMSE={rmse_g:.2f}°C, R²={r2_g:.4f}, Bias={bias_g:.2f}°C')
+    fervo_modeled_stats_caption = f'RMSE={rmse_f:.2f}°C, R²={r2_f:.4f}, Bias={bias_f:.2f}°C'
+    geophires_modeled_stats_caption = f'RMSE={rmse_g:.2f}°C, R²={r2_g:.4f}, Bias={bias_g:.2f}°C'
+    _log.info(f'FERVO:      {fervo_modeled_stats_caption}')
+    _log.info(f'GEOPHIRES:  {geophires_modeled_stats_caption}')
 
     df_steady_state.to_csv(steady_state_csv_path, index=False)
+
+    _tab = '    '
 
     _generate_production_temperature_comparison_graph(
         production_csv_path_,
@@ -435,6 +441,8 @@ def generate_fervo_project_red_2026_docs():
         steady_state_csv_path,
         generated_graph_path_stem,
         geophires_data=geophires_series,
+        fervo_modeled_stats_caption=f'\n{_tab}{fervo_modeled_stats_caption}\n',
+        geophires_modeled_stats_caption=f'\n{_tab}{geophires_modeled_stats_caption}',
     )
 
 
