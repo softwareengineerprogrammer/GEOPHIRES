@@ -27,7 +27,10 @@ _MODEL_OUTLIER_STD_THRESHOLD = 2.5
 _MODEL_ROLLING_WINDOW = 15
 
 _CONTINUOUS_OPERATION_MIN_TEMP_C = 175.0
-_MAX_TRANSIENT_TEMP_CHANGE_C = 10.0
+_STATISTICAL_BUFFER_SIZE = 5
+_STATISTICAL_MIN_BUFFER = 3
+_STATISTICAL_Z_SCORE = 2.0
+_STATISTICAL_MIN_STD = 1.5
 
 
 def extract_plot_data(
@@ -64,17 +67,12 @@ def extract_plot_data(
 def _calculate_variance_analysis(
     df_actual: pd.DataFrame, df_model: pd.DataFrame, steady_state_start_years: float = _STEADY_STATE_START_YEARS
 ) -> pd.DataFrame:
-    df_steady_state = df_actual[df_actual['Time_Years'] > steady_state_start_years].copy()
+    post_ramp_mask = df_actual['Time_Years'] > steady_state_start_years
+    n_before = len(df_actual[post_ramp_mask])
 
-    # TODO: Replace hardcoded minimum temperature threshold with a robust statistical baseline envelope
-    n_before = len(df_steady_state)
+    is_steady = _get_steady_state_mask(df_actual, steady_state_start_years)
+    df_steady_state = df_actual[is_steady].copy()
 
-    temp_diffs = df_steady_state['Temperature_C'].diff().abs().fillna(0.0)
-    is_steady = (df_steady_state['Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C) & (
-        temp_diffs <= _MAX_TRANSIENT_TEMP_CHANGE_C
-    )
-
-    df_steady_state = df_steady_state[is_steady].copy()
     _log.info(f'Continuous operation filter: dropped {n_before - len(df_steady_state)} transient/dip points.')
 
     model_interpolator = interp1d(
@@ -195,6 +193,40 @@ def _dedupe_centers(centers_px: list[tuple[int, int]], min_dist_px: float) -> li
     return accepted
 
 
+def _get_steady_state_mask(df_prod: pd.DataFrame, steady_state_start_years: float) -> pd.Series:
+    """
+    Identifies steady-state production points iteratively. Maintains a rolling
+    buffer of verified plateau points to mathematically isolate and reject
+    the steep walls and floors of transient shut-ins.
+    """
+    is_steady = pd.Series(False, index=df_prod.index)
+    post_ramp_idx = df_prod.index[df_prod['Time_Years'] > steady_state_start_years]
+
+    valid_buffer: list[float] = []
+
+    for idx in post_ramp_idx:
+        temp = df_prod.at[idx, 'Temperature_C']
+
+        if temp < _CONTINUOUS_OPERATION_MIN_TEMP_C:
+            continue
+
+        if len(valid_buffer) >= _STATISTICAL_MIN_BUFFER:
+            history = valid_buffer[-_STATISTICAL_BUFFER_SIZE:]
+            mean_temp = float(np.mean(history))
+            std_temp = float(np.std(history, ddof=1))
+
+            # Prevent excessively tight windows during flat extractions
+            std_temp = max(std_temp, _STATISTICAL_MIN_STD)
+
+            if abs(temp - mean_temp) > _STATISTICAL_Z_SCORE * std_temp:
+                continue
+
+        is_steady.at[idx] = True
+        valid_buffer.append(temp)
+
+    return is_steady
+
+
 def _regenerate_graph_from_csv(
     production_csv_path: Path,
     model_csv_path: Path,
@@ -205,16 +237,8 @@ def _regenerate_graph_from_csv(
     df_prod = pd.read_csv(production_csv_path)
     df_model = pd.read_csv(model_csv_path)
 
-    # Apply the exclusion logic directly via boolean mask to avoid float-merge bugs across CSVs
     is_ramp_up = df_prod['Time_Years'] <= steady_state_start_years
-
-    post_ramp_up_mask = ~is_ramp_up
-    temp_diffs = df_prod.loc[post_ramp_up_mask, 'Temperature_C'].diff().abs().fillna(0.0)
-
-    is_steady = pd.Series(False, index=df_prod.index)
-    is_steady.loc[post_ramp_up_mask] = (
-        df_prod.loc[post_ramp_up_mask, 'Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C
-    ) & (temp_diffs <= _MAX_TRANSIENT_TEMP_CHANGE_C)
+    is_steady = _get_steady_state_mask(df_prod, steady_state_start_years)
 
     df_included = df_prod[is_ramp_up | is_steady]
     df_excluded = df_prod[~(is_ramp_up | is_steady)]
