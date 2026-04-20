@@ -22,7 +22,7 @@ _BUILD_DIR: Path = _PROJECT_ROOT / 'build' / 'generate_fervo_project_red_2026_do
 _PRODUCTION_CSV_FILENAME = 'project_red_2026_production_data.csv'
 _MODEL_CSV_FILENAME = 'project_red_2026_model_data.csv'
 _STEADY_STATE_CSV_FILENAME = 'project_red_2026_variance_analysis.csv'
-_REGENERATED_GRAPH_FILENAME = 'project_red_2026_figure-5_regenerated.png'
+_REGENERATED_GRAPH_FILENAME = 'fervo_project_red-2026_production-temperature-data-vs-modeling.png'
 
 _STEADY_STATE_START_YEARS = 0.041625
 
@@ -368,7 +368,7 @@ if __name__ == '__main__':
     production_csv_path_ = _BUILD_DIR / _PRODUCTION_CSV_FILENAME
     model_csv_path_ = _BUILD_DIR / _MODEL_CSV_FILENAME
     steady_state_csv_path = _BUILD_DIR / _STEADY_STATE_CSV_FILENAME
-    regenerated_graph_path = _BUILD_DIR / _REGENERATED_GRAPH_FILENAME
+    regenerated_graph_path = _get_file_path(f'../../docs/_images/{_REGENERATED_GRAPH_FILENAME}')
 
     _log.info('Extracting data from image...')
     df_actual, df_model_ = extract_plot_data(IMAGE_PATH, PRODUCTION_IMAGE_PATH)
