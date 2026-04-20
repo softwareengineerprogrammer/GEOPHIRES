@@ -302,9 +302,14 @@ def _generate_production_temperature_comparison_graph(
         ax.plot(
             geophires_data.index,
             geophires_data.values,
-            color='#1f77b4',
-            linestyle='-.',
-            linewidth=1.5,
+            # color='#1f77b4',
+            color='green',
+            # linestyle='-.',
+            linestyle=(
+                0,
+                (1, 3),
+            ),  # loosely dotted - https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
+            linewidth=7,
             label='GEOPHIRES-Modeled Temperature (Gringarten)',
         )
 
