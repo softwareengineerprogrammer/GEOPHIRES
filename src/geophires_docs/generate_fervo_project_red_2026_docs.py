@@ -27,6 +27,7 @@ _MODEL_OUTLIER_STD_THRESHOLD = 2.5
 _MODEL_ROLLING_WINDOW = 15
 
 _CONTINUOUS_OPERATION_MIN_TEMP_C = 175.0
+_MAX_TRANSIENT_TEMP_CHANGE_C = 10.0
 
 
 def extract_plot_data(
@@ -67,8 +68,14 @@ def _calculate_variance_analysis(
 
     # TODO: Replace hardcoded minimum temperature threshold with a robust statistical baseline envelope
     n_before = len(df_steady_state)
-    df_steady_state = df_steady_state[df_steady_state['Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C].copy()
-    _log.info(f'Continuous operation filter: dropped {n_before - len(df_steady_state)} dip points.')
+
+    temp_diffs = df_steady_state['Temperature_C'].diff().abs().fillna(0.0)
+    is_steady = (df_steady_state['Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C) & (
+        temp_diffs <= _MAX_TRANSIENT_TEMP_CHANGE_C
+    )
+
+    df_steady_state = df_steady_state[is_steady].copy()
+    _log.info(f'Continuous operation filter: dropped {n_before - len(df_steady_state)} transient/dip points.')
 
     model_interpolator = interp1d(
         df_model['Time_Years'],
@@ -200,7 +207,14 @@ def _regenerate_graph_from_csv(
 
     # Apply the exclusion logic directly via boolean mask to avoid float-merge bugs across CSVs
     is_ramp_up = df_prod['Time_Years'] <= steady_state_start_years
-    is_steady = df_prod['Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C
+
+    post_ramp_up_mask = ~is_ramp_up
+    temp_diffs = df_prod.loc[post_ramp_up_mask, 'Temperature_C'].diff().abs().fillna(0.0)
+
+    is_steady = pd.Series(False, index=df_prod.index)
+    is_steady.loc[post_ramp_up_mask] = (
+        df_prod.loc[post_ramp_up_mask, 'Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C
+    ) & (temp_diffs <= _MAX_TRANSIENT_TEMP_CHANGE_C)
 
     df_included = df_prod[is_ramp_up | is_steady]
     df_excluded = df_prod[~(is_ramp_up | is_steady)]
