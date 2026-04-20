@@ -22,7 +22,7 @@ _BUILD_DIR: Path = _PROJECT_ROOT / 'build' / 'generate_fervo_project_red_2026_do
 _PRODUCTION_CSV_FILENAME = 'project_red_2026_production_data.csv'
 _MODEL_CSV_FILENAME = 'project_red_2026_model_data.csv'
 _STEADY_STATE_CSV_FILENAME = 'project_red_2026_variance_analysis.csv'
-_REGENERATED_GRAPH_FILENAME = 'fervo_project_red-2026_production-temperature-data-vs-modeling.png'
+_GENERATED_GRAPH_FILENAME_STEM = 'fervo_project_red-2026_production-temperature-data-vs-modeling'
 
 _STEADY_STATE_START_YEARS = 0.041625
 
@@ -235,7 +235,7 @@ def _generate_production_temperature_comparison_graph(
     production_csv_path: Path,
     model_csv_path: Path,
     steady_state_csv_path: Path,
-    output_path: Path,
+    output_path_stem: Path,
     steady_state_start_years: float = _STEADY_STATE_START_YEARS,
     geophires_data: pd.Series | None = None,
 ) -> None:
@@ -323,18 +323,21 @@ def _generate_production_temperature_comparison_graph(
 
     ax.set_xlim(0.0, 2.0)
 
-    ax.set_ylim(
-        # 0.0, 200.0  # TODO generate zoomed out version as well
-        175,
-        185,
-    )
-
     ax.grid(True, linestyle='--', alpha=0.5)
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=1, frameon=False, fontsize=11)
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=150, bbox_inches='tight')
+    output_path_stem.parent.mkdir(parents=True, exist_ok=True)
+
+    ax.set_ylim(0.0, 200.0)
+    fig.savefig(f'{output_path_stem}-1.png', dpi=150, bbox_inches='tight')
+
+    ax.set_ylim(
+        175,
+        185,
+    )
+    fig.savefig(f'{output_path_stem}-2.png', dpi=150, bbox_inches='tight')
+
     plt.close(fig)
 
 
@@ -380,7 +383,7 @@ def generate_fervo_project_red_2026_docs():
     production_csv_path_ = _BUILD_DIR / _PRODUCTION_CSV_FILENAME
     model_csv_path_ = _BUILD_DIR / _MODEL_CSV_FILENAME
     steady_state_csv_path = _BUILD_DIR / _STEADY_STATE_CSV_FILENAME
-    regenerated_graph_path = _get_file_path(f'../../docs/_images/{_REGENERATED_GRAPH_FILENAME}')
+    generated_graph_path_stem = _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}')
 
     _log.info('Extracting data from image...')
     df_actual, df_model_ = extract_plot_data(IMAGE_PATH, PRODUCTION_IMAGE_PATH)
@@ -412,10 +415,10 @@ def generate_fervo_project_red_2026_docs():
         production_csv_path_,
         model_csv_path_,
         steady_state_csv_path,
-        regenerated_graph_path,
+        generated_graph_path_stem,
         geophires_data=get_project_red_production_temperature_profile_series(df_model_),
     )
-    _log.info(f'Wrote regenerated graph:      {regenerated_graph_path}')
+    _log.info(f'Wrote regenerated graph:      {generated_graph_path_stem}')
 
 
 if __name__ == '__main__':
