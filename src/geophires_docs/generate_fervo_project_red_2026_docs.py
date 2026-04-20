@@ -24,7 +24,7 @@ _MODEL_CSV_FILENAME = 'project_red_2026_model_data.csv'
 _STEADY_STATE_CSV_FILENAME = 'project_red_2026_variance_analysis.csv'
 _REGENERATED_GRAPH_FILENAME = 'project_red_2026_figure-5_regenerated.png'
 
-_STEADY_STATE_START_YEARS = 0.125
+_STEADY_STATE_START_YEARS = 0.041625
 
 _HOUGH_MIN_DIST_PX = 4
 
@@ -231,7 +231,7 @@ def _get_steady_state_mask(df_prod: pd.DataFrame, steady_state_start_years: floa
     return is_steady
 
 
-def _regenerate_graph_from_csv(
+def _generate_production_temperature_comparison_graph(
     production_csv_path: Path,
     model_csv_path: Path,
     steady_state_csv_path: Path,
@@ -242,11 +242,19 @@ def _regenerate_graph_from_csv(
     df_prod = pd.read_csv(production_csv_path)
     df_model = pd.read_csv(model_csv_path)
 
-    is_ramp_up = df_prod['Time_Years'] <= steady_state_start_years
-    is_steady = _get_steady_state_mask(df_prod, steady_state_start_years)
+    is_thermal_conditioning = df_prod['Time_Years'] <= steady_state_start_years  # noqa: F841
+    is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
 
-    df_included = df_prod[is_ramp_up | is_steady]
-    df_excluded = df_prod[~(is_ramp_up | is_steady)]
+    df_included = df_prod[
+        # is_thermal_conditioning |
+        is_steady_state
+    ]
+    df_excluded = df_prod[
+        ~(
+            # is_thermal_conditioning |
+            is_steady_state
+        )
+    ]
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -260,7 +268,7 @@ def _regenerate_graph_from_csv(
         alpha=0.85,
         label='Measured '
         # f'Flowing '
-        'Temperature (Thermal Conditioning and Steady State)',  # TODO exclude Thermal Conditioning
+        'Temperature (Steady State)',
         # f', n={len(df_included)}',
     )
 
@@ -275,7 +283,9 @@ def _regenerate_graph_from_csv(
             alpha=0.5,
             label='Measured '
             # f'Flowing '
-            'Temperature (Excluded Operational Periods)',  # TODO better wording/phrasing
+            'Temperature (Thermal Conditioning '
+            '& Excluded Operational Periods'  # TODO better wording/phrasing
+            ')',
             # f', n={len(df_excluded)}',
         )
 
@@ -321,7 +331,7 @@ def _get_file_path(file_name: str) -> Path:
     return Path(__file__).parent / file_name
 
 
-def get_project_red_production_temperature_profile_series() -> pd.Series:
+def get_project_red_production_temperature_profile_series(fervo_graph_df_model: pd.Series) -> pd.Series:
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
         from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt')
     )
@@ -343,9 +353,9 @@ def get_project_red_production_temperature_profile_series() -> pd.Series:
 
     # Interpolate the GEOPHIRES curve along the exact timestamps established by the model dashed line extraction
     geophires_interpolator = interp1d(geophires_x, geophires_y, kind='linear', fill_value='extrapolate')
-    geophires_interpolated_y = geophires_interpolator(df_model['Time_Years'])
+    geophires_interpolated_y = geophires_interpolator(fervo_graph_df_model['Time_Years'])
 
-    geophires_series = pd.Series(data=geophires_interpolated_y, index=df_model['Time_Years'])
+    geophires_series = pd.Series(data=geophires_interpolated_y, index=fervo_graph_df_model['Time_Years'])
 
     return geophires_series
 
@@ -355,24 +365,24 @@ if __name__ == '__main__':
     PRODUCTION_IMAGE_PATH = _get_file_path('fervo_project_red-2026_graph-data-extraction_production-series-edited.png')
 
     _BUILD_DIR.mkdir(parents=True, exist_ok=True)
-    production_csv_path = _BUILD_DIR / _PRODUCTION_CSV_FILENAME
-    model_csv_path = _BUILD_DIR / _MODEL_CSV_FILENAME
+    production_csv_path_ = _BUILD_DIR / _PRODUCTION_CSV_FILENAME
+    model_csv_path_ = _BUILD_DIR / _MODEL_CSV_FILENAME
     steady_state_csv_path = _BUILD_DIR / _STEADY_STATE_CSV_FILENAME
     regenerated_graph_path = _BUILD_DIR / _REGENERATED_GRAPH_FILENAME
 
     _log.info('Extracting data from image...')
-    df_actual, df_model = extract_plot_data(IMAGE_PATH, PRODUCTION_IMAGE_PATH)
+    df_actual, df_model_ = extract_plot_data(IMAGE_PATH, PRODUCTION_IMAGE_PATH)
 
     _log.info(f'Extracted {len(df_actual)} production data points.')
-    _log.info(f'Extracted {len(df_model)} model line data points.')
+    _log.info(f'Extracted {len(df_model_)} model line data points.')
 
-    df_actual.to_csv(production_csv_path, index=False)
-    df_model.to_csv(model_csv_path, index=False)
-    _log.info(f'Wrote production data CSV: {production_csv_path}')
-    _log.info(f'Wrote model data CSV:      {model_csv_path}')
+    df_actual.to_csv(production_csv_path_, index=False)
+    df_model_.to_csv(model_csv_path_, index=False)
+    _log.info(f'Wrote production data CSV: {production_csv_path_}')
+    _log.info(f'Wrote model data CSV:      {model_csv_path_}')
 
-    if not df_actual.empty and not df_model.empty:
-        df_steady_state = _calculate_variance_analysis(df_actual, df_model)
+    if not df_actual.empty and not df_model_.empty:
+        df_steady_state = _calculate_variance_analysis(df_actual, df_model_)
 
         rmse = float(np.sqrt((df_steady_state['Error_C'] ** 2).mean()))
         mae = float(df_steady_state['Error_C'].abs().mean())
@@ -386,11 +396,11 @@ if __name__ == '__main__':
         df_steady_state.to_csv(steady_state_csv_path, index=False)
         _log.info(f'Wrote variance analysis CSV:  {steady_state_csv_path}')
 
-    _regenerate_graph_from_csv(
-        production_csv_path,
-        model_csv_path,
+    _generate_production_temperature_comparison_graph(
+        production_csv_path_,
+        model_csv_path_,
         steady_state_csv_path,
         regenerated_graph_path,
-        geophires_data=get_project_red_production_temperature_profile_series(),
+        geophires_data=get_project_red_production_temperature_profile_series(df_model_),
     )
     _log.info(f'Wrote regenerated graph:      {regenerated_graph_path}')
