@@ -321,7 +321,7 @@ def _generate_production_temperature_comparison_graph(
         title = 'Project Red Temperature: Measured vs. Fervo-Modeled vs. GEOPHIRES-Modeled'
     ax.set_title(title, fontsize=13)
 
-    ax.set_xlim(0.0, 2.0)
+    ax.set_xlim(0.0, 1.75)
 
     ax.grid(True, linestyle='--', alpha=0.5)
 
