@@ -35,7 +35,7 @@ thermal conditioning phase and steady-state operations.
 This boundary is an analytical judgment call necessitated by structural differences in the models: the Fervo curve
 appears to assume an idealized steady-state flow from inception, omitting the early thermal ramp-up phase entirely.
 Conversely, while the GEOPHIRES (Gringarten) model does account for early transient heat transfer, its precision
-during this rapid ramp-up is inherently constrained by its temporal resolution (one simulation time step per month).
+during this rapid ramp-up is inherently constrained by its temporal resolution (100 time steps per year).
 
 ## Production Temperature: Measured vs. Modeled
 
