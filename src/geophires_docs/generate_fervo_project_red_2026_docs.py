@@ -283,7 +283,9 @@ def _regenerate_graph_from_csv(
     ax.set_xlim(0.0, 2.0)
     ax.set_ylim(0.0, 200.0)
     ax.grid(True, linestyle='--', alpha=0.5)
-    ax.legend(loc='best')
+
+    # Position the legend below the graph, centered horizontally.
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=1, frameon=False, fontsize=11)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=150, bbox_inches='tight')
