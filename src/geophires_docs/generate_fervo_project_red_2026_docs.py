@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
+from scipy.ndimage import maximum_filter
 
 from geophires_docs import _PROJECT_ROOT
 
@@ -80,37 +81,51 @@ def _extract_red_circles(
     plot_mask: np.ndarray,
     pixel_to_data,
 ) -> pd.DataFrame:
-    img = cv2.imread(str(img_path))
+    img = cv2.imread(str(img_path), cv2.IMREAD_UNCHANGED)
     if img is None:
         raise FileNotFoundError(f'Could not load image at {img_path}')
 
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    if len(img.shape) == 3 and img.shape[2] == 4:
+        alpha = img[:, :, 3]
+        _, mask_alpha = cv2.threshold(alpha, 10, 255, cv2.THRESH_BINARY)
+        hsv = cv2.cvtColor(img[:, :, :3], cv2.COLOR_BGR2HSV)
+    else:
+        mask_alpha = np.ones(img.shape[:2], dtype=np.uint8) * 255
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    lower_red1 = np.array([0, 50, 50])
-    upper_red1 = np.array([15, 255, 255])
-    lower_red2 = np.array([165, 50, 50])
+    # Widened HSV bounds to capture anti-aliased/faded brush edges
+    lower_red1 = np.array([0, 20, 20])
+    upper_red1 = np.array([20, 255, 255])
+    lower_red2 = np.array([160, 20, 20])
     upper_red2 = np.array([180, 255, 255])
 
     mask_red1 = cv2.inRange(hsv, lower_red1, upper_red1)
     mask_red2 = cv2.inRange(hsv, lower_red2, upper_red2)
     mask_red = cv2.bitwise_or(mask_red1, mask_red2)
+    mask_red = cv2.bitwise_and(mask_red, mask_alpha)
     mask_red = cv2.bitwise_and(mask_red, plot_mask)
 
-    y_coords, x_coords = np.where(mask_red > 0)
+    # Use distance transform to find the central ridge line of the brush strokes
+    dist_transform = cv2.distanceTransform(mask_red, cv2.DIST_L2, 5)
 
-    if len(x_coords) == 0:
-        _log.warning('No red pixels found in the production data mask.')
+    # Find the peaks (ridges) using a small 3x3 max filter
+    local_max = maximum_filter(dist_transform, size=3) == dist_transform
+    # Filter out absolute noise
+    peak_mask = local_max & (dist_transform > 1.0)
+
+    y_coords, x_coords = np.where(peak_mask)
+    centers_px = [(int(x), int(y)) for x, y in zip(x_coords, y_coords)]
+
+    if not centers_px:
+        _log.warning('No valid pixels found in the production data mask.')
         return pd.DataFrame(columns=['Time_Years', 'Temperature_C'])
 
-    df_pixels = pd.DataFrame({'x': x_coords, 'y': y_coords})
+    # Space the extracted points evenly along the detected ridge
+    deduped_centers_px = _dedupe_centers(centers_px, min_dist_px=_HOUGH_MIN_DIST_PX)
 
-    bin_size = int(_HOUGH_MIN_DIST_PX)
-    df_pixels['x_binned'] = (df_pixels['x'] // bin_size) * bin_size + (bin_size // 2)
-    centerline = df_pixels.groupby('x_binned', as_index=False)[['x', 'y']].mean()
+    _log.info(f'Red-marker detection: Extracted {len(deduped_centers_px)} topological ridge points from edited mask.')
 
-    _log.info(f'Red-marker detection: Extracted {len(centerline)} binned centerline points from edited mask.')
-
-    production_data = [pixel_to_data(row['x'], row['y']) for _, row in centerline.iterrows()]
+    production_data = [pixel_to_data(cx, cy) for cx, cy in deduped_centers_px]
     df_prod = pd.DataFrame(production_data, columns=['Time_Years', 'Temperature_C'])
     return df_prod.sort_values('Time_Years').reset_index(drop=True)
 
@@ -152,6 +167,23 @@ def _extract_black_dashed_line(hsv: np.ndarray, plot_mask: np.ndarray, pixel_to_
     _log.info(f'Model-curve outlier rejection: {n_before - len(df_model)} of {n_before} points dropped')
 
     return df_model
+
+
+def _dedupe_centers(centers_px: list[tuple[int, int]], min_dist_px: float) -> list[tuple[int, int]]:
+    if not centers_px:
+        return []
+
+    accepted: list[tuple[int, int]] = []
+    min_dist_sq = min_dist_px * min_dist_px
+    for cx, cy in centers_px:
+        duplicate = False
+        for ax, ay in accepted:
+            if (cx - ax) * (cx - ax) + (cy - ay) * (cy - ay) < min_dist_sq:
+                duplicate = True
+                break
+        if not duplicate:
+            accepted.append((cx, cy))
+    return accepted
 
 
 def _regenerate_graph_from_csv(
