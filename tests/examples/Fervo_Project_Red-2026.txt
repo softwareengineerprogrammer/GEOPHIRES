@@ -2,6 +2,7 @@
 # Based on GEOPHIRES example Fervo_Norbeck_Latimer_2023 (https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Norbeck_Latimer_2023)
 # with 2026 updates derived from https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 # Paper references are to "Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal System." (Norbeck & Latimer, 2023) (https://doi.org/10.31223/X52X0B).
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Red.html
 
 Reservoir Model, 1
 Reservoir Volume Option, 1
@@ -11,14 +12,14 @@ Reservoir Depth, 7600 feet, -- per the paper
 Reservoir Heat Capacity, 1000, -- [J/kg/K]
 Reservoir Thermal Conductivity, 2.7
 
-Number of Fractures, 100, -- per the paper
+Number of Fractures, 65, -- Paper estimates between 75 and 100; value is de-rated to account for imperfect flow across fractured surface area
 Fracture Shape, 4, -- per the paper
-Fracture Height, 160, -- per the paper
-Fracture Width, 160, -- per the paper (distance between wellbores assumes a dipole flow field)
+Fracture Height, 300 foot, -- per the paper
+Fracture Width, 365 foot, -- per the paper (distance between wellbores assumes a dipole flow field)
 Fracture Separation, 10 meter
 
 Number of Segments, 1
-Gradient 1, 74, -- per the paper
+Gradient 1, 76
 
 Plant Outlet Pressure, 1500 psi, -- per the paper
 
@@ -45,8 +46,8 @@ Injection Temperature, 75, -- per https://fervoenergy.com/enhanced-geothermal-ha
 Injection Wellbore Temperature Gain, 3, -- [degC]
 Ramey Production Wellbore Model, 1
 
-Injectivity Index, 0.6, -- Calibrated to yield ~0.7 MW Average Pumping Power
-Productivity Index, 0.491, -- See Injectivity Index
+Injectivity Index, 0.59, -- Calibrated to yield ~0.7 MW Average Pumping Power
+Productivity Index, 0.49, -- See Injectivity Index
 
 Water Loss Fraction, 0.3, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 
@@ -81,4 +82,4 @@ Inflation Rate During Construction, 0.05
 Property Tax Rate, 0, -- Required for BICYCLE model
 
 Print Output to Console, 1
-Time steps per year, 12
+Time steps per year, 100

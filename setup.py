@@ -92,6 +92,10 @@ setup(
         # eg:
         #   "rst": ["docutils>=0.11"],
         #   ":python_version=="2.6"": ["argparse"],
-        'development': ['bumpversion', 'sphinx_py3doc_enhanced_theme']
+        'development': [
+            'bumpversion',
+            'sphinx_py3doc_enhanced_theme',
+            'opencv-python',  # generate_fervo_project_red_2026_docs
+        ],
     },
 )
