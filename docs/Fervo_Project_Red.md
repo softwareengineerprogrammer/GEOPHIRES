@@ -2,11 +2,11 @@
 
     <style type="text/css">
         a.image-reference {
-            max-width: 75%;
+            max-width: 66%;
         }
 
-        a.image-reference > img {
-            max-width: inherit;
+        a.image-reference > img, a.image-reference > img:active {
+            max-width: 100%;
         }
 
         a.image-reference {
