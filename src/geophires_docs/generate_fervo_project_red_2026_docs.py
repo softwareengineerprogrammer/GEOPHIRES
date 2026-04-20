@@ -8,7 +8,10 @@ from scipy.interpolate import interp1d
 from scipy.ndimage import maximum_filter
 
 from geophires_docs import _PROJECT_ROOT
+from geophires_docs import _get_full_production_temperature_profile
 from geophires_docs import _get_logger
+from geophires_x_client import GeophiresXResult
+from geophires_x_client import ImmutableGeophiresInputParameters
 
 _log = _get_logger(__name__)
 
@@ -230,7 +233,7 @@ def _get_steady_state_mask(df_prod: pd.DataFrame, steady_state_start_years: floa
 def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project_red_geophires_result_data(
     production_csv_path: Path,
     model_csv_path: Path,
-    steady_state_csv_path: Path,
+    # steady_state_csv_path: Path,  # unused...
     output_path: Path,
     steady_state_start_years: float = _STEADY_STATE_START_YEARS,
     # TODO/WIP pass GEOPHIRES production profile data
@@ -271,7 +274,7 @@ def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project
             alpha=0.5,
             label='Measured '
             # f'Flowing '
-            'Temperature (Excluded Operational Periods)',
+            'Temperature (Excluded Operational Periods)',  # TODO better wording/phrasing
             # f', n={len(df_excluded)}',
         )
 
@@ -287,9 +290,7 @@ def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project
     ax.set_xlabel('Time (Years)', fontsize=12)
     ax.set_ylabel('Temperature (°C)', fontsize=12)
     ax.set_title(
-        'Project Red Temperature: Measured vs. Fervo-Modeled'
-        # ' vs. GEOPHIRES-Modeled'  # WIP/TODO
-        '',
+        'Project Red Temperature: Measured vs. Fervo-Modeled' ' vs. GEOPHIRES-Modeled' '',
         fontsize=13,
     )
 
@@ -305,11 +306,13 @@ def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project
     plt.close(fig)
 
 
+def _get_file_path(file_name) -> Path:
+    return Path(__file__).parent / file_name
+
+
 if __name__ == '__main__':
-    IMAGE_PATH = Path(__file__).parent / 'fervo-project-red-2026_figure-5_measured-flowing-temperature.png'
-    PRODUCTION_IMAGE_PATH = (
-        Path(__file__).parent / 'fervo_project_red-2026_graph-data-extraction_production-series-edited.png'
-    )
+    IMAGE_PATH = _get_file_path('fervo-project-red-2026_figure-5_measured-flowing-temperature.png')
+    PRODUCTION_IMAGE_PATH = _get_file_path('fervo_project_red-2026_graph-data-extraction_production-series-edited.png')
 
     _BUILD_DIR.mkdir(parents=True, exist_ok=True)
     production_csv_path = _BUILD_DIR / _PRODUCTION_CSV_FILENAME
@@ -343,7 +346,18 @@ if __name__ == '__main__':
         df_steady_state.to_csv(steady_state_csv_path, index=False)
         _log.info(f'Wrote variance analysis CSV:  {steady_state_csv_path}')
 
+    project_red_geophires_result_data = _get_full_production_temperature_profile(
+        ImmutableGeophiresInputParameters(
+            from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt')
+        ),
+        GeophiresXResult(_get_file_path('../../tests/examples/Fervo_Project_Red-2026.out')),
+    )
+
     _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project_red_geophires_result_data(
-        production_csv_path, model_csv_path, steady_state_csv_path, regenerated_graph_path
+        production_csv_path,
+        model_csv_path,
+        # steady_state_csv_path,  # unused...
+        regenerated_graph_path,
+        # TODO/WIP pass project_red_geophires_result_data as series with interpolation matching csvs
     )
     _log.info(f'Wrote regenerated graph:      {regenerated_graph_path}')

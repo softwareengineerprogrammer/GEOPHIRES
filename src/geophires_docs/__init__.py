@@ -82,7 +82,13 @@ def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCa
     return ret
 
 
-def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], profile_key: str):
+def _get_full_profile(
+    input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], profile_key: str
+) -> list[PlainQuantity]:
+    """
+    :return: List of data points with length Time steps per year * Plant lifetime
+    """
+
     input_params: GeophiresInputParameters = input_and_result[0]
     result = GeophiresXClient().get_geophires_result(input_params)
 
@@ -95,5 +101,7 @@ def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, Geophire
     return profile
 
 
-def _get_full_production_temperature_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
+def _get_full_production_temperature_profile(
+    input_and_result: tuple[GeophiresInputParameters, GeophiresXResult],
+) -> list[PlainQuantity]:
     return _get_full_profile(input_and_result, 'Produced Temperature')
