@@ -9,7 +9,9 @@ from scipy.ndimage import maximum_filter
 
 from geophires_docs import _PROJECT_ROOT
 from geophires_docs import _get_full_production_temperature_profile
+from geophires_docs import _get_input_parameters_dict
 from geophires_docs import _get_logger
+from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
@@ -218,7 +220,6 @@ def _get_steady_state_mask(df_prod: pd.DataFrame, steady_state_start_years: floa
             mean_temp = float(np.mean(history))
             std_temp = float(np.std(history, ddof=1))
 
-            # Prevent excessively tight windows during flat extractions
             std_temp = max(std_temp, _STATISTICAL_MIN_STD)
 
             if abs(temp - mean_temp) > _STATISTICAL_Z_SCORE * std_temp:
@@ -230,13 +231,13 @@ def _get_steady_state_mask(df_prod: pd.DataFrame, steady_state_start_years: floa
     return is_steady
 
 
-def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project_red_geophires_result_data(
+def _regenerate_graph_from_csv(
     production_csv_path: Path,
     model_csv_path: Path,
-    # steady_state_csv_path: Path,  # unused...
+    steady_state_csv_path: Path,
     output_path: Path,
     steady_state_start_years: float = _STEADY_STATE_START_YEARS,
-    # TODO/WIP pass GEOPHIRES production profile data
+    geophires_data: pd.Series | None = None,
 ) -> None:
     df_prod = pd.read_csv(production_csv_path)
     df_model = pd.read_csv(model_csv_path)
@@ -259,7 +260,7 @@ def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project
         alpha=0.85,
         label='Measured '
         # f'Flowing '
-        'Temperature (Thermal Conditioning and Steady State)',
+        'Temperature (Thermal Conditioning and Steady State)',  # TODO exclude Thermal Conditioning
         # f', n={len(df_included)}',
     )
 
@@ -284,21 +285,31 @@ def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project
         color='black',
         linestyle='--',
         linewidth=1.5,
-        label='Fervo-Modeled Temperature',
+        label='Fervo-Modeled Temperature' if geophires_data is not None else 'Modeled output',
     )
 
+    if geophires_data is not None:
+        ax.plot(
+            geophires_data.index,
+            geophires_data.values,
+            color='#1f77b4',
+            linestyle='-.',
+            linewidth=1.5,
+            label='GEOPHIRES-Modeled Temperature (Gringarten)',
+        )
+
     ax.set_xlabel('Time (Years)', fontsize=12)
-    ax.set_ylabel('Temperature (°C)', fontsize=12)
-    ax.set_title(
-        'Project Red Temperature: Measured vs. Fervo-Modeled' ' vs. GEOPHIRES-Modeled' '',
-        fontsize=13,
-    )
+    ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
+
+    title = 'Fervo Project Red: Measured vs. Modeled Flowing Temperature (Regenerated)'
+    if geophires_data is not None:
+        title = 'Project Red Temperature: Measured vs. Fervo-Modeled vs. GEOPHIRES-Modeled'
+    ax.set_title(title, fontsize=13)
 
     ax.set_xlim(0.0, 2.0)
     ax.set_ylim(0.0, 200.0)
     ax.grid(True, linestyle='--', alpha=0.5)
 
-    # Position the legend below the graph, centered horizontally.
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=1, frameon=False, fontsize=11)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -306,8 +317,37 @@ def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project
     plt.close(fig)
 
 
-def _get_file_path(file_name) -> Path:
+def _get_file_path(file_name: str) -> Path:
     return Path(__file__).parent / file_name
+
+
+def get_project_red_production_temperature_profile_series() -> pd.Series:
+    input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+        from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt')
+    )
+    input_and_result = (
+        input_params,
+        GeophiresXResult(_get_file_path('../../tests/examples/Fervo_Project_Red-2026.out')),
+    )
+
+    project_red_geophires_result_data: list = _get_full_production_temperature_profile(input_and_result)
+
+    # Fetch the 'Time' profile data to align exactly with the GEOPHIRES temperature curve
+    time_steps_per_year: int = int(_get_input_parameters_dict(input_params)['Time steps per year'])
+    geophires_time_data = [
+        float(step) / float(time_steps_per_year) for step, _ in enumerate(project_red_geophires_result_data)
+    ]
+
+    geophires_x = geophires_time_data
+    geophires_y = [q.magnitude for q in project_red_geophires_result_data]
+
+    # Interpolate the GEOPHIRES curve along the exact timestamps established by the model dashed line extraction
+    geophires_interpolator = interp1d(geophires_x, geophires_y, kind='linear', fill_value='extrapolate')
+    geophires_interpolated_y = geophires_interpolator(df_model['Time_Years'])
+
+    geophires_series = pd.Series(data=geophires_interpolated_y, index=df_model['Time_Years'])
+
+    return geophires_series
 
 
 if __name__ == '__main__':
@@ -346,18 +386,11 @@ if __name__ == '__main__':
         df_steady_state.to_csv(steady_state_csv_path, index=False)
         _log.info(f'Wrote variance analysis CSV:  {steady_state_csv_path}')
 
-    project_red_geophires_result_data = _get_full_production_temperature_profile(
-        ImmutableGeophiresInputParameters(
-            from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt')
-        ),
-        GeophiresXResult(_get_file_path('../../tests/examples/Fervo_Project_Red-2026.out')),
-    )
-
-    _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project_red_geophires_result_data(
+    _regenerate_graph_from_csv(
         production_csv_path,
         model_csv_path,
-        # steady_state_csv_path,  # unused...
+        steady_state_csv_path,
         regenerated_graph_path,
-        # TODO/WIP pass project_red_geophires_result_data as series with interpolation matching csvs
+        geophires_data=get_project_red_production_temperature_profile_series(),
     )
     _log.info(f'Wrote regenerated graph:      {regenerated_graph_path}')
