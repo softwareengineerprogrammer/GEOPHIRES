@@ -45,8 +45,8 @@ Injection Temperature, 75, -- per https://fervoenergy.com/enhanced-geothermal-ha
 Injection Wellbore Temperature Gain, 3, -- [degC]
 Ramey Production Wellbore Model, 1
 
-Injectivity Index, 0.6, -- Calibrated to yield ~0.7 MW Average Pumping Power
-Productivity Index, 0.491, -- See Injectivity Index
+Injectivity Index, 0.59, -- Calibrated to yield ~0.7 MW Average Pumping Power
+Productivity Index, 0.49, -- See Injectivity Index
 
 Water Loss Fraction, 0.3, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 
