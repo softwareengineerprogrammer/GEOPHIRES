@@ -284,9 +284,7 @@ def _generate_production_temperature_comparison_graph(
             alpha=0.5,
             label='Measured '
             # f'Flowing '
-            'Temperature (Thermal Conditioning '
-            '& Excluded Operational Periods'  # TODO better wording/phrasing
-            ')',
+            'Temperature (Thermal Conditioning ' '& Transient Operations' ')',
             # f', n={len(df_excluded)}',
         )
 
@@ -319,7 +317,7 @@ def _generate_production_temperature_comparison_graph(
 
     title = 'Fervo Project Red: Measured vs. Modeled Flowing Temperature (Regenerated)'
     if geophires_data is not None:
-        title = 'Project Red Temperature: Measured vs. Fervo-Modeled vs. GEOPHIRES-Modeled'
+        title = 'Project Red Temperature: Measured vs. Fervo-Modeled vs. GEOPHIRES'
     ax.set_title(title, fontsize=13)
 
     ax.set_xlim(0.0, 1.75)
