@@ -227,12 +227,13 @@ def _get_steady_state_mask(df_prod: pd.DataFrame, steady_state_start_years: floa
     return is_steady
 
 
-def _regenerate_graph_from_csv(
+def _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project_red_geophires_result_data(
     production_csv_path: Path,
     model_csv_path: Path,
     steady_state_csv_path: Path,
     output_path: Path,
     steady_state_start_years: float = _STEADY_STATE_START_YEARS,
+    # TODO/WIP pass GEOPHIRES production profile data
 ) -> None:
     df_prod = pd.read_csv(production_csv_path)
     df_model = pd.read_csv(model_csv_path)
@@ -253,7 +254,10 @@ def _regenerate_graph_from_csv(
         s=22,
         linewidths=1.0,
         alpha=0.85,
-        label=f'Measured flowing temperature (Included), n={len(df_included)}',
+        label='Measured '
+        # f'Flowing '
+        'Temperature (Thermal Conditioning and Steady State)',
+        # f', n={len(df_included)}',
     )
 
     if not df_excluded.empty:
@@ -265,7 +269,10 @@ def _regenerate_graph_from_csv(
             s=22,
             linewidths=1.0,
             alpha=0.5,
-            label=f'Measured flowing temperature (Excluded), n={len(df_excluded)}',
+            label='Measured '
+            # f'Flowing '
+            'Temperature (Excluded Operational Periods)',
+            # f', n={len(df_excluded)}',
         )
 
     ax.plot(
@@ -274,12 +281,18 @@ def _regenerate_graph_from_csv(
         color='black',
         linestyle='--',
         linewidth=1.5,
-        label='Modeled output',
+        label='Fervo-Modeled Temperature',
     )
 
     ax.set_xlabel('Time (Years)', fontsize=12)
-    ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
-    ax.set_title('Fervo Project Red: Measured vs. Modeled Flowing Temperature (Regenerated)', fontsize=13)
+    ax.set_ylabel('Temperature (°C)', fontsize=12)
+    ax.set_title(
+        'Project Red Temperature: Measured vs. Fervo-Modeled'
+        # ' vs. GEOPHIRES-Modeled'  # WIP/TODO
+        '',
+        fontsize=13,
+    )
+
     ax.set_xlim(0.0, 2.0)
     ax.set_ylim(0.0, 200.0)
     ax.grid(True, linestyle='--', alpha=0.5)
@@ -330,5 +343,7 @@ if __name__ == '__main__':
         df_steady_state.to_csv(steady_state_csv_path, index=False)
         _log.info(f'Wrote variance analysis CSV:  {steady_state_csv_path}')
 
-    _regenerate_graph_from_csv(production_csv_path, model_csv_path, steady_state_csv_path, regenerated_graph_path)
+    _generate_production_temperature_graph_from_fervo_graph_data_csv_and_project_red_geophires_result_data(
+        production_csv_path, model_csv_path, steady_state_csv_path, regenerated_graph_path
+    )
     _log.info(f'Wrote regenerated graph:      {regenerated_graph_path}')
