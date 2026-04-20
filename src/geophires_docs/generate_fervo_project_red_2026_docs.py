@@ -304,12 +304,12 @@ def _generate_production_temperature_comparison_graph(
             geophires_data.values,
             # color='#1f77b4',
             color='green',
-            # linestyle='-.',
-            linestyle=(
-                0,
-                (1, 3),
-            ),  # loosely dotted - https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
-            linewidth=7,
+            linestyle='-.',
+            # linestyle=(
+            #     0,
+            #     (1, 3),
+            # ),  # loosely dotted - https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
+            # linewidth=7,
             label='GEOPHIRES-Modeled Temperature (Gringarten)',
         )
 
@@ -322,7 +322,13 @@ def _generate_production_temperature_comparison_graph(
     ax.set_title(title, fontsize=13)
 
     ax.set_xlim(0.0, 2.0)
-    ax.set_ylim(0.0, 200.0)
+
+    ax.set_ylim(
+        # 0.0, 200.0  # TODO generate zoomed out version as well
+        175,
+        185,
+    )
+
     ax.grid(True, linestyle='--', alpha=0.5)
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=1, frameon=False, fontsize=11)
@@ -338,7 +344,8 @@ def _get_file_path(file_name: str) -> Path:
 
 def get_project_red_production_temperature_profile_series(fervo_graph_df_model: pd.Series) -> pd.Series:
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-        from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt')
+        from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt'),
+        params={'Print Output to Console': 0},
     )
     input_and_result = (
         input_params,
