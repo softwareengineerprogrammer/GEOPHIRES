@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import cv2
 import matplotlib.pyplot as plt
@@ -345,7 +346,12 @@ def _get_file_path(file_name: str) -> Path:
     return Path(__file__).parent / file_name
 
 
-def get_project_red_production_temperature_profile_series(fervo_graph_df_model: pd.Series) -> pd.Series:
+def get_project_red_production_temperature_profile_series(
+    fervo_graph_df_model: pd.Series,
+) -> tuple[
+    pd.Series,
+    Any,  # interpolator
+]:
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
         from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt'),
         params={'Print Output to Console': 0},
@@ -372,7 +378,7 @@ def get_project_red_production_temperature_profile_series(fervo_graph_df_model: 
 
     geophires_series = pd.Series(data=geophires_interpolated_y, index=fervo_graph_df_model['Time_Years'])
 
-    return geophires_series
+    return geophires_series, geophires_interpolator
 
 
 def generate_fervo_project_red_2026_docs():
@@ -396,29 +402,42 @@ def generate_fervo_project_red_2026_docs():
     _log.info(f'Wrote production data CSV: {production_csv_path_}')
     _log.info(f'Wrote model data CSV:      {model_csv_path_}')
 
-    if not df_actual.empty and not df_model_.empty:
-        df_steady_state = _calculate_variance_analysis(df_actual, df_model_)
+    df_steady_state = _calculate_variance_analysis(df_actual, df_model_)
 
-        rmse = float(np.sqrt((df_steady_state['Error_C'] ** 2).mean()))
-        mae = float(df_steady_state['Error_C'].abs().mean())
-        max_error = float(df_steady_state['Error_C'].abs().max())
+    # Like-for-like comparison metrics
+    y_true = df_steady_state['Temperature_C'].values
+    y_fervo = df_steady_state['Model_Temperature_C'].values
 
-        _log.info(f'--- STATISTICAL ALIGNMENT (Steady-State > {_STEADY_STATE_START_YEARS} Years) ---')
-        _log.info(f'Root Mean Square Error (RMSE): {rmse:.2f} °C')
-        _log.info(f'Mean Absolute Error (MAE):     {mae:.2f} °C')
-        _log.info(f'Max Absolute Error:            {max_error:.2f} °C')
+    # Calculate R^2 and Bias for Fervo
+    rmse_f = float(np.sqrt((df_steady_state['Error_C'] ** 2).mean()))
+    bias_f = float((y_fervo - y_true).mean())
+    ss_res_f = np.sum((y_true - y_fervo) ** 2)
+    ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+    r2_f = 1 - (ss_res_f / ss_tot) if ss_tot != 0 else 0.0
 
-        df_steady_state.to_csv(steady_state_csv_path, index=False)
-        _log.info(f'Wrote variance analysis CSV:  {steady_state_csv_path}')
+    # Calculate metrics for GEOPHIRES (interpolated at the exact same steady-state timestamps)
+    geophires_series, geo_interp = get_project_red_production_temperature_profile_series(df_model_)
+    # geo_interp = interp1d(geophires_series.index, geophires_series.values, kind='linear', fill_value='extrapolate')
+    y_geo = geo_interp(df_steady_state['Time_Years'])
+
+    rmse_g = float(np.sqrt(((y_true - y_geo) ** 2).mean()))
+    bias_g = float((y_geo - y_true).mean())
+    ss_res_g = np.sum((y_true - y_geo) ** 2)
+    r2_g = 1 - (ss_res_g / ss_tot) if ss_tot != 0 else 0.0
+
+    _log.info(f'--- STATISTICAL ALIGNMENT (Steady-State > {_STEADY_STATE_START_YEARS} Years) ---')
+    _log.info(f'FERVO:      RMSE={rmse_f:.2f}°C, R²={r2_f:.4f}, Bias={bias_f:.2f}°C')
+    _log.info(f'GEOPHIRES:  RMSE={rmse_g:.2f}°C, R²={r2_g:.4f}, Bias={bias_g:.2f}°C')
+
+    df_steady_state.to_csv(steady_state_csv_path, index=False)
 
     _generate_production_temperature_comparison_graph(
         production_csv_path_,
         model_csv_path_,
         steady_state_csv_path,
         generated_graph_path_stem,
-        geophires_data=get_project_red_production_temperature_profile_series(df_model_),
+        geophires_data=geophires_series,
     )
-    _log.info(f'Wrote regenerated graph:      {generated_graph_path_stem}')
 
 
 if __name__ == '__main__':
