@@ -17,7 +17,7 @@
     </style>
 
 
-# Fervo Project Red: Evaluating the Gringarten Model against Empirical EGS Data
+# Fervo Project Red: Evaluating GEOPHIRES and Gringarten against Empirical EGS Data
 
 ℹ️ The GEOPHIRES (Gringarten) model parameters used in this evaluation can be explored and executed via the [Fervo_Project_Red-2026 example in the web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Red-2026).
 
