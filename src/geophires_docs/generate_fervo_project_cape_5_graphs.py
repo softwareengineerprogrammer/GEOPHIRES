@@ -40,9 +40,12 @@ def _get_full_thermal_drawdown_profile(input_and_result: tuple[GeophiresInputPar
     return _get_full_profile(input_and_result, 'Thermal Drawdown')
 
 
+_FULL_PROFILE_CACHING_GEOPHIRES_CLIENT: GeophiresXClient = GeophiresXClient(enable_caching=True)
+
+
 def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], profile_key: str):
     input_params: GeophiresInputParameters = input_and_result[0]
-    result = GeophiresXClient().get_geophires_result(input_params)
+    result = _FULL_PROFILE_CACHING_GEOPHIRES_CLIENT.get_geophires_result(input_params)
 
     with open(result.json_output_file_path, encoding='utf-8') as f:
         full_result_obj = json.load(f)
