@@ -1,4 +1,3 @@
-from logging import getLogger
 from pathlib import Path
 
 import cv2
@@ -9,8 +8,9 @@ from scipy.interpolate import interp1d
 from scipy.ndimage import maximum_filter
 
 from geophires_docs import _PROJECT_ROOT
+from geophires_docs import _get_logger
 
-_log = getLogger(__name__)
+_log = _get_logger(__name__)
 
 _BUILD_DIR: Path = _PROJECT_ROOT / 'build' / 'generate_fervo_project_red_2026_docs'
 
@@ -19,12 +19,14 @@ _MODEL_CSV_FILENAME = 'project_red_2026_model_data.csv'
 _STEADY_STATE_CSV_FILENAME = 'project_red_2026_variance_analysis.csv'
 _REGENERATED_GRAPH_FILENAME = 'project_red_2026_figure-5_regenerated.png'
 
-_STEADY_STATE_START_YEARS = 0.25
+_STEADY_STATE_START_YEARS = 0.125
 
 _HOUGH_MIN_DIST_PX = 4
 
 _MODEL_OUTLIER_STD_THRESHOLD = 2.5
 _MODEL_ROLLING_WINDOW = 15
+
+_CONTINUOUS_OPERATION_MIN_TEMP_C = 175.0
 
 
 def extract_plot_data(
@@ -63,6 +65,11 @@ def _calculate_variance_analysis(
 ) -> pd.DataFrame:
     df_steady_state = df_actual[df_actual['Time_Years'] > steady_state_start_years].copy()
 
+    # TODO: Replace hardcoded minimum temperature threshold with a robust statistical baseline envelope
+    n_before = len(df_steady_state)
+    df_steady_state = df_steady_state[df_steady_state['Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C].copy()
+    _log.info(f'Continuous operation filter: dropped {n_before - len(df_steady_state)} dip points.')
+
     model_interpolator = interp1d(
         df_model['Time_Years'],
         df_model['Temperature_C'],
@@ -93,7 +100,6 @@ def _extract_red_circles(
         mask_alpha = np.ones(img.shape[:2], dtype=np.uint8) * 255
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # Widened HSV bounds to capture anti-aliased/faded brush edges
     lower_red1 = np.array([0, 20, 20])
     upper_red1 = np.array([20, 255, 255])
     lower_red2 = np.array([160, 20, 20])
@@ -105,12 +111,9 @@ def _extract_red_circles(
     mask_red = cv2.bitwise_and(mask_red, mask_alpha)
     mask_red = cv2.bitwise_and(mask_red, plot_mask)
 
-    # Use distance transform to find the central ridge line of the brush strokes
     dist_transform = cv2.distanceTransform(mask_red, cv2.DIST_L2, 5)
 
-    # Find the peaks (ridges) using a small 3x3 max filter
     local_max = maximum_filter(dist_transform, size=3) == dist_transform
-    # Filter out absolute noise
     peak_mask = local_max & (dist_transform > 1.0)
 
     y_coords, x_coords = np.where(peak_mask)
@@ -120,7 +123,6 @@ def _extract_red_circles(
         _log.warning('No valid pixels found in the production data mask.')
         return pd.DataFrame(columns=['Time_Years', 'Temperature_C'])
 
-    # Space the extracted points evenly along the detected ridge
     deduped_centers_px = _dedupe_centers(centers_px, min_dist_px=_HOUGH_MIN_DIST_PX)
 
     _log.info(f'Red-marker detection: Extracted {len(deduped_centers_px)} topological ridge points from edited mask.')
@@ -189,23 +191,45 @@ def _dedupe_centers(centers_px: list[tuple[int, int]], min_dist_px: float) -> li
 def _regenerate_graph_from_csv(
     production_csv_path: Path,
     model_csv_path: Path,
+    steady_state_csv_path: Path,
     output_path: Path,
+    steady_state_start_years: float = _STEADY_STATE_START_YEARS,
 ) -> None:
     df_prod = pd.read_csv(production_csv_path)
     df_model = pd.read_csv(model_csv_path)
 
+    # Apply the exclusion logic directly via boolean mask to avoid float-merge bugs across CSVs
+    is_ramp_up = df_prod['Time_Years'] <= steady_state_start_years
+    is_steady = df_prod['Temperature_C'] >= _CONTINUOUS_OPERATION_MIN_TEMP_C
+
+    df_included = df_prod[is_ramp_up | is_steady]
+    df_excluded = df_prod[~(is_ramp_up | is_steady)]
+
     fig, ax = plt.subplots(figsize=(10, 6))
 
     ax.scatter(
-        df_prod['Time_Years'],
-        df_prod['Temperature_C'],
+        df_included['Time_Years'],
+        df_included['Temperature_C'],
         facecolors='none',
         edgecolors='#d62728',
         s=22,
         linewidths=1.0,
         alpha=0.85,
-        label=f'Measured flowing temperature (Project Red), n={len(df_prod)}',
+        label=f'Measured flowing temperature (Included), n={len(df_included)}',
     )
+
+    if not df_excluded.empty:
+        ax.scatter(
+            df_excluded['Time_Years'],
+            df_excluded['Temperature_C'],
+            facecolors='none',
+            edgecolors='gray',
+            s=22,
+            linewidths=1.0,
+            alpha=0.5,
+            label=f'Measured flowing temperature (Excluded), n={len(df_excluded)}',
+        )
+
     ax.plot(
         df_model['Time_Years'],
         df_model['Temperature_C'],
@@ -266,5 +290,5 @@ if __name__ == '__main__':
         df_steady_state.to_csv(steady_state_csv_path, index=False)
         _log.info(f'Wrote variance analysis CSV:  {steady_state_csv_path}')
 
-    _regenerate_graph_from_csv(production_csv_path, model_csv_path, regenerated_graph_path)
+    _regenerate_graph_from_csv(production_csv_path, model_csv_path, steady_state_csv_path, regenerated_graph_path)
     _log.info(f'Wrote regenerated graph:      {regenerated_graph_path}')
