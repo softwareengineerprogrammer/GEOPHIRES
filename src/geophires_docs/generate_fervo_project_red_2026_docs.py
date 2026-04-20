@@ -360,7 +360,7 @@ def get_project_red_production_temperature_profile_series(fervo_graph_df_model: 
     return geophires_series
 
 
-if __name__ == '__main__':
+def generate_fervo_project_red_2026_docs():
     IMAGE_PATH = _get_file_path('fervo-project-red-2026_figure-5_measured-flowing-temperature.png')
     PRODUCTION_IMAGE_PATH = _get_file_path('fervo_project_red-2026_graph-data-extraction_production-series-edited.png')
 
@@ -404,3 +404,7 @@ if __name__ == '__main__':
         geophires_data=get_project_red_production_temperature_profile_series(df_model_),
     )
     _log.info(f'Wrote regenerated graph:      {regenerated_graph_path}')
+
+
+if __name__ == '__main__':
+    generate_fervo_project_red_2026_docs()
