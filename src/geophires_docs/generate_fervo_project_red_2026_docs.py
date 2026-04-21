@@ -499,12 +499,16 @@ def generate_fervo_project_red_2026_md(
 
         return input_params_dict
 
+    # TODO derive latest of simulation date or modified time of Fervo_Project_Red.md.jinja file
+    last_updated_date = result.result['Simulation Metadata']['Simulation Date']['value']
+
     # noinspection PyDictCreation
     template_values = {
         'input_params': _get_input_params_dict_with_nbsp(),
         'input_params_comments': _get_input_parameters_comments_dict(input_params),
         **result_values,
         'nbsp': _NON_BREAKING_SPACE,
+        'last_updated_date': last_updated_date,
     }
 
     docs_dir = project_root / 'docs'

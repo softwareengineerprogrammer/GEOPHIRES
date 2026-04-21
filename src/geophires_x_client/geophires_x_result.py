@@ -365,6 +365,7 @@ class GeophiresXResult:
             ],
             'Simulation Metadata': [
                 _StringValueField('GEOPHIRES Version'),
+                _StringValueField('Simulation Date'),
                 'Calculation Time',
             ],
         }
