@@ -8,6 +8,8 @@ GEOPHIRES v3 (2023-2026)
 3.13
 ^^^^
 
+3.13.2: `Project Red 2026 Update <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/145>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.2>`__ | `documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Red.html>`__
+
 3.13: `SAM-EM: Support all End-Use Options (Direct-Use Heat and CHP/Cogeneration) and Absorption Chiller Surface Application <https://github.com/NatLabRockies/GEOPHIRES-X/pull/478>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.1>`__ | `documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-EM_End-Uses-and-Surface-Applications.html>`__
 
 3.12
