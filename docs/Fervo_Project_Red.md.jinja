@@ -39,9 +39,7 @@ appears to assume an idealized steady-state flow from inception, omitting the ea
 Conversely, while the GEOPHIRES (Gringarten) model does account for early transient heat transfer, its precision
 during this rapid ramp-up is inherently constrained by its temporal resolution (100 time steps per year).
 
-## Disclaimer: Independent Analysis
-
-This case study is an independent techno-economic evaluation developed by the author and contributors to the GEOPHIRES
+**Disclaimer: Independent Analysis:** This case study is an independent techno-economic evaluation developed by the author and contributors to the GEOPHIRES
 open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy.
 The author and contributors are not employees or agents of Fervo Energy, and this work has not been reviewed or
 approved by the company. All modeling assumptions, including those derived from public data sources, represent the
@@ -56,7 +54,7 @@ The foundation of this validation lies in aligning the GEOPHIRES inputs with the
 
 The baseline data for this evaluation was extracted from Figure 5 of Fervo Energy's 2026 update report, which plots the measured flowing temperature over approximately two years.
 
-*Original Published Figure 5: Measured Flowing Temperature*
+*Original Published Figure 5: Measured Flowing Temperature:*
 ![](_images/fervo-project-red-2026_figure-5_measured-flowing-temperature.png)
 
 ### GEOPHIRES Reservoir Parameters
@@ -97,7 +95,7 @@ Both models demonstrate high predictive fidelity, tracking steady-state flowing 
 
 ## Discussion
 
-## Evaluating the Predictive Power of Gringarten
+### Evaluating the Predictive Power of Gringarten
 
 The close statistical alignment over the first two years demonstrates that the analytical Gringarten model,
 when appropriately parameterized with empirical reservoir geometry (e.g., de-rating the active fracture count to account for heterogeneous flow),
@@ -121,8 +119,6 @@ bound for long-term (15-30 year) aggregate heat extraction compared to the more 
 required for managing commercial-scale heterogeneous reservoirs like Cape Station.
 
 ### Modeling Assumptions and Power Production Discrepancies
-
-{# TODO move to methodology or results, probably... #}
 
 While the Gringarten model accurately predicts the reservoir's thermal drawdown, translating that thermal energy into net electrical power introduces additional variables.
 Users comparing GEOPHIRES power production estimates to Fervo's published net generation may notice discrepancies.
