@@ -1,8 +1,8 @@
 # Case Study: Fervo Project Red (2026 Update)
-# Based on GEOPHIRES example Fervo_Norbeck_Latimer_2023 (https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Norbeck_Latimer_2023)
-# with 2026 updates derived from https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
-# Paper references are to "Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal System." (Norbeck & Latimer, 2023) (https://doi.org/10.31223/X52X0B).
 # See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Red.html
+# 2026 updates derived from https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+# Paper references are to "Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal System." (Norbeck & Latimer, 2023) (https://doi.org/10.31223/X52X0B).
+
 
 Reservoir Model, 1
 Reservoir Volume Option, 1
@@ -16,7 +16,7 @@ Reservoir Thermal Conductivity, 2.7
 Number of Segments, 1
 Gradient 1, 76
 
-Number of Fractures, 65, -- Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume.
+Number of Fractures, 65, -- Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume (Norbeck & Latimer, 2023).
 Fracture Shape, 4, -- Rectangular geometry (Shape 4), representing standard transverse hydraulic fractures along a horizontal wellbore.
 Fracture Height, 300 foot, -- Estimated vertical propagation of the stimulated fracture network.
 Fracture Width, 365 foot, -- Set to match the distance between the injection and production wellbores, assuming a dipole flow field directly connecting the laterals.
