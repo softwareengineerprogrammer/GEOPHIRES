@@ -7,19 +7,20 @@
 Reservoir Model, 1
 Reservoir Volume Option, 1
 
+Reservoir Depth, 7600 foot, -- per the paper
+
 Reservoir Density, 2800, -- per the paper phyllite + quartzite + diorite + granodiorite
-Reservoir Depth, 7600 feet, -- per the paper
 Reservoir Heat Capacity, 1000, -- [J/kg/K]
 Reservoir Thermal Conductivity, 2.7
+
+Number of Segments, 1
+Gradient 1, 76
 
 Number of Fractures, 65, -- Paper estimates between 75 and 100; value is de-rated to account for imperfect flow across fractured surface area
 Fracture Shape, 4, -- per the paper
 Fracture Height, 300 foot, -- per the paper
 Fracture Width, 365 foot, -- per the paper (distance between wellbores assumes a dipole flow field)
-Fracture Separation, 10 meter
-
-Number of Segments, 1
-Gradient 1, 76
+Fracture Separation, 10
 
 Plant Outlet Pressure, 1500 psi, -- per the paper
 
