@@ -404,7 +404,7 @@ def _generate_long_term_forecast_graph(
     ax.set_xlabel('Time (Years)', fontsize=12)
     ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
 
-    ax.set_title('Project Red Temperature Forecast: 8-Year Horizon', fontsize=13)
+    ax.set_title('Project Red GEOPHIRES Temperature Forecast: 8-Year Horizon', fontsize=13)
 
     ax.set_xlim(0.0, 8.0)
     ax.set_ylim(0.0, 200.0)

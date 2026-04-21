@@ -99,6 +99,18 @@ Both models demonstrate high predictive fidelity, tracking steady-state flowing 
 * **Systematic Bias:** The Fervo model exhibits slightly less systemic underestimation, with a cold bias of -0.50°C compared to the GEOPHIRES cold bias of -0.70°C.
 * **R² Context:** The relatively low R² values for both models are expected statistical artifacts. Because the steady-state temperature profile is essentially a flat plateau, natural sensor variance and minor reservoir oscillations account for a disproportionately large portion of the total sum of squares, suppressing the R² score despite the low absolute error.
 
+### Long-Term Forecast (8-Year Horizon)
+
+To evaluate the model's predictive behavior over a longer timeframe, the GEOPHIRES simulation was extended to an 8-year horizon.
+This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html)
+and provides a realistic view of the anticipated thermal decline before major wellfield intervention would be required.
+
+![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-long-term.png)
+
+As shown in the forecast above, the Gringarten analytical model maintains a relatively flat thermal plateau for several
+years before exhibiting a sharp thermal breakthrough. This extended forecast visually contextualizes the predictive
+limitations of the analytical model discussed below.
+
 ## Discussion
 
 ### Evaluating the Predictive Power of Gringarten
