@@ -96,8 +96,13 @@ def _get_input_parameters_comments_dict(_params: GeophiresInputParameters) -> di
         comment: str = ''
 
         if v is not None and isinstance(v, str) and ',' in v:
-            if k in request_schema['properties'] and request_schema['properties'][k]['type'] == 'array':
-                comment = v.split(', --', maxsplit=1)[1]
+            ARRAY_TYPE_COMMENT_DELINEATOR = ', --'  # TODO use regex to treat space after comma as optional
+            if (
+                k in request_schema['properties']
+                and request_schema['properties'][k]['type'] == 'array'
+                and ARRAY_TYPE_COMMENT_DELINEATOR in v
+            ):
+                comment = v.split(ARRAY_TYPE_COMMENT_DELINEATOR, maxsplit=1)[1]
             else:
                 comment = v.split(',', maxsplit=1)[1]
                 # Strip ' --' and optional whitespace from the start of the comment
