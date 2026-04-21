@@ -65,24 +65,29 @@ Circulation Pump Efficiency, 0.80, -- per the paper
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
-Economic Model, 3, -- BICYCLE Levelized Cost Model
+Economic Model, 5, -- SAM Single Owner PPA economic model
+Inflation Rate, .027, -- US inflation as of December 2025
 
-Starting Electricity Sale Price, 0.15
-Ending Electricity Sale Price, 1.00, -- essentially no limit as the rate can rise continuously with inflation
-Electricity Escalation Rate Per Year, 0.004053223, -- End up being about 2% inflation
+Starting Electricity Sale Price, 0.095
+Electricity Escalation Rate Per Year, 0.00057, -- Calibrated to reach $100/MWh at project year 11
+Ending Electricity Sale Price, 1, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
 Electricity Escalation Start Year, 1
 
-Fraction of Investment in Bonds, .5
-Combined Income Tax Rate, .3
+Fraction of Investment in Bonds, 0.7
+Discount Rate, 0.12
+Inflated Bond Interest Rate, .07
+Inflated Bond Interest Rate During Construction, 0.105
 
-Inflated Bond Interest Rate, .05
-Inflated Equity Interest Rate, .08
-Inflation Rate, .02
-Investment Tax Credit Rate, 0
-Inflation Rate During Construction, 0.05
-Property Tax Rate, 0
+Investment Tax Credit Rate, 0.3
+Combined Income Tax Rate, .2555
+Property Tax Rate, 0.0022
+
+Construction Years, 1
+Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389
 
 Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
 
+# *** SIMULATION PARAMETERS ***
+# *****************************
 Print Output to Console, 1
 Time steps per year, 100

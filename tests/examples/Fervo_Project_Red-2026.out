@@ -6,14 +6,16 @@ Simulation Metadata
 ----------------------
  GEOPHIRES Version: 3.13.1
  Simulation Date: 2026-04-21
- Simulation Time:  09:24
- Calculation Time:      1.008 sec
+ Simulation Time:  11:10
+ Calculation Time:      1.037 sec
 
                            ***SUMMARY OF RESULTS***
 
       End-Use Option: Electricity
       Average Net Electricity Production:                     1.98 MW
-      Electricity breakeven price:                          107.59 cents/kWh
+      Electricity breakeven price:                           45.82 cents/kWh
+      Total CAPEX:                                           28.06 MUSD
+      Total CAPEX ($/kW):                                    13738 USD/kW
       Number of production wells:                             1
       Number of injection wells:                              1
       Flowrate per production well:                          36.0 kg/sec
@@ -23,15 +25,17 @@ Simulation Metadata
 
                            ***ECONOMIC PARAMETERS***
 
-      Economic Model = BICYCLE
-      Accrued financing during construction:                 5.00 %
-      Inflation costs during construction:                   1.37 MUSD
+      Economic Model = SAM Single Owner PPA
+      Real Discount Rate:                                   12.00 %
+      Nominal Discount Rate:                                15.02 %
+      WACC:                                                  8.20 %
+      Investment Tax Credit:                                 8.42 MUSD
       Project lifetime:                                       2 yr
       Capacity factor:                                       90.0 %
-      Project NPV:                                         -24.67 MUSD
-      Project IRR:                                         -74.27 %
-      Project VIR=PI=PIR:                                    0.10
-      Project MOIC:                                         -0.84
+      Project NPV:                                          -9.30 MUSD
+      After-tax IRR:                                       -81.28 %
+      Project VIR=PI=PIR:                                    0.04
+      Project MOIC:                                         -1.11
       Project Payback Period:                                 N/A
       Estimated Jobs Created:                                 6
 
@@ -105,7 +109,9 @@ Simulation Metadata
          Surface power plant costs:                          10.46 MUSD
          Field gathering system costs:                        1.61 MUSD
          Total surface equipment costs:                      12.06 MUSD
-      Total capital costs:                                   27.33 MUSD
+         Overnight Capital Cost:                             27.33 MUSD
+         Inflation costs during construction:                 0.74 MUSD
+      Total CAPEX:                                           28.06 MUSD
 
 
                 ***OPERATING AND MAINTENANCE COSTS (M$/yr)***
@@ -151,14 +157,246 @@ Simulation Metadata
    1                  16.0                       148.5                  1.44                  27.07
    2                  15.3                       145.9                  0.91                  53.68
 
+                            ***************************
+                            *  SAM CASH FLOW PROFILE  *
+                            ***************************
+-----------------------------------------------------------------------------------------
+                                                 	Year 0     	Year 1     	Year 2
+CONSTRUCTION
+Capital expenditure schedule [construction] (%)  	100.0
+Overnight capital expenditure [construction] ($) 	-27,326,633
+plus:
+Inflation cost [construction] ($)                	-737,819
+plus:
+Royalty supplemental payments [construction] ($) 	0
+equals:
+Nominal capital expenditure [construction] ($)   	-28,064,453
 
-                             ********************************
-                             *  REVENUE & CASHFLOW PROFILE  *
-                             ********************************
-Year            Electricity             |            Heat                  |           Cooling                 |         Carbon                    |          Project
-Since     Price   Ann. Rev.  Cumm. Rev. |   Price   Ann. Rev.   Cumm. Rev. |  Price   Ann. Rev.   Cumm. Rev.   |   Price   Ann. Rev.   Cumm. Rev.  | OPEX    Net Rev.      Net Cashflow
-Start    (cents/kWh)(MUSD/yr) (MUSD)    |(cents/kWh) (MUSD/yr)    (MUSD)   |(cents/kWh) (MUSD/yr)    (MUSD)    |(USD/lb)    (MUSD/yr)    (MUSD)    |(MUSD/yr) (MUSD/yr)    (MUSD)
-________________________________________________________________________________________________________________________________________________________________________________________
-  0      0.00           0.00   0.00     |    0.00     0.00         0.00    |    0.00     0.00         0.00     |    0.00     0.00         0.00     |  0.00     -27.33     -27.33
-  1     15.00           2.39   2.39     |    2.50     0.00         0.00    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  0.88      1.52     -25.81
-  2     15.00           2.29   4.69     |    2.50     0.00         0.00    |    2.50     0.00         0.00     |    0.00     0.00         0.00     |  0.88      1.42     -24.39
+Issuance of equity [construction] ($)            	8,419,336
+Issuance of debt [construction] ($)              	19,645,117
+Debt balance [construction] ($)                  	19,645,117
+Debt interest payment [construction] ($)         	0
+
+Installed cost [construction] ($)                	-28,064,453
+After-tax net cash flow [construction] ($)       	-8,419,336
+
+ENERGY
+Electricity to grid (kWh)                        	0.0        	16,069,736 	15,393,404
+Electricity from grid (kWh)                      	0.0        	0.0        	0.0
+Electricity to grid net (kWh)                    	0.0        	16,069,736 	15,393,404
+
+REVENUE
+PPA price (cents/kWh)                            	0.0        	9.50       	9.50
+PPA revenue ($)                                  	0          	1,526,625  	1,462,373
+Curtailment payment revenue ($)                  	0          	0          	0
+Capacity payment revenue ($)                     	0          	0          	0
+Salvage value ($)                                	0          	0          	14,032,226
+Total revenue ($)                                	0          	1,526,625  	15,494,600
+
+Property tax net assessed value ($)              	0          	28,064,453 	28,064,453
+
+OPERATING EXPENSES
+O&M fixed expense ($)                            	0          	876,319    	876,319
+O&M production-based expense ($)                 	0          	0          	0
+O&M capacity-based expense ($)                   	0          	0          	0
+Fuel expense ($)                                 	0          	0          	0
+Electricity purchase ($)                         	0          	0          	0
+Property tax expense ($)                         	0          	61,742     	61,742
+Insurance expense ($)                            	0          	0          	0
+Total operating expenses ($)                     	0          	938,061    	938,061
+
+EBITDA ($)                                       	0          	588,564    	14,556,539
+
+OPERATING ACTIVITIES
+EBITDA ($)                                       	0          	588,564    	14,556,539
+Interest earned on reserves ($)                  	0          	0          	0
+plus PBI if not available for debt service:
+Federal PBI income ($)                           	0          	0          	0
+State PBI income ($)                             	0          	0          	0
+Utility PBI income ($)                           	0          	0          	0
+Other PBI income ($)                             	0          	0          	0
+Debt interest payment ($)                        	0          	1,375,158  	710,831
+Cash flow from operating activities ($)          	0          	-786,594   	13,845,708
+
+INVESTING ACTIVITIES
+Total installed cost ($)                         	-28,064,453
+Debt closing costs ($)                           	0
+Debt up-front fee ($)                            	0
+minus:
+Total IBI income ($)                             	0
+Total CBI income ($)                             	0
+equals:
+Purchase of property ($)                         	-28,064,453
+plus:
+Reserve (increase)/decrease debt service ($)     	0          	0          	0
+Reserve (increase)/decrease working capital ($)  	0          	0          	0
+Reserve (increase)/decrease receivables ($)      	0          	0          	0
+Reserve (increase)/decrease major equipment 1 ($)	0          	0          	0
+Reserve (increase)/decrease major equipment 2 ($)	0          	0          	0
+Reserve (increase)/decrease major equipment 3 ($)	0          	0          	0
+Reserve capital spending major equipment 1 ($)   	0          	0          	0
+Reserve capital spending major equipment 2 ($)   	0          	0          	0
+Reserve capital spending major equipment 3 ($)   	0          	0          	0
+equals:
+Cash flow from investing activities ($)          	-28,064,453	0          	0
+
+FINANCING ACTIVITIES
+Issuance of equity ($)                           	8,419,336
+Size of debt ($)                                 	19,645,117
+minus:
+Debt principal payment ($)                       	0          	9,490,395  	10,154,722
+equals:
+Cash flow from financing activities ($)          	28,064,453 	-9,490,395 	-10,154,722
+
+PROJECT RETURNS
+Pre-tax Cash Flow:
+Cash flow from operating activities ($)          	0          	-786,594   	13,845,708
+Cash flow from investing activities ($)          	-28,064,453	0          	0
+Cash flow from financing activities ($)          	28,064,453 	-9,490,395 	-10,154,722
+Total pre-tax cash flow ($)                      	0          	-10,276,989	3,690,986
+
+Pre-tax Returns:
+Issuance of equity ($)                           	8,419,336
+Total pre-tax cash flow ($)                      	0          	-10,276,989	3,690,986
+Total pre-tax returns ($)                        	-8,419,336 	-10,276,989	3,690,986
+
+After-tax Returns:
+Total pre-tax returns ($)                        	-8,419,336 	-10,276,989	3,690,986
+Federal ITC total income ($)                     	0          	8,419,336  	0
+Federal PTC income ($)                           	0          	0          	0
+Federal tax benefit (liability) ($)              	0          	277,208    	-2,536,224
+State ITC total income ($)                       	0          	0          	0
+State PTC income ($)                             	0          	0          	0
+State tax benefit (liability) ($)                	0          	62,925     	-575,710
+Total after-tax returns ($)                      	-8,419,336 	-1,517,520 	579,052
+
+After-tax net cash flow ($)                      	-8,419,336 	-1,517,520 	579,052
+After-tax cumulative IRR (%)                     	NaN        	NaN        	-81.28
+After-tax cumulative NPV ($)                     	-8,419,336 	-9,738,643 	-9,300,979
+
+AFTER-TAX LCOE AND PPA PRICE
+Annual costs ($)                                 	-8,419,336 	-3,044,145 	-883,322
+PPA revenue ($)                                  	0          	1,526,625  	1,462,373
+Electricity to grid (kWh)                        	0          	16,069,736 	15,393,404
+
+Present value of annual costs ($)                	11,733,506
+
+Present value of annual energy costs ($)         	11,733,506
+Present value of annual energy nominal (kWh)     	25,605,536
+LCOE Levelized cost of energy nominal (cents/kWh)	45.82
+
+Present value of PPA revenue ($)                 	2,432,526
+Present value of annual energy nominal (kWh)     	25,605,536
+LPPA Levelized PPA price nominal (cents/kWh)     	9.50
+
+PROJECT STATE INCOME TAXES
+EBITDA ($)                                       	0          	588,564    	14,556,539
+State taxable PBI income ($)                     	0          	0          	0
+Interest earned on reserves ($)                  	0          	0          	0
+State taxable IBI income ($)                     	0
+State taxable CBI income ($)                     	0
+minus:
+Debt interest payment ($)                        	0          	1,375,158  	710,831
+Total state tax depreciation ($)                 	0          	596,370    	1,192,739
+equals:
+State taxable income ($)                         	0          	-1,382,964 	12,652,969
+
+State income tax rate (frac)                     	0.0        	0.05       	0.05
+State tax benefit (liability) ($)                	0          	62,925     	-575,710
+
+PROJECT FEDERAL INCOME TAXES
+EBITDA ($)                                       	0          	588,564    	14,556,539
+Interest earned on reserves ($)                  	0          	0          	0
+State tax benefit (liability) ($)                	0          	62,925     	-575,710
+State ITC total income ($)                       	0          	0          	0
+State PTC income ($)                             	0          	0          	0
+Federal taxable IBI income ($)                   	0
+Federal taxable CBI income ($)                   	0
+Federal taxable PBI income ($)                   	0          	0          	0
+minus:
+Debt interest payment ($)                        	0          	1,375,158  	710,831
+Total federal tax depreciation ($)               	0          	596,370    	1,192,739
+equals:
+Federal taxable income ($)                       	0          	-1,320,039 	12,077,259
+
+Federal income tax rate (frac)                   	0.0        	0.21       	0.21
+Federal tax benefit (liability) ($)              	0          	277,208    	-2,536,224
+
+CASH INCENTIVES
+Federal IBI income ($)                           	0
+State IBI income ($)                             	0
+Utility IBI income ($)                           	0
+Other IBI income ($)                             	0
+Total IBI income ($)                             	0
+
+Federal CBI income ($)                           	0
+State CBI income ($)                             	0
+Utility CBI income ($)                           	0
+Other CBI income ($)                             	0
+Total CBI income ($)                             	0
+
+Federal PBI income ($)                           	0          	0          	0
+State PBI income ($)                             	0          	0          	0
+Utility PBI income ($)                           	0          	0          	0
+Other PBI income ($)                             	0          	0          	0
+Total PBI income ($)                             	0          	0          	0
+
+TAX CREDITS
+Federal PTC income ($)                           	0          	0          	0
+State PTC income ($)                             	0          	0          	0
+
+Federal ITC amount income ($)                    	0          	0          	0
+Federal ITC percent income ($)                   	0          	8,419,336  	0
+Federal ITC total income ($)                     	0          	8,419,336  	0
+
+State ITC amount income ($)                      	0          	0          	0
+State ITC percent income ($)                     	0          	0          	0
+State ITC total income ($)                       	0          	0          	0
+
+DEBT REPAYMENT
+Debt balance ($)                                 	19,645,117 	10,154,722 	0
+Debt interest payment ($)                        	0          	1,375,158  	710,831
+Debt principal payment ($)                       	0          	9,490,395  	10,154,722
+Debt total payment ($)                           	0          	10,865,553 	10,865,553
+
+DSCR (DEBT FRACTION)
+EBITDA ($)                                       	0          	588,564    	14,556,539
+minus:
+Reserves major equipment 1 funding ($)           	0          	0          	0
+Reserves major equipment 2 funding ($)           	0          	0          	0
+Reserves major equipment 3 funding ($)           	0          	0          	0
+Reserves receivables funding ($)                 	0          	0          	0
+equals:
+Cash available for debt service (CAFDS) ($)      	0          	588,564    	14,556,539
+Debt total payment ($)                           	0          	10,865,553 	10,865,553
+DSCR (pre-tax)                                   	0.0        	0.05       	1.34
+
+RESERVES
+Reserves working capital funding ($)             	0          	0          	0
+Reserves working capital disbursement ($)        	0          	0          	0
+Reserves working capital balance ($)             	0          	0          	0
+
+Reserves debt service funding ($)                	0          	0          	0
+Reserves debt service disbursement ($)           	0          	0          	0
+Reserves debt service balance ($)                	0          	0          	0
+
+Reserves receivables funding ($)                 	0          	0          	0
+Reserves receivables disbursement ($)            	0          	0          	0
+Reserves receivables balance ($)                 	0          	0          	0
+
+Reserves major equipment 1 funding ($)           	0          	0          	0
+Reserves major equipment 1 disbursement ($)      	0          	0          	0
+Reserves major equipment 1 balance ($)           	0          	0          	0
+
+Reserves major equipment 2 funding ($)           	0          	0          	0
+Reserves major equipment 2 disbursement ($)      	0          	0          	0
+Reserves major equipment 2 balance ($)           	0          	0          	0
+
+Reserves major equipment 3 funding ($)           	0          	0          	0
+Reserves major equipment 3 disbursement ($)      	0          	0          	0
+Reserves major equipment 3 balance ($)           	0          	0          	0
+
+Reserves total reserves balance ($)              	0          	0          	0
+Interest on reserves (%/year)                    	1.75
+Interest earned on reserves ($)                  	0          	0          	0
+-----------------------------------------------------------------------------------------
