@@ -148,11 +148,30 @@ These arise from fundamental differences between an idealized techno-economic mo
 * **Capacity Factor and Transients:** While the GEOPHIRES model utilizes a 90% capacity factor, this derating is applied continuously across the simulation. Real-world output is subject to discrete transient operational events (such as thermal conditioning, testing, and maintenance shut-ins) which inherently causes the time-averaged power production to diverge temporally from an uninterrupted analytical model.
 * **ORC Efficiency:** The power generation results rely on the GEOPHIRES built-in supercritical ORC efficiency correlation, which assumes the selection of an optimal working fluid for each specific geofluid temperature. For further details, please refer to the [Surface Plant section in the Theoretical Basis for GEOPHIRES](Theoretical-Basis-for-GEOPHIRES.html#surface-plant). Real-world net generation is constrained by the specific, fixed surface equipment installed at the site, which may operate below this theoretical optimum. This limitation may be addressed in the future by [FGEM integration](https://github.com/NatLabRockies/GEOPHIRES-X/issues/395).
 
+### Economic Modeling Framework (SAM Economic Model)
+
+Although this validation document focuses exclusively on reservoir thermal performance and power generation physics,
+the underlying GEOPHIRES simulation example incorporates the [System Advisor Model (SAM) Single Owner PPA Economic Model](SAM-Economic-Models.html).
+This replaces the deprecated BICYCLE financial model used in the previous Project Red [example version](#previous-versions-section).
+
+While project economics are not the focus of this specific validation, the SAM Economic Model is included to establish
+a modern, supported baseline and actively discourage the use of legacy economic models, as users frequently adopt
+these case studies as templates for custom simulations.
+
+The economic inputs utilized in this run are largely generalized default assumptions, with the exception of
+`Well Drilling Cost Correlation` (set to `VERTICAL_LARGE_INT1`), which nominally reflects the ~$400/ft drilling costs referenced in
+the literature. However, this parameter is provided primarily for continuity and has not been rigorously calibrated
+for a full financial assessment here.
+Users seeking a comprehensive, purpose-built template for EGS techno-economic analysis are strongly encouraged to
+utilize the [500 MW EGS Cape Station Case Study](Fervo_Project_Cape-5.html#economic-parameters) instead, which
+features a fully developed SAM Economic Model financial pro-forma.
+
 ---
 
+<div id="previous-versions-section"></div>
 ## Previous Versions
 
-1. [Fervo_Norbeck_Latimer_2023](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Norbeck_Latimer_2023)
+1. [Fervo_Norbeck_Latimer_2023](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Norbeck_Latimer_2023): Original 2023 case study based on initial 30-day flow test results and the legacy BICYCLE economic model.
 
 ## References
 
