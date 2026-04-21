@@ -19,7 +19,7 @@
 
 # Fervo Project Red: Evaluating GEOPHIRES and Gringarten against Empirical EGS Data
 
-ℹ️ The GEOPHIRES (Gringarten) model parameters used in this evaluation can be explored and executed via the [Fervo_Project_Red-2026 example in the web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Red-2026).
+ℹ️ The GEOPHIRES (Gringarten) model parameters used in this evaluation can be interactively explored via the [Fervo_Project_Red-2026 example in the web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Red-2026).
 
 ---
 
@@ -39,7 +39,44 @@ appears to assume an idealized steady-state flow from inception, omitting the ea
 Conversely, while the GEOPHIRES (Gringarten) model does account for early transient heat transfer, its precision
 during this rapid ramp-up is inherently constrained by its temporal resolution (100 time steps per year).
 
-## Production Temperature: Measured vs. Modeled
+## Disclaimer: Independent Analysis
+
+This case study is an independent techno-economic evaluation developed by the author and contributors to the GEOPHIRES
+open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy.
+The author and contributors are not employees or agents of Fervo Energy, and this work has not been reviewed or
+approved by the company. All modeling assumptions, including those derived from public data sources, represent the
+independent interpretation of the author and the GEOPHIRES open-source community and do not constitute proprietary
+information or official company projections.
+
+## Methodology: Model Calibration and Parameterization
+
+The foundation of this validation lies in aligning the GEOPHIRES inputs with the physical realities of the Fervo Project Red site. To achieve this, the Gringarten analytical reservoir model was parameterized using published data and physical constraints derived from the site's initial reporting and recent updates.
+
+### Empirical Data Extraction
+
+The baseline data for this evaluation was extracted from Figure 5 of Fervo Energy's 2026 update report, which plots the measured flowing temperature over approximately two years.
+
+*Original Published Figure 5: Measured Flowing Temperature*
+![](_images/fervo-project-red-2026_figure-5_measured-flowing-temperature.png)
+
+### GEOPHIRES Reservoir Parameters
+
+The GEOPHIRES Gringarten model utilizes a multiple parallel fracture geometry. The critical inputs defining this geometry for the Project Red simulation are detailed below:
+
+| Parameter | Input Value | Derivation Notes |
+| :--- | :--- | :--- |
+| **Number of Fractures** | `{{ input_params['Number of Fractures'] }}` | Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume. |
+| **Fracture Shape** | `{{ input_params['Fracture Shape'] }}` | Rectangular geometry (Shape 4), representing standard transverse hydraulic fractures along a horizontal wellbore. |
+| **Fracture Height** | `{{ input_params['Fracture Height'] }}` | Estimated vertical propagation of the stimulated fracture network. |
+| **Fracture Width** | `{{ input_params['Fracture Width'] }}` | Set to match the distance between the injection and production wellbores, assuming a dipole flow field directly connecting the laterals. |
+| **Fracture Separation** | `{{ input_params['Fracture Separation'] }}` | The modeled physical spacing between individual transverse fractures along the lateral section. |
+
+*Note: These parameters represent a simplified, homogenized analytical equivalent of a highly complex, heterogeneous subsurface fracture network.*
+
+
+## Results
+
+### Production Temperature: Measured vs. Modeled
 
 The charts below plot the measured flowing temperature over a roughly two-year period. Data points captured during early thermal conditioning and transient operations (e.g., shut-ins, flow-rate testing) are rendered in gray and excluded from the steady-state statistical alignment.
 
@@ -48,7 +85,7 @@ The charts below plot the measured flowing temperature over a roughly two-year p
 *Detail view of the steady-state temperature plateau (175°C–185°C):*
 ![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-2.png)
 
-## Statistical Alignment Analysis
+### Statistical Alignment Analysis
 
 The variance analysis (results displayed in legend captions) evaluates the predictive accuracy of both models against the measured steady-state data (excluding the initial thermal conditioning/ramp-up period).
 
@@ -58,7 +95,34 @@ Both models demonstrate high predictive fidelity, tracking steady-state flowing 
 * **Systematic Bias:** The Fervo model exhibits slightly less systemic underestimation, with a cold bias of -0.50°C compared to the GEOPHIRES cold bias of -0.70°C.
 * **R² Context:** The relatively low R² values for both models are expected statistical artifacts. Because the steady-state temperature profile is essentially a flat plateau, natural sensor variance and minor reservoir oscillations account for a disproportionately large portion of the total sum of squares, suppressing the R² score despite the low absolute error.
 
-## Modeling Assumptions and Power Production Discrepancies
+## Discussion
+
+## Evaluating the Predictive Power of Gringarten
+
+The close statistical alignment over the first two years demonstrates that the analytical Gringarten model,
+when appropriately parameterized with empirical reservoir geometry (e.g., de-rating the active fracture count to account for heterogeneous flow),
+serves as a highly capable proxy for forecasting early-stage EGS thermal performance.
+However, evaluating its predictive power over a multi-decade commercial lifecycle requires acknowledging the structural limitations of analytical solutions.
+
+The Gringarten model assumes uniform thermal sweep across idealized, homogeneous rectangular fractures.
+This assumption tends to produce a flat thermal plateau that is maintained for an extended duration,
+followed eventually by a sharp decline when the cold thermal front from the injector cleanly breaks through to the producer.
+
+In highly heterogeneous real-world reservoirs, early thermal dispersion typically occurs.
+Cold fluid travels faster through dominant, wider fractures (short-circuiting), while smaller fractures contribute
+less flow but maintain higher temperatures.
+Fully coupled numerical simulations (such as the ResFrac models used by Fervo) account for this heterogeneity.
+As demonstrated in the GEOPHIRES case study for Fervo's commercial-scale Cape Station, numerical models
+often predict a more gradual, earlier onset of thermal decline compared to the prolonged, flat plateau of the Gringarten analytical solution.
+
+Therefore, while Gringarten is an excellent tool for rapid scoping and establishing baseline
+techno-economic viability (as validated by the two-year Project Red data), it likely represents an optimistic upper
+bound for long-term (15-30 year) aggregate heat extraction compared to the more conservative, gradual decline models
+required for managing commercial-scale heterogeneous reservoirs like Cape Station.
+
+### Modeling Assumptions and Power Production Discrepancies
+
+{# TODO move to methodology or results, probably... #}
 
 While the Gringarten model accurately predicts the reservoir's thermal drawdown, translating that thermal energy into net electrical power introduces additional variables.
 Users comparing GEOPHIRES power production estimates to Fervo's published net generation may notice discrepancies.
@@ -74,16 +138,6 @@ These arise from fundamental differences between an idealized techno-economic mo
 
 1. [Fervo_Norbeck_Latimer_2023](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Norbeck_Latimer_2023)
 
----
-
-## Disclaimer: Independent Analysis
-
-This case study is an independent techno-economic evaluation developed by the author and contributors to the GEOPHIRES
-open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy.
-The author and contributors are not employees or agents of Fervo Energy, and this work has not been reviewed or
-approved by the company. All modeling assumptions, including those derived from public data sources, represent the
-independent interpretation of the author and the GEOPHIRES open-source community and do not constitute proprietary
-information or official company projections.
 
 ---
 
