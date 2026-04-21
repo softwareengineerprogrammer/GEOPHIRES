@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -499,8 +500,11 @@ def generate_fervo_project_red_2026_md(
 
         return input_params_dict
 
-    # TODO derive latest of simulation date or modified time of Fervo_Project_Red.md.jinja file
-    last_updated_date = result.result['Simulation Metadata']['Simulation Date']['value']
+    docs_dir = project_root / 'docs'
+    template_file = docs_dir / 'Fervo_Project_Red.md.jinja'
+    template_mtime = datetime.fromtimestamp(template_file.stat().st_mtime).strftime('%Y-%m-%d')  # noqa: DTZ006
+    sim_date = result.result['Simulation Metadata']['Simulation Date']['value']
+    last_updated_date = max(sim_date, template_mtime)
 
     # noinspection PyDictCreation
     template_values = {
@@ -510,8 +514,6 @@ def generate_fervo_project_red_2026_md(
         'nbsp': _NON_BREAKING_SPACE,
         'last_updated_date': last_updated_date,
     }
-
-    docs_dir = project_root / 'docs'
 
     # Set up Jinja environment
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
