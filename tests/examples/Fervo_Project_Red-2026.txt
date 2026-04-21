@@ -3,7 +3,8 @@
 # 2026 updates derived from https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 # Paper references are to "Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal System." (Norbeck & Latimer, 2023) (https://doi.org/10.31223/X52X0B).
 
-
+# *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
+# *************************************************
 Reservoir Model, 1
 Reservoir Volume Option, 1
 
@@ -31,8 +32,6 @@ Well Geometry Configuration, 4
 Multilaterals Cased, True
 Number of Multilateral Sections, 2, -- Two parallel horizontal sections
 Nonvertical Length per Multilateral Section, 3250 feet, -- per the paper
-
-Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
 
 Production Flow Rate per Well, 36, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 Production Wellhead Pressure, 225 psi, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
@@ -64,6 +63,8 @@ Power Plant Type, 2, -- supercritical binary cycle
 End-Use Efficiency Factor, .9
 Circulation Pump Efficiency, 0.80, -- per the paper
 
+# *** ECONOMIC/FINANCIAL PARAMETERS ***
+# *************************************
 Economic Model, 3, -- BICYCLE Levelized Cost Model
 
 Starting Electricity Sale Price, 0.15
@@ -71,15 +72,17 @@ Ending Electricity Sale Price, 1.00, -- essentially no limit as the rate can ris
 Electricity Escalation Rate Per Year, 0.004053223, -- End up being about 2% inflation
 Electricity Escalation Start Year, 1
 
-Fraction of Investment in Bonds, .5, -- Required for BICYCLE model
-Combined Income Tax Rate, .3, -- Required for BICYCLE model
-Gross Revenue Tax Rate, 0, -- Required for BICYCLE model
-Inflated Bond Interest Rate, .05, -- Required for BICYCLE model
-Inflated Equity Interest Rate, .08, -- Required for BICYCLE model
-Inflation Rate, .02, -- Required for BICYCLE model
-Investment Tax Credit Rate, 0, -- Required for BICYCLE model
+Fraction of Investment in Bonds, .5
+Combined Income Tax Rate, .3
+
+Inflated Bond Interest Rate, .05
+Inflated Equity Interest Rate, .08
+Inflation Rate, .02
+Investment Tax Credit Rate, 0
 Inflation Rate During Construction, 0.05
-Property Tax Rate, 0, -- Required for BICYCLE model
+Property Tax Rate, 0
+
+Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
 
 Print Output to Console, 1
 Time steps per year, 100
