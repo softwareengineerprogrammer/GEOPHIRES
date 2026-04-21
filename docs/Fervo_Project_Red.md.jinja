@@ -28,23 +28,7 @@ For comparative context, it also includes the predictive temperature curve gener
 
 [^author]: Author: Jonathan Pezzino, Scientific Web Services LLC. GitHub profile: [softwareengineerprogrammer](https://github.com/softwareengineerprogrammer).
 
-**Data Source & Methodology Notes:** The empirical production data evaluated here is derived from Figure 5 of Fervo Energy's report, [Enhanced Geothermal Has Been Proven at Scale: Here’s What Two Years of Production Data Show](https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/).
-It should be noted that this analysis contains inherent limitations: the data points were semi-manually extracted from
-the published chart using image processing techniques, which introduces minor digitization artifacts.
-
-Additionally, aligning the data for statistical analysis requires establishing a threshold between the initial
-thermal conditioning phase and steady-state operations.
-This boundary is an analytical judgment call necessitated by structural differences in the models: the Fervo curve
-appears to assume an idealized steady-state flow from inception, omitting the early thermal ramp-up phase entirely.
-Conversely, while the GEOPHIRES (Gringarten) model does account for early transient heat transfer, its precision
-during this rapid ramp-up is inherently constrained by its temporal resolution (100 time steps per year).
-
-**Disclaimer: Independent Analysis:** This case study is an independent techno-economic evaluation developed by the author and contributors to the GEOPHIRES
-open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy.
-The author and contributors are not employees or agents of Fervo Energy, and this work has not been reviewed or
-approved by the company. All modeling assumptions, including those derived from public data sources, represent the
-independent interpretation of the author and the GEOPHIRES open-source community and do not constitute proprietary
-information or official company projections.
+**Disclaimer: Independent Analysis:** This case study is an independent techno-economic evaluation developed by the author and contributors to the GEOPHIRES open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy. The author and contributors are not employees or agents of Fervo Energy, and this work has not been reviewed or approved by the company. All modeling assumptions, including those derived from public data sources, represent the independent interpretation of the author and the GEOPHIRES open-source community and do not constitute proprietary information or official company projections.
 
 ## Methodology: Model Calibration and Parameterization
 
@@ -52,10 +36,25 @@ The foundation of this validation lies in aligning the GEOPHIRES inputs with the
 
 ### Empirical Data Extraction
 
-The baseline data for this evaluation was extracted from Figure 5 of Fervo Energy's 2026 update report, which plots the measured flowing temperature over approximately two years.
+The baseline empirical production data for this evaluation was derived from Figure 5 of Fervo Energy's report, [*Enhanced Geothermal Has Been Proven at Scale: Here’s What Two Years of Production Data Show*](https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/).
 
 *Original Published Figure 5: Measured Flowing Temperature:*
 ![](_images/fervo-project-red-2026_figure-5_measured-flowing-temperature.png)
+
+**Extraction Limitations:** It should be noted that this analysis contains inherent limitations.
+Because the raw underlying dataset is not publicly available, the data points were semi-manually extracted from the
+published chart using Optical Character Recognition (OCR) and image processing techniques.
+While sufficient for macro-level validation, this extraction method inevitably introduces minor digitization artifacts
+and precision imperfections compared to the raw sensor data.
+
+### Steady-State Alignment and Thresholding
+
+Aligning the extracted data for statistical analysis requires establishing a threshold between the initial thermal
+conditioning phase and steady-state operations. This boundary is an analytical judgment call necessitated by
+structural differences in the models: the Fervo curve appears to assume an idealized steady-state flow from inception,
+omitting the early thermal ramp-up phase entirely. Conversely, while the GEOPHIRES (Gringarten) model does account for
+early transient heat transfer, its precision during this rapid ramp-up is inherently constrained by its temporal
+resolution (100 time steps per year).
 
 ### GEOPHIRES Reservoir Parameters
 
@@ -70,7 +69,6 @@ The GEOPHIRES Gringarten model utilizes a multiple parallel fracture geometry. T
 | **Fracture Separation** | `{{ input_params['Fracture Separation'] }}` | {{ input_params_comments['Fracture Separation'] }} |
 
 *Note: These parameters represent a simplified, homogenized analytical equivalent of a highly complex, heterogeneous subsurface fracture network.*
-
 
 ## Results
 
