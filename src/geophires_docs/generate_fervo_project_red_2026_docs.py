@@ -5,6 +5,8 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
 from scipy.interpolate import interp1d
 from scipy.ndimage import maximum_filter
 
@@ -346,12 +348,7 @@ def _get_file_path(file_name: str) -> Path:
     return Path(__file__).parent / file_name
 
 
-def get_project_red_production_temperature_profile_series(
-    fervo_graph_df_model: pd.Series,
-) -> tuple[
-    pd.Series,
-    Any,  # interpolator
-]:
+def get_project_red_input_params_and_result() -> tuple[GeophiresInputParameters, GeophiresXResult]:
     input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
         from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt'),
         params={'Print Output to Console': 0},
@@ -361,9 +358,21 @@ def get_project_red_production_temperature_profile_series(
         GeophiresXResult(_get_file_path('../../tests/examples/Fervo_Project_Red-2026.out')),
     )
 
+    return input_and_result
+
+
+def get_project_red_production_temperature_profile_series(
+    fervo_graph_df_model: pd.Series,
+) -> tuple[
+    pd.Series,
+    Any,  # interpolator
+]:
+
+    input_and_result = get_project_red_input_params_and_result()
+    input_params: GeophiresInputParameters = input_and_result[0]
+
     project_red_geophires_result_data: list = _get_full_production_temperature_profile(input_and_result)
 
-    # Fetch the 'Time' profile data to align exactly with the GEOPHIRES temperature curve
     time_steps_per_year: int = int(_get_input_parameters_dict(input_params)['Time steps per year'])
     geophires_time_data = [
         float(step) / float(time_steps_per_year) for step, _ in enumerate(project_red_geophires_result_data)
@@ -379,6 +388,58 @@ def get_project_red_production_temperature_profile_series(
     geophires_series = pd.Series(data=geophires_interpolated_y, index=fervo_graph_df_model['Time_Years'])
 
     return geophires_series, geophires_interpolator
+
+
+def generate_fervo_project_red_2026_md(
+    input_params: GeophiresInputParameters,
+    result: GeophiresXResult,
+    res_eng_reference_sim_params: dict[str, Any] | None = None,
+    project_root: Path = _PROJECT_ROOT,
+) -> None:
+    if res_eng_reference_sim_params is None:
+        res_eng_reference_sim_params = {}
+
+    result_values: dict[str, Any] = {}  # get_result_values(result)
+
+    # noinspection PyDictCreation
+    template_values = {
+        # **get_fpc5_input_parameter_values(input_params, result),
+        **result_values
+    }
+
+    # for template_key, md_method in {
+    #     'opex_result_outputs_table_md': generate_fpc_opex_output_table_md,
+    #     'reservoir_parameters_table_md': generate_fpc_reservoir_parameters_table_md,
+    #     'surface_plant_parameters_table_md': generate_fpc_surface_plant_parameters_table_md,
+    #     'well_bores_parameters_table_md': generate_fpc_well_bores_parameters_table_md,
+    #     'economics_parameters_table_md': generate_fpc_economics_parameters_table_md,
+    #     'construction_parameters_table_md': generate_fpc_construction_parameters_table_md,
+    # }.items():
+    #     template_values[template_key] = md_method(input_params, result)
+    #
+    # template_values['reservoir_engineering_reference_simulation_params_table_md'] = (
+    #     generate_res_eng_reference_sim_params_table_md(input_params, res_eng_reference_sim_params)
+    # )
+
+    docs_dir = project_root / 'docs'
+
+    # Set up Jinja environment
+    env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
+    template = env.get_template('Fervo_Project_Red.md.jinja')
+
+    # Render template
+    _log.info('Rendering template...')
+    output = template.render(**template_values)
+
+    # Write output
+    output_file = docs_dir / 'Fervo_Project_Red.md'
+    output_file.write_text(output, encoding='utf-8')
+
+    _log.info(f'✓ Generated {output_file}')
+    # _log.info('\nKey results:')
+    # _log.info(f"\tLCOE: ${template_values['lcoe_usd_per_mwh']}/MWh")
+    # _log.info(f"\tIRR: {template_values['irr_pct']}%")
+    # _log.info(f"\tTotal CAPEX: ${template_values['total_capex_gusd']}B")
 
 
 def generate_fervo_project_red_2026_docs():
@@ -444,6 +505,8 @@ def generate_fervo_project_red_2026_docs():
         fervo_modeled_stats_caption=f'\n{_tab}{fervo_modeled_stats_caption}\n',
         geophires_modeled_stats_caption=f'\n{_tab}{geophires_modeled_stats_caption}',
     )
+
+    generate_fervo_project_red_2026_md(*get_project_red_input_params_and_result())
 
 
 if __name__ == '__main__':
