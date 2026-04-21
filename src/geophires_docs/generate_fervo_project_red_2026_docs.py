@@ -17,6 +17,7 @@ from geophires_docs import _get_input_parameters_comments_dict
 from geophires_docs import _get_input_parameters_dict
 from geophires_docs import _get_logger
 from geophires_x_client import GeophiresInputParameters
+from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
@@ -346,6 +347,76 @@ def _generate_production_temperature_comparison_graph(
     plt.close(fig)
 
 
+def _generate_long_term_forecast_graph(
+    df_prod: pd.DataFrame,
+    df_model: pd.DataFrame,
+    geophires_data: pd.Series,
+    steady_state_start_years: float,
+    output_path: Path,
+) -> None:
+    is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
+
+    df_included = df_prod[is_steady_state]
+    df_excluded = df_prod[~is_steady_state]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    ax.scatter(
+        df_included['Time_Years'],
+        df_included['Temperature_C'],
+        facecolors='none',
+        edgecolors='#d62728',
+        s=22,
+        linewidths=1.0,
+        alpha=0.85,
+        label='Measured Temperature (Steady State)',
+    )
+
+    if not df_excluded.empty:
+        ax.scatter(
+            df_excluded['Time_Years'],
+            df_excluded['Temperature_C'],
+            facecolors='none',
+            edgecolors='gray',
+            s=22,
+            linewidths=1.0,
+            alpha=0.5,
+            label='Measured Temperature (Thermal Conditioning & Transient Operations)',
+        )
+
+    ax.plot(
+        df_model['Time_Years'],
+        df_model['Temperature_C'],
+        color='black',
+        linestyle='--',
+        linewidth=1.5,
+        label='Fervo-Modeled Temperature',
+    )
+
+    ax.plot(
+        geophires_data.index,
+        geophires_data.values,
+        color='green',
+        linestyle='-.',
+        label='GEOPHIRES-Modeled Temperature (Gringarten)',
+    )
+
+    ax.set_xlabel('Time (Years)', fontsize=12)
+    ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
+
+    ax.set_title('Project Red Temperature Forecast: 8-Year Horizon', fontsize=13)
+
+    ax.set_xlim(0.0, 8.0)
+    ax.set_ylim(0.0, 200.0)
+    ax.grid(True, linestyle='--', alpha=0.5)
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=1, frameon=False, fontsize=11)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close(fig)
+
+
 def _get_file_path(file_name: str) -> Path:
     return Path(__file__).parent / file_name
 
@@ -390,6 +461,22 @@ def get_project_red_production_temperature_profile_series(
     geophires_series = pd.Series(data=geophires_interpolated_y, index=fervo_graph_df_model['Time_Years'])
 
     return geophires_series, geophires_interpolator
+
+
+def get_long_term_geophires_profile() -> pd.Series:
+    long_term_input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+        from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt'),
+        params={'Plant Lifetime': 8, 'Print Output to Console': 0},
+    )
+    long_term_result: GeophiresXResult = GeophiresXClient().get_geophires_result(long_term_input_params)
+
+    long_term_profile = _get_full_production_temperature_profile((long_term_input_params, long_term_result))
+
+    time_steps_per_year: int = int(_get_input_parameters_dict(long_term_input_params)['Time steps per year'])
+    geophires_x = [float(step) / float(time_steps_per_year) for step, _ in enumerate(long_term_profile)]
+    geophires_y = [q.magnitude for q in long_term_profile]
+
+    return pd.Series(data=geophires_y, index=geophires_x)
 
 
 def generate_fervo_project_red_2026_md(
@@ -500,6 +587,20 @@ def generate_fervo_project_red_2026_docs():
         fervo_modeled_stats_caption=f'\n{_tab}{fervo_modeled_stats_caption}\n',
         geophires_modeled_stats_caption=f'\n{_tab}{geophires_modeled_stats_caption}',
     )
+
+    # 8-year long-term simulation graph
+    _log.info('Running long-term 8-year forecast simulation...')
+    long_term_series = get_long_term_geophires_profile()
+    long_term_graph_path = _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-long-term.png')
+
+    _generate_long_term_forecast_graph(
+        df_actual,
+        df_model_,
+        long_term_series,
+        _STEADY_STATE_START_YEARS,
+        long_term_graph_path,
+    )
+    _log.info(f'Wrote long-term graph:     {long_term_graph_path}')
 
     generate_fervo_project_red_2026_md(*get_project_red_input_params_and_result())
 
