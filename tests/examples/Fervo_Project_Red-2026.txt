@@ -16,11 +16,11 @@ Reservoir Thermal Conductivity, 2.7
 Number of Segments, 1
 Gradient 1, 76
 
-Number of Fractures, 65, -- Paper estimates between 75 and 100; value is de-rated to account for imperfect flow across fractured surface area
-Fracture Shape, 4, -- per the paper
-Fracture Height, 300 foot, -- per the paper
-Fracture Width, 365 foot, -- per the paper (distance between wellbores assumes a dipole flow field)
-Fracture Separation, 10
+Number of Fractures, 65, -- Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume.
+Fracture Shape, 4, -- Rectangular geometry (Shape 4), representing standard transverse hydraulic fractures along a horizontal wellbore.
+Fracture Height, 300 foot, -- Estimated vertical propagation of the stimulated fracture network.
+Fracture Width, 365 foot, -- Set to match the distance between the injection and production wellbores, assuming a dipole flow field directly connecting the laterals.
+Fracture Separation, 10, -- The modeled physical spacing between individual transverse fractures along the lateral section.
 
 Plant Outlet Pressure, 1500 psi, -- per the paper
 
@@ -33,7 +33,6 @@ Number of Multilateral Sections, 2, -- Two parallel horizontal sections
 Nonvertical Length per Multilateral Section, 3250 feet, -- per the paper
 
 Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
-Horizontal Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
 
 Production Flow Rate per Well, 36, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
 Production Wellhead Pressure, 225 psi, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/

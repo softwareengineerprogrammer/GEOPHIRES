@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -10,6 +11,8 @@ from pint.facets.plain import PlainQuantity
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
+
+_NON_BREAKING_SPACE = '\xa0'
 
 
 def _get_file_path(file_name) -> Path:
@@ -78,6 +81,31 @@ def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCa
             comment_idx += 1
 
         # TODO preserve newlines
+
+    return ret
+
+
+def _get_input_parameters_comments_dict(_params: GeophiresInputParameters) -> dict[str, str]:
+    ret: dict[str, str] = {}
+
+    with open(_get_file_path('../geophires_x_schema_generator/geophires-request.json'), encoding='utf-8') as f:
+        request_schema = json.loads(f.read())
+
+    input_params_with_comments: dict[str, Any] = _get_input_parameters_dict(_params, include_parameter_comments=True)
+    for k, v in input_params_with_comments.items():
+        comment: str = ''
+
+        if v is not None and isinstance(v, str) and ',' in v:
+            if k in request_schema['properties'] and request_schema['properties'][k]['type'] == 'array':
+                comment = v.split(', --', maxsplit=1)[1]
+            else:
+                comment = v.split(',', maxsplit=1)[1]
+                # Strip ' --' and optional whitespace from the start of the comment
+                comment = re.sub(r'^\s*--\s*', '', comment)
+
+            comment = comment.strip()
+
+        ret[k] = comment
 
     return ret
 

@@ -10,8 +10,10 @@ from jinja2 import FileSystemLoader
 from scipy.interpolate import interp1d
 from scipy.ndimage import maximum_filter
 
+from geophires_docs import _NON_BREAKING_SPACE
 from geophires_docs import _PROJECT_ROOT
 from geophires_docs import _get_full_production_temperature_profile
+from geophires_docs import _get_input_parameters_comments_dict
 from geophires_docs import _get_input_parameters_dict
 from geophires_docs import _get_logger
 from geophires_x_client import GeophiresInputParameters
@@ -401,12 +403,21 @@ def generate_fervo_project_red_2026_md(
 
     result_values: dict[str, Any] = {}  # get_result_values(result)
 
+    def _get_input_params_dict_with_nbsp() -> dict[str, Any]:
+        input_params_dict: dict[str, Any] = _get_input_parameters_dict(input_params)
+
+        for k, v in input_params_dict.items():
+            if isinstance(v, str):
+                input_params_dict[k] = v.replace(' ', _NON_BREAKING_SPACE)
+
+        return input_params_dict
+
     # noinspection PyDictCreation
     template_values = {
-        # **get_fpc5_input_parameter_values(input_params, result),
-        # **_get_input_parameters_dict(input_params),
-        'input_params': _get_input_parameters_dict(input_params),
+        'input_params': _get_input_params_dict_with_nbsp(),
+        'input_params_comments': _get_input_parameters_comments_dict(input_params),
         **result_values,
+        'nbsp': _NON_BREAKING_SPACE,
     }
 
     docs_dir = project_root / 'docs'

@@ -63,13 +63,13 @@ The baseline data for this evaluation was extracted from Figure 5 of Fervo Energ
 
 The GEOPHIRES Gringarten model utilizes a multiple parallel fracture geometry. The critical inputs defining this geometry for the Project Red simulation are detailed below:
 
-| Parameter | Input Value | Derivation Notes |
+| Parameter | Input{{ nbsp }}Value | Derivation Notes |
 | :--- | :--- | :--- |
-| **Number of Fractures** | `{{ input_params['Number of Fractures'] }}` | Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume. |
-| **Fracture Shape** | `{{ input_params['Fracture Shape'] }}` | Rectangular geometry (Shape 4), representing standard transverse hydraulic fractures along a horizontal wellbore. |
-| **Fracture Height** | `{{ input_params['Fracture Height'] }}` | Estimated vertical propagation of the stimulated fracture network. |
-| **Fracture Width** | `{{ input_params['Fracture Width'] }}` | Set to match the distance between the injection and production wellbores, assuming a dipole flow field directly connecting the laterals. |
-| **Fracture Separation** | `{{ input_params['Fracture Separation'] }}` | The modeled physical spacing between individual transverse fractures along the lateral section. |
+| **Number of Fractures** | `{{ input_params['Number of Fractures'] }}` | {{ input_params_comments['Number of Fractures'] }} |
+| **Fracture Shape** | `{{ input_params['Fracture Shape'] }}` | {{ input_params_comments['Fracture Shape'] }} |
+| **Fracture Height** | `{{ input_params['Fracture Height'] }}` | {{ input_params_comments['Fracture Height'] }} |
+| **Fracture Width** | `{{ input_params['Fracture Width'] }}` | {{ input_params_comments['Fracture Width'] }} |
+| **Fracture Separation** | `{{ input_params['Fracture Separation'] }}` | {{ input_params_comments['Fracture Separation'] }} |
 
 *Note: These parameters represent a simplified, homogenized analytical equivalent of a highly complex, heterogeneous subsurface fracture network.*
 
