@@ -14,6 +14,10 @@
           margin: auto;
           align-content: center;
         }
+
+        #input-params-table-wrapper tr td:first-child {
+            white-space: nowrap;
+        }
     </style>
 
 
@@ -70,13 +74,21 @@ resolution (100 time steps per year).
 
 The GEOPHIRES Gringarten model utilizes a multiple parallel fracture geometry. The critical inputs defining this geometry for the Project Red simulation are detailed below:
 
+.. raw:: html
+
+    <div id="input-params-table-wrapper">
+
 | Parameter | Input{{ nbsp }}Value | Derivation Notes |
 | :--- | :--- | :--- |
-| **Number of Fractures** | `{{ input_params['Number of Fractures'] }}` | {{ input_params_comments['Number of Fractures'] }} |
-| **Fracture Shape** | `{{ input_params['Fracture Shape'] }}` | {{ input_params_comments['Fracture Shape'] }} |
-| **Fracture Height** | `{{ input_params['Fracture Height'] }}` | {{ input_params_comments['Fracture Height'] }} |
-| **Fracture Width** | `{{ input_params['Fracture Width'] }}` | {{ input_params_comments['Fracture Width'] }} |
-| **Fracture Separation** | `{{ input_params['Fracture Separation'] }}` | {{ input_params_comments['Fracture Separation'] }} |
+| Number of Fractures | `{{ input_params['Number of Fractures'] }}` | {{ input_params_comments['Number of Fractures'] }} |
+| Fracture Shape | `{{ input_params['Fracture Shape'] }}` | {{ input_params_comments['Fracture Shape'] }} |
+| Fracture Height | `{{ input_params['Fracture Height'] }}` | {{ input_params_comments['Fracture Height'] }} |
+| Fracture Width | `{{ input_params['Fracture Width'] }}` | {{ input_params_comments['Fracture Width'] }} |
+| Fracture Separation | `{{ input_params['Fracture Separation'] }}` | {{ input_params_comments['Fracture Separation'] }} |
+
+.. raw:: html
+
+    </div>
 
 *Note: These parameters represent a simplified, homogenized analytical equivalent of a highly complex, heterogeneous subsurface fracture network.*
 
