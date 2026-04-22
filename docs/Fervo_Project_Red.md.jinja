@@ -104,14 +104,24 @@ Both models demonstrate high predictive fidelity, tracking steady-state flowing 
 ### Long-Term Forecast (8-Year Horizon)
 
 To evaluate the model's predictive behavior over a longer timeframe, the GEOPHIRES simulation was extended to an 8-year horizon.
-This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html)
-and provides a realistic view of the anticipated thermal decline before major wellfield intervention would be required.
+This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html) and provides a
+realistic view of the anticipated thermal decline before major wellfield intervention would be required.
 
 ![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-long-term.png)
 
-As shown in the forecast above, the Gringarten analytical model maintains a relatively flat thermal plateau for several
-years before exhibiting a sharp thermal breakthrough. This extended forecast visually contextualizes the predictive
-limitations of the analytical model discussed below.
+As shown in the forecast above, the Gringarten analytical model predicts a gradual onset of thermal decline following
+the initial two-year plateau, which eventually accelerates into a more pronounced drawdown.
+
+When interpreting the trailing edge of the empirical dataset, minor deviations between the extracted data and the
+forecast curve are to be expected given the inherent imprecision of image-based data digitization and the presence of
+localized wellbore transients.
+Because Fervo has explicitly characterized this two-year operational period as demonstrating highly stable
+flowing temperatures with marginal to no actual reservoir drawdown, the GEOPHIRES parameterization
+deliberately favors a stabilized, slightly more optimistic decline curve rather than overfitting to potential
+extraction artifacts.
+This 8-year forecast establishes a testable predictive baseline, which can be further rigorously validated, tuned,
+and recalibrated as additional multi-year operational data becomes available.
+
 
 ## Discussion
 
