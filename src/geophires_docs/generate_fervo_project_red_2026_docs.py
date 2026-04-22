@@ -524,10 +524,12 @@ def generate_fervo_project_red_2026_md(
         **result_values,
         'nbsp': _NON_BREAKING_SPACE,
         'last_updated_date': last_updated_date,
-        'fervo_r_squared': f'{fervo_stats_alignment.r2:.4f}',
-        'geophires_r_squared': f'{geophires_stats_alignment.r2:.4f}',
-        'fervo_bias': f'{fervo_stats_alignment.bias_degc:.2f}',
-        'geophires_bias': f'{geophires_stats_alignment.bias_degc:.2f}',
+        'fervo_rmse_degc': f'{fervo_stats_alignment.rmse_degc:.2f}',
+        'fervo_r2': f'{fervo_stats_alignment.r2:.4f}',
+        'fervo_bias_degc': f'{fervo_stats_alignment.bias_degc:.2f}',
+        'geophires_rmse_degc': f'{geophires_stats_alignment.rmse_degc:.2f}',
+        'geophires_r2': f'{geophires_stats_alignment.r2:.4f}',
+        'geophires_bias_degc': f'{geophires_stats_alignment.bias_degc:.2f}',
     }
 
     # Set up Jinja environment
