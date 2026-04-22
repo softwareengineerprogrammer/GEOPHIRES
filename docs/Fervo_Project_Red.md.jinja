@@ -36,6 +36,36 @@ For comparative context, it also includes the predictive temperature curve gener
 
 ℹ️ The GEOPHIRES parameters and result used in this evaluation can be interactively explored via the [Fervo_Project_Red-2026 example in the web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Red-2026). Their source code is also available on GitHub: [Fervo_Project_Red-2026.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Red-2026.txt) and [Fervo_Project_Red-2026.out](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Red-2026.out).
 
+
+.. raw:: html
+
+    <style type="text/css">
+        #intro-result-images {
+            width: 90%;
+            margin:auto;
+        }
+        #intro-result-images img {
+            max-width: 49%;
+            display: inline;
+            vertical-align: top;
+        }
+    </style>
+    <div id="intro-result-images">
+        <a href="#production-temperature-measured-vs-modeled-section"
+            title="Jump to the Production Temperature Results section">
+            <img src="_images/fervo_project_red-2026_production-temperature-data-vs-modeling-2.png"
+                class="no-active"
+                alt="Graph: Project Red Temperature: Measured vs. Fervo-Modeled vs. GEOPHIRES" />
+        </a>
+
+        <a href="#long-term-forecast-section"
+            title="Jump to the Long Term Forecast section">
+            <img src="_images/fervo_project_red-2026_production-temperature-data-vs-modeling-long-term.png"
+                class="no-active"
+                alt="Graph: Long Term Forecast" />
+        </a>
+    </div>
+
 **Disclaimer: Independent Analysis:** This is an independent evaluation developed by the author and
 contributors to the GEOPHIRES open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy.
 The author and contributors are not employees or agents of Fervo Energy, and this work has not been reviewed or approved
@@ -102,6 +132,8 @@ Further relevant detailed discussion can be found in the [Cape Station case stud
 
 ## Results
 
+<div id="production-temperature-measured-vs-modeled-section"></div>
+
 ### Production Temperature: Measured vs. Modeled
 
 The charts below plot the measured flowing temperature over a roughly two-year period. Data points captured during early thermal conditioning and transient operations (e.g., shut-ins, flow-rate testing) are rendered in gray and excluded from the steady-state statistical alignment.
@@ -131,6 +163,8 @@ Both models demonstrate high predictive fidelity, tracking steady-state flowing 
 * **Overall Fit:** GEOPHIRES mathematically achieves a tighter overall fit, yielding a lower Root Mean Square Error (RMSE) and a higher coefficient of determination (R²).
 * **Systematic Bias:** The Fervo model exhibits slightly less systemic underestimation, with a cold bias of -0.50°C compared to the GEOPHIRES cold bias of -0.67°C.
 * **R² Context:** The relatively low R² values for both models are expected statistical artifacts. Because the steady-state temperature profile is essentially a flat plateau, natural sensor variance and minor reservoir oscillations account for a disproportionately large portion of the total sum of squares, suppressing the R² score despite the low absolute error.
+
+<div id="long-term-forecast-section"></div>
 
 ### Long-Term Forecast (8-Year Horizon)
 
