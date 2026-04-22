@@ -532,7 +532,9 @@ def generate_fervo_project_red_2026_md(
 
 def generate_fervo_project_red_2026_docs():
     IMAGE_PATH = _get_file_path('../../docs/_images/fervo-project-red-2026_figure-5_measured-flowing-temperature.png')
-    PRODUCTION_IMAGE_PATH = _get_file_path('fervo_project_red-2026_graph-data-extraction_production-series-edited.png')
+    PRODUCTION_IMAGE_PATH = _get_file_path(
+        '../../docs/_images/fervo_project_red-2026_graph-data-extraction_production-series-edited.png'
+    )
 
     _BUILD_DIR.mkdir(parents=True, exist_ok=True)
     production_csv_path_ = _BUILD_DIR / _PRODUCTION_CSV_FILENAME
