@@ -15,9 +15,9 @@ Reservoir Heat Capacity, 1000, -- [J/kg/K]
 Reservoir Thermal Conductivity, 2.7
 
 Number of Segments, 1
-Gradient 1, 76
+Gradient 1, 76.1
 
-Number of Fractures, 65, -- Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume (Norbeck & Latimer, 2023).
+Number of Fractures, 63, -- Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume (Norbeck & Latimer, 2023).
 Fracture Shape, 4, -- Rectangular geometry (Shape 4), representing standard transverse hydraulic fractures along a horizontal wellbore.
 Fracture Height, 300 foot, -- Estimated vertical propagation of the stimulated fracture network.
 Fracture Width, 365 foot, -- Set to match the distance between the injection and production wellbores, assuming a dipole flow field directly connecting the laterals.
