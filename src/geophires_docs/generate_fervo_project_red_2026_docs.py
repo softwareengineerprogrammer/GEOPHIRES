@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -43,6 +44,17 @@ _STATISTICAL_BUFFER_SIZE = 5
 _STATISTICAL_MIN_BUFFER = 3
 _STATISTICAL_Z_SCORE = 2.0
 _STATISTICAL_MIN_STD = 1.5
+
+
+@dataclass
+class _StatsAlignmentResult:
+    rmse_degc: float
+    bias_degc: float
+    r2: float
+
+    @property
+    def as_caption(self) -> str:
+        return f'RMSE={self.rmse_degc:.2f}°C, R²={self.r2:.4f}, Bias={self.bias_degc:.2f}°C'
 
 
 def extract_plot_data(
@@ -483,11 +495,10 @@ def get_long_term_geophires_profile() -> pd.Series:
 def generate_fervo_project_red_2026_md(
     input_params: GeophiresInputParameters,
     result: GeophiresXResult,
-    res_eng_reference_sim_params: dict[str, Any] | None = None,
+    fervo_stats_alignment: _StatsAlignmentResult,
+    geophires_stats_alignment: _StatsAlignmentResult,
     project_root: Path = _PROJECT_ROOT,
 ) -> None:
-    if res_eng_reference_sim_params is None:
-        res_eng_reference_sim_params = {}
 
     result_values: dict[str, Any] = {}  # get_result_values(result)
 
@@ -513,6 +524,10 @@ def generate_fervo_project_red_2026_md(
         **result_values,
         'nbsp': _NON_BREAKING_SPACE,
         'last_updated_date': last_updated_date,
+        'fervo_r_squared': f'{fervo_stats_alignment.r2:.4f}',
+        'geophires_r_squared': f'{geophires_stats_alignment.r2:.4f}',
+        'fervo_bias': f'{fervo_stats_alignment.bias_degc:.2f}',
+        'geophires_bias': f'{geophires_stats_alignment.bias_degc:.2f}',
     }
 
     # Set up Jinja environment
@@ -565,6 +580,7 @@ def generate_fervo_project_red_2026_docs():
     ss_res_f = np.sum((y_true - y_fervo) ** 2)
     ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
     r2_f = 1 - (ss_res_f / ss_tot) if ss_tot != 0 else 0.0
+    fervo_stat_result = _StatsAlignmentResult(rmse_degc=rmse_f, bias_degc=bias_f, r2=r2_f)
 
     # Calculate metrics for GEOPHIRES (interpolated at the exact same steady-state timestamps)
     geophires_series, geo_interp = get_project_red_production_temperature_profile_series(df_model_)
@@ -576,9 +592,11 @@ def generate_fervo_project_red_2026_docs():
     ss_res_g = np.sum((y_true - y_geo) ** 2)
     r2_g = 1 - (ss_res_g / ss_tot) if ss_tot != 0 else 0.0
 
+    geophires_stat_result = _StatsAlignmentResult(rmse_degc=rmse_g, bias_degc=bias_g, r2=r2_g)
+
     _log.info(f'--- STATISTICAL ALIGNMENT (Steady-State > {_STEADY_STATE_START_YEARS} Years) ---')
-    fervo_modeled_stats_caption = f'RMSE={rmse_f:.2f}°C, R²={r2_f:.4f}, Bias={bias_f:.2f}°C'
-    geophires_modeled_stats_caption = f'RMSE={rmse_g:.2f}°C, R²={r2_g:.4f}, Bias={bias_g:.2f}°C'
+    fervo_modeled_stats_caption = fervo_stat_result.as_caption
+    geophires_modeled_stats_caption = geophires_stat_result.as_caption
     _log.info(f'FERVO:      {fervo_modeled_stats_caption}')
     _log.info(f'GEOPHIRES:  {geophires_modeled_stats_caption}')
 
@@ -610,7 +628,9 @@ def generate_fervo_project_red_2026_docs():
     )
     _log.info(f'Wrote long-term graph:     {long_term_graph_path}')
 
-    generate_fervo_project_red_2026_md(*get_project_red_input_params_and_result())
+    generate_fervo_project_red_2026_md(
+        *get_project_red_input_params_and_result(), fervo_stat_result, geophires_stat_result
+    )
 
 
 if __name__ == '__main__':

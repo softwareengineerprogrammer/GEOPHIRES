@@ -165,8 +165,8 @@ The variance analysis (results displayed in legend captions) evaluates the predi
 Both models demonstrate high predictive fidelity, tracking steady-state flowing temperatures within 1.5°C of the empirical data.
 
 * **Overall Fit:** GEOPHIRES mathematically achieves a tighter overall fit, yielding a lower Root Mean Square Error (RMSE) and a higher coefficient of determination (R²).
-* **Systematic Bias:** The Fervo model exhibits slightly less systemic underestimation, with a cold bias of -0.50°C compared to the GEOPHIRES cold bias of -0.67°C.
-* **R² Context:** While the Fervo model yields a relatively low R² (0.2022), GEOPHIRES achieves a stronger R² of 0.5192, indicating it more successfully captures the underlying physical trend of the data (the slight thermal drawdown) rather than simply averaging the noise. However, it is important to note that the absolute R² ceiling for both models is inherently suppressed by the dataset. Because the steady-state temperature profile is essentially a flat plateau, natural sensor variance and minor reservoir oscillations may account for a disproportionately large portion of the total variance, keeping the R² scores modest despite the favorable absolute error (RMSE).
+* **Systematic Bias:** The Fervo model exhibits slightly less systemic underestimation, with a cold bias of {{ fervo_bias }}°C compared to the GEOPHIRES cold bias of {{ geophires_bias }}°C.
+* **R² Context:** While the Fervo model yields a relatively low R² ({{ fervo_r_squared }}), GEOPHIRES achieves a stronger R² of {{ geophires_r_squared }}, indicating it more successfully captures the underlying physical trend of the data (the slight thermal drawdown) rather than simply averaging the noise. However, it is important to note that the absolute R² ceiling for both models is inherently suppressed by the dataset. Because the steady-state temperature profile is essentially a flat plateau, natural sensor variance and minor reservoir oscillations may account for a disproportionately large portion of the total variance, keeping the R² scores modest despite the favorable absolute error (RMSE).
 
 <div id="long-term-forecast-section"></div>
 
