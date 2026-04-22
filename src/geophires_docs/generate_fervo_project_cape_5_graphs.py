@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import json
 from math import ceil
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 from matplotlib import pyplot as plt
-from pint.facets.plain import PlainQuantity
 
 from geophires_docs import _FPC5_INPUT_FILE_PATH
 from geophires_docs import _FPC5_RESULT_FILE_PATH
 from geophires_docs import _PROJECT_ROOT
+from geophires_docs import _get_full_production_temperature_profile
+from geophires_docs import _get_full_profile
 from geophires_docs import _get_input_parameters_dict
 from geophires_docs import _get_logger
 from geophires_x_client import GeophiresInputParameters
-from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
 
@@ -32,25 +31,8 @@ def _get_full_total_electricity_generation_profile(input_and_result: tuple[Geoph
     return _get_full_profile(input_and_result, 'Total Electricity Production')
 
 
-def _get_full_production_temperature_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
-    return _get_full_profile(input_and_result, 'Produced Temperature')
-
-
 def _get_full_thermal_drawdown_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult]):
     return _get_full_profile(input_and_result, 'Thermal Drawdown')
-
-
-def _get_full_profile(input_and_result: tuple[GeophiresInputParameters, GeophiresXResult], profile_key: str):
-    input_params: GeophiresInputParameters = input_and_result[0]
-    result = GeophiresXClient().get_geophires_result(input_params)
-
-    with open(result.json_output_file_path, encoding='utf-8') as f:
-        full_result_obj = json.load(f)
-
-    net_gen_obj = full_result_obj[profile_key]
-    net_gen_obj_unit = net_gen_obj['CurrentUnits'].replace('CELSIUS', 'degC')
-    profile = [PlainQuantity(it, net_gen_obj_unit) for it in net_gen_obj['value']]
-    return profile
 
 
 def _get_redrilling_event_indexes(

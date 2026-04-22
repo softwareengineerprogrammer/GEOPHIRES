@@ -15,6 +15,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pint.facets.plain import PlainQuantity
 
+from geophires_docs import _NON_BREAKING_SPACE
 from geophires_docs import _PROJECT_ROOT
 from geophires_docs import _get_fpc5_input_file_path
 from geophires_docs import _get_fpc5_result_file_path
@@ -31,7 +32,6 @@ from geophires_x_client import ImmutableGeophiresInputParameters
 _current_project_root: Path | None = None
 
 _log = _get_logger(__name__)
-_NON_BREAKING_SPACE = '\xa0'
 
 
 def _get_schema(schema_file_name: str) -> dict[str, Any]:

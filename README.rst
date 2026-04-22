@@ -58,9 +58,9 @@ Free software: `MIT license <LICENSE>`__
     :alt: Supported implementations
     :target: https://pypi.org/project/geophires-x
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/softwareengineerprogrammer/GEOPHIRES-X/v3.13.1.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/softwareengineerprogrammer/GEOPHIRES-X/v3.13.3.svg
     :alt: Commits since latest release
-    :target: https://github.com/softwareengineerprogrammer/GEOPHIRES-X/compare/v3.13.1...main
+    :target: https://github.com/softwareengineerprogrammer/GEOPHIRES-X/compare/v3.13.3...main
 
 .. |docs| image:: https://readthedocs.org/projects/GEOPHIRES-X/badge/?style=flat
     :target: https://softwareengineerprogrammer.github.io/GEOPHIRES
@@ -296,6 +296,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `Fervo_Norbeck_Latimer_2023.txt <tests/examples/Fervo_Norbeck_Latimer_2023.txt>`__
      - `.out <tests/examples/Fervo_Norbeck_Latimer_2023.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Norbeck_Latimer_2023>`__
+   * - Fervo Project Red (2026) (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Red.html>`__)
+     - `Fervo_Project_Red-2026.txt <tests/examples/Fervo_Project_Red-2026.txt>`__
+     - `.out <tests/examples/Fervo_Project_Red-2026.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Red-2026>`__
    * - Fervo Cape Station 1: 2023 Results
      - `Fervo_Project_Cape.txt <tests/examples/Fervo_Project_Cape.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape.out>`__

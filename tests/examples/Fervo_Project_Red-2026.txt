@@ -1,0 +1,93 @@
+# Case Study: Fervo Project Red (2026 Update)
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Red.html
+# 2026 updates derived from https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+# Paper references are to "Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal System." (Norbeck & Latimer, 2023) (https://doi.org/10.31223/X52X0B).
+
+# *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
+# *************************************************
+Reservoir Model, 1
+Reservoir Volume Option, 1
+
+Reservoir Depth, 7600 foot, -- per the paper
+
+Reservoir Density, 2800, -- per the paper phyllite + quartzite + diorite + granodiorite
+Reservoir Heat Capacity, 1000, -- [J/kg/K]
+Reservoir Thermal Conductivity, 2.7
+
+Number of Segments, 1
+Gradient 1, 76.1
+
+Number of Fractures, 63, -- Fervo estimates between 75 and 100 fractures were created. This value is de-rated in the model to account for the physical reality of imperfect flow distribution and uneven utilization across the entire stimulated rock volume (Norbeck and Latimer, 2023).
+Fracture Shape, 4, -- Rectangular geometry (Shape 4), representing standard transverse hydraulic fractures along a horizontal wellbore.
+Fracture Height, 300 foot, -- Estimated vertical propagation of the stimulated fracture network.
+Fracture Width, 365 foot, -- Set to match the distance between the injection and production wellbores, assuming a dipole flow field directly connecting the laterals.
+Fracture Separation, 10, -- The modeled physical spacing between individual transverse fractures along the lateral section.
+
+Plant Outlet Pressure, 1500 psi, -- per the paper
+
+Number of Injection Wells, 1
+Number of Production Wells, 1
+
+Well Geometry Configuration, 4
+Multilaterals Cased, True
+Number of Multilateral Sections, 2, -- Two parallel horizontal sections
+Nonvertical Length per Multilateral Section, 3250 feet, -- per the paper
+
+Production Flow Rate per Well, 36, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+Production Wellhead Pressure, 225 psi, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+
+Production Well Diameter, 4.276, -- Assumed ID for 5 inch casing size per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+Injection Well Diameter, 4.276, -- See Production Well Diameter
+
+Well Separation, 365 feet, -- per the paper
+
+Injection Temperature, 75, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/. Note that this value is overridden by the lower model-calculated optimum injection temperature.
+Injection Wellbore Temperature Gain, 3, -- [degC]
+Ramey Production Wellbore Model, 1
+
+Injectivity Index, 0.59, -- Calibrated to yield ~0.7 MW Average Pumping Power
+Productivity Index, 0.49, -- See Injectivity Index
+
+Water Loss Fraction, 0.3, -- per https://fervoenergy.com/enhanced-geothermal-has-been-proven-at-scale-heres-what-two-years-of-production-data-show/
+
+Utilization Factor, .9
+Maximum Drawdown, 1, -- no redrilling considered
+
+Ambient Temperature, 10.27
+Surface Temperature, 10.27
+
+End-Use Option, 1, -- electricity as the main product
+Plant Lifetime, 2, -- 614 days of operation from April 2023 to April 2026
+Power Plant Type, 2, -- supercritical binary cycle
+
+End-Use Efficiency Factor, .9
+Circulation Pump Efficiency, 0.80, -- per the paper
+
+# *** ECONOMIC/FINANCIAL PARAMETERS ***
+# *************************************
+Economic Model, 5, -- SAM Single Owner PPA economic model
+Inflation Rate, .027, -- US inflation as of December 2025
+
+Starting Electricity Sale Price, 0.095
+Electricity Escalation Rate Per Year, 0.00057, -- Calibrated to reach $100/MWh at project year 11
+Ending Electricity Sale Price, 1, -- Note that this value does not directly determine price at the end of the project life, but rather as a cap as the maximum price to which the starting price can escalate.
+Electricity Escalation Start Year, 1
+
+Fraction of Investment in Bonds, 0.7
+Discount Rate, 0.12
+Inflated Bond Interest Rate, .07
+Inflated Bond Interest Rate During Construction, 0.105
+
+Investment Tax Credit Rate, 0.3
+Combined Income Tax Rate, .2555
+Property Tax Rate, 0.0022
+
+Construction Years, 1
+Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389
+
+Well Drilling Cost Correlation, 10, -- per the drill cost paper - works out to $400/ft
+
+# *** SIMULATION PARAMETERS ***
+# *****************************
+Print Output to Console, 1
+Time steps per year, 100

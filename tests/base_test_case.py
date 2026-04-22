@@ -5,6 +5,9 @@ import numbers
 import os.path
 import sys
 import unittest
+from typing import Any
+
+from pint.facets.plain import PlainQuantity
 
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x_client import GeophiresInputParameters
@@ -154,3 +157,7 @@ class BaseTestCase(unittest.TestCase):
                 return str(ret)
 
         return None
+
+    @staticmethod
+    def value_unit_as_quantity(v_u_entry: dict[str, Any]) -> PlainQuantity:
+        return PlainQuantity(v_u_entry['value'], v_u_entry['unit'])

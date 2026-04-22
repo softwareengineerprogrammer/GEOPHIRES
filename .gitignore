@@ -105,6 +105,7 @@ docs/tmp
 docs/reference/geophires-request.json
 docs/reference/parameters.rst
 docs/Fervo_Project_Cape-5.md
+docs/Fervo_Project_Red.md
 docs/_images/*.bak.png
 docs/_images/singh-et-al-2025_fig-7_well-and-bench-spacing.xcf
 docs/geophires-request.json
@@ -114,6 +115,9 @@ docs/hip_ra_x_parameters.rst
 _site/
 /docs/geophires_x.rstx
 /docs/temperature.txt
+
+src/geophires_docs/fervo_project_red-2026_graph-data-extraction.xcf
+
 /geophires_x.rst
 /modules.rst
 /Useful sites for Sphinx docstrings.txt
