@@ -30,9 +30,19 @@ class FervoProjectRed2026TestCase(BaseTestCase):
 
         self.assertLess(_vuq(r.result['SUMMARY OF RESULTS']['Average Net Electricity Production']), _q(2.0, 'MW'))
 
-        self.assertGreater(
-            _vuq(r.result['RESERVOIR SIMULATION RESULTS']['Average Production Temperature']), _q(346, 'degF')
+        max_total_power_q = _vuq(
+            r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Maximum Total Electricity Generation']
         )
-        self.assertLess(
-            _vuq(r.result['RESERVOIR SIMULATION RESULTS']['Average Production Temperature']), _q(356, 'degF')
+        self.assertGreaterEqual(max_total_power_q, _q(2.1, 'MW'))
+        self.assertLess(max_total_power_q, _q(2.8, 'MW'))
+
+        reference_geofluid_availability_q = _q(60, 'kW/(kg/s)')
+        result_geofluid_availability_q = _vuq(
+            r.result['SURFACE EQUIPMENT SIMULATION RESULTS']['Initial geofluid availability']
         )
+        self.assertGreaterEqual(result_geofluid_availability_q, reference_geofluid_availability_q)
+        self.assertLessEqual(result_geofluid_availability_q, reference_geofluid_availability_q * 2.5)
+
+        avg_production_temp_q = _vuq(r.result['RESERVOIR SIMULATION RESULTS']['Average Production Temperature'])
+        self.assertGreater(avg_production_temp_q, _q(346, 'degF'))
+        self.assertLess(avg_production_temp_q, _q(356, 'degF'))
