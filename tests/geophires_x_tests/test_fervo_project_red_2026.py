@@ -9,7 +9,7 @@ from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXClient
 
 
-class FervoProjectCape4TestCase(BaseTestCase):
+class FervoProjectRed2026TestCase(BaseTestCase):
 
     def test_fervo_project_red_2026_results_against_reference_values(self):
         """
