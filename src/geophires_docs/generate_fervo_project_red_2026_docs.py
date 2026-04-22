@@ -602,7 +602,25 @@ def generate_fervo_project_red_2026_docs():
     _log.info(f'FERVO:      {fervo_modeled_stats_caption}')
     _log.info(f'GEOPHIRES:  {geophires_modeled_stats_caption}')
 
-    df_steady_state.to_csv(steady_state_csv_path, index=False)
+    is_thermal_conditioning = df_actual['Time_Years'] <= _STEADY_STATE_START_YEARS
+    is_steady_state = _get_steady_state_mask(df_actual, _STEADY_STATE_START_YEARS)
+
+    df_variance = pd.DataFrame(
+        {
+            'Time_Years': df_actual['Time_Years'],
+            'Measured_Temperature_C': df_actual['Temperature_C'],
+            'Is_Thermal_Conditioning': is_thermal_conditioning,
+            'Is_Transient_Operation': ~(is_thermal_conditioning | is_steady_state),
+        }
+    )
+
+    model_interpolator = interp1d(
+        df_model_['Time_Years'], df_model_['Temperature_C'], kind='linear', fill_value='extrapolate'
+    )
+    df_variance['Fervo_Modeled_Temperature_C'] = model_interpolator(df_variance['Time_Years'])
+    df_variance['GEOPHIRES_Modeled_Temperature_C'] = geo_interp(df_variance['Time_Years'])
+
+    df_variance.to_csv(steady_state_csv_path, index=False)
 
     _tab = '    '
 
