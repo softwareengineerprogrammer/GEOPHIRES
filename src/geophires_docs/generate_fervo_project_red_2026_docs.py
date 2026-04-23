@@ -49,6 +49,8 @@ _STATISTICAL_MIN_STD = 1.5
 
 _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS = 8
 
+NUMBER_OF_FRACTURES_PARAM_NAME = 'Number of Fractures'
+
 _GRAPH_DPI = 300
 _SAVEFIG_ARGS = {'dpi': _GRAPH_DPI, 'metadata': {'Date': None}}
 
@@ -502,6 +504,18 @@ def get_long_term_geophires_profile() -> pd.Series:
     return pd.Series(data=geophires_y, index=geophires_x)
 
 
+def _get_fracture_sensitivity_fracture_counts() -> list[int]:
+    base_input_params: GeophiresInputParameters = get_project_red_input_params_and_result()[0]
+    base_number_of_fractures = int(_get_input_parameters_dict(base_input_params)[NUMBER_OF_FRACTURES_PARAM_NAME])
+    return [
+        base_number_of_fractures,
+        base_number_of_fractures - 6,
+        base_number_of_fractures - 3,
+        base_number_of_fractures + 3,
+        base_number_of_fractures + 6,
+    ]
+
+
 def _generate_fracture_sensitivity_graph(
     df_prod: pd.DataFrame,
     steady_state_start_years: float,
@@ -545,18 +559,10 @@ def _generate_fracture_sensitivity_graph(
             label='Measured Temperature (Thermal Conditioning & Transient Operations)',
         )
 
-    number_of_fractures_param_name = 'Number of Fractures'
-
     base_input_params: GeophiresInputParameters = get_project_red_input_params_and_result()[0]
-    base_number_of_fractures = int(_get_input_parameters_dict(base_input_params)[number_of_fractures_param_name])
+    base_number_of_fractures = int(_get_input_parameters_dict(base_input_params)[NUMBER_OF_FRACTURES_PARAM_NAME])
 
-    fracture_counts = [
-        base_number_of_fractures,
-        base_number_of_fractures - 6,
-        base_number_of_fractures - 3,
-        base_number_of_fractures + 3,
-        base_number_of_fractures + 6,
-    ]
+    fracture_counts = _get_fracture_sensitivity_fracture_counts()
     client = GeophiresXClient()
 
     colors = {
@@ -583,7 +589,7 @@ def _generate_fracture_sensitivity_graph(
         input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
             from_file_path=base_input_params.as_file_path(),
             params={
-                number_of_fractures_param_name: frac_count,
+                NUMBER_OF_FRACTURES_PARAM_NAME: frac_count,
                 'Plant Lifetime': _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS,
                 'Gringarten-Stehfest Precision': 10,  # Speed up build with only minor effect on precision
                 'Print Output to Console': 0,
@@ -615,8 +621,7 @@ def _generate_fracture_sensitivity_graph(
         final_temp_degc = float(geophires_y[-1]) if geophires_y else 0.0
         power_data.append(
             {
-                number_of_fractures_param_name: frac_count,
-                #'Average Net Electricity Production (MW)': avg_generation_v,
+                NUMBER_OF_FRACTURES_PARAM_NAME: frac_count,
                 f'{avg_generation_param} ({avg_generation_u})': avg_generation_v,
                 f'Year {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS} Flowing Temperature (°C)': final_temp_degc,
             }
@@ -674,16 +679,16 @@ def _generate_fracture_sensitivity_graph(
     plt.close(fig)
 
     df_power = pd.DataFrame(power_data)
-    df_power = df_power.sort_values(number_of_fractures_param_name).reset_index(drop=True)
+    df_power = df_power.sort_values(NUMBER_OF_FRACTURES_PARAM_NAME).reset_index(drop=True)
     df_power.to_csv(power_csv_path, index=False)
 
     fig_pwr, ax_pwr = plt.subplots(figsize=(8, 5))
-    x_labels = [str(x) for x in df_power[number_of_fractures_param_name]]
+    x_labels = [str(x) for x in df_power[NUMBER_OF_FRACTURES_PARAM_NAME]]
     y_values = df_power[f'{avg_generation_param} ({avg_generation_u})']
 
     bars = ax_pwr.bar(x_labels, y_values, color='#1f77b4', alpha=0.8, edgecolor='black')
 
-    baseline_idx = df_power.index[df_power[number_of_fractures_param_name] == base_number_of_fractures].tolist()[0]
+    baseline_idx = df_power.index[df_power[NUMBER_OF_FRACTURES_PARAM_NAME] == base_number_of_fractures].tolist()[0]
     bars[baseline_idx].set_color('green')
     bars[baseline_idx].set_edgecolor('black')
 
@@ -765,6 +770,8 @@ def generate_fervo_project_red_2026_md(
         'geophires_r2': f'{geophires_stats_alignment.r2:.4f}',
         'geophires_bias_degc': f'{geophires_stats_alignment.bias_degc:.2f}',
         'long_term_forecast_years': _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS,
+        'fracture_sensitivity_range_low': min(_get_fracture_sensitivity_fracture_counts()),
+        'fracture_sensitivity_range_high': max(_get_fracture_sensitivity_fracture_counts()),
     }
 
     # Set up Jinja environment
