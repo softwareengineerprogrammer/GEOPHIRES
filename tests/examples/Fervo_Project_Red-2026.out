@@ -4,18 +4,18 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.13.2
- Simulation Date: 2026-04-22
- Simulation Time:  09:52
- Calculation Time:      1.056 sec
+ GEOPHIRES Version: 3.13.3
+ Simulation Date: 2026-04-23
+ Simulation Time:  09:27
+ Calculation Time:      1.039 sec
 
                            ***SUMMARY OF RESULTS***
 
       End-Use Option: Electricity
-      Average Net Electricity Production:                     1.98 MW
-      Electricity breakeven price:                           45.95 cents/kWh
-      Total CAPEX:                                           28.09 MUSD
-      Total CAPEX ($/kW):                                    13698 USD/kW
+      Average Net Electricity Production:                     1.99 MW
+      Electricity breakeven price:                           45.69 cents/kWh
+      Total CAPEX:                                           28.10 MUSD
+      Total CAPEX ($/kW):                                    13692 USD/kW
       Number of production wells:                             1
       Number of injection wells:                              1
       Flowrate per production well:                          36.0 kg/sec
@@ -32,9 +32,9 @@ Simulation Metadata
       Investment Tax Credit:                                 8.43 MUSD
       Project lifetime:                                       2 yr
       Capacity factor:                                       90.0 %
-      Project NPV:                                          -9.32 MUSD
-      After-tax IRR:                                       -81.53 %
-      Project VIR=PI=PIR:                                    0.04
+      Project NPV:                                          -9.31 MUSD
+      After-tax IRR:                                       -81.22 %
+      Project VIR=PI=PIR:                                    0.05
       Project MOIC:                                         -1.11
       Project Payback Period:                                 N/A
       Estimated Jobs Created:                                 6
@@ -48,7 +48,7 @@ Simulation Metadata
       Pump efficiency:                                       80.0 %
       Injection temperature:                                 56.4 degC
       Production Wellbore heat transmission calculated with Ramey's model
-      Average production well temperature drop:               4.7 degC
+      Average production well temperature drop:               4.8 degC
       Flowrate per production well:                          36.0 kg/sec
       Injection well casing ID:                               4.276 in
       Production well casing ID:                              4.276 in
@@ -72,9 +72,9 @@ Simulation Metadata
       Fracture width:                                                 111.25 meter
       Fracture area:                                      10172.88 m**2
       Reservoir volume calculated with fracture separation and number of fractures as input
-      Number of fractures:                                    63
+      Number of fractures:                                    65
       Fracture separation:                                   10.00 meter
-      Reservoir volume:                                 6307187 m**3
+      Reservoir volume:                                 6510645 m**3
       Reservoir hydrostatic pressure:                         22008.33 kPa
       Plant outlet pressure:                              10342.14 kPa
       Production wellhead pressure:                        1551.32 kPa
@@ -87,15 +87,15 @@ Simulation Metadata
 
                            ***RESERVOIR SIMULATION RESULTS***
 
-      Maximum Production Temperature:                       181.7 degC
-      Average Production Temperature:                       179.9 degC
-      Minimum Production Temperature:                       172.9 degC
+      Maximum Production Temperature:                       181.8 degC
+      Average Production Temperature:                       180.2 degC
+      Minimum Production Temperature:                       174.3 degC
       Initial Production Temperature:                       177.9 degC
-      Average Reservoir Heat Extraction:                     18.66 MW
+      Average Reservoir Heat Extraction:                     18.70 MW
       Production Wellbore Heat Transmission Model = Ramey Model
-      Average Production Well Temperature Drop:               4.7 degC
+      Average Production Well Temperature Drop:               4.8 degC
       Average Injection Well Pump Pressure Drop:           2653.5 kPa
-      Average Production Well Pump Pressure Drop:         10755.5 kPa
+      Average Production Well Pump Pressure Drop:         10748.8 kPa
 
 
                           ***CAPITAL COSTS (M$)***
@@ -106,12 +106,12 @@ Simulation Metadata
              Drilling and completion costs per vertical injection well:          3.02 MUSD
              Drilling and completion costs per non-vertical section:             1.80 MUSD
          Stimulation costs:                                   1.51 MUSD
-         Surface power plant costs:                          10.48 MUSD
+         Surface power plant costs:                          10.49 MUSD
          Field gathering system costs:                        1.61 MUSD
          Total surface equipment costs:                      12.09 MUSD
-         Overnight Capital Cost:                             27.35 MUSD
+         Overnight Capital Cost:                             27.36 MUSD
          Inflation costs during construction:                 0.74 MUSD
-      Total CAPEX:                                           28.09 MUSD
+      Total CAPEX:                                           28.10 MUSD
 
 
                 ***OPERATING AND MAINTENANCE COSTS (M$/yr)***
@@ -125,18 +125,18 @@ Simulation Metadata
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
       Initial geofluid availability:                          0.15 MW/(kg/s)
       Maximum Total Electricity Generation:                   2.75 MW
-      Average Total Electricity Generation:                   2.68 MW
-      Minimum Total Electricity Generation:                   2.40 MW
+      Average Total Electricity Generation:                   2.69 MW
+      Minimum Total Electricity Generation:                   2.46 MW
       Initial Total Electricity Generation:                   2.60 MW
       Maximum Net Electricity Generation:                     2.05 MW
-      Average Net Electricity Generation:                     1.98 MW
-      Minimum Net Electricity Generation:                     1.70 MW
+      Average Net Electricity Generation:                     1.99 MW
+      Minimum Net Electricity Generation:                     1.76 MW
       Initial Net Electricity Generation:                     1.90 MW
-      Average Annual Total Electricity Generation:           21.09 GWh
-      Average Annual Net Electricity Generation:             15.60 GWh
+      Average Annual Total Electricity Generation:           21.20 GWh
+      Average Annual Net Electricity Generation:             15.70 GWh
       Initial pumping power/net installed power:             36.67 %
       Average Pumping Power:                                  0.70 MW
-      Heat to Power Conversion Efficiency:                   10.59 %
+      Heat to Power Conversion Efficiency:                   10.64 %
 
                             ************************************************************
                             *  HEATING, COOLING AND/OR ELECTRICITY PRODUCTION PROFILE  *
@@ -144,8 +144,8 @@ Simulation Metadata
   YEAR       THERMAL               GEOFLUID               PUMP               NET               FIRST LAW
              DRAWDOWN             TEMPERATURE             POWER             POWER              EFFICIENCY
                                      (degC)               (MW)              (MW)                  (%)
-   1           1.0000                177.95               0.6970            1.9009               10.3509
-   2           1.0201                181.52               0.6968            2.0424               10.8041
+   1           1.0000                177.95               0.6970            1.9009               10.3534
+   2           1.0207                181.63               0.6968            2.0470               10.8210
 
 
                               *******************************************************************
@@ -154,8 +154,8 @@ Simulation Metadata
   YEAR             ELECTRICITY                   HEAT                RESERVOIR            PERCENTAGE OF
                     PROVIDED                   EXTRACTED            HEAT CONTENT        TOTAL HEAT MINED
                    (GWh/year)                  (GWh/year)            (10^15 J)                 (%)
-   1                  16.0                       148.8                  1.38                  27.94
-   2                  15.2                       145.5                  0.86                  55.25
+   1                  16.0                       148.8                  1.44                  27.06
+   2                  15.4                       146.2                  0.92                  53.66
 
                             ***************************
                             *  SAM CASH FLOW PROFILE  *
@@ -164,69 +164,69 @@ Simulation Metadata
                                                  	Year 0     	Year 1     	Year 2
 CONSTRUCTION
 Capital expenditure schedule [construction] (%)  	100.0
-Overnight capital expenditure [construction] ($) 	-27,352,942
+Overnight capital expenditure [construction] ($) 	-27,356,676
 plus:
-Inflation cost [construction] ($)                	-738,529
+Inflation cost [construction] ($)                	-738,630
 plus:
 Royalty supplemental payments [construction] ($) 	0
 equals:
-Nominal capital expenditure [construction] ($)   	-28,091,471
+Nominal capital expenditure [construction] ($)   	-28,095,306
 
-Issuance of equity [construction] ($)            	8,427,441
-Issuance of debt [construction] ($)              	19,664,030
-Debt balance [construction] ($)                  	19,664,030
+Issuance of equity [construction] ($)            	8,428,592
+Issuance of debt [construction] ($)              	19,666,714
+Debt balance [construction] ($)                  	19,666,714
 Debt interest payment [construction] ($)         	0
 
-Installed cost [construction] ($)                	-28,091,471
-After-tax net cash flow [construction] ($)       	-8,427,441
+Installed cost [construction] ($)                	-28,095,306
+After-tax net cash flow [construction] ($)       	-8,428,592
 
 ENERGY
-Electricity to grid (kWh)                        	0.0        	16,133,125 	15,257,506
+Electricity to grid (kWh)                        	0.0        	16,141,623 	15,462,625
 Electricity from grid (kWh)                      	0.0        	0.0        	0.0
-Electricity to grid net (kWh)                    	0.0        	16,133,125 	15,257,506
+Electricity to grid net (kWh)                    	0.0        	16,141,623 	15,462,625
 
 REVENUE
 PPA price (cents/kWh)                            	0.0        	9.50       	9.50
-PPA revenue ($)                                  	0          	1,532,647  	1,449,463
+PPA revenue ($)                                  	0          	1,533,454  	1,468,949
 Curtailment payment revenue ($)                  	0          	0          	0
 Capacity payment revenue ($)                     	0          	0          	0
-Salvage value ($)                                	0          	0          	14,045,736
-Total revenue ($)                                	0          	1,532,647  	15,495,199
+Salvage value ($)                                	0          	0          	14,047,653
+Total revenue ($)                                	0          	1,533,454  	15,516,603
 
-Property tax net assessed value ($)              	0          	28,091,471 	28,091,471
+Property tax net assessed value ($)              	0          	28,095,306 	28,095,306
 
 OPERATING EXPENSES
-O&M fixed expense ($)                            	0          	878,561    	878,561
+O&M fixed expense ($)                            	0          	878,898    	878,898
 O&M production-based expense ($)                 	0          	0          	0
 O&M capacity-based expense ($)                   	0          	0          	0
 Fuel expense ($)                                 	0          	0          	0
 Electricity purchase ($)                         	0          	0          	0
-Property tax expense ($)                         	0          	61,801     	61,801
+Property tax expense ($)                         	0          	61,810     	61,810
 Insurance expense ($)                            	0          	0          	0
-Total operating expenses ($)                     	0          	940,362    	940,362
+Total operating expenses ($)                     	0          	940,707    	940,707
 
-EBITDA ($)                                       	0          	592,285    	14,554,837
+EBITDA ($)                                       	0          	592,747    	14,575,895
 
 OPERATING ACTIVITIES
-EBITDA ($)                                       	0          	592,285    	14,554,837
+EBITDA ($)                                       	0          	592,747    	14,575,895
 Interest earned on reserves ($)                  	0          	0          	0
 plus PBI if not available for debt service:
 Federal PBI income ($)                           	0          	0          	0
 State PBI income ($)                             	0          	0          	0
 Utility PBI income ($)                           	0          	0          	0
 Other PBI income ($)                             	0          	0          	0
-Debt interest payment ($)                        	0          	1,376,482  	711,515
-Cash flow from operating activities ($)          	0          	-784,197   	13,843,322
+Debt interest payment ($)                        	0          	1,376,670  	711,612
+Cash flow from operating activities ($)          	0          	-783,923   	13,864,283
 
 INVESTING ACTIVITIES
-Total installed cost ($)                         	-28,091,471
+Total installed cost ($)                         	-28,095,306
 Debt closing costs ($)                           	0
 Debt up-front fee ($)                            	0
 minus:
 Total IBI income ($)                             	0
 Total CBI income ($)                             	0
 equals:
-Purchase of property ($)                         	-28,091,471
+Purchase of property ($)                         	-28,095,306
 plus:
 Reserve (increase)/decrease debt service ($)     	0          	0          	0
 Reserve (increase)/decrease working capital ($)  	0          	0          	0
@@ -238,89 +238,89 @@ Reserve capital spending major equipment 1 ($)   	0          	0          	0
 Reserve capital spending major equipment 2 ($)   	0          	0          	0
 Reserve capital spending major equipment 3 ($)   	0          	0          	0
 equals:
-Cash flow from investing activities ($)          	-28,091,471	0          	0
+Cash flow from investing activities ($)          	-28,095,306	0          	0
 
 FINANCING ACTIVITIES
-Issuance of equity ($)                           	8,427,441
-Size of debt ($)                                 	19,664,030
+Issuance of equity ($)                           	8,428,592
+Size of debt ($)                                 	19,666,714
 minus:
-Debt principal payment ($)                       	0          	9,499,531  	10,164,499
+Debt principal payment ($)                       	0          	9,500,828  	10,165,886
 equals:
-Cash flow from financing activities ($)          	28,091,471 	-9,499,531 	-10,164,499
+Cash flow from financing activities ($)          	28,095,306 	-9,500,828 	-10,165,886
 
 PROJECT RETURNS
 Pre-tax Cash Flow:
-Cash flow from operating activities ($)          	0          	-784,197   	13,843,322
-Cash flow from investing activities ($)          	-28,091,471	0          	0
-Cash flow from financing activities ($)          	28,091,471 	-9,499,531 	-10,164,499
-Total pre-tax cash flow ($)                      	0          	-10,283,728	3,678,823
+Cash flow from operating activities ($)          	0          	-783,923   	13,864,283
+Cash flow from investing activities ($)          	-28,095,306	0          	0
+Cash flow from financing activities ($)          	28,095,306 	-9,500,828 	-10,165,886
+Total pre-tax cash flow ($)                      	0          	-10,284,751	3,698,397
 
 Pre-tax Returns:
-Issuance of equity ($)                           	8,427,441
-Total pre-tax cash flow ($)                      	0          	-10,283,728	3,678,823
-Total pre-tax returns ($)                        	-8,427,441 	-10,283,728	3,678,823
+Issuance of equity ($)                           	8,428,592
+Total pre-tax cash flow ($)                      	0          	-10,284,751	3,698,397
+Total pre-tax returns ($)                        	-8,428,592 	-10,284,751	3,698,397
 
 After-tax Returns:
-Total pre-tax returns ($)                        	-8,427,441 	-10,283,728	3,678,823
-Federal ITC total income ($)                     	0          	8,427,441  	0
+Total pre-tax returns ($)                        	-8,428,592 	-10,284,751	3,698,397
+Federal ITC total income ($)                     	0          	8,428,592  	0
 Federal PTC income ($)                           	0          	0          	0
-Federal tax benefit (liability) ($)              	0          	276,843    	-2,535,516
+Federal tax benefit (liability) ($)              	0          	276,804    	-2,539,685
 State ITC total income ($)                       	0          	0          	0
 State PTC income ($)                             	0          	0          	0
-State tax benefit (liability) ($)                	0          	62,842     	-575,549
-Total after-tax returns ($)                      	-8,427,441 	-1,516,602 	567,758
+State tax benefit (liability) ($)                	0          	62,833     	-576,496
+Total after-tax returns ($)                      	-8,428,592 	-1,516,522 	582,217
 
-After-tax net cash flow ($)                      	-8,427,441 	-1,516,602 	567,758
-After-tax cumulative IRR (%)                     	NaN        	NaN        	-81.53
-After-tax cumulative NPV ($)                     	-8,427,441 	-9,745,950 	-9,316,823
+After-tax net cash flow ($)                      	-8,428,592 	-1,516,522 	582,217
+After-tax cumulative IRR (%)                     	NaN        	NaN        	-81.22
+After-tax cumulative NPV ($)                     	-8,428,592 	-9,747,032 	-9,306,976
 
 AFTER-TAX LCOE AND PPA PRICE
-Annual costs ($)                                 	-8,427,441 	-3,049,249 	-881,705
-PPA revenue ($)                                  	0          	1,532,647  	1,449,463
-Electricity to grid (kWh)                        	0          	16,133,125 	15,257,506
+Annual costs ($)                                 	-8,428,592 	-3,049,976 	-886,733
+PPA revenue ($)                                  	0          	1,533,454  	1,468,949
+Electricity to grid (kWh)                        	0          	16,141,623 	15,462,625
 
-Present value of annual costs ($)                	11,744,826
+Present value of annual costs ($)                	11,750,409
 
-Present value of annual energy costs ($)         	11,744,826
-Present value of annual energy nominal (kWh)     	25,557,931
-LCOE Levelized cost of energy nominal (cents/kWh)	45.95
+Present value of annual energy costs ($)         	11,750,409
+Present value of annual energy nominal (kWh)     	25,720,353
+LCOE Levelized cost of energy nominal (cents/kWh)	45.69
 
-Present value of PPA revenue ($)                 	2,428,003
-Present value of annual energy nominal (kWh)     	25,557,931
+Present value of PPA revenue ($)                 	2,443,433
+Present value of annual energy nominal (kWh)     	25,720,353
 LPPA Levelized PPA price nominal (cents/kWh)     	9.50
 
 PROJECT STATE INCOME TAXES
-EBITDA ($)                                       	0          	592,285    	14,554,837
+EBITDA ($)                                       	0          	592,747    	14,575,895
 State taxable PBI income ($)                     	0          	0          	0
 Interest earned on reserves ($)                  	0          	0          	0
 State taxable IBI income ($)                     	0
 State taxable CBI income ($)                     	0
 minus:
-Debt interest payment ($)                        	0          	1,376,482  	711,515
-Total state tax depreciation ($)                 	0          	596,944    	1,193,888
+Debt interest payment ($)                        	0          	1,376,670  	711,612
+Total state tax depreciation ($)                 	0          	597,025    	1,194,051
 equals:
-State taxable income ($)                         	0          	-1,381,141 	12,649,434
+State taxable income ($)                         	0          	-1,380,948 	12,670,233
 
 State income tax rate (frac)                     	0.0        	0.05       	0.05
-State tax benefit (liability) ($)                	0          	62,842     	-575,549
+State tax benefit (liability) ($)                	0          	62,833     	-576,496
 
 PROJECT FEDERAL INCOME TAXES
-EBITDA ($)                                       	0          	592,285    	14,554,837
+EBITDA ($)                                       	0          	592,747    	14,575,895
 Interest earned on reserves ($)                  	0          	0          	0
-State tax benefit (liability) ($)                	0          	62,842     	-575,549
+State tax benefit (liability) ($)                	0          	62,833     	-576,496
 State ITC total income ($)                       	0          	0          	0
 State PTC income ($)                             	0          	0          	0
 Federal taxable IBI income ($)                   	0
 Federal taxable CBI income ($)                   	0
 Federal taxable PBI income ($)                   	0          	0          	0
 minus:
-Debt interest payment ($)                        	0          	1,376,482  	711,515
-Total federal tax depreciation ($)               	0          	596,944    	1,193,888
+Debt interest payment ($)                        	0          	1,376,670  	711,612
+Total federal tax depreciation ($)               	0          	597,025    	1,194,051
 equals:
-Federal taxable income ($)                       	0          	-1,318,299 	12,073,885
+Federal taxable income ($)                       	0          	-1,318,115 	12,093,737
 
 Federal income tax rate (frac)                   	0.0        	0.21       	0.21
-Federal tax benefit (liability) ($)              	0          	276,843    	-2,535,516
+Federal tax benefit (liability) ($)              	0          	276,804    	-2,539,685
 
 CASH INCENTIVES
 Federal IBI income ($)                           	0
@@ -346,29 +346,29 @@ Federal PTC income ($)                           	0          	0          	0
 State PTC income ($)                             	0          	0          	0
 
 Federal ITC amount income ($)                    	0          	0          	0
-Federal ITC percent income ($)                   	0          	8,427,441  	0
-Federal ITC total income ($)                     	0          	8,427,441  	0
+Federal ITC percent income ($)                   	0          	8,428,592  	0
+Federal ITC total income ($)                     	0          	8,428,592  	0
 
 State ITC amount income ($)                      	0          	0          	0
 State ITC percent income ($)                     	0          	0          	0
 State ITC total income ($)                       	0          	0          	0
 
 DEBT REPAYMENT
-Debt balance ($)                                 	19,664,030 	10,164,499 	0
-Debt interest payment ($)                        	0          	1,376,482  	711,515
-Debt principal payment ($)                       	0          	9,499,531  	10,164,499
-Debt total payment ($)                           	0          	10,876,013 	10,876,013
+Debt balance ($)                                 	19,666,714 	10,165,886 	0
+Debt interest payment ($)                        	0          	1,376,670  	711,612
+Debt principal payment ($)                       	0          	9,500,828  	10,165,886
+Debt total payment ($)                           	0          	10,877,498 	10,877,498
 
 DSCR (DEBT FRACTION)
-EBITDA ($)                                       	0          	592,285    	14,554,837
+EBITDA ($)                                       	0          	592,747    	14,575,895
 minus:
 Reserves major equipment 1 funding ($)           	0          	0          	0
 Reserves major equipment 2 funding ($)           	0          	0          	0
 Reserves major equipment 3 funding ($)           	0          	0          	0
 Reserves receivables funding ($)                 	0          	0          	0
 equals:
-Cash available for debt service (CAFDS) ($)      	0          	592,285    	14,554,837
-Debt total payment ($)                           	0          	10,876,013 	10,876,013
+Cash available for debt service (CAFDS) ($)      	0          	592,747    	14,575,895
+Debt total payment ($)                           	0          	10,877,498 	10,877,498
 DSCR (pre-tax)                                   	0.0        	0.05       	1.34
 
 RESERVES

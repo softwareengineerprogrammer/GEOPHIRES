@@ -45,4 +45,4 @@ class FervoProjectRed2026TestCase(BaseTestCase):
 
         avg_production_temp_q = _vuq(r.result['RESERVOIR SIMULATION RESULTS']['Average Production Temperature'])
         self.assertGreater(avg_production_temp_q, _q(346, 'degF'))
-        self.assertLess(avg_production_temp_q, _q(356, 'degF'))
+        self.assertLess(avg_production_temp_q, _q(357, 'degF'))

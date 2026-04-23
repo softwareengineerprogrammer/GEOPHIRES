@@ -124,9 +124,9 @@ geometry for the Project Red simulation are detailed below:
 | :--- | :--- | :--- |
 | Number of Fractures | `{{ input_params['Number of Fractures'] }}` | {{ input_params_comments['Number of Fractures'] }} |
 | Fracture Shape | `{{ input_params['Fracture Shape'] }}` | {{ input_params_comments['Fracture Shape'] }} |
-| Fracture Height | `{{ input_params['Fracture Height'] }}` | {{ input_params_comments['Fracture Height'] }} |
-| Fracture Width | `{{ input_params['Fracture Width'] }}` | {{ input_params_comments['Fracture Width'] }} |
-| Fracture Separation | `{{ input_params['Fracture Separation'] }} meter` | {{ input_params_comments['Fracture Separation'] }} |
+| Fracture Height | `{{ input_params['Fracture Height'] | replace("foot", "feet") }}` | {{ input_params_comments['Fracture Height'] }} |
+| Fracture Width | `{{ input_params['Fracture Width'] | replace("foot", "feet") }}` | {{ input_params_comments['Fracture Width'] }} |
+| Fracture Separation | `{{ input_params['Fracture Separation'] }} meters` | {{ input_params_comments['Fracture Separation'] }} |
 
 .. raw:: html
 
@@ -134,6 +134,7 @@ geometry for the Project Red simulation are detailed below:
 
 Note that these parameters represent a simplified, homogenized analytical equivalent of a highly complex, heterogeneous subsurface fracture network.
 Further relevant detailed discussion can be found in the [Cape Station case study methodology section](Fervo_Project_Cape-5.html#calibration-with-fervo-implemented-field-design).
+See also the [effective number of fractures sensitivity analysis below](#sensitivity-analysis-effective-number-of-fractures-section).
 
 ## Results
 
@@ -172,33 +173,65 @@ The variance analysis (results displayed in legend captions) evaluates the predi
 Both models demonstrate high predictive fidelity, tracking steady-state flowing temperatures within 1.5°C of the empirical data.
 
 * **Overall Fit:** GEOPHIRES mathematically achieves a tighter overall fit, yielding a lower Root Mean Square Error (RMSE) and a higher coefficient of determination (R²).
-* **Systematic Bias:** The Fervo model exhibits slightly less systemic underestimation, with a cold bias of {{ fervo_bias_degc }}°C compared to the GEOPHIRES cold bias of {{ geophires_bias_degc }}°C.
+* **Systematic Bias:** The GEOPHIRES model exhibits slightly less systemic underestimation, with a cold bias of {{ geophires_bias_degc }}°C compared to the Fervo cold bias of {{ fervo_bias_degc }}°C.
 * **R² Context:** While the Fervo model yields a relatively low R² ({{ fervo_r2 }}), GEOPHIRES achieves a stronger R² of {{ geophires_r2 }}, indicating it more successfully captures the underlying physical trend of the data (the slight thermal drawdown) rather than simply averaging the noise. However, it is important to note that the absolute R² ceiling for both models is inherently suppressed by the dataset. Because the steady-state temperature profile is essentially a flat plateau, natural sensor variance and minor reservoir oscillations may account for a disproportionately large portion of the total variance, keeping the R² scores modest despite the favorable absolute error (RMSE).
 
 <div id="long-term-forecast-section"></div>
 
-### Long-Term Forecast (8-Year Horizon)
+### Long-Term Forecast ({{ long_term_forecast_years }}-Year Horizon)
 
-To evaluate the model's predictive behavior over a longer timeframe, the GEOPHIRES simulation was extended to an 8-year horizon.
-This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html) and provides a
-realistic view of the anticipated thermal decline before major wellfield intervention would be required.
+To evaluate the model's predictive behavior over a longer timeframe, the GEOPHIRES simulation was extended to an {{ long_term_forecast_years }}-year horizon.
+This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html)
+and provides a plausible view of the anticipated thermal decline before major wellfield intervention would be required.
 
 ![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-long-term.png)
 
 As shown in the forecast above, the Gringarten analytical model predicts a gradual onset of thermal decline following
 the initial two-year plateau, which eventually accelerates into a more pronounced drawdown.
-
 When interpreting the trailing edge of the empirical dataset, minor deviations between the extracted data and the
 forecast curve are to be expected given the inherent imprecision of image-based data digitization and the presence of
 localized wellbore transients.
-Because Fervo has explicitly characterized this two-year operational period as demonstrating highly stable
-flowing temperatures with marginal to no actual reservoir drawdown, the GEOPHIRES parameterization
-deliberately favors a stabilized, slightly more optimistic decline curve rather than overfitting to potential
-extraction artifacts.
-This 8-year forecast establishes a testable predictive baseline, which can be further rigorously validated, tuned,
-and recalibrated as additional multi-year operational data becomes available
-to determine if late-stage variations represent minor transients or the onset of non-linear geological thresholds.
 
+Because Fervo has explicitly characterized this two-year operational period as demonstrating highly stable flowing
+temperatures with marginal to no actual reservoir drawdown, the GEOPHIRES parameterization deliberately favors a
+stabilized, slightly more optimistic decline curve rather than overfitting to potential extraction artifacts.
+
+While this {{ long_term_forecast_years }}-year forecast establishes a testable predictive baseline, understanding the true bounds of this decline
+requires accounting for inherent subsurface uncertainty.
+To explore how variations in reservoir geometry might accelerate or delay the onset of this long-term drawdown, the
+following sensitivity analysis expands our single baseline into a predictive envelope.
+
+<div id="sensitivity-analysis-effective-number-of-fractures-section"></div>
+
+#### Sensitivity Analysis: Effective Number of Fractures
+
+As detailed in the methodology's [GEOPHIRES Reservoir Parameters](#geophires-reservoir-parameters) table, the baseline
+`Number of Fractures` ({{ input_params['Number of Fractures'] }}) represents a deliberately de-rated analytical
+equivalent designed to proxy a highly complex, heterogeneous subsurface fracture network. While this calibrated
+baseline provides the tightest statistical fit for the current two-year empirical window, assigning an exact number to
+the effective fracture surface area inherently relies on analytical interpretation.
+
+To evaluate the bounding envelope of the reservoir's thermal drawdown, a sensitivity analysis was performed on this
+effective `Number of Fractures`. By expanding the model to include other plausible values (ranging from {{ fracture_sensitivity_range_low }} to {{ fracture_sensitivity_range_high }}
+fractures), the analysis demonstrates the sensitivity of the long-term thermal decline to the idealized fracture surface area.
+
+![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-fracture-sensitivity-1.png)
+
+*Detail view of the sensitivity curves overlapping the empirical steady-state data (Years 0–3):*
+
+![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-fracture-sensitivity-2.png)
+
+While the {{ input_params['Number of Fractures'] }}-fracture baseline is currently the most empirically supported
+estimate based on existing data alignment, time and additional multi-year operational data will ultimately determine
+which structural interpretation within this predictive envelope is the most accurate.
+
+To further quantify the impact of these varying fracture geometries, the corresponding average annual net electricity
+generation over the {{ long_term_forecast_years }}-year horizon was also evaluated. While the flowing temperatures across all sensitivity cases
+essentially converge by year {{ long_term_forecast_years }}, their distinct intermediate thermal decline paths result in measurable differences in
+total power output. Utilizing Average Annual Net Electricity Generation (GWh) isolates these aggregate differences,
+providing a relative basis for comparing the lifecycle performance of each sensitivity case.
+
+![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-power-sensitivity.png)
 
 ## Discussion
 
