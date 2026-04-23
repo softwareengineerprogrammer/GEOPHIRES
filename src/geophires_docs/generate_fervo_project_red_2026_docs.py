@@ -45,6 +45,8 @@ _STATISTICAL_MIN_BUFFER = 3
 _STATISTICAL_Z_SCORE = 2.0
 _STATISTICAL_MIN_STD = 1.5
 
+_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS = 8
+
 
 @dataclass
 class _StatsAlignmentResult:
@@ -417,7 +419,10 @@ def _generate_long_term_forecast_graph(
     ax.set_xlabel('Time (Years)', fontsize=12)
     ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
 
-    ax.set_title('Project Red GEOPHIRES Temperature Forecast: 8-Year Horizon', fontsize=13)
+    ax.set_title(
+        f'Project Red GEOPHIRES Temperature Forecast: {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS}-Year Horizon',
+        fontsize=13,
+    )
 
     ax.set_xlim(0.0, 8.0)
     ax.set_ylim(0.0, 200.0)
@@ -479,7 +484,7 @@ def get_project_red_production_temperature_profile_series(
 def get_long_term_geophires_profile() -> pd.Series:
     long_term_input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
         from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt'),
-        params={'Plant Lifetime': 8, 'Print Output to Console': 0},
+        params={'Plant Lifetime': _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS, 'Print Output to Console': 0},
     )
     long_term_result: GeophiresXResult = GeophiresXClient().get_geophires_result(long_term_input_params)
 
@@ -490,6 +495,96 @@ def get_long_term_geophires_profile() -> pd.Series:
     geophires_y = [q.magnitude for q in long_term_profile]
 
     return pd.Series(data=geophires_y, index=geophires_x)
+
+
+def _generate_fracture_sensitivity_graph(
+    df_prod: pd.DataFrame,
+    steady_state_start_years: float,
+    output_path: Path,
+) -> None:
+    is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
+
+    df_included = df_prod[is_steady_state]
+    df_excluded = df_prod[~is_steady_state]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    ax.scatter(
+        df_included['Time_Years'],
+        df_included['Temperature_C'],
+        facecolors='none',
+        edgecolors='#d62728',
+        s=22,
+        linewidths=1.0,
+        alpha=0.85,
+        label='Measured Temperature (Steady State)',
+    )
+
+    if not df_excluded.empty:
+        ax.scatter(
+            df_excluded['Time_Years'],
+            df_excluded['Temperature_C'],
+            facecolors='none',
+            edgecolors='gray',
+            s=22,
+            linewidths=1.0,
+            alpha=0.5,
+            label='Measured Temperature (Thermal Conditioning & Transient Operations)',
+        )
+
+    number_of_fractures_param_name = 'Number of Fractures'
+
+    base_input_params: GeophiresInputParameters = get_project_red_input_params_and_result()[0]
+    base_number_of_fractures = int(_get_input_parameters_dict(base_input_params)[number_of_fractures_param_name])
+
+    fracture_counts = [40, base_number_of_fractures, 80, 100]
+    client = GeophiresXClient()
+
+    colors = {40: '#1f77b4', 63: 'green', 80: '#ff7f0e', 100: '#9467bd'}
+    line_styles = {40: ':', 63: '-.', 80: '--', 100: '-'}
+
+    for frac_count in fracture_counts:
+        input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+            from_file_path=base_input_params.as_file_path(),
+            params={
+                number_of_fractures_param_name: frac_count,
+                'Plant Lifetime': _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS,
+                'Gringarten-Stehfest Precision': 10,
+                'Print Output to Console': 0,
+            },
+        )
+        result: GeophiresXResult = client.get_geophires_result(input_params)
+
+        profile = _get_full_production_temperature_profile((input_params, result))
+        time_steps_per_year: int = int(_get_input_parameters_dict(input_params)['Time steps per year'])
+
+        geophires_x = [float(step) / float(time_steps_per_year) for step, _ in enumerate(profile)]
+        geophires_y = [q.magnitude for q in profile]
+
+        label_suffix = ' (Baseline)' if frac_count == 63 else ''
+
+        ax.plot(
+            geophires_x,
+            geophires_y,
+            color=colors[frac_count],
+            linestyle=line_styles[frac_count],
+            linewidth=1.5 if frac_count != 63 else 2.0,
+            label=f'GEOPHIRES: {frac_count} Fractures{label_suffix}',
+        )
+
+    ax.set_xlabel('Time (Years)', fontsize=12)
+    ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
+    ax.set_title('Project Red GEOPHIRES Temperature Forecast: Number of Fractures Sensitivity', fontsize=13)
+
+    ax.set_xlim(0.0, 8.0)
+    ax.set_ylim(0.0, 200.0)
+    ax.grid(True, linestyle='--', alpha=0.5)
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close(fig)
 
 
 def generate_fervo_project_red_2026_md(
@@ -545,86 +640,6 @@ def generate_fervo_project_red_2026_md(
     output_file.write_text(output, encoding='utf-8')
 
     _log.info(f'✓ Generated {output_file}')
-
-
-def _generate_fracture_sensitivity_graph(
-    df_prod: pd.DataFrame,
-    steady_state_start_years: float,
-    output_path: Path,
-) -> None:
-    is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
-
-    df_included = df_prod[is_steady_state]
-    df_excluded = df_prod[~is_steady_state]
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    ax.scatter(
-        df_included['Time_Years'],
-        df_included['Temperature_C'],
-        facecolors='none',
-        edgecolors='#d62728',
-        s=22,
-        linewidths=1.0,
-        alpha=0.85,
-        label='Measured Temperature (Steady State)',
-    )
-
-    if not df_excluded.empty:
-        ax.scatter(
-            df_excluded['Time_Years'],
-            df_excluded['Temperature_C'],
-            facecolors='none',
-            edgecolors='gray',
-            s=22,
-            linewidths=1.0,
-            alpha=0.5,
-            label='Measured Temperature (Thermal Conditioning & Transient Operations)',
-        )
-
-    fracture_counts = [40, 63, 80, 100]
-    client = GeophiresXClient()
-
-    colors = {40: '#1f77b4', 63: 'green', 80: '#ff7f0e', 100: '#9467bd'}
-    line_styles = {40: ':', 63: '-.', 80: '--', 100: '-'}
-
-    for frac_count in fracture_counts:
-        input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
-            from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt'),
-            params={'Plant Lifetime': 8, 'Print Output to Console': 0, 'Number of Fractures': frac_count},
-        )
-        result: GeophiresXResult = client.get_geophires_result(input_params)
-
-        profile = _get_full_production_temperature_profile((input_params, result))
-        time_steps_per_year: int = int(_get_input_parameters_dict(input_params)['Time steps per year'])
-
-        geophires_x = [float(step) / float(time_steps_per_year) for step, _ in enumerate(profile)]
-        geophires_y = [q.magnitude for q in profile]
-
-        label_suffix = ' (Baseline)' if frac_count == 63 else ''
-
-        ax.plot(
-            geophires_x,
-            geophires_y,
-            color=colors[frac_count],
-            linestyle=line_styles[frac_count],
-            linewidth=1.5 if frac_count != 63 else 2.0,
-            label=f'GEOPHIRES: {frac_count} Fractures{label_suffix}',
-        )
-
-    ax.set_xlabel('Time (Years)', fontsize=12)
-    ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
-    ax.set_title('Project Red GEOPHIRES Temperature Forecast: Number of Fractures Sensitivity', fontsize=13)
-
-    ax.set_xlim(0.0, 8.0)
-    ax.set_ylim(0.0, 200.0)
-    ax.grid(True, linestyle='--', alpha=0.5)
-
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=150, bbox_inches='tight')
-    plt.close(fig)
 
 
 def generate_fervo_project_red_2026_docs():
@@ -715,7 +730,7 @@ def generate_fervo_project_red_2026_docs():
     )
 
     # 8-year long-term simulation graph
-    _log.info('Running long-term 8-year forecast simulation...')
+    _log.info(f'Running long-term {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS}-year forecast simulation...')
     long_term_series = get_long_term_geophires_profile()
     long_term_graph_path = _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-long-term.png')
 
