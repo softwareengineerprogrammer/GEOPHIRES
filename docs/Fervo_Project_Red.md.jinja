@@ -181,17 +181,17 @@ Both models demonstrate high predictive fidelity, tracking steady-state flowing 
 ### Long-Term Forecast (8-Year Horizon)
 
 To evaluate the model's predictive behavior over a longer timeframe, the GEOPHIRES simulation was extended to an 8-year horizon.
-This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html) and provides a
-realistic view of the anticipated thermal decline before major wellfield intervention would be required.
+This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html)
+and provides a plausible view of the anticipated thermal decline before major wellfield intervention would be required.
 
 ![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-long-term.png)
 
 As shown in the forecast above, the Gringarten analytical model predicts a gradual onset of thermal decline following
 the initial two-year plateau, which eventually accelerates into a more pronounced drawdown.
-
 When interpreting the trailing edge of the empirical dataset, minor deviations between the extracted data and the
 forecast curve are to be expected given the inherent imprecision of image-based data digitization and the presence of
 localized wellbore transients.
+
 Because Fervo has explicitly characterized this two-year operational period as demonstrating highly stable flowing
 temperatures with marginal to no actual reservoir drawdown, the GEOPHIRES parameterization deliberately favors a
 stabilized, slightly more optimistic decline curve rather than overfitting to potential extraction artifacts.
@@ -205,16 +205,25 @@ following sensitivity analysis expands our single baseline into a predictive env
 
 #### Sensitivity Analysis: Effective Number of Fractures
 
-To evaluate the bounding envelope of the reservoir's thermal drawdown, a sensitivity analysis was performed on the effective `Number of Fractures`.
-The calibrated baseline model assumes {{ input_params['Number of Fractures'] }} parallel fractures.
-By varying this parameter (ranging from 57 to 69 fractures), the analytical model demonstrates the sensitivity of the
-long-term thermal decline to the idealized fracture surface area.
+As detailed in the methodology's [GEOPHIRES Reservoir Parameters](#geophires-reservoir-parameters) table, the baseline
+`Number of Fractures` ({{ input_params['Number of Fractures'] }}) represents a deliberately de-rated analytical
+equivalent designed to proxy a highly complex, heterogeneous subsurface fracture network. While this calibrated
+baseline provides the tightest statistical fit for the current two-year empirical window, assigning an exact number to
+the effective fracture surface area inherently relies on analytical interpretation.
+
+To evaluate the bounding envelope of the reservoir's thermal drawdown, a sensitivity analysis was performed on this
+effective `Number of Fractures`. By expanding the model to include other plausible values (ranging from 57 to 69
+fractures), the analysis demonstrates the sensitivity of the long-term thermal decline to the idealized fracture surface area.
 
 ![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-fracture-sensitivity-1.png)
 
 *Detail view of the sensitivity curves overlapping the empirical steady-state data (Years 0–3):*
 
 ![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-fracture-sensitivity-2.png)
+
+While the {{ input_params['Number of Fractures'] }}-fracture baseline is currently the most empirically supported
+estimate based on existing data alignment, time and additional multi-year operational data will ultimately determine
+which structural interpretation within this predictive envelope is the most accurate.
 
 ## Discussion
 
