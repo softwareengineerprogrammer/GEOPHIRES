@@ -52,7 +52,13 @@ _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS = 8
 NUMBER_OF_FRACTURES_PARAM_NAME = 'Number of Fractures'
 
 _GRAPH_DPI = 300
-_SAVEFIG_ARGS = {'dpi': _GRAPH_DPI, 'metadata': {'Date': None}}
+_SAVEFIG_ARGS = {
+    'dpi': _GRAPH_DPI,
+    'metadata': {
+        # TODO: intended to prevent spurious image diffs after graph/doc regeneration, but does not work as intended.
+        'Date': None
+    },
+}
 
 
 @dataclass
