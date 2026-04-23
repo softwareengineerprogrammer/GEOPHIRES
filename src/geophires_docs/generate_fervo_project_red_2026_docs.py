@@ -538,20 +538,18 @@ def _generate_fracture_sensitivity_graph(
     base_input_params: GeophiresInputParameters = get_project_red_input_params_and_result()[0]
     base_number_of_fractures = int(_get_input_parameters_dict(base_input_params)[number_of_fractures_param_name])
 
-    fracture_counts = [60, base_number_of_fractures, 66, 73]
+    fracture_counts = [base_number_of_fractures, 57, 60, 66, 69]
     client = GeophiresXClient()
 
     colors = {
-        fracture_counts[0]: '#1f77b4',
         base_number_of_fractures: 'green',
-        fracture_counts[2]: '#ff7f0e',
-        fracture_counts[3]: '#9467bd',
+        fracture_counts[1]: '#1C6CA4',
+        fracture_counts[2]: '#1f77b4',
+        fracture_counts[3]: '#ff7f0e',
+        fracture_counts[4]: '#9467bd',
     }
     line_styles = {
-        # fracture_counts[0]: ':',
         base_number_of_fractures: '-.',
-        # fracture_counts[2]: '--',
-        # fracture_counts[3]: '-'
     }
 
     for frac_count in fracture_counts:
@@ -560,7 +558,7 @@ def _generate_fracture_sensitivity_graph(
             params={
                 number_of_fractures_param_name: frac_count,
                 'Plant Lifetime': _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS,
-                'Gringarten-Stehfest Precision': 10,
+                'Gringarten-Stehfest Precision': 10,  # Speed up build with only minor effect on precision
                 'Print Output to Console': 0,
             },
         )
@@ -572,7 +570,8 @@ def _generate_fracture_sensitivity_graph(
         geophires_x = [float(step) / float(time_steps_per_year) for step, _ in enumerate(profile)]
         geophires_y = [q.magnitude for q in profile]
 
-        label_suffix = ' (Baseline)' if frac_count == 63 else ''
+        label_prefix = 'GEOPHIRES: ' if frac_count == base_number_of_fractures else ''
+        label_suffix = ' (Baseline)' if frac_count == base_number_of_fractures else ''
 
         ax.plot(
             geophires_x,
@@ -580,15 +579,15 @@ def _generate_fracture_sensitivity_graph(
             color=colors[frac_count],
             linestyle=line_styles.get(frac_count, ':'),
             linewidth=1.5 if frac_count != base_number_of_fractures else 2.0,
-            label=f'GEOPHIRES: {frac_count} Fractures{label_suffix}',
+            label=f'{label_prefix}{frac_count} Fractures{label_suffix}',
         )
 
     ax.set_xlabel('Time (Years)', fontsize=12)
     ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
-    ax.set_title('Project Red GEOPHIRES Temperature Forecast: Number of Fractures Sensitivity', fontsize=13)
+    ax.set_title('Project Red GEOPHIRES Temperature Forecast: Effective Number of Fractures Sensitivity', fontsize=13)
 
-    ax.set_xlim(0.0, _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS)
-    ax.set_ylim(75, 190)
+    ax.set_xlim(0.0, _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS / 2)
+    ax.set_ylim(160, 190)
     ax.grid(True, linestyle='--', alpha=0.5)
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
