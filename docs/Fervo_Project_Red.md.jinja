@@ -178,9 +178,9 @@ Both models demonstrate high predictive fidelity, tracking steady-state flowing 
 
 <div id="long-term-forecast-section"></div>
 
-### Long-Term Forecast (8-Year Horizon)
+### Long-Term Forecast ({{ long_term_forecast_years }}-Year Horizon)
 
-To evaluate the model's predictive behavior over a longer timeframe, the GEOPHIRES simulation was extended to an 8-year horizon.
+To evaluate the model's predictive behavior over a longer timeframe, the GEOPHIRES simulation was extended to an {{ long_term_forecast_years }}-year horizon.
 This timeframe aligns with the redrilling interval modeled in the [Cape Station case study](Fervo_Project_Cape-5.html)
 and provides a plausible view of the anticipated thermal decline before major wellfield intervention would be required.
 
@@ -224,6 +224,14 @@ fractures), the analysis demonstrates the sensitivity of the long-term thermal d
 While the {{ input_params['Number of Fractures'] }}-fracture baseline is currently the most empirically supported
 estimate based on existing data alignment, time and additional multi-year operational data will ultimately determine
 which structural interpretation within this predictive envelope is the most accurate.
+
+To further quantify the impact of these varying fracture geometries, the corresponding average annual net electricity
+generation over the {{ long_term_forecast_years }}-year horizon was also evaluated. While the flowing temperatures across all sensitivity cases
+essentially converge by year {{ long_term_forecast_years }}, their distinct intermediate thermal decline paths result in measurable differences in
+total power output. Utilizing Average Annual Net Electricity Generation (GWh) isolates these aggregate differences,
+providing a relative basis for comparing the lifecycle performance of each sensitivity case.
+
+![](_images/fervo_project_red-2026_production-temperature-data-vs-modeling-power-sensitivity.png)
 
 ## Discussion
 

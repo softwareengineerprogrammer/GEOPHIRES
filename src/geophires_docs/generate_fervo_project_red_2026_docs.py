@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import cv2
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -509,9 +510,9 @@ def _generate_fracture_sensitivity_graph(
     show_excluded_measured_temperatures: bool = False,
     calculate_stats: bool = True,
 ) -> pd.DataFrame:
-    import matplotlib.patches as mpatches
-
-    _log.info('Running 8-year fracture sensitivity analysis (including power generation)...')
+    _log.info(
+        f'Running {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS}-year fracture sensitivity analysis (including power generation)...'
+    )
 
     is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
 
@@ -613,7 +614,7 @@ def _generate_fracture_sensitivity_graph(
         final_temp_degc = float(geophires_y[-1]) if geophires_y else 0.0
         power_data.append(
             {
-                'Number of Fractures': frac_count,
+                number_of_fractures_param_name: frac_count,
                 #'Average Net Electricity Production (MW)': avg_generation_v,
                 f'{avg_generation_param} ({avg_generation_u})': avg_generation_v,
                 f'Year {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS} Flowing Temperature (°C)': final_temp_degc,
@@ -672,16 +673,16 @@ def _generate_fracture_sensitivity_graph(
     plt.close(fig)
 
     df_power = pd.DataFrame(power_data)
-    df_power = df_power.sort_values('Number of Fractures').reset_index(drop=True)
+    df_power = df_power.sort_values(number_of_fractures_param_name).reset_index(drop=True)
     df_power.to_csv(power_csv_path, index=False)
 
     fig_pwr, ax_pwr = plt.subplots(figsize=(8, 5))
-    x_labels = [str(x) for x in df_power['Number of Fractures']]
+    x_labels = [str(x) for x in df_power[number_of_fractures_param_name]]
     y_values = df_power[f'{avg_generation_param} ({avg_generation_u})']
 
     bars = ax_pwr.bar(x_labels, y_values, color='#1f77b4', alpha=0.8, edgecolor='black')
 
-    baseline_idx = df_power.index[df_power['Number of Fractures'] == base_number_of_fractures].tolist()[0]
+    baseline_idx = df_power.index[df_power[number_of_fractures_param_name] == base_number_of_fractures].tolist()[0]
     bars[baseline_idx].set_color('green')
     bars[baseline_idx].set_edgecolor('black')
 
@@ -762,6 +763,7 @@ def generate_fervo_project_red_2026_md(
         'geophires_rmse_degc': f'{geophires_stats_alignment.rmse_degc:.2f}',
         'geophires_r2': f'{geophires_stats_alignment.r2:.4f}',
         'geophires_bias_degc': f'{geophires_stats_alignment.bias_degc:.2f}',
+        'long_term_forecast_years': _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS,
     }
 
     # Set up Jinja environment
