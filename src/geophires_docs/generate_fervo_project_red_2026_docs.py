@@ -47,6 +47,8 @@ _STATISTICAL_MIN_STD = 1.5
 
 _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS = 8
 
+_GRAPH_DPI = 300
+
 
 @dataclass
 class _StatsAlignmentResult:
@@ -351,13 +353,13 @@ def _generate_production_temperature_comparison_graph(
     output_path_stem.parent.mkdir(parents=True, exist_ok=True)
 
     ax.set_ylim(0.0, 200.0)
-    fig.savefig(f'{output_path_stem}-1.png', dpi=150, bbox_inches='tight')
+    fig.savefig(f'{output_path_stem}-1.png', dpi=_GRAPH_DPI, bbox_inches='tight')
 
     ax.set_ylim(
         175,
         185,
     )
-    fig.savefig(f'{output_path_stem}-2.png', dpi=150, bbox_inches='tight')
+    fig.savefig(f'{output_path_stem}-2.png', dpi=_GRAPH_DPI, bbox_inches='tight')
 
     plt.close(fig)
 
@@ -431,7 +433,7 @@ def _generate_long_term_forecast_graph(
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=1, frameon=False, fontsize=11)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=150, bbox_inches='tight')
+    fig.savefig(output_path, dpi=_GRAPH_DPI, bbox_inches='tight')
     plt.close(fig)
 
 
@@ -500,9 +502,11 @@ def get_long_term_geophires_profile() -> pd.Series:
 def _generate_fracture_sensitivity_graph(
     df_prod: pd.DataFrame,
     steady_state_start_years: float,
-    output_path: Path,
+    sensitivity_graph_path: Path,
     show_excluded_measured_temperatures: bool = False,
 ) -> None:
+    _log.info('Running 8-year fracture sensitivity analysis...')
+
     is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
 
     df_included = df_prod[is_steady_state]
@@ -586,14 +590,30 @@ def _generate_fracture_sensitivity_graph(
     ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
     ax.set_title('Project Red GEOPHIRES Temperature Forecast: Effective Number of Fractures Sensitivity', fontsize=13)
 
-    ax.set_xlim(0.0, _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS / 2)
-    ax.set_ylim(160, 190)
     ax.grid(True, linestyle='--', alpha=0.5)
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=150, bbox_inches='tight')
+    sensitivity_graph_path.parent.mkdir(parents=True, exist_ok=True)
+
+    def _savefig(version: int | str) -> None:
+        fig.savefig(
+            # sensitivity_graph_path,
+            sensitivity_graph_path.with_name(f'{sensitivity_graph_path.stem}-{version}').with_suffix(
+                sensitivity_graph_path.suffix
+            ),
+            dpi=_GRAPH_DPI,
+            bbox_inches='tight',
+        )
+
+    ax.set_xlim(0.0, _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS)
+    ax.set_ylim(0, 200)
+    _savefig(1)
+
+    ax.set_xlim(0.0, _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS * 0.375)
+    ax.set_ylim(160, 190)
+    _savefig(2)
+
     plt.close(fig)
 
 
@@ -753,12 +773,9 @@ def generate_fervo_project_red_2026_docs():
     )
     _log.info(f'Wrote long-term graph:     {long_term_graph_path}')
 
-    # Run Fracture Sensitivity
-    _log.info('Running 8-year fracture sensitivity analysis...')
-    sensitivity_graph_path = _get_file_path(
+    sensitivity_graph_path: Path = _get_file_path(
         f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-fracture-sensitivity.png'
     )
-
     _generate_fracture_sensitivity_graph(
         df_actual,
         _STEADY_STATE_START_YEARS,
