@@ -50,6 +50,7 @@ _STATISTICAL_MIN_STD = 1.5
 _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS = 8
 
 _GRAPH_DPI = 300
+_SAVEFIG_ARGS = {'dpi': _GRAPH_DPI, 'metadata': {'Date': None}}
 
 
 @dataclass
@@ -355,13 +356,13 @@ def _generate_production_temperature_comparison_graph(
     output_path_stem.parent.mkdir(parents=True, exist_ok=True)
 
     ax.set_ylim(0.0, 200.0)
-    fig.savefig(f'{output_path_stem}-1.png', dpi=_GRAPH_DPI, bbox_inches='tight')
+    fig.savefig(f'{output_path_stem}-1.png', bbox_inches='tight', **_SAVEFIG_ARGS)
 
     ax.set_ylim(
         175,
         185,
     )
-    fig.savefig(f'{output_path_stem}-2.png', dpi=_GRAPH_DPI, bbox_inches='tight')
+    fig.savefig(f'{output_path_stem}-2.png', bbox_inches='tight', **_SAVEFIG_ARGS)
 
     plt.close(fig)
 
@@ -435,7 +436,7 @@ def _generate_long_term_forecast_graph(
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=1, frameon=False, fontsize=11)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=_GRAPH_DPI, bbox_inches='tight')
+    fig.savefig(output_path, bbox_inches='tight', **_SAVEFIG_ARGS)
     plt.close(fig)
 
 
@@ -658,8 +659,8 @@ def _generate_fracture_sensitivity_graph(
             sensitivity_graph_path.with_name(f'{sensitivity_graph_path.stem}-{version}').with_suffix(
                 sensitivity_graph_path.suffix
             ),
-            dpi=_GRAPH_DPI,
             bbox_inches='tight',
+            **_SAVEFIG_ARGS,
         )
 
     ax.set_xlim(0.0, _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS)
@@ -719,7 +720,7 @@ def _generate_fracture_sensitivity_graph(
     ax_pwr.legend(handles=[baseline_patch, sensitivity_patch], loc='upper left', frameon=False)
 
     power_graph_path.parent.mkdir(parents=True, exist_ok=True)
-    fig_pwr.savefig(power_graph_path, dpi=_GRAPH_DPI, bbox_inches='tight')
+    fig_pwr.savefig(power_graph_path, bbox_inches='tight', **_SAVEFIG_ARGS)
     plt.close(fig_pwr)
 
     return df_power
