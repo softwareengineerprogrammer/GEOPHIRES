@@ -504,6 +504,7 @@ def _generate_fracture_sensitivity_graph(
     steady_state_start_years: float,
     sensitivity_graph_path: Path,
     show_excluded_measured_temperatures: bool = False,
+    calculate_stats: bool = True,
 ) -> None:
     _log.info('Running 8-year fracture sensitivity analysis...')
 
@@ -542,7 +543,13 @@ def _generate_fracture_sensitivity_graph(
     base_input_params: GeophiresInputParameters = get_project_red_input_params_and_result()[0]
     base_number_of_fractures = int(_get_input_parameters_dict(base_input_params)[number_of_fractures_param_name])
 
-    fracture_counts = [base_number_of_fractures, 57, 60, 66, 69]
+    fracture_counts = [
+        base_number_of_fractures,
+        base_number_of_fractures - 6,
+        base_number_of_fractures - 3,
+        base_number_of_fractures + 3,
+        base_number_of_fractures + 6,
+    ]
     client = GeophiresXClient()
 
     colors = {
@@ -555,6 +562,13 @@ def _generate_fracture_sensitivity_graph(
     line_styles = {
         base_number_of_fractures: '-.',
     }
+
+    if calculate_stats:
+        _log.info(
+            f'--- FRACTURE SENSITIVITY STATISTICAL ALIGNMENT (Steady-State > {steady_state_start_years} Years) ---'
+        )
+        y_true = df_included['Temperature_C'].values
+        ss_tot = float(np.sum((y_true - np.mean(y_true)) ** 2))
 
     for frac_count in fracture_counts:
         input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
@@ -573,6 +587,17 @@ def _generate_fracture_sensitivity_graph(
 
         geophires_x = [float(step) / float(time_steps_per_year) for step, _ in enumerate(profile)]
         geophires_y = [q.magnitude for q in profile]
+
+        if calculate_stats and not df_included.empty:
+            geo_interp = interp1d(geophires_x, geophires_y, kind='linear', fill_value='extrapolate')
+            y_geo = geo_interp(df_included['Time_Years'])
+
+            rmse_g = float(np.sqrt(((y_true - y_geo) ** 2).mean()))
+            bias_g = float((y_geo - y_true).mean())
+            ss_res_g = float(np.sum((y_true - y_geo) ** 2))
+            r2_g = 1.0 - (ss_res_g / ss_tot) if ss_tot != 0.0 else 0.0
+
+            _log.info(f'{frac_count} Fractures: RMSE={rmse_g:.2f}°C, R²={r2_g:.4f}, Bias={bias_g:.2f}°C')
 
         label_prefix = 'GEOPHIRES: ' if frac_count == base_number_of_fractures else ''
         label_suffix = ' (Baseline)' if frac_count == base_number_of_fractures else ''
@@ -598,7 +623,6 @@ def _generate_fracture_sensitivity_graph(
 
     def _savefig(version: int | str) -> None:
         fig.savefig(
-            # sensitivity_graph_path,
             sensitivity_graph_path.with_name(f'{sensitivity_graph_path.stem}-{version}').with_suffix(
                 sensitivity_graph_path.suffix
             ),
