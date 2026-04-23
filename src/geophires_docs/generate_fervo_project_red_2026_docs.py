@@ -547,6 +547,86 @@ def generate_fervo_project_red_2026_md(
     _log.info(f'✓ Generated {output_file}')
 
 
+def _generate_fracture_sensitivity_graph(
+    df_prod: pd.DataFrame,
+    steady_state_start_years: float,
+    output_path: Path,
+) -> None:
+    is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
+
+    df_included = df_prod[is_steady_state]
+    df_excluded = df_prod[~is_steady_state]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    ax.scatter(
+        df_included['Time_Years'],
+        df_included['Temperature_C'],
+        facecolors='none',
+        edgecolors='#d62728',
+        s=22,
+        linewidths=1.0,
+        alpha=0.85,
+        label='Measured Temperature (Steady State)',
+    )
+
+    if not df_excluded.empty:
+        ax.scatter(
+            df_excluded['Time_Years'],
+            df_excluded['Temperature_C'],
+            facecolors='none',
+            edgecolors='gray',
+            s=22,
+            linewidths=1.0,
+            alpha=0.5,
+            label='Measured Temperature (Thermal Conditioning & Transient Operations)',
+        )
+
+    fracture_counts = [40, 63, 80, 100]
+    client = GeophiresXClient()
+
+    colors = {40: '#1f77b4', 63: 'green', 80: '#ff7f0e', 100: '#9467bd'}
+    line_styles = {40: ':', 63: '-.', 80: '--', 100: '-'}
+
+    for frac_count in fracture_counts:
+        input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
+            from_file_path=_get_file_path('../../tests/examples/Fervo_Project_Red-2026.txt'),
+            params={'Plant Lifetime': 8, 'Print Output to Console': 0, 'Number of Fractures': frac_count},
+        )
+        result: GeophiresXResult = client.get_geophires_result(input_params)
+
+        profile = _get_full_production_temperature_profile((input_params, result))
+        time_steps_per_year: int = int(_get_input_parameters_dict(input_params)['Time steps per year'])
+
+        geophires_x = [float(step) / float(time_steps_per_year) for step, _ in enumerate(profile)]
+        geophires_y = [q.magnitude for q in profile]
+
+        label_suffix = ' (Baseline)' if frac_count == 63 else ''
+
+        ax.plot(
+            geophires_x,
+            geophires_y,
+            color=colors[frac_count],
+            linestyle=line_styles[frac_count],
+            linewidth=1.5 if frac_count != 63 else 2.0,
+            label=f'GEOPHIRES: {frac_count} Fractures{label_suffix}',
+        )
+
+    ax.set_xlabel('Time (Years)', fontsize=12)
+    ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
+    ax.set_title('Project Red GEOPHIRES Temperature Forecast: Number of Fractures Sensitivity', fontsize=13)
+
+    ax.set_xlim(0.0, 8.0)
+    ax.set_ylim(0.0, 200.0)
+    ax.grid(True, linestyle='--', alpha=0.5)
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close(fig)
+
+
 def generate_fervo_project_red_2026_docs():
     IMAGE_PATH = _get_file_path('../../docs/_images/fervo-project-red-2026_figure-5_measured-flowing-temperature.png')
     PRODUCTION_IMAGE_PATH = _get_file_path(
@@ -647,6 +727,19 @@ def generate_fervo_project_red_2026_docs():
         long_term_graph_path,
     )
     _log.info(f'Wrote long-term graph:     {long_term_graph_path}')
+
+    # Run Fracture Sensitivity
+    _log.info('Running 8-year fracture sensitivity analysis...')
+    sensitivity_graph_path = _get_file_path(
+        f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-fracture-sensitivity.png'
+    )
+
+    _generate_fracture_sensitivity_graph(
+        df_actual,
+        _STEADY_STATE_START_YEARS,
+        sensitivity_graph_path,
+    )
+    _log.info(f'Wrote sensitivity graph:   {sensitivity_graph_path}')
 
     generate_fervo_project_red_2026_md(
         *get_project_red_input_params_and_result(), fervo_stat_result, geophires_stat_result
