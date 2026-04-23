@@ -529,6 +529,7 @@ def _generate_fracture_sensitivity_graph(
         f'Running {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS}-year fracture sensitivity analysis (including power generation)...'
     )
 
+    # noinspection DuplicatedCode
     is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
 
     df_included = df_prod[is_steady_state]
@@ -598,20 +599,13 @@ def _generate_fracture_sensitivity_graph(
         result: GeophiresXResult = client.get_geophires_result(input_params)
 
         avg_generation_param: str = 'Average Annual Net Electricity Generation'
-        avg_generation_vu: dict[str, Any] = result.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
-            avg_generation_param
-            # 'Average Net Electricity Generation'
-        ]
+        avg_generation_vu: dict[str, Any] = result.result['SURFACE EQUIPMENT SIMULATION RESULTS'][avg_generation_param]
         avg_generation_u = 'GWh'
         avg_generation_v: float = (
-            PlainQuantity(avg_generation_vu['value'], avg_generation_vu['unit'])
-            .to(
-                avg_generation_u
-                #'MW'
-            )
-            .magnitude
+            PlainQuantity(avg_generation_vu['value'], avg_generation_vu['unit']).to(avg_generation_u).magnitude
         )
 
+        # noinspection DuplicatedCode
         profile = _get_full_production_temperature_profile((input_params, result))
         time_steps_per_year: int = int(_get_input_parameters_dict(input_params)['Time steps per year'])
 

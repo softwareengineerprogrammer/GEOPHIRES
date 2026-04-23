@@ -124,9 +124,9 @@ geometry for the Project Red simulation are detailed below:
 | :--- | :--- | :--- |
 | Number of Fractures | `{{ input_params['Number of Fractures'] }}` | {{ input_params_comments['Number of Fractures'] }} |
 | Fracture Shape | `{{ input_params['Fracture Shape'] }}` | {{ input_params_comments['Fracture Shape'] }} |
-| Fracture Height | `{{ input_params['Fracture Height'] }}` | {{ input_params_comments['Fracture Height'] }} |
-| Fracture Width | `{{ input_params['Fracture Width'] }}` | {{ input_params_comments['Fracture Width'] }} |
-| Fracture Separation | `{{ input_params['Fracture Separation'] }} meter` | {{ input_params_comments['Fracture Separation'] }} |
+| Fracture Height | `{{ input_params['Fracture Height'] | replace("foot", "feet") }}` | {{ input_params_comments['Fracture Height'] }} |
+| Fracture Width | `{{ input_params['Fracture Width'] | replace("foot", "feet") }}` | {{ input_params_comments['Fracture Width'] }} |
+| Fracture Separation | `{{ input_params['Fracture Separation'] }} meters` | {{ input_params_comments['Fracture Separation'] }} |
 
 .. raw:: html
 
