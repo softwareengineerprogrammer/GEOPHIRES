@@ -501,6 +501,7 @@ def _generate_fracture_sensitivity_graph(
     df_prod: pd.DataFrame,
     steady_state_start_years: float,
     output_path: Path,
+    show_excluded_measured_temperatures: bool = False,
 ) -> None:
     is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
 
@@ -520,7 +521,7 @@ def _generate_fracture_sensitivity_graph(
         label='Measured Temperature (Steady State)',
     )
 
-    if not df_excluded.empty:
+    if not df_excluded.empty and show_excluded_measured_temperatures:
         ax.scatter(
             df_excluded['Time_Years'],
             df_excluded['Temperature_C'],
@@ -546,7 +547,12 @@ def _generate_fracture_sensitivity_graph(
         fracture_counts[2]: '#ff7f0e',
         fracture_counts[3]: '#9467bd',
     }
-    line_styles = {fracture_counts[0]: ':', fracture_counts[1]: '-.', fracture_counts[2]: '--', fracture_counts[3]: '-'}
+    line_styles = {
+        # fracture_counts[0]: ':',
+        base_number_of_fractures: '-.',
+        # fracture_counts[2]: '--',
+        # fracture_counts[3]: '-'
+    }
 
     for frac_count in fracture_counts:
         input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
@@ -572,8 +578,8 @@ def _generate_fracture_sensitivity_graph(
             geophires_x,
             geophires_y,
             color=colors[frac_count],
-            linestyle=line_styles[frac_count],
-            linewidth=1.5 if frac_count != 63 else 2.0,
+            linestyle=line_styles.get(frac_count, ':'),
+            linewidth=1.5 if frac_count != base_number_of_fractures else 2.0,
             label=f'GEOPHIRES: {frac_count} Fractures{label_suffix}',
         )
 
