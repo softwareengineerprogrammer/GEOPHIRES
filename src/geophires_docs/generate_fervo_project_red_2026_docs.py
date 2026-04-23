@@ -537,11 +537,16 @@ def _generate_fracture_sensitivity_graph(
     base_input_params: GeophiresInputParameters = get_project_red_input_params_and_result()[0]
     base_number_of_fractures = int(_get_input_parameters_dict(base_input_params)[number_of_fractures_param_name])
 
-    fracture_counts = [40, base_number_of_fractures, 80, 100]
+    fracture_counts = [60, base_number_of_fractures, 66, 73]
     client = GeophiresXClient()
 
-    colors = {40: '#1f77b4', 63: 'green', 80: '#ff7f0e', 100: '#9467bd'}
-    line_styles = {40: ':', 63: '-.', 80: '--', 100: '-'}
+    colors = {
+        fracture_counts[0]: '#1f77b4',
+        base_number_of_fractures: 'green',
+        fracture_counts[2]: '#ff7f0e',
+        fracture_counts[3]: '#9467bd',
+    }
+    line_styles = {fracture_counts[0]: ':', fracture_counts[1]: '-.', fracture_counts[2]: '--', fracture_counts[3]: '-'}
 
     for frac_count in fracture_counts:
         input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
@@ -576,8 +581,8 @@ def _generate_fracture_sensitivity_graph(
     ax.set_ylabel('Flowing Temperature (°C)', fontsize=12)
     ax.set_title('Project Red GEOPHIRES Temperature Forecast: Number of Fractures Sensitivity', fontsize=13)
 
-    ax.set_xlim(0.0, 8.0)
-    ax.set_ylim(0.0, 200.0)
+    ax.set_xlim(0.0, _LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS)
+    ax.set_ylim(75, 190)
     ax.grid(True, linestyle='--', alpha=0.5)
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
