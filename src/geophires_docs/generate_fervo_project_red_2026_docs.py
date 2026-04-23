@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+from pint.facets.plain import PlainQuantity
 from scipy.interpolate import interp1d
 from scipy.ndimage import maximum_filter
 
@@ -503,10 +504,14 @@ def _generate_fracture_sensitivity_graph(
     df_prod: pd.DataFrame,
     steady_state_start_years: float,
     sensitivity_graph_path: Path,
+    power_graph_path: Path,
+    power_csv_path: Path,
     show_excluded_measured_temperatures: bool = False,
     calculate_stats: bool = True,
-) -> None:
-    _log.info('Running 8-year fracture sensitivity analysis...')
+) -> pd.DataFrame:
+    import matplotlib.patches as mpatches
+
+    _log.info('Running 8-year fracture sensitivity analysis (including power generation)...')
 
     is_steady_state = _get_steady_state_mask(df_prod, steady_state_start_years)
 
@@ -570,6 +575,8 @@ def _generate_fracture_sensitivity_graph(
         y_true = df_included['Temperature_C'].values
         ss_tot = float(np.sum((y_true - np.mean(y_true)) ** 2))
 
+    power_data = []
+
     for frac_count in fracture_counts:
         input_params: GeophiresInputParameters = ImmutableGeophiresInputParameters(
             from_file_path=base_input_params.as_file_path(),
@@ -582,11 +589,36 @@ def _generate_fracture_sensitivity_graph(
         )
         result: GeophiresXResult = client.get_geophires_result(input_params)
 
+        avg_generation_param: str = 'Average Annual Net Electricity Generation'
+        avg_generation_vu: dict[str, Any] = result.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
+            avg_generation_param
+            # 'Average Net Electricity Generation'
+        ]
+        avg_generation_u = 'GWh'
+        avg_generation_v: float = (
+            PlainQuantity(avg_generation_vu['value'], avg_generation_vu['unit'])
+            .to(
+                avg_generation_u
+                #'MW'
+            )
+            .magnitude
+        )
+
         profile = _get_full_production_temperature_profile((input_params, result))
         time_steps_per_year: int = int(_get_input_parameters_dict(input_params)['Time steps per year'])
 
         geophires_x = [float(step) / float(time_steps_per_year) for step, _ in enumerate(profile)]
         geophires_y = [q.magnitude for q in profile]
+
+        final_temp_degc = float(geophires_y[-1]) if geophires_y else 0.0
+        power_data.append(
+            {
+                'Number of Fractures': frac_count,
+                #'Average Net Electricity Production (MW)': avg_generation_v,
+                f'{avg_generation_param} ({avg_generation_u})': avg_generation_v,
+                f'Year {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS} Flowing Temperature (°C)': final_temp_degc,
+            }
+        )
 
         if calculate_stats and not df_included.empty:
             geo_interp = interp1d(geophires_x, geophires_y, kind='linear', fill_value='extrapolate')
@@ -616,7 +648,6 @@ def _generate_fracture_sensitivity_graph(
     ax.set_title('Project Red GEOPHIRES Temperature Forecast: Effective Number of Fractures Sensitivity', fontsize=13)
 
     ax.grid(True, linestyle='--', alpha=0.5)
-
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
 
     sensitivity_graph_path.parent.mkdir(parents=True, exist_ok=True)
@@ -639,6 +670,59 @@ def _generate_fracture_sensitivity_graph(
     _savefig(2)
 
     plt.close(fig)
+
+    df_power = pd.DataFrame(power_data)
+    df_power = df_power.sort_values('Number of Fractures').reset_index(drop=True)
+    df_power.to_csv(power_csv_path, index=False)
+
+    fig_pwr, ax_pwr = plt.subplots(figsize=(8, 5))
+    x_labels = [str(x) for x in df_power['Number of Fractures']]
+    y_values = df_power[f'{avg_generation_param} ({avg_generation_u})']
+
+    bars = ax_pwr.bar(x_labels, y_values, color='#1f77b4', alpha=0.8, edgecolor='black')
+
+    baseline_idx = df_power.index[df_power['Number of Fractures'] == base_number_of_fractures].tolist()[0]
+    bars[baseline_idx].set_color('green')
+    bars[baseline_idx].set_edgecolor('black')
+
+    ax_pwr.set_xlabel('Effective Number of Fractures', fontsize=12)
+    ax_pwr.set_ylabel(f'{avg_generation_param} ({avg_generation_u})', fontsize=12)
+    ax_pwr.set_title(
+        f'GEOPHIRES: {_LONG_TERM_FORECAST_PLANT_LIFETIME_YEARS}-Year Average Power Production by Fracture Count',
+        fontsize=13,
+    )
+
+    y_max = y_values.max()
+    y_min = y_values.min()
+    y_padding = (y_max - y_min) * 0.4
+    if y_padding == 0:
+        y_padding = max(y_max * 0.1, 1.0)
+    ax_pwr.set_ylim(max(0.0, y_min - y_padding), y_max + y_padding)
+
+    for bar in bars:
+        height = bar.get_height()
+        ax_pwr.annotate(
+            f'{height:.2f} {avg_generation_u}',
+            xy=(bar.get_x() + bar.get_width() / 2, height),
+            xytext=(0, 4),
+            textcoords='offset points',
+            ha='center',
+            va='bottom',
+            fontsize=11,
+        )
+
+    ax_pwr.grid(True, axis='y', linestyle='--', alpha=0.5)
+
+    # FIXME WIP - fix legend positioning (currently overlaps bars)
+    baseline_patch = mpatches.Patch(color='green', label='Baseline Model')
+    sensitivity_patch = mpatches.Patch(color='#1f77b4', alpha=0.8, label='Sensitivity Cases')
+    ax_pwr.legend(handles=[baseline_patch, sensitivity_patch], loc='lower right', frameon=False)
+
+    power_graph_path.parent.mkdir(parents=True, exist_ok=True)
+    fig_pwr.savefig(power_graph_path, dpi=_GRAPH_DPI, bbox_inches='tight')
+    plt.close(fig_pwr)
+
+    return df_power
 
 
 def generate_fervo_project_red_2026_md(
@@ -797,15 +881,14 @@ def generate_fervo_project_red_2026_docs():
     )
     _log.info(f'Wrote long-term graph:     {long_term_graph_path}')
 
-    sensitivity_graph_path: Path = _get_file_path(
-        f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-fracture-sensitivity.png'
-    )
-    _generate_fracture_sensitivity_graph(
+    _df_power_sensitivity = _generate_fracture_sensitivity_graph(
         df_actual,
         _STEADY_STATE_START_YEARS,
-        sensitivity_graph_path,
+        _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-fracture-sensitivity.png'),
+        _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-power-sensitivity.png'),
+        _BUILD_DIR / 'project_red_2026_power_sensitivity.csv',
     )
-    _log.info(f'Wrote sensitivity graph:   {sensitivity_graph_path}')
+    _log.info('Wrote sensitivity graphs and power data')
 
     generate_fervo_project_red_2026_md(
         *get_project_red_input_params_and_result(), fervo_stat_result, geophires_stat_result
