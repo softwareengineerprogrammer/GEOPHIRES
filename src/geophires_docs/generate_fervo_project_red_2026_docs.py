@@ -713,10 +713,9 @@ def _generate_fracture_sensitivity_graph(
 
     ax_pwr.grid(True, axis='y', linestyle='--', alpha=0.5)
 
-    # FIXME WIP - fix legend positioning (currently overlaps bars)
     baseline_patch = mpatches.Patch(color='green', label='Baseline Model')
     sensitivity_patch = mpatches.Patch(color='#1f77b4', alpha=0.8, label='Sensitivity Cases')
-    ax_pwr.legend(handles=[baseline_patch, sensitivity_patch], loc='lower right', frameon=False)
+    ax_pwr.legend(handles=[baseline_patch, sensitivity_patch], loc='upper left', frameon=False)
 
     power_graph_path.parent.mkdir(parents=True, exist_ok=True)
     fig_pwr.savefig(power_graph_path, dpi=_GRAPH_DPI, bbox_inches='tight')
