@@ -134,6 +134,7 @@ geometry for the Project Red simulation are detailed below:
 
 Note that these parameters represent a simplified, homogenized analytical equivalent of a highly complex, heterogeneous subsurface fracture network.
 Further relevant detailed discussion can be found in the [Cape Station case study methodology section](Fervo_Project_Cape-5.html#calibration-with-fervo-implemented-field-design).
+See also the [effective number of fractures sensitivity analysis below](#sensitivity-analysis-effective-number-of-fractures-section).
 
 ## Results
 
@@ -191,13 +192,16 @@ the initial two-year plateau, which eventually accelerates into a more pronounce
 When interpreting the trailing edge of the empirical dataset, minor deviations between the extracted data and the
 forecast curve are to be expected given the inherent imprecision of image-based data digitization and the presence of
 localized wellbore transients.
-Because Fervo has explicitly characterized this two-year operational period as demonstrating highly stable
-flowing temperatures with marginal to no actual reservoir drawdown, the GEOPHIRES parameterization
-deliberately favors a stabilized, slightly more optimistic decline curve rather than overfitting to potential
-extraction artifacts.
-This 8-year forecast establishes a testable predictive baseline, which can be further rigorously validated, tuned,
-and recalibrated as additional multi-year operational data becomes available
-to determine if late-stage variations represent minor transients or the onset of non-linear geological thresholds.
+Because Fervo has explicitly characterized this two-year operational period as demonstrating highly stable flowing
+temperatures with marginal to no actual reservoir drawdown, the GEOPHIRES parameterization deliberately favors a
+stabilized, slightly more optimistic decline curve rather than overfitting to potential extraction artifacts.
+
+While this 8-year forecast establishes a testable predictive baseline, understanding the true bounds of this decline
+requires accounting for inherent subsurface uncertainty.
+To explore how variations in reservoir geometry might accelerate or delay the onset of this long-term drawdown, the
+following sensitivity analysis expands our single baseline into a predictive envelope.
+
+<div id="sensitivity-analysis-effective-number-of-fractures-section"></div>
 
 #### Sensitivity Analysis: Effective Number of Fractures
 
