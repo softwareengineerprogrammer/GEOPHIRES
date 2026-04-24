@@ -31,7 +31,7 @@ _BUILD_DIR: Path = _PROJECT_ROOT / 'build' / 'generate_fervo_project_red_2026_do
 
 _PRODUCTION_CSV_FILENAME = 'project_red_2026_production_data.csv'
 _MODEL_CSV_FILENAME = 'project_red_2026_model_data.csv'
-_STEADY_STATE_CSV_FILENAME = 'project_red_2026_variance_analysis.csv'
+_VARIANCE_ANALYSIS_CSV_FILENAME = 'project_red_2026_variance_analysis.csv'
 _GENERATED_GRAPH_FILENAME_STEM = 'fervo_project_red-2026_production-temperature-data-vs-modeling'
 
 _STEADY_STATE_START_YEARS = 0.041625
@@ -268,7 +268,6 @@ def _get_steady_state_mask(df_prod: pd.DataFrame, steady_state_start_years: floa
 def _generate_production_temperature_comparison_graph(
     production_csv_path: Path,
     model_csv_path: Path,
-    steady_state_csv_path: Path,
     output_path_stem: Path,
     steady_state_start_years: float = _STEADY_STATE_START_YEARS,
     geophires_data: pd.Series | None = None,
@@ -803,7 +802,7 @@ def generate_fervo_project_red_2026_docs():
     _BUILD_DIR.mkdir(parents=True, exist_ok=True)
     production_csv_path_ = _BUILD_DIR / _PRODUCTION_CSV_FILENAME
     model_csv_path_ = _BUILD_DIR / _MODEL_CSV_FILENAME
-    steady_state_csv_path = _BUILD_DIR / _STEADY_STATE_CSV_FILENAME
+    variance_analysis_csv_path = _BUILD_DIR / _VARIANCE_ANALYSIS_CSV_FILENAME
     generated_graph_path_stem = _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}')
 
     _log.info('Extracting data from image...')
@@ -867,14 +866,13 @@ def generate_fervo_project_red_2026_docs():
     df_variance['Fervo_Modeled_Temperature_C'] = model_interpolator(df_variance['Time_Years'])
     df_variance['GEOPHIRES_Modeled_Temperature_C'] = geo_interp(df_variance['Time_Years'])
 
-    df_variance.to_csv(steady_state_csv_path, index=False)
+    df_variance.to_csv(variance_analysis_csv_path, index=False)
 
     _tab = '    '
 
     _generate_production_temperature_comparison_graph(
         production_csv_path_,
         model_csv_path_,
-        steady_state_csv_path,
         generated_graph_path_stem,
         geophires_data=geophires_series,
         fervo_modeled_stats_caption=f'\n{_tab}{fervo_modeled_stats_caption}\n',
