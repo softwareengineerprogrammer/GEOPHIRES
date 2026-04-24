@@ -470,7 +470,6 @@ def get_project_red_production_temperature_profile_series(
     pd.Series,
     Any,  # interpolator
 ]:
-
     input_and_result = get_project_red_input_params_and_result()
     input_params: GeophiresInputParameters = input_and_result[0]
 
@@ -527,6 +526,7 @@ def _generate_fracture_sensitivity_graph(
     sensitivity_graph_path: Path,
     power_graph_path: Path,
     power_csv_path: Path,
+    df_variance: pd.DataFrame | None = None,
     show_excluded_measured_temperatures: bool = False,
     calculate_stats: bool = True,
 ) -> pd.DataFrame:
@@ -626,24 +626,27 @@ def _generate_fracture_sensitivity_graph(
             }
         )
 
-        label_prefix = 'GEOPHIRES: ' if frac_count == base_number_of_fractures else ''
-        label_suffix = ' (Baseline)' if frac_count == base_number_of_fractures else ''
-
         if calculate_stats and not df_included.empty:
             geo_interp = interp1d(geophires_x, geophires_y, kind='linear', fill_value='extrapolate')
             y_geo = geo_interp(df_included['Time_Years'])
 
+            if df_variance is not None:
+                df_variance[f'GEOPHIRES_Modeled_Temperature_C_{frac_count}_Fractures'] = geo_interp(
+                    df_variance['Time_Years']
+                )
+
+            rmse_g = float(np.sqrt(((y_true - y_geo) ** 2).mean()))
+            bias_g = float((y_geo - y_true).mean())
             ss_res_g = float(np.sum((y_true - y_geo) ** 2))
+            r2_g = 1.0 - (ss_res_g / ss_tot) if ss_tot != 0.0 else 0.0
 
-            calculated_stats = _StatsAlignmentResult(
-                rmse_degc=float(np.sqrt(((y_true - y_geo) ** 2).mean())),
-                bias_degc=float((y_geo - y_true).mean()),
-                r2=1.0 - (ss_res_g / ss_tot) if ss_tot != 0.0 else 0.0,
-            )
+            if df_variance is not None:
+                df_variance.loc[0, f'GEOPHIRES_R2_{frac_count}_Fractures'] = r2_g
 
-            _log.info(f'{frac_count} Fractures: {calculated_stats.as_caption}')
+            _log.info(f'{frac_count} Fractures: RMSE={rmse_g:.2f}°C, R²={r2_g:.4f}, Bias={bias_g:.2f}°C')
 
-            label_suffix += f' (R²={calculated_stats.r2:.4f})'
+        label_prefix = 'GEOPHIRES: ' if frac_count == base_number_of_fractures else ''
+        label_suffix = ' (Baseline)' if frac_count == base_number_of_fractures else ''
 
         ax.plot(
             geophires_x,
@@ -742,7 +745,6 @@ def generate_fervo_project_red_2026_md(
     geophires_stats_alignment: _StatsAlignmentResult,
     project_root: Path = _PROJECT_ROOT,
 ) -> None:
-
     result_values: dict[str, Any] = {}  # get_result_values(result)
 
     def _get_input_params_dict_with_nbsp() -> dict[str, Any]:
@@ -864,9 +866,10 @@ def generate_fervo_project_red_2026_docs():
         df_model_['Time_Years'], df_model_['Temperature_C'], kind='linear', fill_value='extrapolate'
     )
     df_variance['Fervo_Modeled_Temperature_C'] = model_interpolator(df_variance['Time_Years'])
-    df_variance['GEOPHIRES_Modeled_Temperature_C'] = geo_interp(df_variance['Time_Years'])
+    df_variance.loc[0, 'Fervo_R2'] = fervo_stat_result.r2
 
-    df_variance.to_csv(variance_analysis_csv_path, index=False)
+    df_variance['GEOPHIRES_Modeled_Temperature_C'] = geo_interp(df_variance['Time_Years'])
+    df_variance.loc[0, 'GEOPHIRES_R2'] = geophires_stat_result.r2
 
     _tab = '    '
 
@@ -899,8 +902,12 @@ def generate_fervo_project_red_2026_docs():
         _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-fracture-sensitivity.png'),
         _get_file_path(f'../../docs/_images/{_GENERATED_GRAPH_FILENAME_STEM}-power-sensitivity.png'),
         _BUILD_DIR / 'project_red_2026_power_sensitivity.csv',
+        df_variance=df_variance,
     )
     _log.info('Wrote sensitivity graphs and power data')
+
+    df_variance.to_csv(variance_analysis_csv_path, index=False)
+    _log.info(f'Wrote variance analysis CSV: {variance_analysis_csv_path}')
 
     generate_fervo_project_red_2026_md(
         *get_project_red_input_params_and_result(), fervo_stat_result, geophires_stat_result
