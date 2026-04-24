@@ -627,19 +627,24 @@ def _generate_fracture_sensitivity_graph(
             }
         )
 
+        label_prefix = 'GEOPHIRES: ' if frac_count == base_number_of_fractures else ''
+        label_suffix = ' (Baseline)' if frac_count == base_number_of_fractures else ''
+
         if calculate_stats and not df_included.empty:
             geo_interp = interp1d(geophires_x, geophires_y, kind='linear', fill_value='extrapolate')
             y_geo = geo_interp(df_included['Time_Years'])
 
-            rmse_g = float(np.sqrt(((y_true - y_geo) ** 2).mean()))
-            bias_g = float((y_geo - y_true).mean())
             ss_res_g = float(np.sum((y_true - y_geo) ** 2))
-            r2_g = 1.0 - (ss_res_g / ss_tot) if ss_tot != 0.0 else 0.0
 
-            _log.info(f'{frac_count} Fractures: RMSE={rmse_g:.2f}°C, R²={r2_g:.4f}, Bias={bias_g:.2f}°C')
+            calculated_stats = _StatsAlignmentResult(
+                rmse_degc=float(np.sqrt(((y_true - y_geo) ** 2).mean())),
+                bias_degc=float((y_geo - y_true).mean()),
+                r2=1.0 - (ss_res_g / ss_tot) if ss_tot != 0.0 else 0.0,
+            )
 
-        label_prefix = 'GEOPHIRES: ' if frac_count == base_number_of_fractures else ''
-        label_suffix = ' (Baseline)' if frac_count == base_number_of_fractures else ''
+            _log.info(f'{frac_count} Fractures: {calculated_stats.as_caption}')
+
+            label_suffix += f' (R²={calculated_stats.r2:.4f})'
 
         ax.plot(
             geophires_x,
