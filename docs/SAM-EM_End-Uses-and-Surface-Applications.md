@@ -1,3 +1,22 @@
+.. raw:: html
+
+    <style type="text/css">
+        a.image-reference {
+            max-width: 66%;
+        }
+
+        a.image-reference > img, a.image-reference > img:active {
+            max-width: 100%;
+        }
+
+        a.image-reference {
+          display: block;
+          margin: auto;
+          align-content: center;
+        }
+
+    </style>
+
 # SAM Economic Models: End Uses and Surface Applications
 
 [SAM Economic Models](SAM-Economic-Models.html) support a variety of geothermal end-use options and surface applications.
@@ -43,6 +62,10 @@ costs were omitted.
 
 Combined Heat and Power (CHP) end-uses simulate both electricity and direct-use heat generation.
 The model outputs allocated metrics for both product streams, including `Electricity CAPEX ($/kWe)`, `Heat CAPEX ($/kWth)`, LCOE, and LCOH.
+
+*Schematic of a GEOPHIRES Combined Heat and Power (CHP) Topping Cycle. High-temperature geofluid first drives electricity generation in the upstream power plant before residual heat is extracted for direct-use applications prior to reinjection:*
+
+![](_images/chp-topping-diagram.png)
 
 ### CHP Cost Allocation Ratio
 
