@@ -151,7 +151,7 @@ SAM Economic Models support a variety of geothermal end-use options and surface 
 * **Cogeneration** (Combined Heat and Power; CHP)
 * **Cooling** (Absorption Chiller)
 
-For detailed information on how these different configurations are modeled financially—including cash flow reporting adjustments, CHP cost allocation methodologies, and configuration-specific examples—see the [SAM Economic Models: End Uses and Surface Applications documentation](SAM-EM_End-Uses-and-Surface-Applications.html).
+For detailed information on how these different configurations are modeled financially, including cash flow reporting adjustments, CHP cost allocation methodologies, and configuration-specific examples, see the [SAM Economic Models: End Uses and Surface Applications documentation](SAM-EM_End-Uses-and-Surface-Applications.html).
 
 ## Examples
 
