@@ -1350,6 +1350,24 @@
       "minimum": 0.0,
       "maximum": 1
     },
+    "Project Latitude": {
+      "description": "Latitude of the project location.",
+      "type": "number",
+      "units": null,
+      "category": "Surface Plant",
+      "default": 0.0,
+      "minimum": -90,
+      "maximum": 90
+    },
+    "Project Longitude": {
+      "description": "Longitude of the project location.",
+      "type": "number",
+      "units": null,
+      "category": "Surface Plant",
+      "default": 0.0,
+      "minimum": -180,
+      "maximum": 180
+    },
     "Dead-state Pressure": {
       "description": "",
       "type": "number",
