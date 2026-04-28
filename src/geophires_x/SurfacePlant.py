@@ -472,6 +472,26 @@ class SurfacePlant:
             ToolTipText="Dynamic viscosity of the working fluid"
         )
 
+        self.project_latitude = self.ParameterDict[self.project_latitude.Name] = floatParameter(
+            "Project Latitude",
+            UnitType=Units.NONE,
+            CurrentUnits=Units.NONE,
+            PreferredUnits=Units.NONE,
+            Min=-90,
+            Max=90,
+            ToolTipText="Latitude of the project location."
+        )
+        self.project_longitude = self.ParameterDict[self.project_longitude.Name] = floatParameter(
+            "Project Longitude",
+            UnitType=Units.NONE,
+            CurrentUnits=Units.NONE,
+            PreferredUnits=Units.NONE,
+            Min=-180,
+            Max=180,
+            ToolTipText="Longitude of the project location."
+        )
+
+
         # local variable initialization
         self.setinjectionpressurefixed = False
         sclass = str(__class__).replace("<class \'", "")
