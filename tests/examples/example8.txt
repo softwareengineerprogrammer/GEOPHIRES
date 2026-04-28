@@ -43,6 +43,9 @@ Surface Temperature,20,		  				---[deg.C]
 Ambient Temperature,20,		 				---[deg.C]
 Electricity Rate,0.1,						---Electricity rate for pumping power [$/kWh]
 
+Project Latitude, 42.441977082209235, -- Estimated location; https://www.google.com/maps/search/?api=1&query=42.441977082209235,76.43242140337269
+Project Longitude, -76.43242140337269
+
 ***FINANCIAL PARAMETERS***
 **************************
 Plant Lifetime,30,			  			---[years]
