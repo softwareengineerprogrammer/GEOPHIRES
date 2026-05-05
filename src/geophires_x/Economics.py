@@ -3317,8 +3317,13 @@ class Economics:
                 self.Cplant.value = self.ccplantfixed.value  # TODO unit conversion
 
                 # TODO compute self.CAPEX_heat_electricity_plant_ratio.Valid property instead
-                is_cogen_plant_capex_ratio_valid: bool = self.CAPEX_heat_electricity_plant_ratio.Provided \
-                                                         and self.CAPEX_heat_electricity_plant_ratio.value != -1
+                is_cogen_plant_capex_ratio_valid: bool = (
+                        not model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option
+                        or (
+                                self.CAPEX_heat_electricity_plant_ratio.Provided \
+                                and self.CAPEX_heat_electricity_plant_ratio.value != -1
+                        )
+                )
 
                 if not is_cogen_plant_capex_ratio_valid:
                     # TODO enhance message user-friendliness
