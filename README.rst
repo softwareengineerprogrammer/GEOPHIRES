@@ -324,6 +324,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SHR-2.txt <tests/examples/example_SHR-2.txt>`__
      - `.out <tests/examples/example_SHR-2.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-2>`__
+   * - Superhot Rock (SHR) Example 3 (`analysis <https://scientificwebservices.com/shr/VERTICAL_LARGE_IDEAL_ADJUSTED/graphs/graphs.html>`__)
+     - `example_SHR-3.txt <tests/examples/example_SHR-3.txt>`__
+     - `.out <tests/examples/example_SHR-3.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-3>`__
    * - SAM Single Owner PPA: 50 MWe (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html>`__)
      - `example_SAM-single-owner-PPA.txt <tests/examples/example_SAM-single-owner-PPA.txt>`__
      - `.out <tests/examples/example_SAM-single-owner-PPA.out>`__
