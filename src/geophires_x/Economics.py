@@ -2975,7 +2975,8 @@ class Economics:
                 else:
                     input_vert_depth_km = model.reserv.InputDepth.quantity().to('km').magnitude
                     output_vert_depth_km = model.reserv.OutputDepth.quantity().to('km').magnitude
-                model.wellbores.injection_reservoir_depth.value = input_vert_depth_km
+                model.wellbores.injection_reservoir_depth.value = quantity(input_vert_depth_km, 'km').to(
+                    model.wellbores.injection_reservoir_depth.CurrentUnits).magnitude
 
                 tot_m, tot_vert_m, tot_horiz_m, _ = calculate_total_drilling_lengths_m(
                     model.wellbores.Configuration.value,
@@ -2990,10 +2991,11 @@ class Economics:
                 tot_m = tot_vert_m = model.reserv.depth.quantity().to('km').magnitude
                 tot_horiz_m = 0.0
                 if not model.wellbores.injection_reservoir_depth.Provided:
-                    model.wellbores.injection_reservoir_depth.value = model.reserv.depth.quantity().to('km').magnitude
+                    model.wellbores.injection_reservoir_depth.value = model.reserv.depth.quantity().to(
+                        model.wellbores.injection_reservoir_depth.CurrentUnits).magnitude
                 else:
                     model.wellbores.injection_reservoir_depth.value = model.wellbores.injection_reservoir_depth.quantity().to(
-                        'km').magnitude
+                        model.wellbores.injection_reservoir_depth.CurrentUnits).magnitude
 
             self.cost_one_production_well.value = calculate_cost_of_one_vertical_well(model,
                                                                                       model.reserv.depth.quantity().to(
@@ -3006,7 +3008,7 @@ class Economics:
                 self.cost_one_injection_well.value = -1.0
             else:
                 self.cost_one_injection_well.value = calculate_cost_of_one_vertical_well(model,
-                                                                                         model.wellbores.injection_reservoir_depth.value * 1000.0,
+                                                                                         model.wellbores.injection_reservoir_depth.quantity().to('m').magnitude,
                                                                                          self.wellcorrelation.value,
                                                                                          self.Vertical_drilling_cost_per_m.value,
                                                                                          self.per_injection_well_cost.Name,
