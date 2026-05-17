@@ -299,7 +299,7 @@
         "Segment 3   Thickness": {},
         "Segment 4   Geothermal gradient": {},
         "Project location": {
-          "type": "number",
+          "type": "object",
           "description": "Project location (latitude, longitude)",
           "units": null
         }
