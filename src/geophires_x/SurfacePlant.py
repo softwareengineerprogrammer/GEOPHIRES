@@ -645,6 +645,9 @@ class SurfacePlant:
         self.project_location = self.OutputParameterDict[self.project_location.Name] = OutputParameter(
             Name='Project location',
             UnitType=Units.NONE,
+            CurrentUnits=Units.NONE,
+            PreferredUnits=Units.NONE,
+            value=None,
             ToolTipText='Project location (latitude, longitude)'
         )
 
