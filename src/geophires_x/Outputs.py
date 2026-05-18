@@ -371,6 +371,9 @@ class Outputs:
                         f.write(f'      Segment {str(i):s}   Thickness:                         {round(model.reserv.layerthickness.value[i-1], 10)} {model.reserv.layerthickness.CurrentUnits.value}\n')
                     f.write(f'      Segment {str(i+1):s}   Geothermal gradient:                    {model.reserv.gradient.value[i]:10.4g} {model.reserv.gradient.CurrentUnits.value}\n')
 
+                if model.surfaceplant.project_location.value is not None:
+                    f.write(f'      {Outputs._field_label(model.surfaceplant.project_location.display_name,54)}{model.surfaceplant.project_location.value}\n')
+
                 f.write(NL)
                 f.write(NL)
                 f.write('                           ***RESERVOIR PARAMETERS***\n')

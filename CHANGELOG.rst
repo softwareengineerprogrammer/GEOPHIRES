@@ -8,6 +8,8 @@ GEOPHIRES v3 (2023-2026)
 3.13
 ^^^^
 
+3.13.7: `Project Location (Latitude & Longitude) <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/151>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.7>`__
+
 3.13.6: `Fix drilling cost types output unit conversion issue. <https://github.com/NatLabRockies/GEOPHIRES-X/pull/497>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.6>`__
 
 3.13.5: `Fix CHP Electrical Plant Cost Allocation Ratio check for non-cogen end-use option with fixed Surface Plant Capital Cost. Add example_SHR-3. <https://github.com/NatLabRockies/GEOPHIRES-X/pull/496>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.5>`__

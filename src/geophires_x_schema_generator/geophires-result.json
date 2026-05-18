@@ -297,7 +297,12 @@
         "Segment 2   Thickness": {},
         "Segment 3   Geothermal gradient": {},
         "Segment 3   Thickness": {},
-        "Segment 4   Geothermal gradient": {}
+        "Segment 4   Geothermal gradient": {},
+        "Project location": {
+          "type": "object",
+          "description": "Project location (latitude, longitude)",
+          "units": null
+        }
       }
     },
     "RESERVOIR PARAMETERS": {
