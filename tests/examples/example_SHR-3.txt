@@ -19,6 +19,7 @@ Reservoir Volume Option, 1, -- FRAC_NUM_SEP: calculate heat-in-place based on re
 Fracture Shape, 3, -- Square (Congruent with Gringarten)
 
 Number of Segments, 1
+Gradient 1, 112
 Maximum Temperature, 600
 
 
@@ -34,6 +35,9 @@ Maximum Drawdown, 1
 
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
 Injection Well Diameter, 8.535
+
+Injectivity Index, 2.185875, -- Derated 27.5% from NREL 2024b ATB conservative scenario
+Productivity Index, 1.80815, -- Derated 27.5% from NREL 2024b ATB conservative scenario
 
 Injection Temperature, 50
 Injection Wellbore Temperature Gain, 3
@@ -53,8 +57,8 @@ Plant Lifetime, 25
 Circulation Pump Efficiency, 0.80
 Plant Outlet Pressure, 1 atm
 
-Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389, -- Matches Fervo_Project_Cape-5
 Construction Years, 3, -- Matches Fervo_Project_Cape-6
+Construction CAPEX Schedule, 0.0258, 0.256, 0.718, -- Derived from Fervo_Project_Cape-6
 
 Project Latitude, 43.812139, -- Newberry Volcano
 Project Longitude, -121.281671, -- Newberry Volcano
@@ -89,7 +93,8 @@ Well Drilling and Completion Capital Cost Adjustment Factor, 1.8162293703140313
 
 Surface Plant Capital Cost, 664.94
 
-# FIXME WIP TODO Project Latitude & Longitude (Project location)
+Project Latitude, 43.812139, -- Newberry National Volcanic Monument
+Project Longitude, -121.281671, -- Newberry National Volcanic Monument
 
 # ******************** OTHER ********************
 Time steps per year, 12
