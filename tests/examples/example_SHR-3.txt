@@ -1,67 +1,100 @@
-# Example: Superhot Rock (SHR) 3
-# SHR LCOE Analysis: https://scientificwebservices.com/shr/VERTICAL_LARGE_IDEAL_ADJUSTED/graphs/graphs.html
+# Example: Superhot Rock (SHR) 3: Newberry Volcano
+# Adapted from Super Hot EGS and the Newberry Deep Drilling Project (Cladouhos et al., 2018) (https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2018/Cladouhos.pdf) and
+# SHR LCOE Analysis (https://scientificwebservices.com/shr/VERTICAL_LARGE_IDEAL_ADJUSTED/graphs/graphs.html):
 #    NOAK: Adjusted VERTICAL_LARGE_IDEAL Correlation drilling and completion cost model
 #    BHT = 450.0 C
 #    Gradient = 112.0 C/km
 
-Reservoir Model, 1
-Reservoir Density, 2800
-Reservoir Heat Capacity, 790
-Reservoir Thermal Conductivity, 3.05
-Reservoir Porosity, 0.0118
-Reservoir Volume Option, 1
-Fracture Shape, 3
+
+# ******************** RESERVOIR ********************
+Reservoir Model, 1, -- Multiple Parallel Fractures Model (Gringarten et al., 1975)
+
+Reservoir Depth, 4
+Reservoir Density, 2700
+Reservoir Heat Capacity, 1000
+Reservoir Thermal Conductivity, 2.7
+# Reservoir Porosity, 0.0118
+
+Reservoir Volume Option, 1, -- FRAC_NUM_SEP: calculate heat-in-place based on realistic fracture geometry. Number of Fractures calculated in code.
+Fracture Shape, 3, -- Square (Congruent with Gringarten)
+
 Number of Segments, 1
 Maximum Temperature, 600
-Injectivity Index, 5.482
-Productivity Index, 4.569
-Maximum Drawdown, 0.0531
-Production Well Diameter, 9.625
-Injection Well Diameter, 9.625
-Injection Temperature, 60
+
+
+# ******************** WELL BORES ********************
+Number of Production Wells, 2
+Number of Injection Wells per Production Well, 1
+
+Well Geometry Configuration, 4, -- L (required for lateral costing)
+
+# Production Wellhead Pressure, 325 psi
+
+Maximum Drawdown, 1
+
+Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of “increasing casing diameter” (Fervo Energy, 2025).
+Injection Well Diameter, 8.535
+
+Injection Temperature, 50
 Injection Wellbore Temperature Gain, 3
-Ramey Production Wellbore Model, 1
+Ramey Production Wellbore Model, True
+
+# ******************** SURFACE & PLANT ********************
 End-Use Option, 1
 Utilization Factor, .9
-Water Loss Fraction, 0.2375
-Ambient Temperature, 10
+
+Water Loss Fraction, 0.2375, -- Average of 14.5-33% range (Clark et al., 2010)
+# Range given in Clark et al., 2010: https://www.energy.gov/eere/geothermal/articles/water-use-development-and-operations-geothermal-power-plants-0
+
+Ambient Temperature, 2, -- Estimated temperature near Newberry Volcano
+Surface Temperature, 2
+
 Plant Lifetime, 25
 Circulation Pump Efficiency, 0.80
 Plant Outlet Pressure, 1 atm
-Economic Model, 5
-Starting Electricity Sale Price, 0.095
-Electricity Escalation Rate Per Year, 0.00057
+
+Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389, -- Matches Fervo_Project_Cape-5
+Construction Years, 3, -- Matches Fervo_Project_Cape-6
+
+Project Latitude, 43.812139, -- Newberry Volcano
+Project Longitude, -121.281671, -- Newberry Volcano
+
+# ******************** ECONOMICS ********************
+Economic Model, 5, -- SAM Single Owner PPA
+
+Starting Electricity Sale Price, 0.095, -- Upper end of ranges given in NREL Annual Technology Baseline (ATB) (NREL, 2024)
+# NREL ATB: https://atb.nrel.gov/electricity/2024/geothermal
+Electricity Escalation Rate Per Year, 0.00057, -- Conservatively calibrated to escalate to 10 cents/kWh at Year 11 (as opposed to calibrating to inflation which would escalate more quickly)
 Electricity Escalation Start Year, 1
 Ending Electricity Sale Price, 0.15
-Fraction of Investment in Bonds, .6
-Combined Income Tax Rate, 0
-Inflated Bond Interest Rate, .056
-Inflation Rate, .023
-Property Tax Rate, 0
-Reservoir Stimulation Capital Cost per Injection Well, 4
-Reservoir Stimulation Capital Cost per Production Well, 4
-Reservoir Stimulation Indirect Capital Cost Percentage, 0
-Field Gathering System Capital Cost Adjustment Factor, 0.339
-Time steps per year, 12
-Print Output to Console, 0
-Surface Temperature, 12
-Reservoir Depth, 3.91
-Gradient 1, 112
-Production Tax Credit Electricity, 0
-Investment Tax Credit Rate, 0
-Power Plant Type, 4
-Discount Rate, 0.075
-Number of Injection Wells, 12
-Number of Production Wells, 12
-Number of Fractures, 960
-Production Flow Rate per Well, 80
-Fracture Separation, 18
-Fracture Height, 224 m
-Well Geometry Configuration, 4
-Number of Multilateral Sections, 24
-Nonvertical Length per Multilateral Section, 1440 m
-Reservoir Stimulation Capital Cost Adjustment Factor, 1.8162293703140313
-All-in Nonvertical Drilling Costs, 1299.2629411805556
-Surface Plant Capital Cost, 664.94
+
+Fraction of Investment in Bonds, .7, -- https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/ suggests a long-term target of 85% debt; the value we use may be calibrated towards this in the future.
+Inflated Bond Interest Rate, .07, -- 2024b ATB (NREL)
+
+Inflated Bond Interest Rate During Construction, 0.0105, -- Higher than interest rate during normal operation to account for increased risk of default prior to COD. Value aligns with ATB discount rate (NREL, 2025).
+Bond Financing Start Year, -2 yr, -- Equity-only for first 2 construction years (ATB)
+
+Inflation Rate, .027, -- US inflation as of December 2025.
+
+Combined Income Tax Rate, 0.2700, -- Estimated effective combined federal and Oregon state income tax rate
+Property Tax Rate, 0.0081, -- Estimated effective Oregon property tax rate
+
+Reservoir Stimulation Capital Cost per Injection Well, 4, -- Baseline stimulation cost of $4.0M, calibrated from high-intensity U.S. shale well analogue (~$39k/frac stage for 102 stages). This is a pre-contingency value and excludes EGS-specific cost premiums such as ceramic proppant and HPHT hardware.
+Reservoir Stimulation Capital Cost per Production Well, 4, -- Baseline stimulation cost of $4.0M, calibrated from high-intensity U.S. shale well analogue (~$39k/frac stage for 102 stages). This is a pre-contingency value and excludes EGS-specific cost premiums such as ceramic proppant and HPHT hardware.
+
+Field Gathering System Capital Cost Adjustment Factor, 0.339, -- Gathering costs represent 2% of facilities CAPEX per https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/
+
 Well Drilling Cost Correlation, 16
 Well Drilling and Completion Capital Cost Adjustment Factor, 1.8162293703140313
+
+Surface Plant Capital Cost, 664.94
+
+# FIXME WIP TODO Project Latitude & Longitude (Project location)
+
+# ******************** OTHER ********************
+Time steps per year, 12
+
+Do Carbon Price Calculations, True
+Units:Total Saved Carbon Production, kilotonne
+
+Print Output to Console, 0
