@@ -50,8 +50,8 @@ Ramey Production Wellbore Model, True
 Production Flow Rate per Well, 60
 
 # ******************** SURFACE & PLANT ********************
-End-Use Option, 1
-Utilization Factor, .9
+End-Use Option, 1, -- Electricity
+Power Plant Type, 4, -- Double-Flash
 
 Water Loss Fraction, 0.2375, -- Average of 14.5-33% range (Clark et al., 2010)
 # Range given in Clark et al., 2010: https://www.energy.gov/eere/geothermal/articles/water-use-development-and-operations-geothermal-power-plants-0
@@ -62,9 +62,10 @@ Surface Temperature, 2
 Plant Lifetime, 25
 Circulation Pump Efficiency, 0.80
 Plant Outlet Pressure, 1 atm
+Utilization Factor, .9
 
 Construction Years, 3, -- Matches Fervo_Project_Cape-6
-Construction CAPEX Schedule, 0.0258, 0.256, 0.718, -- Derived from Fervo_Project_Cape-6
+Construction CAPEX Schedule, 0.0258, 0.256, 0.7182, -- Derived from Fervo_Project_Cape-6
 
 Project Latitude, 43.812139, -- Newberry National Volcanic Monument
 Project Longitude, -121.281671, -- Newberry National Volcanic Monument
