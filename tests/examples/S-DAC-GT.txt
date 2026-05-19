@@ -43,6 +43,7 @@ Economic Model,3,						---BICYCLE Levelized Cost Model
 Inflated Equity Interest Rate,.08,				---[-] Required for BICYCLE model
 Combined Income Tax Rate,.3,					---[-] Required for BICYCLE model
 Gross Revenue Tax Rate,0,					---[-] Required for BICYCLE model
+S-DAC-GT Carbon Credit Price, 180.0,        ---[USD/tonne CO2] 45Q tax credit rate or voluntary market price
 
 ***Simulation Parameters***
 ***************************
