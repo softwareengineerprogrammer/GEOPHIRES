@@ -170,7 +170,7 @@ def _validate_construction_capex_schedule(
 
             msg = f'{econ_capex_schedule.Name} ({econ_capex_schedule.value}) '
             msg += ' and '.join(adjust_schedule_reasons)
-            msg += f'. It has been adjusted to: {capex_schedule}'
+            msg += f'. It has been adjusted to: {[sig_figs(it, 3) for it in capex_schedule]}'
 
             model.logger.warning(msg)
 

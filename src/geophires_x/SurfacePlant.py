@@ -472,6 +472,26 @@ class SurfacePlant:
             ToolTipText="Dynamic viscosity of the working fluid"
         )
 
+        self.project_latitude = self.ParameterDict[self.project_latitude.Name] = floatParameter(
+            "Project Latitude",
+            UnitType=Units.NONE,
+            CurrentUnits=Units.NONE,
+            PreferredUnits=Units.NONE,
+            Min=-90,
+            Max=90,
+            ToolTipText="Latitude of the project location."
+        )
+        self.project_longitude = self.ParameterDict[self.project_longitude.Name] = floatParameter(
+            "Project Longitude",
+            UnitType=Units.NONE,
+            CurrentUnits=Units.NONE,
+            PreferredUnits=Units.NONE,
+            Min=-180,
+            Max=180,
+            ToolTipText="Longitude of the project location."
+        )
+
+
         # local variable initialization
         self.setinjectionpressurefixed = False
         sclass = str(__class__).replace("<class \'", "")
@@ -621,6 +641,14 @@ class SurfacePlant:
             UnitType=Units.POWER,
             PreferredUnits=PowerUnit.MW,
             CurrentUnits=PowerUnit.MW
+        )
+        self.project_location = self.OutputParameterDict[self.project_location.Name] = OutputParameter(
+            Name='Project location',
+            UnitType=Units.NONE,
+            CurrentUnits=Units.NONE,
+            PreferredUnits=Units.NONE,
+            value=None,
+            ToolTipText='Project location (latitude, longitude)'
         )
 
         model.logger.info(f'Complete {self.__class__.__name__}: {__name__}')
@@ -773,3 +801,6 @@ class SurfacePlant:
         if model.surfaceplant.enduse_option.value.has_direct_use_heat_component or model.surfaceplant.plant_type.value in [
             PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP]:
             self.HeatProducedMax.value = np.max(model.surfaceplant.HeatProduced.value)
+
+        if self.project_latitude.Provided and self.project_longitude.Provided:
+            self.project_location.value = f'{self.project_latitude.value}, {self.project_longitude.value}'

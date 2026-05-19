@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.9.28
- Simulation Date: 2025-07-02
- Simulation Time:  12:19
- Calculation Time:      0.861 sec
+ GEOPHIRES Version: 3.13.6
+ Simulation Date: 2026-05-16
+ Simulation Time:  18:26
+ Calculation Time:      1.042 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -25,7 +25,7 @@ Simulation Metadata
 
       Economic Model = Fixed Charge Rate (FCR)
       Fixed Charge Rate (FCR):                                5.00
-      Accrued financing during construction:                  0.00 %
+      Accrued financing during construction:                 0.00 %
       Project lifetime:                                      30 yr
       Capacity factor:                                       90.0 %
       Project NPV:                                         -26.12 MUSD
@@ -57,6 +57,7 @@ Simulation Metadata
       Maximum reservoir temperature:                        400.0 degC
       Number of segments:                                     1
       Geothermal gradient:                                        28 degC/km
+      Project location:                                     42.441977082209235, -76.43242140337269
 
 
                            ***RESERVOIR PARAMETERS***
@@ -94,13 +95,13 @@ Simulation Metadata
 
                           ***CAPITAL COSTS (M$)***
 
+         Exploration costs:                                   5.79 MUSD
          Drilling and completion costs:                      12.25 MUSD
          Drilling and completion costs per well:              6.12 MUSD
          Stimulation costs:                                   1.51 MUSD
          Surface power plant costs:                           2.43 MUSD
          Field gathering system costs:                        1.13 MUSD
          Total surface equipment costs:                       3.56 MUSD
-         Exploration costs:                                   5.79 MUSD
       Total capital costs:                                   23.11 MUSD
       Annualized capital costs:                               1.16 MUSD
 
@@ -114,7 +115,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Initial geofluid availability:                          0.06 MW/(kg/s)
       Maximum Total Electricity Generation:                   0.57 MW
       Average Total Electricity Generation:                   0.55 MW
