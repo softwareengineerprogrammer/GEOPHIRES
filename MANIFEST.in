@@ -4,6 +4,7 @@ graft ci
 graft tests
 
 include .aiexclude
+include .aiignore
 include .bumpversion.cfg
 include .cookiecutterrc
 include .coveragerc
