@@ -2901,6 +2901,18 @@ class Economics:
         if self.DoSDACGTCalculations.value:
             model.sdacgteconomics.Calculate(model)
 
+            # Consolidate S-DAC-GT CAPEX and OPEX into the main plant ledgers
+            max_carbon_capacity_tonnes = np.max(model.sdacgteconomics.CarbonExtractedAnnually.value)
+            sdac_overnight_capex_musd = (
+                                                    model.sdacgteconomics.CAPEX.value * model.sdacgteconomics.CAPEX_mult.value * max_carbon_capacity_tonnes) / 1_000_000.0
+            self.CCap.value += sdac_overnight_capex_musd
+
+            avg_carbon_extracted_tonnes = np.average(model.sdacgteconomics.CarbonExtractedAnnually.value)
+            sdac_annual_opex_musd = ((
+                                                 model.sdacgteconomics.OPEX.value + model.sdacgteconomics.storage.value + model.sdacgteconomics.transport.value)
+                                     * avg_carbon_extracted_tonnes) / 1_000_000.0
+            self.Coam.value += sdac_annual_opex_musd
+
         self.calculate_cashflow(model)
 
         # Calculate more financial values using numpy financials
@@ -3722,6 +3734,13 @@ class Economics:
                 for i in range(model.surfaceplant.construction_years.value, model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value, 1):
                     self.TotalRevenue.value[i] = self.TotalRevenue.value[i] + self.CarbonRevenue.value[i]
                     #self.TotalCummRevenue.value[i] = self.TotalCummRevenue.value[i] + self.CarbonCummCashFlow.value[i]
+
+            if self.DoSDACGTCalculations.value:
+                for i in range(model.surfaceplant.construction_years.value,
+                               model.surfaceplant.plant_lifetime.value + model.surfaceplant.construction_years.value,
+                               1):
+                    sdac_index = i - model.surfaceplant.construction_years.value
+                    self.TotalRevenue.value[i] += (model.sdacgteconomics.CarbonRevenue.value[sdac_index] / 1_000_000.0)
 
             # for the sake of display, insert zeros at the beginning of the pricing arrays
             for i in range(0, model.surfaceplant.construction_years.value, 1):
