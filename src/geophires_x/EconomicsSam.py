@@ -758,6 +758,22 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
         )
         ret.append(carbon_revenue_source)
 
+    if econ.DoSDACGTCalculations.value:
+        # Pad the scalar price to match the full timeline array length required by SAM formatting
+        sdac_price_array = [0.0] * _pre_revenue_years_count(model) + [
+            model.sdacgteconomics.carbon_credit_price.value
+        ] * model.surfaceplant.plant_lifetime.value
+
+        sdac_revenue_source = CapacityPaymentRevenueSource(
+            name='S-DAC-GT Carbon credits',
+            revenue_usd=[round(it) for it in model.sdacgteconomics.CarbonRevenue.value],
+            price_label=f'S-DAC-GT Carbon credit price ({model.sdacgteconomics.carbon_credit_price.CurrentUnits.value})',
+            price=_price_vector(sdac_price_array),
+            amount_provided_label=f'S-DAC-GT Carbon Extracted ({model.sdacgteconomics.CarbonExtractedAnnually.CurrentUnits.value})',
+            amount_provided=model.sdacgteconomics.CarbonExtractedAnnually.value,
+        )
+        ret.append(sdac_revenue_source)
+
     def _get_revenue_usd_series(econ_revenue_output: OutputParameter) -> Iterable[float]:
         return [
             round(it)
