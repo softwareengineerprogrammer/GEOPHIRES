@@ -388,6 +388,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SAM-single-owner-PPA-9_cooling.txt <tests/examples/example_SAM-single-owner-PPA-9_cooling.txt>`__
      - `.out <tests/examples/example_SAM-single-owner-PPA-9_cooling.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-9_cooling>`__
+   * - SAM Single Owner PPA: S-DAC
+     - `S-DAC-GT-2.txt <tests/examples/S-DAC-GT-2.txt>`__
+     - `.out <tests/examples/S-DAC-GT-2.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=S-DAC-GT-2>`__
 .. raw:: html
 
    <embed>
