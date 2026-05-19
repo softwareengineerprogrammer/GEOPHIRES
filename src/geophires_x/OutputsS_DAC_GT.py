@@ -88,7 +88,7 @@ class OutputsS_DAC_GT(Outputs):
 
                 f.write(NL)
                 f.write("                **********************" + NL)
-                f.write("                * S-DAC-GT PROFILE  *" + NL)
+                f.write("                *  S-DAC-GT PROFILE  *" + NL)
                 f.write("                **********************" + NL)
                 f.write("Year       Carbon      Cumm. Carbon     S-DAC-GT           S-DAC-GT Cumm.      Cumm. Cost        Annual Carbon" + NL)
                 f.write("Since      Captured     Captured       Annual Cost          Cash Flow        Cost Per Tonne         Revenue" + NL)
