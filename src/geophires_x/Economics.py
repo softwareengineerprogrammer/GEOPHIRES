@@ -2908,9 +2908,18 @@ class Economics:
             self.CCap.value += sdac_overnight_capex_musd
 
             avg_carbon_extracted_tonnes = np.average(model.sdacgteconomics.CarbonExtractedAnnually.value)
-            sdac_annual_opex_musd = ((
-                                                 model.sdacgteconomics.OPEX.value + model.sdacgteconomics.storage.value + model.sdacgteconomics.transport.value)
-                                     * avg_carbon_extracted_tonnes) / 1_000_000.0
+            sdac_annual_opex_usd = (
+                                               model.sdacgteconomics.OPEX.value + model.sdacgteconomics.storage.value + model.sdacgteconomics.transport.value) * avg_carbon_extracted_tonnes
+
+            if model.sdacgteconomics.sorbent_replacement_frequency.value > 0:
+                max_carbon_capacity_tonnes = np.max(model.sdacgteconomics.CarbonExtractedAnnually.value)
+                replacements_per_lifetime = int(
+                    model.surfaceplant.plant_lifetime.value / model.sdacgteconomics.sorbent_replacement_frequency.value)
+                annualized_replacement_usd = (
+                                                         max_carbon_capacity_tonnes * model.sdacgteconomics.sorbent_replacement_cost.value * replacements_per_lifetime) / model.surfaceplant.plant_lifetime.value
+                sdac_annual_opex_usd += annualized_replacement_usd
+
+            sdac_annual_opex_musd = sdac_annual_opex_usd / 1_000_000.0
             self.Coam.value += sdac_annual_opex_musd
 
         self.calculate_cashflow(model)
