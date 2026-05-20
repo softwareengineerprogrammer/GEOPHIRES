@@ -688,18 +688,62 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     ret['federal_tax_rate'], ret['state_tax_rate'] = _get_fed_and_state_tax_rates(econ.CTR.value)
 
     geophires_itc_tenths = Decimal(econ.RITC.value)
-    ret['itc_fed_percent'] = [float(geophires_itc_tenths * Decimal(100))]
 
     geophires_state_itc_usd = Decimal(econ.ritc_state_amount.quantity().to(convertible_unit('USD')).magnitude)
     ret['itc_sta_amount'] = [float(geophires_state_itc_usd)]
 
+    if econ.DoSDACGTCalculations.value and geophires_itc_tenths > 0:
+        # Shield DAC CAPEX from ITC to prevent unlawful MACRS basis reduction
+        max_carbon_capacity_tonnes = max(model.sdacgteconomics.CarbonExtractedAnnually.value)
+        sdac_capex_usd = (
+            model.sdacgteconomics.CAPEX.value * model.sdacgteconomics.CAPEX_mult.value * max_carbon_capacity_tonnes
+        )
+
+        # Geothermal eligible basis = Total Installed Cost - DAC CAPEX
+        eligible_geothermal_basis_usd = ret['total_installed_cost'] - sdac_capex_usd
+        itc_fed_amount_usd = float(Decimal(eligible_geothermal_basis_usd) * geophires_itc_tenths)
+
+        ret['itc_fed_percent'] = [0.0]  # Disable percentage-based ITC on the whole project
+        ret['itc_fed_amount'] = [itc_fed_amount_usd]  # Inject fixed ITC amount for geothermal only
+    else:
+        ret['itc_fed_percent'] = [float(geophires_itc_tenths * Decimal(100))]
+
+    # Build a year-by-year schedule for the Federal Production Tax Credit
+    ptc_fed_amount_schedule = [0.0] * model.surfaceplant.plant_lifetime.value
+
+    # 1. Base Electricity PTC
     if econ.PTCElec.Provided:
-        ret['ptc_fed_amount'] = [econ.PTCElec.quantity().to(convertible_unit('USD/kWh')).magnitude]
+        base_ptc_rate = econ.PTCElec.quantity().to(convertible_unit('USD/kWh')).magnitude
+        ptc_term = int(econ.PTCDuration.quantity().to(convertible_unit('yr')).magnitude)
+        for i in range(min(ptc_term, model.surfaceplant.plant_lifetime.value)):
+            escalation = (1.0 + _pct(econ.RINFL) / 100.0) ** i if econ.PTCInflationAdjusted.value else 1.0
+            ptc_fed_amount_schedule[i] = base_ptc_rate * escalation
 
-        ret['ptc_fed_term'] = econ.PTCDuration.quantity().to(convertible_unit('yr')).magnitude
+    # 2. S-DAC 45Q Equivalent (Mapped as Non-Taxable PBI to avoid MACRS/Exclusivity issues)
+    if econ.DoSDACGTCalculations.value:
+        pbi_oth_amount_schedule = [0.0] * model.surfaceplant.plant_lifetime.value
 
-        if econ.PTCInflationAdjusted.value:
-            ret['ptc_fed_escal'] = _pct(econ.RINFL)
+        for i in range(model.surfaceplant.plant_lifetime.value):
+            # The statutory duration cutoff (e.g., 12 years) is already handled inside EconomicsS_DAC_GT.py
+            # so CarbonRevenue will naturally be 0.0 for years > 12.
+            sdac_revenue_usd = model.sdacgteconomics.CarbonRevenue.value[i]
+            net_kwh_produced = model.surfaceplant.NetkWhProduced.value[i]
+
+            # Convert absolute S-DAC revenue (USD) into an equivalent USD/kWh PBI rate for SAM
+            if net_kwh_produced > 0:
+                pbi_oth_amount_schedule[i] = sdac_revenue_usd / net_kwh_produced
+
+        if any(rate > 0.0 for rate in pbi_oth_amount_schedule):
+            ret['pbi_oth_amount'] = pbi_oth_amount_schedule
+            ret['pbi_oth_term'] = model.surfaceplant.plant_lifetime.value
+            ret['pbi_oth_tax_fed'] = 0.0  # Strictly exclude from Federal taxable gross income
+            ret['pbi_oth_tax_sta'] = 0.0  # Strictly exclude from State taxable gross income
+
+    # Inject the combined array into SAM
+    if any(rate > 0.0 for rate in ptc_fed_amount_schedule):
+        ret['ptc_fed_amount'] = ptc_fed_amount_schedule
+        ret['ptc_fed_term'] = model.surfaceplant.plant_lifetime.value
+        ret['ptc_fed_escal'] = 0.0  # Escalation is already manually calculated in the array above
 
     # 'Property Tax Rate'
     geophires_ptr_tenths = Decimal(econ.PTR.value)
@@ -770,22 +814,6 @@ def _get_capacity_payment_revenue_sources(model: Model) -> list[CapacityPaymentR
             amount_provided=econ.CarbonThatWouldHaveBeenProducedAnnually.value[_pre_revenue_years_count(model) :],
         )
         ret.append(carbon_revenue_source)
-
-    if econ.DoSDACGTCalculations.value:
-        # Pad the scalar price to match the full timeline array length required by SAM formatting
-        sdac_price_array = [0.0] * _pre_revenue_years_count(model) + [
-            model.sdacgteconomics.carbon_credit_price.value
-        ] * model.surfaceplant.plant_lifetime.value
-
-        sdac_revenue_source = CapacityPaymentRevenueSource(
-            name='S-DAC-GT Carbon credits',
-            revenue_usd=[round(it) for it in model.sdacgteconomics.CarbonRevenue.value],
-            price_label=f'S-DAC-GT Carbon credit price ({model.sdacgteconomics.carbon_credit_price.CurrentUnits.value})',
-            price=_price_vector(sdac_price_array),
-            amount_provided_label=f'S-DAC-GT Carbon Extracted ({model.sdacgteconomics.CarbonExtractedAnnually.CurrentUnits.value})',
-            amount_provided=model.sdacgteconomics.CarbonExtractedAnnually.value,
-        )
-        ret.append(sdac_revenue_source)
 
     def _get_revenue_usd_series(econ_revenue_output: OutputParameter) -> Iterable[float]:
         return [
