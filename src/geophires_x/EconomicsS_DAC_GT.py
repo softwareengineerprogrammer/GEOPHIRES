@@ -219,7 +219,7 @@ class EconomicsS_DAC_GT(Economics.Economics):
             ErrMessage="assume default Percent Energy Devoted To Process (50%)",
             ToolTipText="Percent Energy Devoted To Process (%)"
         )
-        self.carbon_credit_price = floatParameter(
+        self.carbon_credit_price = self.ParameterDict[self.carbon_credit_price.Name] = floatParameter(
             "S-DAC-GT Carbon Credit Price",
             value=180.0,
             DefaultValue=180.0,
@@ -231,7 +231,19 @@ class EconomicsS_DAC_GT(Economics.Economics):
             ErrMessage="assume default Carbon Credit Price (180 USD per tonne CO2)",
             ToolTipText="Carbon Credit or Market Price (USD per tonne CO2)"
         )
-        self.ParameterDict[self.carbon_credit_price.Name] = self.carbon_credit_price
+
+        self.carbon_credit_duration = self.ParameterDict[self.carbon_credit_duration.Name] = floatParameter(
+            "S-DAC-GT Carbon Credit Duration",
+            value=12.0,
+            DefaultValue=12.0,
+            Min=0.0,
+            Max=100.0,
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
+            ErrMessage="assume default Carbon Credit Duration (12 years)",
+            ToolTipText="Duration for which the carbon credit can be claimed (e.g., 12 years for US 45Q)"
+        )
 
         # local variable initiation
         # Capital Recovery Rate or Fixed Charge Factor - set initially for definitions
@@ -511,6 +523,13 @@ class EconomicsS_DAC_GT(Economics.Economics):
                                                                                                   storage_max)
             return True, error_message
 
+        if not (self.carbon_credit_duration.Min
+                <= self.carbon_credit_duration.value
+                <= self.carbon_credit_duration.Max):
+            error_message = "S-DAC-GT ERROR: Carbon Credit Duration should be between {} and {}".format(
+                self.carbon_credit_duration.Min, self.carbon_credit_duration.Max)
+            return True, error_message
+
         return False, ""
 
     def geo_therm_cost(self, power_cost: float, CAPEX_mult: float, OPEX_mult: float, depth: float,
@@ -703,16 +722,19 @@ class EconomicsS_DAC_GT(Economics.Economics):
                                                                (self.CarbonExtractedAnnually.value[
                                                                     i] * self.therm.value))
 
-        # Calculate Carbon Revenue based on S-DAC-GT specific credit price
+        # Calculate Carbon Revenue based on S-DAC-GT specific credit price and duration
         self.CarbonRevenue.value = [0.0] * model.surfaceplant.plant_lifetime.value
         self.CarbonCummCashFlow.value = [0.0] * model.surfaceplant.plant_lifetime.value
 
         for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
-            self.CarbonRevenue.value[i] = self.CarbonExtractedAnnually.value[i] * self.carbon_credit_price.value
+            # Enforce the parameterized statutory limit for tax credits
+            applicable_price = self.carbon_credit_price.value if i < self.carbon_credit_duration.value else 0.0
+
+            self.CarbonRevenue.value[i] = self.CarbonExtractedAnnually.value[i] * applicable_price
             if i == 0:
                 self.CarbonCummCashFlow.value[i] = self.CarbonRevenue.value[i]
             else:
-                self.CarbonCummCashFlow.value[i] = self.CarbonCummCashFlow.value[i - 1] + self.CarbonRevenue.value[i]
-
+                self.CarbonCummCashFlow.value[i] = self.CarbonCummCashFlow.value[i - 1] + \
+                                                   self.CarbonRevenue.value[i]
         self._calculate_derived_outputs(model)
         model.logger.info(f'Complete {str(__class__)}: {sys._getframe().f_code.co_name}')
