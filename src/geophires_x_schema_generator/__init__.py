@@ -377,6 +377,11 @@ def _fix_floating_point_error(val: Any) -> Any:
 
 
 class HipRaXSchemaGenerator(GeophiresXSchemaGenerator):
+    # Single implicit category used to keep the result schema shape consistent
+    # with the GEOPHIRES result schema (top-level properties -> category -> properties -> fields).
+    # FIXME WIP refactor to reflect SUMMARY OF RESULTS and SUMMARY OF INPUTS categories
+    _RESULT_CATEGORY: str = 'HIP-RA-X OUTPUTS'
+
     def get_parameter_sources(self) -> list:
         """
         :rtype: list[Tuple[Any, str]]
@@ -388,7 +393,35 @@ class HipRaXSchemaGenerator(GeophiresXSchemaGenerator):
         return 'HIP-RA-X'
 
     def get_result_json_schema(self, output_params_json) -> dict:
-        return None  # FIXME TODO
+        output_params = json.loads(output_params_json)
+
+        cat_properties = {}
+        for param_name, output_param in output_params.items():
+            description = _get_key(output_param, 'ToolTipText', default_val=None) or None
+            units_val = output_param['CurrentUnits'] if isinstance(output_param.get('CurrentUnits'), str) else None
+            cat_properties[param_name] = {
+                'type': _get_key(output_param, 'json_parameter_type', default_val=None) or None,
+                'description': description,
+                'units': units_val,
+            }
+
+        properties = {
+            self._RESULT_CATEGORY: {
+                'type': 'object',
+                'properties': cat_properties,
+            }
+        }
+
+        result_schema = {
+            'definitions': {},
+            '$schema': 'http://json-schema.org/draft-04/schema#',
+            'type': 'object',
+            'title': f'{self.get_schema_title()} Result Schema',
+            'required': [],
+            'properties': properties,
+        }
+
+        return result_schema
 
     def get_output_params_table_rst(self, output_params_json) -> str:
         """
