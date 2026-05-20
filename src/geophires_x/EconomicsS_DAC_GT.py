@@ -1,7 +1,7 @@
 import sys
 import os
 import numpy as np
-from geophires_x.Parameter import floatParameter, OutputParameter, ReadParameter
+from geophires_x.Parameter import floatParameter, OutputParameter, ReadParameter, intParameter
 from geophires_x.Units import *
 from geophires_x.OptionList import EndUseOptions
 import geophires_x.Model as Model
@@ -243,6 +243,31 @@ class EconomicsS_DAC_GT(Economics.Economics):
             CurrentUnits=TimeUnit.YEAR,
             ErrMessage="assume default Carbon Credit Duration (12 years)",
             ToolTipText="Duration for which the carbon credit can be claimed (e.g., 12 years for US 45Q)"
+        )
+
+        self.sorbent_replacement_frequency = self.ParameterDict[self.sorbent_replacement_frequency.Name] = intParameter(
+            "S-DAC-GT Sorbent Replacement Frequency",
+            value=0,
+            DefaultValue=0,
+            AllowableRange=list(range(1, 101, 1)),
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
+            ErrMessage="assume default Sorbent Replacement Frequency (0 years - no discrete replacement)",
+            ToolTipText="Frequency of solid sorbent replacement in years (0 disables step-function replacement costs)"
+        )
+
+        self.sorbent_replacement_cost = self.ParameterDict[self.sorbent_replacement_cost.Name] = floatParameter(
+            "S-DAC-GT Sorbent Replacement Cost",
+            value=0.0,
+            DefaultValue=0.0,
+            Min=0.0,
+            Max=1000.0,
+            UnitType=Units.COSTPERMASS,
+            PreferredUnits=CostPerMassUnit.DOLLARSPERTONNE,
+            CurrentUnits=CostPerMassUnit.DOLLARSPERTONNE,
+            ErrMessage="assume default Sorbent Replacement Cost (0 USD per tonne CO2)",
+            ToolTipText="Cost to replace solid sorbent (USD per tonne CO2 capacity)"
         )
 
         # local variable initiation
@@ -702,6 +727,19 @@ class EconomicsS_DAC_GT(Economics.Economics):
                                                      self.S_DAC_GTAnnualCost.value[i]
             self.CummCostPerTonne.value[i] = self.S_DAC_GTCummCashFlow.value[i] / \
                                              self.S_DAC_GTCummCarbonExtracted.value[i]
+
+        max_carbon_capacity_tonnes = np.max(self.CarbonExtractedAnnually.value)
+        self.AnnualOPEX_USD = [0.0] * model.surfaceplant.plant_lifetime.value
+        for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
+            base_opex = self.CarbonExtractedAnnually.value[i] * (
+                        self.OPEX.value + self.storage.value + self.transport.value)
+            replacement_cost = 0.0
+            operational_year = i + 1
+            if self.sorbent_replacement_frequency.value > 0 and (
+                    operational_year % self.sorbent_replacement_frequency.value) == 0:
+                replacement_cost = max_carbon_capacity_tonnes * self.sorbent_replacement_cost.value
+
+            self.AnnualOPEX_USD[i] = base_opex + replacement_cost
 
         # We need to update the heat and electricity generated because we have consumed
         # some (all) of it to do the capture, so when they get used in the final economic calculation (below),
