@@ -661,8 +661,36 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
         _pre_revenue_years_count(model) :
     ]
+
+    sdac_average_opex_usd = 0.0
+    sdac_opex_by_year_usd = [0.0] * model.surfaceplant.plant_lifetime.value
+    if econ.DoSDACGTCalculations.value:
+        sdac_opex_by_year_usd = model.sdacgteconomics.AnnualOPEX_USD
+        avg_carbon_extracted_tonnes = np.average(model.sdacgteconomics.CarbonExtractedAnnually.value)
+        sdac_average_opex_usd = (
+            model.sdacgteconomics.OPEX.value
+            + model.sdacgteconomics.storage.value
+            + model.sdacgteconomics.transport.value
+        ) * avg_carbon_extracted_tonnes
+        if model.sdacgteconomics.sorbent_replacement_frequency.value > 0:
+            max_carbon_capacity_tonnes = np.max(model.sdacgteconomics.CarbonExtractedAnnually.value)
+            replacements_per_lifetime = int(
+                model.surfaceplant.plant_lifetime.value / model.sdacgteconomics.sorbent_replacement_frequency.value
+            )
+            annualized_replacement_usd = (
+                max_carbon_capacity_tonnes
+                * model.sdacgteconomics.sorbent_replacement_cost.value
+                * replacements_per_lifetime
+            ) / model.surfaceplant.plant_lifetime.value
+            sdac_average_opex_usd += annualized_replacement_usd
+
+    opex_base_without_sdac_usd = opex_base_usd - sdac_average_opex_usd
     for year_index in range(model.surfaceplant.plant_lifetime.value):
-        opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
+        opex_by_year_usd.append(
+            opex_base_without_sdac_usd
+            + royalty_supplemental_payments_by_year_usd[year_index]
+            + sdac_opex_by_year_usd[year_index]
+        )
 
     if model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
         # For pure direct-use, pumping is a grid purchase.
