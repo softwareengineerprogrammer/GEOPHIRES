@@ -598,6 +598,13 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
 
     max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.quantity().to(convertible_unit('kWh')).magnitude)
 
+    if econ.DoSDACGTCalculations.value:
+        # Restore the true gross maximum before S-DAC in-place mutation decremented it
+        sdac_elec_consumption_kwh = (
+            np.max(m.sdacgteconomics.CarbonExtractedAnnually.value) * m.sdacgteconomics.elec.value
+        )
+        max_total_kWh_produced += sdac_elec_consumption_kwh
+
     net_kwh_produced_series: Iterable | float | int = (
         m.surfaceplant.NetkWhProduced.quantity().to(convertible_unit('kWh')).magnitude
     )
