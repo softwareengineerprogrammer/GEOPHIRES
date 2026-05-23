@@ -1,4 +1,5 @@
 import logging
+import shutil
 from pathlib import Path
 
 from jinja2 import Environment
@@ -14,10 +15,12 @@ _log = logging.getLogger(__name__)
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 _BUILD_DIR = _PROJECT_ROOT / 'build' / 'fpc_hiip_analysis'
+_IMAGES_DIR = _PROJECT_ROOT / 'docs' / '_images'
 
 
 def generate_fpc_hiip_analysis_doc():
     _BUILD_DIR.mkdir(parents=True, exist_ok=True)
+    _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. Define and Run Deterministic Baseline
     base_params = {
@@ -72,7 +75,6 @@ def generate_fpc_hiip_analysis_doc():
     _log.info('Running Monte Carlo HIP-RA-X simulation (170°C - 250°C)...')
 
     # Initialize the Monte Carlo Request
-    # (Note: Paths must be absolute as required by the MonteCarloRequest class)
     mc_request = MonteCarloRequest(
         simulation_program=SimulationProgram.HIP_RA_X,
         input_file=base_input_path.absolute(),
@@ -89,6 +91,20 @@ def generate_fpc_hiip_analysis_doc():
 
     mc_stored_heat_mean_kj = mc_stats['Stored Heat (reservoir)']['mean']
     mc_stored_heat_mean_15j = mc_stored_heat_mean_kj / 1e12
+
+    # Copy generated MC histogram images to the docs directory
+    mc_temp_img_src = _BUILD_DIR / 'Reservoir Temperature.png'
+    mc_heat_img_src = _BUILD_DIR / 'Stored Heat (reservoir).png'
+
+    mc_temp_img_dst = _IMAGES_DIR / 'fpc_hiip_mc_Reservoir_Temperature.png'
+    mc_heat_img_dst = _IMAGES_DIR / 'fpc_hiip_mc_Stored_Heat.png'
+
+    if mc_temp_img_src.exists():
+        shutil.copy(mc_temp_img_src, mc_temp_img_dst)
+        _log.info(f'Copied {mc_temp_img_src.name} to docs/_images/')
+    if mc_heat_img_src.exists():
+        shutil.copy(mc_heat_img_src, mc_heat_img_dst)
+        _log.info(f'Copied {mc_heat_img_src.name} to docs/_images/')
 
     # 4. Render Jinja Template
     _log.info('Rendering Markdown documentation...')

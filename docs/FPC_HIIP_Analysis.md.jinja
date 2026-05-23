@@ -13,11 +13,11 @@
 The foundational calculation for measuring thermal energy in a reservoir relies on the volumetric heat-in-place method.
 
 ### Thermal Energy Physics
-The SEC filing determines the total thermal energy ($Q_T$) as the sum of the thermal energy of the rock ($Q_R$) and the pore fluid ($Q_W$). Because the Granitic Basement rocks of the Project Cape Area have little to no porosity, the pore fluid energy effectively drops out, allowing the equation to be simplified to:
+The SEC filing determines the total thermal energy (Q<sub>T</sub>) as the sum of the thermal energy of the rock (Q<sub>R</sub>) and the pore fluid (Q<sub>W</sub>). Because the Granitic Basement rocks of the Project Cape Area have little to no porosity, the pore fluid energy effectively drops out, allowing the equation to be simplified to:
 
-$$Q_T = (A \times h) \times \rho_b \times c_r \times (T_{res} - T_{ref})$$
+Q<sub>T</sub> = (A × h) × &rho;<sub>b</sub> × c<sub>r</sub> × (T<sub>res</sub> - T<sub>ref</sub>)
 
-**HIP-RA-X Alignment:** HIP-RA-X performs this exact calculation. The primary difference is input structuring: while the SEC model takes bulk density ($\rho_b$) and rock specific heat ($c_r$) as separate variables, HIP-RA-X expects them pre-multiplied as a single `Rock Heat Capacity` (Volumetric Heat Capacity).
+**HIP-RA-X Alignment:** HIP-RA-X performs this exact calculation. The primary difference is input structuring: while the SEC model takes bulk density (&rho;<sub>b</sub>) and rock specific heat (c<sub>r</sub>) as separate variables, HIP-RA-X expects them pre-multiplied as a single `Rock Heat Capacity` (Volumetric Heat Capacity).
 
 ### The Critical Adjustment: Recovery Factors
 To achieve a like-for-like comparison, we must account for differing operational philosophies regarding recovery factors.
@@ -50,7 +50,7 @@ The HIP-RA-X inputs below were calibrated using the data provided in the D&M SEC
 
 When evaluated using the deterministic 199°C baseline, HIP-RA-X produces an incredibly tight alignment with the SEC report's lower-bound thermal energy estimates.
 
-| Model | Evaluated Thermal Metric | Result ($10^{15}$ Joules) |
+| Model | Evaluated Thermal Metric | Result (10<sup>15</sup> Joules) |
 | :--- | :--- | :--- |
 | **SEC Filing (D&M)** | Gross HIIP (Low Estimate) | **50,730** |
 | **HIP-RA-X** | Stored Heat (reservoir) | **{{ det_stored_heat_15j }}** |
@@ -61,12 +61,20 @@ Because our HIP-RA-X run used a static, deterministic input of 199°C—which si
 
 To directly validate against the SEC's Mean Estimate, a Monte Carlo simulation (`MC_GeoPHIRES3`) was executed over 1,000 iterations using a uniform distribution between 170°C and 250°C.
 
-| Model | Evaluated Thermal Metric | Result ($10^{15}$ Joules) |
+| Model | Evaluated Thermal Metric | Result (10<sup>15</sup> Joules) |
 | :--- | :--- | :--- |
 | **SEC Filing (D&M)** | Gross HIIP (Mean Estimate) | **63,560** |
 | **HIP-RA-X (Monte Carlo)**| Stored Heat (reservoir) Mean | **{{ mc_stored_heat_mean_15j }}** |
 
 This successfully demonstrates that when supplied with identical bounding conditions, the HIP-RA-X volumetric engine perfectly mirrors the industry-standard probabilistic HIIP methodology.
+
+#### Monte Carlo Distributions
+
+The following histograms illustrate the uniform input distribution applied to the reservoir temperature and the resulting probabilistic output for stored heat.
+
+![](_images/fpc_hiip_mc_Reservoir_Temperature.png)
+
+![](_images/fpc_hiip_mc_Stored_Heat.png)
 
 ### Divergence in Electrical Power Capacity
 
