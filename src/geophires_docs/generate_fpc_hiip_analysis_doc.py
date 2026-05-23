@@ -66,13 +66,20 @@ def generate_fpc_hiip_analysis_doc():
     mc_output_path = _BUILD_DIR / 'fpc_hiip_mc_results.txt'
 
     with open(mc_settings_path, 'w') as f:
-        f.write('INPUT, Reservoir Temperature, uniform, 170.0, 250.0\n')
+        # The SEC HIIP methodology explicitly models productive volume (Area * Thickness),
+        # density, specific heat (Rock Heat Capacity), and temperature using normal distributions.
+        f.write('INPUT, Reservoir Temperature, normal, 210.0, 15.0\n')
+        f.write('INPUT, Reservoir Area, normal, 48.0, 2.4\n')
+        f.write('INPUT, Reservoir Thickness, normal, 4.0, 0.2\n')
+        f.write('INPUT, Rock Heat Capacity, normal, 2.212e12, 1.1e11\n')
+        f.write('INPUT, Density Of Reservoir Rock, normal, 2.8e12, 0.1e12\n')
+
         f.write('OUTPUT, Stored Heat (reservoir)\n')
         f.write('OUTPUT, Producible Electricity (reservoir)\n')
         f.write('ITERATIONS, 1000\n')
         f.write(f'MC_OUTPUT_FILE, {mc_output_path.absolute()}\n')
 
-    _log.info('Running Monte Carlo HIP-RA-X simulation (170°C - 250°C)...')
+    _log.info('Running Monte Carlo HIP-RA-X simulation...')
 
     # Initialize the Monte Carlo Request
     mc_request = MonteCarloRequest(
@@ -92,19 +99,17 @@ def generate_fpc_hiip_analysis_doc():
     mc_stored_heat_mean_kj = mc_stats['Stored Heat (reservoir)']['mean']
     mc_stored_heat_mean_15j = mc_stored_heat_mean_kj / 1e12
 
+    mc_elec_mean_mw = mc_stats['Producible Electricity (reservoir)']['mean']
+
     # Copy generated MC histogram images to the docs directory
-    mc_temp_img_src = _BUILD_DIR / 'Reservoir Temperature.png'
-    mc_heat_img_src = _BUILD_DIR / 'Stored Heat (reservoir).png'
+    mc_images = ['Stored Heat (reservoir).png', 'Producible Electricity (reservoir).png']
 
-    mc_temp_img_dst = _IMAGES_DIR / 'fpc_hiip_mc_Reservoir_Temperature.png'
-    mc_heat_img_dst = _IMAGES_DIR / 'fpc_hiip_mc_Stored_Heat.png'
-
-    if mc_temp_img_src.exists():
-        shutil.copy(mc_temp_img_src, mc_temp_img_dst)
-        _log.info(f'Copied {mc_temp_img_src.name} to docs/_images/')
-    if mc_heat_img_src.exists():
-        shutil.copy(mc_heat_img_src, mc_heat_img_dst)
-        _log.info(f'Copied {mc_heat_img_src.name} to docs/_images/')
+    for img_name in mc_images:
+        src = _BUILD_DIR / img_name
+        dst = _IMAGES_DIR / f'fpc_hiip_mc_{img_name.replace(" ", "_").replace("(", "").replace(")", "")}'
+        if src.exists():
+            shutil.copy(src, dst)
+            _log.info(f'Copied {src.name} to docs/_images/')
 
     # 4. Render Jinja Template
     _log.info('Rendering Markdown documentation...')
@@ -114,6 +119,7 @@ def generate_fpc_hiip_analysis_doc():
         'det_stored_heat_15j': f'{det_stored_heat_15j:,.0f}',
         'det_elec_mw': f'{det_elec_mw:,.0f}',
         'mc_stored_heat_mean_15j': f'{mc_stored_heat_mean_15j:,.0f}',
+        'mc_elec_mean_mw': f'{mc_elec_mean_mw:,.0f}',
     }
 
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
