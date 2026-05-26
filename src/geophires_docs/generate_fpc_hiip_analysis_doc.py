@@ -10,6 +10,7 @@ from geophires_monte_carlo import MonteCarloRequest
 from geophires_monte_carlo import SimulationProgram
 from hip_ra import HipRaInputParameters
 from hip_ra_x import HipRaXClient
+from hip_ra_x import HipRaXResult
 
 _log = logging.getLogger(__name__)
 
@@ -28,17 +29,12 @@ def generate_fpc_hiip_analysis_doc():
 
     _log.info('Running deterministic HIP-RA-X baseline...')
     client = HipRaXClient()
-    det_result = client.get_hip_ra_result(HipRaInputParameters(file_path_or_params_dict=base_input_path))
+    det_result: HipRaXResult = client.get_hip_ra_x_result(
+        HipRaInputParameters(file_path_or_params_dict=base_input_path)
+    )
 
-    # Parse deterministic outputs
-    det_stored_heat_kj = 0.0
-    det_elec_mw = 0.0
-    with open(det_result.output_file_path) as f:
-        for line in f:
-            if 'Stored Heat (reservoir):' in line:
-                det_stored_heat_kj = float(line.split(':')[1].strip().split(' ')[0])
-            if 'Producible Electricity (reservoir):' in line:
-                det_elec_mw = float(line.split(':')[1].strip().split(' ')[0])
+    det_stored_heat_kj = det_result.result['SUMMARY OF RESULTS']['Stored Heat (reservoir)']['value']
+    det_elec_mw = det_result.result['SUMMARY OF RESULTS']['Producible Electricity (reservoir)']['value']
 
     # Convert kJ to 10^15 Joules (10^15 J = 10^12 kJ)
     det_stored_heat_15j = det_stored_heat_kj / 1e12
