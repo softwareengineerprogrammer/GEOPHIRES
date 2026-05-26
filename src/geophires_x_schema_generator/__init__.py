@@ -411,38 +411,6 @@ class HipRaXSchemaGenerator(GeophiresXSchemaGenerator):
     def get_schema_title(self) -> str:
         return 'HIP-RA-X'
 
-    def get_output_params_table_rst(self, output_params_json) -> str:
-        """
-        FIXME TODO consolidate with generated result schema
-        """
-
-        output_params = json.loads(output_params_json)
-
-        output_rst = """
-    .. list-table:: Outputs
-       :header-rows: 1
-
-       * - Name
-         - Description
-         - Preferred Units
-         - Default Value Type"""
-
-        for param_name in output_params:
-            param = output_params[param_name]
-
-            def get_key(k):
-                if k in param and str(param[k]) != '':  # noqa
-                    return param[k]  # noqa
-                else:
-                    return ''
-
-            output_rst += f"""\n       * - {param['Name']}
-         - {get_key('ToolTipText')}
-         - {get_key('PreferredUnits')}
-         - {get_key('json_parameter_type')}"""
-
-        return output_rst
-
     def get_input_schema_reference(self) -> str:
         return 'hip-ra-x-request.json'
 
