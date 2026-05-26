@@ -863,45 +863,43 @@ class HIP_RA_X:
             case_data_results = {self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY: summary_of_results}
 
             with open(outputfile, 'w', encoding='UTF-8') as f:
-                nl = '\n'
-
-                f.write(f'                               *********************{nl}')
-                f.write(f'                               ***HIP CASE REPORT***{nl}')
-                f.write(f'                               *********************{nl}')
-                f.write(nl)
-                f.write(f'      ***{self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY}***{nl}')
+                f.write('                               *********************\n')
+                f.write('                               ***HIP CASE REPORT***\n')
+                f.write('                               *********************\n')
+                f.write('\n')
+                f.write(f'      ***{self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY}***\n')
 
                 for k, v in case_data_inputs[self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY].items():
                     # align space between value and units to same column
                     kv_spaces = max(1, (24 - (len(v.split(' ')[0]) + len(k)))) * ' '
 
-                    f.write(f'      {k}:{kv_spaces}{v}{nl}')
+                    f.write(f'      {k}:{kv_spaces}{v}\n')
 
-                f.write(nl)
-                f.write(f'      ***{self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY}***{nl}')
+                f.write('\n')
+                f.write(f'      ***{self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY}***\n')
                 for k, v in case_data_results[self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY].items():
                     # align space between value and units to same column
                     kv_spaces = max(1, (24 - (len(v.split(' ')[0]) + len(k)))) * ' '
 
-                    f.write(f'      {k}:{kv_spaces}{v}{nl}')
+                    f.write(f'      {k}:{kv_spaces}{v}\n')
 
         except FileNotFoundError as ex:
             traceback_str = traceback.format_exc()
-            msg = f'Error: HIP_RA_X Failed to write the output file. Exiting....\n{traceback_str}'
+            msg = f'Error: HIP-RA-X Failed to write the output file. Exiting....\n{traceback_str}'
             self.logger.critical(str(ex))
             self.logger.critical(msg)
             raise
 
         except PermissionError as ex:
             traceback_str = traceback.format_exc()
-            msg = f'Error: HIP_RA_X Failed to write the output file. Exiting....\n{traceback_str}'
+            msg = f'Error: HIP-RA-X Failed to write the output file. Exiting....\n{traceback_str}'
             self.logger.critical(str(ex))
             self.logger.critical(msg)
             raise
 
         except Exception as ex:
             traceback_str = traceback.format_exc()
-            msg = f'Error: HIP_RA_X Failed to write the output file. Exiting....\n{traceback_str}'
+            msg = f'Error: HIP-RA-X Failed to write the output file. Exiting....\n{traceback_str}'
             self.logger.critical(str(ex))
             self.logger.critical(msg)
             raise
