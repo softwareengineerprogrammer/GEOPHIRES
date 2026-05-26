@@ -834,14 +834,13 @@ class HIP_RA_X:
 
             inputs = self._get_output_config_for_summary_of_inputs_category(render_default, render_scientific)
             # If depth and/or pressure are provided, report them as inputs. If not, as outputs
-            if self.reservoir_depth.Provided:
-                # inputs.append((self.reservoir_depth, render_default))
-                reservoir_pressure_idx = [it[0].Name for it in inputs].index(self.reservoir_pressure.Name)
-                inputs.pop(reservoir_pressure_idx)
-            if self.reservoir_pressure.Provided:
-                # inputs.append((self.reservoir_pressure, render_default))
+            if not self.reservoir_depth.Provided:
                 reservoir_depth_idx = [it[0].Name for it in inputs].index(self.reservoir_depth.Name)
                 inputs.pop(reservoir_depth_idx)
+
+            if not self.reservoir_pressure.Provided:
+                reservoir_pressure_idx = [it[0].Name for it in inputs].index(self.reservoir_pressure.Name)
+                inputs.pop(reservoir_pressure_idx)
 
             for param, render in inputs:
                 summary_of_inputs[param.Name] = render(param)
@@ -851,14 +850,12 @@ class HIP_RA_X:
             outputs = self._get_output_config_for_summary_of_results_category(render_default, render_scientific)
 
             # If depth and/or pressure are provided, report them as inputs. If not, as outputs
-            if not self.reservoir_depth.Provided:
-                # outputs.insert(0, (self.reservoir_depth, render_default))
-                reservoir_pressure_idx = [it[0].Name for it in outputs].index(self.reservoir_pressure.Name)
-                outputs.pop(reservoir_pressure_idx)
-            if not self.reservoir_pressure.Provided:
-                # outputs.insert(0, (self.reservoir_pressure, render_default))
+            if self.reservoir_depth.Provided:
                 reservoir_depth_idx = [it[0].Name for it in outputs].index(self.reservoir_depth.Name)
                 outputs.pop(reservoir_depth_idx)
+            if self.reservoir_pressure.Provided:
+                reservoir_pressure_idx = [it[0].Name for it in outputs].index(self.reservoir_pressure.Name)
+                outputs.pop(reservoir_pressure_idx)
 
             for param, render in outputs:
                 summary_of_results[param.Name] = render(param)

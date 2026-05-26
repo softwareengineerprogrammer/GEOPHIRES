@@ -27,6 +27,7 @@ from hip_ra import HipRaInputParameters
 from hip_ra import HipRaResult
 from hip_ra.HIP_RA import HIP_RA
 from hip_ra_x import HipRaXClient
+from hip_ra_x import HipRaXResult
 from hip_ra_x.hip_ra_x import HIP_RA_X
 from tests.base_test_case import BaseTestCase
 
@@ -53,6 +54,10 @@ class HipRaXTestCase(BaseTestCase):
 
                     expected_result = HipRaResult(expected_result_output_file_path)
                     self.assertDictEqual(expected_result.result, result.result)
+
+                    x_result = client.get_hip_ra_x_result(HipRaInputParameters(input_file_path))
+                    expected_x_result = HipRaXResult.from_hip_ra_result(expected_result)
+                    self.assertDictEqual(expected_x_result.result, x_result.result)
 
                     # TODO
                     # self.assertFileContentsEqual(expected_result_output_file_path, result.output_file_path)
