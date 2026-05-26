@@ -6,6 +6,8 @@ import os
 import sys
 import traceback
 from pathlib import Path
+from typing import Callable
+from typing import ClassVar
 
 import pint
 from rich.console import Console
@@ -78,6 +80,9 @@ class HIP_RA_X:
     """
 
     _ureg = pint.get_application_registry()
+
+    _SUMMARY_OF_RESULTS_OUTPUT_CATEGORY: ClassVar[str] = 'SUMMARY OF RESULTS'
+    _SUMMARY_OF_INPUTS_OUTPUT_CATEGORY: ClassVar[str] = 'SUMMARY OF INPUTS'
 
     def __init__(self, enable_hip_ra_logging_config=True):
         # get logging started
@@ -827,66 +832,38 @@ class HIP_RA_X:
             summary_of_inputs = {}
             summary_of_results = {}
 
-            inputs = [
-                (self.reservoir_temperature, render_default),
-                (self.rejection_temperature, render_default),
-                (self.reservoir_porosity, render_default),
-                (self.reservoir_area, render_default),
-                (self.reservoir_thickness, render_default),
-                (self.reservoir_life_cycle, render_default),
-                (self.rock_heat_capacity, render_scientific),
-                (self.fluid_heat_capacity, render_default),
-                (self.fluid_density, render_scientific),
-                (self.rock_density, render_scientific),
-                (self.recoverable_fluid_factor, render_default),
-                (self.recoverable_rock_heat, render_default),
-            ]
-
+            inputs = self._get_output_config_for_summary_of_inputs_category(render_default, render_scientific)
             # If depth and/or pressure are provided, report them as inputs. If not, as outputs
             if self.reservoir_depth.Provided:
-                inputs.append((self.reservoir_depth, render_default))
+                # inputs.append((self.reservoir_depth, render_default))
+                reservoir_pressure_idx = [it[0].Name for it in inputs].index(self.reservoir_pressure.Name)
+                inputs.pop(reservoir_pressure_idx)
             if self.reservoir_pressure.Provided:
-                inputs.append((self.reservoir_pressure, render_default))
+                # inputs.append((self.reservoir_pressure, render_default))
+                reservoir_depth_idx = [it[0].Name for it in inputs].index(self.reservoir_depth.Name)
+                inputs.pop(reservoir_depth_idx)
 
             for param, render in inputs:
                 summary_of_inputs[param.Name] = render(param)
 
-            case_data_inputs = {'SUMMARY OF INPUTS': summary_of_inputs}
+            case_data_inputs = {self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY: summary_of_inputs}
 
-            outputs = [
-                (self.reservoir_volume, render_default),
-                (self.volume_rock, render_default),
-                (self.volume_recoverable_fluid, render_default),
-                (self.reservoir_stored_heat, render_scientific),
-                (self.stored_heat_rock, render_scientific),
-                (self.stored_heat_fluid, render_scientific),
-                (self.mass_rock, render_scientific),
-                (self.mass_recoverable_fluid, render_scientific),
-                (self.reservoir_enthalpy, render_default),
-                (self.enthalpy_rock, render_default),
-                (self.enthalpy_fluid, render_default),
-                (
-                    self.reservoir_recovery_factor,
-                    lambda rg: f'{(100 * rg.value):10.2f} {self.reservoir_recovery_factor.CurrentUnits.value}',
-                ),
-                (self.reservoir_available_heat, render_scientific),
-                (self.reservoir_producible_heat, render_scientific),
-                (self.producible_heat_per_unit_area, render_scientific),
-                (self.heat_per_unit_volume_reservoir, render_scientific),
-                (self.reservoir_producible_electricity, render_default),
-                (self.producible_electricity_per_unit_area, render_default),
-                (self.electricity_per_unit_volume_reservoir, render_default),
-            ]
+            outputs = self._get_output_config_for_summary_of_results_category(render_default, render_scientific)
 
             # If depth and/or pressure are provided, report them as inputs. If not, as outputs
             if not self.reservoir_depth.Provided:
-                outputs.insert(0, (self.reservoir_depth, render_default))
+                # outputs.insert(0, (self.reservoir_depth, render_default))
+                reservoir_pressure_idx = [it[0].Name for it in outputs].index(self.reservoir_pressure.Name)
+                outputs.pop(reservoir_pressure_idx)
             if not self.reservoir_pressure.Provided:
-                outputs.insert(0, (self.reservoir_pressure, render_default))
+                # outputs.insert(0, (self.reservoir_pressure, render_default))
+                reservoir_depth_idx = [it[0].Name for it in outputs].index(self.reservoir_depth.Name)
+                outputs.pop(reservoir_depth_idx)
+
             for param, render in outputs:
                 summary_of_results[param.Name] = render(param)
 
-            case_data_results = {'SUMMARY OF RESULTS': summary_of_results}
+            case_data_results = {self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY: summary_of_results}
 
             with open(outputfile, 'w', encoding='UTF-8') as f:
                 nl = '\n'
@@ -895,17 +872,17 @@ class HIP_RA_X:
                 f.write(f'                               ***HIP CASE REPORT***{nl}')
                 f.write(f'                               *********************{nl}')
                 f.write(nl)
-                f.write(f'      ***SUMMARY OF INPUTS***{nl}')
+                f.write(f'      ***{self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY}***{nl}')
 
-                for k, v in case_data_inputs['SUMMARY OF INPUTS'].items():
+                for k, v in case_data_inputs[self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY].items():
                     # align space between value and units to same column
                     kv_spaces = max(1, (24 - (len(v.split(' ')[0]) + len(k)))) * ' '
 
                     f.write(f'      {k}:{kv_spaces}{v}{nl}')
 
                 f.write(nl)
-                f.write(f'      ***SUMMARY OF RESULTS***{nl}')
-                for k, v in case_data_results['SUMMARY OF RESULTS'].items():
+                f.write(f'      ***{self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY}***{nl}')
+                for k, v in case_data_results[self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY].items():
                     # align space between value and units to same column
                     kv_spaces = max(1, (24 - (len(v.split(' ')[0]) + len(k)))) * ' '
 
@@ -943,6 +920,60 @@ class HIP_RA_X:
                 # Now write each line to the screen
                 for line in content:
                     sys.stdout.write(line)
+
+    def _get_output_config_for_summary_of_inputs_category(
+        self, render_default: Callable[[Parameter], str], render_scientific: Callable[[Parameter], str]
+    ) -> list[tuple[Parameter, Callable[[Parameter], str]]]:
+        return [
+            (self.reservoir_temperature, render_default),
+            (self.rejection_temperature, render_default),
+            (self.reservoir_porosity, render_default),
+            (self.reservoir_area, render_default),
+            (self.reservoir_thickness, render_default),
+            (self.reservoir_life_cycle, render_default),
+            (self.rock_heat_capacity, render_scientific),
+            (self.fluid_heat_capacity, render_default),
+            (self.fluid_density, render_scientific),
+            (self.rock_density, render_scientific),
+            (self.recoverable_fluid_factor, render_default),
+            (self.recoverable_rock_heat, render_default),
+            # Note: If depth and/or pressure are provided, they are reported as inputs.
+            # If not, they are reported as outputs.
+            (self.reservoir_depth, render_default),
+            (self.reservoir_pressure, render_default),
+        ]
+
+    def _get_output_config_for_summary_of_results_category(
+        self, render_default: Callable[[Parameter], str], render_scientific: Callable[[Parameter], str]
+    ) -> list[tuple[Parameter, Callable[[Parameter], str]]]:
+        return [
+            # Note: If depth and/or pressure are provided, they are reported as inputs.
+            # If not, they are reported as outputs.
+            (self.reservoir_depth, render_default),
+            (self.reservoir_pressure, render_default),
+            (self.reservoir_volume, render_default),
+            (self.volume_rock, render_default),
+            (self.volume_recoverable_fluid, render_default),
+            (self.reservoir_stored_heat, render_scientific),
+            (self.stored_heat_rock, render_scientific),
+            (self.stored_heat_fluid, render_scientific),
+            (self.mass_rock, render_scientific),
+            (self.mass_recoverable_fluid, render_scientific),
+            (self.reservoir_enthalpy, render_default),
+            (self.enthalpy_rock, render_default),
+            (self.enthalpy_fluid, render_default),
+            (
+                self.reservoir_recovery_factor,
+                lambda rg: f'{(100 * rg.value):10.2f} {self.reservoir_recovery_factor.CurrentUnits.value}',
+            ),
+            (self.reservoir_available_heat, render_scientific),
+            (self.reservoir_producible_heat, render_scientific),
+            (self.producible_heat_per_unit_area, render_scientific),
+            (self.heat_per_unit_volume_reservoir, render_scientific),
+            (self.reservoir_producible_electricity, render_default),
+            (self.producible_electricity_per_unit_area, render_default),
+            (self.electricity_per_unit_volume_reservoir, render_default),
+        ]
 
     def PrintOutputsHTML(self, inputs, outputs, output_filename: str = 'HIP.html'):
         """
