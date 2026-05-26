@@ -109,7 +109,7 @@ class GeophiresXSchemaGenerator:
     def generate_json_schema(self) -> tuple[dict, dict]:
         """
         :return: request schema, result schema
-        :rtype: Tuple[dict, dict]
+        :rtype: tuple[dict, dict]
         """
         input_params_json, output_params_json = self.get_parameters_json()
         input_params = json.loads(input_params_json)
@@ -155,10 +155,6 @@ class GeophiresXSchemaGenerator:
     def get_result_json_schema(self, output_params_json) -> dict:
         properties = {}
         required = []
-
-        # if result_fields_by_category is None:
-        #     # noinspection PyProtectedMember
-        #     result_fields_by_category = GeophiresXResult._RESULT_FIELDS_BY_CATEGORY
 
         output_params = json.loads(output_params_json)
         display_name_aliases = {}
@@ -414,39 +410,6 @@ class HipRaXSchemaGenerator(GeophiresXSchemaGenerator):
 
     def get_schema_title(self) -> str:
         return 'HIP-RA-X'
-
-    def get_result_json_schema(self, output_params_json) -> dict:
-        output_params = json.loads(output_params_json)
-
-        properties = {}
-
-        # noinspection PyProtectedMember
-        for category in [HIP_RA_X._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY, HIP_RA_X._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY]:
-            cat_properties = {}
-            for param_name, output_param in output_params.items():
-                description = _get_key(output_param, 'ToolTipText', default_val=None) or None
-                units_val = output_param['CurrentUnits'] if isinstance(output_param.get('CurrentUnits'), str) else None
-                cat_properties[param_name] = {
-                    'type': _get_key(output_param, 'json_parameter_type', default_val=None) or None,
-                    'description': description,
-                    'units': units_val,
-                }
-
-            properties[category] = {
-                'type': 'object',
-                'properties': cat_properties,
-            }
-
-        result_schema = {
-            'definitions': {},
-            '$schema': 'http://json-schema.org/draft-04/schema#',
-            'type': 'object',
-            'title': f'{self.get_schema_title()} Result Schema',
-            'required': [],
-            'properties': properties,
-        }
-
-        return result_schema
 
     def get_output_params_table_rst(self, output_params_json) -> str:
         """
