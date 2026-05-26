@@ -44,7 +44,10 @@ class HipRaXTestCase(BaseTestCase):
             return self._get_test_file_path(Path(example_file).with_suffix('.out'))
 
         for example_file_path in example_files:
-            if example_file_path.startswith('HIP-RA-X_example') and '.out' not in example_file_path:
+            if (
+                example_file_path.startswith(('HIP-RA-X_example', 'Fervo_Project_Cape-HIIP'))
+                and '.out' not in example_file_path
+            ):
                 with self.subTest(msg=example_file_path):
                     input_file_path = self._get_test_file_path(Path('./examples', example_file_path))
                     result = client.get_hip_ra_result(HipRaInputParameters(input_file_path))

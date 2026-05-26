@@ -22,27 +22,9 @@ def generate_fpc_hiip_analysis_doc():
     _BUILD_DIR.mkdir(parents=True, exist_ok=True)
     _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 1. Define and Run Deterministic Baseline
-    base_params = {
-        'Reservoir Temperature': 199.0,
-        'Rejection Temperature': 80.0,
-        'Reservoir Porosity': 0.0,
-        'Reservoir Area': 48.0,
-        'Reservoir Thickness': 4.0,
-        'Reservoir Life Cycle': 30,
-        'Rock Heat Capacity': 2.212e12,
-        'Fluid Specific Heat Capacity': -1.0,
-        'Density Of Reservoir Fluid': -1.0,
-        'Density Of Reservoir Rock': 2.8e12,
-        'Recoverable Heat from Rock': 1.0,
-        'Recoverable Fluid Factor': 1.0,
-        'Print Output to Console': False,
-    }
-
-    base_input_path = _BUILD_DIR / 'fpc_hiip_base.txt'
-    with open(base_input_path, 'w') as f:
-        for k, v in base_params.items():
-            f.write(f'{k}, {v}\n')
+    base_input_path = (
+        _PROJECT_ROOT / 'tests' / 'hip_ra_x_tests' / 'examples' / 'Fervo_Project_Cape-HIIP-analysis-baseline.txt'
+    )
 
     _log.info('Running deterministic HIP-RA-X baseline...')
     client = HipRaXClient()
