@@ -5,7 +5,187 @@
   "title": "HIP-RA-X Result Schema",
   "required": [],
   "properties": {
-    "HIP-RA-X OUTPUTS": {
+    "SUMMARY OF RESULTS": {
+      "type": "object",
+      "properties": {
+        "Reservoir Volume (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "km**3"
+        },
+        "Reservoir Volume (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "km**3"
+        },
+        "Recoverable Volume (recoverable fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "km**3"
+        },
+        "Stored Heat (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Stored Heat (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Stored Heat (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Mass of Reservoir (total)": {
+          "type": "number",
+          "description": null,
+          "units": "kilogram"
+        },
+        "Mass of Reservoir (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "kilogram"
+        },
+        "Mass of Reservoir (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "kilogram"
+        },
+        "Specific Enthalpy (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ/kg"
+        },
+        "Specific Enthalpy (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ/kg"
+        },
+        "Specific Enthalpy (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ/kg"
+        },
+        "Wellhead Heat (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Wellhead Heat (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Wellhead Heat (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Recovery Factor (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "%"
+        },
+        "Recovery Factor (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "%"
+        },
+        "Recovery Factor (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "%"
+        },
+        "Available Heat (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Available Heat (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Available Heat (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Producible Heat (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Producible Heat (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Producible Heat (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ"
+        },
+        "Producible Electricity (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "MW"
+        },
+        "Producible Electricity (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "MW"
+        },
+        "Producible Electricity (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "MW"
+        },
+        "Producible Heat/Unit Area (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ/km**2"
+        },
+        "Producible Heat/Unit Area (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ/km**2"
+        },
+        "Producible Heat/Unit Area (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ/km**2"
+        },
+        "Producible Heat/Unit Volume (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "kJ/km**3"
+        },
+        "Producible Electricity/Unit Area (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "MW/km**2"
+        },
+        "Producible Electricity/Unit Area (rock)": {
+          "type": "number",
+          "description": null,
+          "units": "MW/km**2"
+        },
+        "Producible Electricity/Unit Area (fluid)": {
+          "type": "number",
+          "description": null,
+          "units": "MW/km**2"
+        },
+        "Producible Electricity/Unit Volume (reservoir)": {
+          "type": "number",
+          "description": null,
+          "units": "MW/km**3"
+        }
+      }
+    },
+    "SUMMARY OF INPUTS": {
       "type": "object",
       "properties": {
         "Reservoir Volume (reservoir)": {

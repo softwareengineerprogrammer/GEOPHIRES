@@ -6,6 +6,8 @@ import os
 import sys
 import traceback
 from pathlib import Path
+from typing import Callable
+from typing import ClassVar
 
 import pint
 from rich.console import Console
@@ -78,6 +80,9 @@ class HIP_RA_X:
     """
 
     _ureg = pint.get_application_registry()
+
+    _SUMMARY_OF_RESULTS_OUTPUT_CATEGORY: ClassVar[str] = 'SUMMARY OF RESULTS'
+    _SUMMARY_OF_INPUTS_OUTPUT_CATEGORY: ClassVar[str] = 'SUMMARY OF INPUTS'
 
     def __init__(self, enable_hip_ra_logging_config=True):
         # get logging started
@@ -841,9 +846,9 @@ class HIP_RA_X:
             for param, render in inputs:
                 summary_of_inputs[param.Name] = render(param)
 
-            case_data_inputs = {'SUMMARY OF INPUTS': summary_of_inputs}
+            case_data_inputs = {self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY: summary_of_inputs}
 
-            outputs = self._get_output_config_for_summary_of_outputs_category(render_default, render_scientific)
+            outputs = self._get_output_config_for_summary_of_results_category(render_default, render_scientific)
 
             # If depth and/or pressure are provided, report them as inputs. If not, as outputs
             if not self.reservoir_depth.Provided:
@@ -858,7 +863,7 @@ class HIP_RA_X:
             for param, render in outputs:
                 summary_of_results[param.Name] = render(param)
 
-            case_data_results = {'SUMMARY OF RESULTS': summary_of_results}
+            case_data_results = {self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY: summary_of_results}
 
             with open(outputfile, 'w', encoding='UTF-8') as f:
                 nl = '\n'
@@ -867,17 +872,17 @@ class HIP_RA_X:
                 f.write(f'                               ***HIP CASE REPORT***{nl}')
                 f.write(f'                               *********************{nl}')
                 f.write(nl)
-                f.write(f'      ***SUMMARY OF INPUTS***{nl}')
+                f.write(f'      ***{self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY}***{nl}')
 
-                for k, v in case_data_inputs['SUMMARY OF INPUTS'].items():
+                for k, v in case_data_inputs[self._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY].items():
                     # align space between value and units to same column
                     kv_spaces = max(1, (24 - (len(v.split(' ')[0]) + len(k)))) * ' '
 
                     f.write(f'      {k}:{kv_spaces}{v}{nl}')
 
                 f.write(nl)
-                f.write(f'      ***SUMMARY OF RESULTS***{nl}')
-                for k, v in case_data_results['SUMMARY OF RESULTS'].items():
+                f.write(f'      ***{self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY}***{nl}')
+                for k, v in case_data_results[self._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY].items():
                     # align space between value and units to same column
                     kv_spaces = max(1, (24 - (len(v.split(' ')[0]) + len(k)))) * ' '
 
@@ -916,7 +921,9 @@ class HIP_RA_X:
                 for line in content:
                     sys.stdout.write(line)
 
-    def _get_output_config_for_summary_of_inputs_category(self, render_default, render_scientific):
+    def _get_output_config_for_summary_of_inputs_category(
+        self, render_default: Callable[[Parameter], str], render_scientific: Callable[[Parameter], str]
+    ) -> list[tuple[Parameter, Callable[[Parameter], str]]]:
         return [
             (self.reservoir_temperature, render_default),
             (self.rejection_temperature, render_default),
@@ -936,7 +943,9 @@ class HIP_RA_X:
             (self.reservoir_pressure, render_default),
         ]
 
-    def _get_output_config_for_summary_of_outputs_category(self, render_default, render_scientific):
+    def _get_output_config_for_summary_of_results_category(
+        self, render_default: Callable[[Parameter], str], render_scientific: Callable[[Parameter], str]
+    ) -> list[tuple[Parameter, Callable[[Parameter], str]]]:
         return [
             # Note: If depth and/or pressure are provided, they are reported as inputs.
             # If not, they are reported as outputs.
