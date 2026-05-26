@@ -379,6 +379,10 @@ def _fix_floating_point_error(val: Any) -> Any:
 
 
 class HipRaXSchemaGenerator(GeophiresXSchemaGenerator):
+    """
+    TODO fix JSON & RST metadata generation for outputs that are also inputs (like Reservoir Depth) - currently only
+        Names are correctly processed
+    """
 
     def __init__(self):
         dummy_model = HIP_RA_X()
