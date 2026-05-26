@@ -20,11 +20,12 @@ Contents
 
 .. toctree::
    :maxdepth: 3
-   :caption: Examples
+   :caption: Examples & Case Studies
 
    GEOPHIRES-Examples
    Fervo_Project_Cape-5
    Fervo_Project_Red
+   Fervo_Project_Cape_HIIP_Analysis
 
 
 ..   reference/index
