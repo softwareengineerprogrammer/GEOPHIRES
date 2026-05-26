@@ -7,6 +7,7 @@ from jinja2 import FileSystemLoader
 
 from geophires_monte_carlo import GeophiresMonteCarloClient
 from geophires_monte_carlo import MonteCarloRequest
+from geophires_monte_carlo import MonteCarloResult
 from geophires_monte_carlo import SimulationProgram
 from hip_ra import HipRaInputParameters
 from hip_ra_x import HipRaXClient
@@ -69,10 +70,10 @@ def generate_fpc_hiip_analysis_doc():
 
     # Execute the client
     mc_client = GeophiresMonteCarloClient()
-    mc_result = mc_client.get_monte_carlo_result(mc_request)
+    mc_result: MonteCarloResult = mc_client.get_monte_carlo_result(mc_request)
 
     # 3. Read MC JSON Results directly from the result object
-    mc_stats = mc_result.result['output']
+    mc_stats: dict = mc_result.result['output']
 
     mc_stored_heat_mean_kj = mc_stats['Stored Heat (reservoir)']['mean']
     mc_stored_heat_mean_15j = mc_stored_heat_mean_kj / 1e12
