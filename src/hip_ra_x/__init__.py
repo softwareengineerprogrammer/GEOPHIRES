@@ -29,7 +29,7 @@ class HipRaXClient:
             sys.argv = stash_sys_argv
             os.chdir(stash_cwd)
 
-        self._logger.info(f'HIP-RA output file: {input_params.output_file_path}')
+        self._logger.info(f'HIP-RA-X output file: {input_params.output_file_path}')
 
         return HipRaResult(input_params.output_file_path)
 
