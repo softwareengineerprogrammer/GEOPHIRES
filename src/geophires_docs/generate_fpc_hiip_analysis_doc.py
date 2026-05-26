@@ -123,10 +123,10 @@ def generate_fpc_hiip_analysis_doc():
     }
 
     env = Environment(loader=FileSystemLoader(docs_dir), autoescape=True)
-    template = env.get_template('FPC_HIIP_Analysis.md.jinja')
+    template = env.get_template('Fervo_Project_Cape_HIIP_Analysis.md.jinja')
     output = template.render(**template_values)
 
-    output_file = docs_dir / 'FPC_HIIP_Analysis.md'
+    output_file = docs_dir / 'Fervo_Project_Cape_HIIP_Analysis.md'
     output_file.write_text(output, encoding='utf-8')
     _log.info(f'✓ Generated {output_file}')
 
