@@ -1,19 +1,23 @@
 # Project Cape HIIP Validation
 
 **Overview:** This analysis evaluates the accuracy and methodology of GEOPHIRES' HIP-RA-X volumetric heat-in-place tool
-by comparing its calculations against the DeGolyer and MacNaughton (D&M) Heat Initially In Place (HIIP) report prepared
+by comparing its calculations against the DeGolyer and MacNaughton (D&M) Heat Initially In Place (HIIP) [report](https://www.sec.gov/Archives/edgar/data/1853868/000162828026025821/exhibit991-sx1.htm) prepared
 for Fervo Energy's Cape Station (filed with the SEC in June 2024).
 
-**The results confirm that the HIP-RA-X core volumetric methodology is mathematically identical to the
-industry-standard D&M HIIP methodology. When appropriately parameterized to remove secondary thermodynamic recovery
-constraints, HIP-RA-X aligns with the SEC's baseline thermal energy estimates.**
+The results confirm that the HIP-RA-X core volumetric methodology is mathematically aligned to the
+D&M HIIP methodology. When appropriately parameterized to remove secondary thermodynamic recovery
+constraints, HIP-RA-X produces results in agreements with the SEC filing's baseline thermal energy estimates.
+
+**Disclaimer: Independent Analysis:** This is an independent evaluation developed by the author and contributors to the
+GEOPHIRES open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy, DeGolyer and MacNaughton,
+the SEC, or any other party.
+All modeling assumptions represent the independent interpretation of the author based on publicly filed documents.
 
 ---
 
-**Disclaimer: Independent Analysis:** This is an independent evaluation developed by the author and contributors to the GEOPHIRES open-source project. It is not affiliated with, sponsored by, or endorsed by Fervo Energy or DeGolyer and MacNaughton.
-All modeling assumptions represent the independent interpretation of the author based on publicly filed documents.
+## Methodology
 
-## 1. Geologic and Thermal Model
+### Geologic and Thermal Model
 
 **SEC Document Claim:** The Project Cape Area targets a high-temperature geothermal anomaly in low-permeability Granitic Basement rocks with little to no porosity. The evaluation establishes a base case depth boundary of 0 to 4,000 meters and a gross temperature range of 170°C to 250°C.
 
@@ -27,16 +31,19 @@ HIP-RA-X mathematically aligns perfectly with the SEC's thermal energy physics. 
 * **Density Of Reservoir Rock:** 2.8e12 kg/km³ (GEOPHIRES Cape Station baseline).
 * **Rock Heat Capacity:** 2.212e12 kJ/km³°C (GEOPHIRES Cape Station baseline).
 
-## 2. Estimation Methodology
+### Estimation Methodology
 
 **SEC Document Claim:** The SEC HIIP estimates are raw, un-risked baselines. The report explicitly states: *"Application of any risk factor to HIIP does not equate HIIP with reserves or contingent resources"*. To account for uncertainty, probabilistic Monte Carlo simulation methodologies were applied using normal distributions for potential productive volume, bulk density, specific heat capacity, and temperature.
 
 **HIP-RA-X Evaluation:**
 By default, HIP-RA-X acts as a resource assessment tool and bakes in a 75% rock heat recovery factor. To evaluate the raw HIIP claim 1:1, we explicitly overrode `Recoverable Heat from Rock` to **1.0 (100%)**.
 
-Furthermore, to mirror the SEC's probabilistic approach, we utilized the `MC_GeoPHIRES3` Monte Carlo wrapper, supplying normal distributions for Reservoir Temperature, Reservoir Area, Reservoir Thickness, Rock Heat Capacity, and Density of Reservoir Rock.
+Furthermore, to mirror the SEC filing's probabilistic approach, GEOPHIRES's [Monte Carlo module](Monte-Carlo-User-Guide.html) was utilized, supplying normal
+distributions for Reservoir Temperature, Reservoir Area, Reservoir Thickness, Rock Heat Capacity, and Density of Reservoir Rock.
 
-## 3. Estimation of Heat Initially in Place
+## Results
+
+### Estimation of Heat Initially in Place
 
 **SEC Document Claim:** The probabilistic evaluation yielded a "Low Estimate" (P90) Gross HIIP of 50,730 PJ and a "Mean Estimate" of 63,560 PJ.
 
@@ -56,7 +63,7 @@ Because our deterministic run used a static 199°C input—sitting in the lower 
 
 ![](_images/fpc_hiip_mc_Stored_Heat_reservoir.png)
 
-## 4. Electric Power Capacity
+### Electric Power Capacity
 
 **SEC Document Claim:** The SEC filing converts thermal energy to electricity by taking the raw HIIP and applying a static 19.5% ORC plant efficiency and a 1.069 peak output correction factor over 30 years. This yields a Mean Estimate Electric Power Capacity of 14,005 MW.
 
