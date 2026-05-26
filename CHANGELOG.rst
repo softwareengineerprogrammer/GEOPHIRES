@@ -8,7 +8,7 @@ GEOPHIRES v3 (2023-2026)
 3.13
 ^^^^
 
-3.13.9: `Add hip-ra-x-result.json schema and HipRaXResult <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/157>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.9>`__
+3.13.9: `Add hip-ra-x-result.json schema and HipRaXResult <https://github.com/NatLabRockies/GEOPHIRES-X/pull/499>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.9>`__
 
 3.13.8: `Fix drilling cost types output unit conversion issue; Project Location (Latitude & Longitude); SHR Example 3 update <https://github.com/NatLabRockies/GEOPHIRES-X/pull/497>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.8>`__
 
