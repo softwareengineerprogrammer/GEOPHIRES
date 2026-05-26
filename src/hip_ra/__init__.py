@@ -6,6 +6,7 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+# noinspection PyProtectedMember
 from geophires_x_client.common import _get_logger
 from hip_ra import HIP_RA
 

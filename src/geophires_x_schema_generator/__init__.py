@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import json
 import os
 import sys
 from pathlib import Path
-from typing import Tuple, Any
+from typing import Any, Callable
 
 # Ruff disabled because imports are order-dependent
 # ruff: noqa: I001
@@ -38,7 +40,8 @@ _log = _get_logger()
 
 class GeophiresXSchemaGenerator:
     def __init__(self):
-        pass
+        # noinspection PyProtectedMember
+        self.result_fields_by_category: dict[str, list[Any]] = GeophiresXResult._RESULT_FIELDS_BY_CATEGORY
 
     @staticmethod
     def _get_dummy_model():
@@ -85,7 +88,7 @@ class GeophiresXSchemaGenerator:
     def get_schema_title(self) -> str:
         return 'GEOPHIRES'
 
-    def get_parameters_json(self) -> Tuple[str, str]:
+    def get_parameters_json(self) -> tuple[str, str]:
 
         def with_category(param_dict: dict, category: str):
             def _with_cat(p: Parameter, cat: str):
@@ -103,10 +106,10 @@ class GeophiresXSchemaGenerator:
 
         return json_dumpse(input_params), json_dumpse(output_params)
 
-    def generate_json_schema(self) -> Tuple[dict, dict]:
+    def generate_json_schema(self) -> tuple[dict, dict]:
         """
         :return: request schema, result schema
-        :rtype: Tuple[dict, dict]
+        :rtype: tuple[dict, dict]
         """
         input_params_json, output_params_json = self.get_parameters_json()
         input_params = json.loads(input_params_json)
@@ -165,11 +168,10 @@ class GeophiresXSchemaGenerator:
 
         output_params = {**output_params, **display_name_aliases}
 
-        # noinspection PyProtectedMember
-        for category in GeophiresXResult._RESULT_FIELDS_BY_CATEGORY:
+        for category in self.result_fields_by_category:
             cat_properties = {}
-            # noinspection PyProtectedMember
-            for field in GeophiresXResult._RESULT_FIELDS_BY_CATEGORY[category]:
+
+            for field in self.result_fields_by_category[category]:
                 param_name = field if isinstance(field, str) else field.field_name
 
                 ignored_output_param_names = ['After-Tax IRR']  # Silently ignored in favor of "After-tax IRR"
@@ -357,7 +359,7 @@ def _get_key(param: dict, k: str, default_val='') -> Any:
         return default_val
 
 
-def _get_min_and_max(param: dict, default_val='') -> Tuple:
+def _get_min_and_max(param: dict, default_val='') -> tuple:
     min_val = _get_key(param, 'Min', default_val=default_val)
     max_val = _get_key(param, 'Max', default_val=default_val)
 
@@ -377,8 +379,34 @@ def _fix_floating_point_error(val: Any) -> Any:
 
 
 class HipRaXSchemaGenerator(GeophiresXSchemaGenerator):
+    """
+    TODO fix JSON & RST metadata generation for outputs that are also inputs (like Reservoir Depth) - currently only
+        Names are correctly processed
+    """
+
+    def __init__(self):
+        dummy_model = HIP_RA_X()
+
+        def _get_result_fields_for_category(
+            output_config: list[tuple[Parameter, Callable[[Parameter], str]]],
+        ) -> list[Any]:
+            return [it[0].Name for it in output_config]
+
+        # noinspection PyProtectedMember
+        self.result_fields_by_category: dict[str, list[Any]] = {
+            HIP_RA_X._SUMMARY_OF_RESULTS_OUTPUT_CATEGORY: _get_result_fields_for_category(
+                dummy_model._get_output_config_for_summary_of_results_category(None, None)
+            ),
+            HIP_RA_X._SUMMARY_OF_INPUTS_OUTPUT_CATEGORY: _get_result_fields_for_category(
+                dummy_model._get_output_config_for_summary_of_inputs_category(None, None)
+            ),
+        }
+
     def get_parameter_sources(self) -> list:
         """
+        Single implicit input category used to keep the result schema shape consistent
+        with the GEOPHIRES result schema (top-level properties -> category -> properties -> fields).
+
         :rtype: list[Tuple[Any, str]]
         """
         dummy_model = HIP_RA_X()
@@ -387,43 +415,8 @@ class HipRaXSchemaGenerator(GeophiresXSchemaGenerator):
     def get_schema_title(self) -> str:
         return 'HIP-RA-X'
 
-    def get_result_json_schema(self, output_params_json) -> dict:
-        return None  # FIXME TODO
-
-    def get_output_params_table_rst(self, output_params_json) -> str:
-        """
-        FIXME TODO consolidate with generated result schema
-        """
-
-        output_params = json.loads(output_params_json)
-
-        output_rst = """
-    .. list-table:: Outputs
-       :header-rows: 1
-
-       * - Name
-         - Description
-         - Preferred Units
-         - Default Value Type"""
-
-        for param_name in output_params:
-            param = output_params[param_name]
-
-            def get_key(k):
-                if k in param and str(param[k]) != '':  # noqa
-                    return param[k]  # noqa
-                else:
-                    return ''
-
-            output_rst += f"""\n       * - {param['Name']}
-         - {get_key('ToolTipText')}
-         - {get_key('PreferredUnits')}
-         - {get_key('json_parameter_type')}"""
-
-        return output_rst
-
     def get_input_schema_reference(self) -> str:
         return 'hip-ra-x-request.json'
 
     def get_output_schema_reference(self) -> str:
-        return None
+        return 'hip-ra-x-result.json'

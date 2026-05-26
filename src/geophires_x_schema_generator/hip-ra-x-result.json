@@ -1,0 +1,130 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "HIP-RA-X Result Schema",
+  "required": [],
+  "properties": {
+    "SUMMARY OF RESULTS": {
+      "type": "object",
+      "properties": {
+        "Reservoir Depth": {},
+        "Reservoir Pressure": {},
+        "Reservoir Volume (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "km**3"
+        },
+        "Reservoir Volume (rock)": {
+          "type": "number",
+          "description": "",
+          "units": "km**3"
+        },
+        "Recoverable Volume (recoverable fluid)": {
+          "type": "number",
+          "description": "",
+          "units": "km**3"
+        },
+        "Stored Heat (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ"
+        },
+        "Stored Heat (rock)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ"
+        },
+        "Stored Heat (fluid)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ"
+        },
+        "Mass of Reservoir (rock)": {
+          "type": "number",
+          "description": "",
+          "units": "kilogram"
+        },
+        "Mass of Reservoir (fluid)": {
+          "type": "number",
+          "description": "",
+          "units": "kilogram"
+        },
+        "Specific Enthalpy (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ/kg"
+        },
+        "Specific Enthalpy (rock)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ/kg"
+        },
+        "Specific Enthalpy (fluid)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ/kg"
+        },
+        "Recovery Factor (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "%"
+        },
+        "Available Heat (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ"
+        },
+        "Producible Heat (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ"
+        },
+        "Producible Heat/Unit Area (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ/km**2"
+        },
+        "Producible Heat/Unit Volume (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "kJ/km**3"
+        },
+        "Producible Electricity (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "MW"
+        },
+        "Producible Electricity/Unit Area (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "MW/km**2"
+        },
+        "Producible Electricity/Unit Volume (reservoir)": {
+          "type": "number",
+          "description": "",
+          "units": "MW/km**3"
+        }
+      }
+    },
+    "SUMMARY OF INPUTS": {
+      "type": "object",
+      "properties": {
+        "Reservoir Temperature": {},
+        "Rejection Temperature": {},
+        "Reservoir Porosity": {},
+        "Reservoir Area": {},
+        "Reservoir Thickness": {},
+        "Reservoir Life Cycle": {},
+        "Rock Heat Capacity": {},
+        "Fluid Specific Heat Capacity": {},
+        "Density Of Reservoir Fluid": {},
+        "Density Of Reservoir Rock": {},
+        "Recoverable Fluid Factor": {},
+        "Recoverable Heat from Rock": {},
+        "Reservoir Depth": {},
+        "Reservoir Pressure": {}
+      }
+    }
+  }
+}
