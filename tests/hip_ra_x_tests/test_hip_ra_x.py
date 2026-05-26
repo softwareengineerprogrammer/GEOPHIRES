@@ -58,12 +58,12 @@ class HipRaXTestCase(BaseTestCase):
                     expected_result = HipRaResult(expected_result_output_file_path)
                     self.assertDictEqual(expected_result.result, result.result)
 
+                    # TODO
+                    # self.assertFileContentsEqual(expected_result_output_file_path, result.output_file_path)
+
                     x_result = client.get_hip_ra_x_result(HipRaInputParameters(input_file_path))
                     expected_x_result = HipRaXResult.from_hip_ra_result(expected_result)
                     self.assertDictEqual(expected_x_result.result, x_result.result)
-
-                    # TODO
-                    # self.assertFileContentsEqual(expected_result_output_file_path, result.output_file_path)
 
     def test_print_output_to_console(self):
         def get_stdout_from_running(print_output_to_console: bool | int) -> str:

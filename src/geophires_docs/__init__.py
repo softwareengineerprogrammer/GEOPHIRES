@@ -11,6 +11,7 @@ from pint.facets.plain import PlainQuantity
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
+from hip_ra import HipRaInputParameters
 
 _NON_BREAKING_SPACE = '\xa0'
 
@@ -63,7 +64,9 @@ def _get_logger(_name_: str) -> Any:
 
 
 def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCase._get_input_parameters
-    _params: GeophiresInputParameters, include_parameter_comments: bool = False, include_line_comments: bool = False
+    _params: GeophiresInputParameters | HipRaInputParameters,
+    include_parameter_comments: bool = False,
+    include_line_comments: bool = False,
 ) -> dict[str, Any]:
     comment_idx = 0
     ret: dict[str, Any] = {}
@@ -85,7 +88,7 @@ def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCa
     return ret
 
 
-def _get_input_parameters_comments_dict(_params: GeophiresInputParameters) -> dict[str, str]:
+def _get_input_parameters_comments_dict(_params: GeophiresInputParameters | HipRaInputParameters) -> dict[str, str]:
     ret: dict[str, str] = {}
 
     with open(_get_file_path('../geophires_x_schema_generator/geophires-request.json'), encoding='utf-8') as f:

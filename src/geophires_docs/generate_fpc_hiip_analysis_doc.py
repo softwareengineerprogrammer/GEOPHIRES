@@ -4,7 +4,10 @@ from pathlib import Path
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+from tabulate import tabulate
 
+from geophires_docs import _get_input_parameters_dict
+from geophires_docs import _get_logger
 from geophires_monte_carlo import GeophiresMonteCarloClient
 from geophires_monte_carlo import MonteCarloRequest
 from geophires_monte_carlo import MonteCarloResult
@@ -13,11 +16,33 @@ from hip_ra import HipRaInputParameters
 from hip_ra_x import HipRaXClient
 from hip_ra_x import HipRaXResult
 
-_log = logging.getLogger(__name__)
+_log = _get_logger(__name__)
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 _BUILD_DIR = _PROJECT_ROOT / 'build' / 'fpc_hiip_analysis'
 _IMAGES_DIR = _PROJECT_ROOT / 'docs' / '_images'
+
+
+def _get_baseline_input_params_table_md(baseline_input_params):
+    params_dict = _get_input_parameters_dict(baseline_input_params, include_parameter_comments=True)
+
+    table = []
+
+    for k, v_c in params_dict.items():
+        v = v_c.split(',')[0].strip()
+        c = v_c.split(',')[1].replace(' -- ', '').strip()
+
+        # Prevent tabulate from trying to convert boolean strings to float
+        if v.lower() in ('true', 'false'):
+            v = f' {v}'
+
+        if c == '':
+            # c = ' .. N/A'
+            continue  # omit commentless params for now
+
+        table.append([k, v, c])
+
+    return tabulate(table, ['Parameter', 'Value', 'Comment'], tablefmt='github', floatfmt='')
 
 
 def generate_fpc_hiip_analysis_doc():
@@ -30,9 +55,8 @@ def generate_fpc_hiip_analysis_doc():
 
     _log.info('Running deterministic HIP-RA-X baseline...')
     client = HipRaXClient()
-    det_result: HipRaXResult = client.get_hip_ra_x_result(
-        HipRaInputParameters(file_path_or_params_dict=base_input_path)
-    )
+    det_input_params: HipRaInputParameters = HipRaInputParameters(file_path_or_params_dict=base_input_path)
+    det_result: HipRaXResult = client.get_hip_ra_x_result(det_input_params)
 
     det_stored_heat_kj = det_result.result['SUMMARY OF RESULTS']['Stored Heat (reservoir)']['value']
     det_elec_mw = det_result.result['SUMMARY OF RESULTS']['Producible Electricity (reservoir)']['value']
@@ -94,7 +118,10 @@ def generate_fpc_hiip_analysis_doc():
     _log.info('Rendering Markdown documentation...')
     docs_dir = _PROJECT_ROOT / 'docs'
 
+    baseline_input_params_table_md = _get_baseline_input_params_table_md(det_input_params)
+
     template_values = {
+        'baseline_input_params_table_md': baseline_input_params_table_md,
         'det_stored_heat_15j': f'{det_stored_heat_15j:,.0f}',
         'det_elec_mw': f'{det_elec_mw:,.0f}',
         'mc_stored_heat_mean_15j': f'{mc_stored_heat_mean_15j:,.0f}',
