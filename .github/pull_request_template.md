@@ -13,13 +13,14 @@ and any other relevant information.*
 
 **Change Checklist**:
 
-Observe the following checklist items if your change includes a new version (see [versioning notes](https://github.com/NREL/GEOPHIRES-X/blob/main/CHANGELOG.rst#versioning-notes) and [version management docs](https://github.com/NREL/GEOPHIRES-X/blob/main/CONTRIBUTING.rst#version-management)).
-
 Before merging:
-1. [ ] Add a CHANGELOG entry ([example](https://github.com/NREL/GEOPHIRES-X/commit/15e10e5c3c08633a16645e41dfb7e8131805483f)). RST Template:
+1. [ ] I certify that I am a human and I have manually verified the correctness of the changes in this PR.
+1. [ ] Add a CHANGELOG entry if your change includes a new version[^new-version-footnote] ([example](https://github.com/NREL/GEOPHIRES-X/commit/15e10e5c3c08633a16645e41dfb7e8131805483f)). RST Template:
 ```restructuredtext
 M.m.P: `TITLE <https://github.com/NREL/GEOPHIRES-X/pull/PR-NUMBER>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/vM.m.P>`__
 ```
+
+[^new-version-footnote]: See [versioning notes](https://github.com/NREL/GEOPHIRES-X/blob/main/CHANGELOG.rst#versioning-notes) and [version management docs](https://github.com/NREL/GEOPHIRES-X/blob/main/CONTRIBUTING.rst#version-management).
 
 After merging:
 1. [ ] Push tag(s) to GitHub: `git push origin refs/tags/vM.m.P`
