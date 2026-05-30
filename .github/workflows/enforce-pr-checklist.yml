@@ -17,6 +17,6 @@ jobs:
             echo "Required PR description checklist items verified. Passing."
             exit 0
           else
-            echo "::error::Merge blocked. Please review the applicable checklist items in your PR description. (If you have removed the checklist items from your description, please re-add them from the template: https://github.com/NREL/GEOPHIRES-X/blob/main/.github/pull_request_template.md#change-checklist)"
+            echo "::error::Merge blocked. Please review the applicable checklist items in your PR description. (If you have removed the checklist items from your description, please re-add them from the template: https://github.com/NREL/GEOPHIRES-X/blob/main/.github/pull_request_template.md#change-checklist )"
             exit 1
           fi
