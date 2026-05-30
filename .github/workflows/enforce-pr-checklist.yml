@@ -1,0 +1,22 @@
+name: Enforce PR Checklist
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  verify-pr-checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify checklist items in the PR description
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Use grep to look for the checked box (handles lowercase 'x' or uppercase 'X')
+          if echo "$PR_BODY" | grep -Eq '\[[xX]\] I certify that I am a human'; then
+            echo "Required PR description checklist items verified. Passing."
+            exit 0
+          else
+            echo "::error::Merge blocked. Please review the applicable checklist items in your PR description. (If you have removed the checklist items from your description, please re-add them from the template: https://github.com/NREL/GEOPHIRES-X/blob/main/.github/pull_request_template.md#change-checklist)"
+            exit 1
+          fi
