@@ -176,10 +176,18 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `Fervo_Project_Cape-6.txt <tests/examples/Fervo_Project_Cape-6.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape-6.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-6>`__
+   * -  
+     -  
+     -  
+     -  
    * - Example 1: EGS Electricity
      - `example1.txt <tests/examples/example1.txt>`__
      - `.out <tests/examples/example1.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example1>`__
+   * - SAM Single Owner PPA: 50 MWe (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html>`__)
+     - `example_SAM-single-owner-PPA.txt <tests/examples/example_SAM-single-owner-PPA.txt>`__
+     - `.out <tests/examples/example_SAM-single-owner-PPA.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA>`__
    * - Example 1 with Add-Ons
      - `example1_addons.txt <tests/examples/example1_addons.txt>`__
      - `.out <tests/examples/example1_addons.out>`__
@@ -360,10 +368,6 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SHR-3.txt <tests/examples/example_SHR-3.txt>`__
      - `.out <tests/examples/example_SHR-3.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-3>`__
-   * - SAM Single Owner PPA: 50 MWe (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html>`__)
-     - `example_SAM-single-owner-PPA.txt <tests/examples/example_SAM-single-owner-PPA.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA>`__
    * - SAM Single Owner PPA: 400 MWe BICYCLE Comparison
      - `example_SAM-single-owner-PPA-2.txt <tests/examples/example_SAM-single-owner-PPA-2.txt>`__
      - `.out <tests/examples/example_SAM-single-owner-PPA-2.out>`__
