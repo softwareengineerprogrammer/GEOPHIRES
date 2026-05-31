@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import math
 import numbers
 import os.path
 import sys
@@ -11,6 +12,7 @@ from pint.facets.plain import PlainQuantity
 
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x_client import GeophiresInputParameters
+from geophires_x_client import GeophiresXResult
 
 # noinspection PyProtectedMember
 from geophires_x_client import _get_logger
@@ -28,6 +30,41 @@ class BaseTestCase(unittest.TestCase):
 
     def _list_test_files_dir(self, test_files_dir: str):
         return os.listdir(self._get_test_file_path(test_files_dir))  # noqa: PTH208
+
+    # noinspection PyMethodMayBeStatic
+    def _sanitize_nan(self, r: GeophiresXResult) -> GeophiresXResult:
+        """
+        Workaround for float('nan') != float('nan')
+        See https://stackoverflow.com/questions/51728427/unittest-how-to-assert-if-the-two-possibly-nan-values-are-equal
+
+        TODO generalize beyond After-tax IRR
+
+        Mutates passed-in result object.
+        """
+
+        irr_key = 'After-tax IRR'
+        if irr_key in r.result['ECONOMIC PARAMETERS']:
+            try:
+                if math.isnan(r.result['ECONOMIC PARAMETERS'][irr_key]['value']):
+                    r.result['ECONOMIC PARAMETERS'][irr_key]['value'] = 'NaN'
+            except TypeError:
+                pass
+
+        return r
+
+    # noinspection PyMethodMayBeStatic
+    def _strip_metadata(self, geophires_result: GeophiresXResult) -> GeophiresXResult:
+        """
+        Useful for comparing results from different runs.
+
+        Mutates passed-in result object.
+        """
+
+        for key in ['metadata', 'Simulation Metadata']:
+            if key in geophires_result.result:
+                del geophires_result.result[key]
+
+        return geophires_result
 
     def assertAlmostEqualWithinPercentage(self, expected, actual, msg: str | None = None, percent=5):
         if msg is not None and not isinstance(msg, str):

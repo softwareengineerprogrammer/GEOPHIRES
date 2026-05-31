@@ -818,13 +818,22 @@
       "maximum": 10000.0
     },
     "Maximum Drawdown": {
-      "description": "Maximum allowable thermal drawdown before redrilling of all wells into new reservoir (most applicable to EGS-type reservoirs with heat farming strategies). E.g. a value of 0.2 means that all wells are redrilled after the production temperature (at the wellhead) has dropped by 20% of its initial temperature",
+      "description": "Maximum allowable thermal drawdown before redrilling of all wells into new reservoir (most applicable to EGS-type reservoirs with heat farming strategies). E.g. a value of 0.2 means that all wells are redrilled after the production temperature (at the wellhead) has dropped by 20% of its initial temperature. Note that redrilling is triggered by whichever occurs first: this thermal drawdown limit or the chronological limit defined by Well Integrity Maximum Lifetime.",
       "type": "number",
       "units": "",
       "category": "Well Bores",
       "default": 1.0,
       "minimum": 0.0,
       "maximum": "1.0"
+    },
+    "Well Integrity Maximum Lifetime": {
+      "description": "Maximum chronological lifetime of the wellbore infrastructure before mechanical/chemical failure forces a redrilling event, independent of thermal drawdown. Models a deterministic first-order approximation of well integrity failure (compressive yielding, high-temperature creep, low-cycle fatigue, cement degradation, sulfide stress cracking, etc.) that is particularly relevant for Superhot Rock systems where wellbore infrastructure may typically fail before thermal depletion. Redrilling is triggered at the minimum of the thermal drawdown index defined by Maximum Drawdown and this chronological index. If not provided, defaults to project lifetime (no mechanical failure).",
+      "type": "number",
+      "units": "yr",
+      "category": "Well Bores",
+      "default": -1.0,
+      "minimum": 0.1,
+      "maximum": 100.0
     },
     "Is AGS": {
       "description": "Set to true if the model is for an Advanced Geothermal System (AGS)",
