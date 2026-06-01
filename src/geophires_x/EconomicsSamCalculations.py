@@ -286,9 +286,12 @@ class SamEconomicsCalculations:
         def _for_operational_years(_row: list[Any]) -> list[Any]:
             return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
 
+        line_item_display_name = self.s_dac_carbon_extracted_annually.Name.replace(
+            'Tonnes per Year CO2 extracted', 'S-DAC CO2 extracted'
+        )
         _insert_row_before(
             REVENUE_CATEGORY_ROW_NAME,
-            f'{self.s_dac_carbon_extracted_annually.Name} ({self.s_dac_carbon_extracted_annually.CurrentUnits.value})',
+            f'{line_item_display_name} ({self.s_dac_carbon_extracted_annually.CurrentUnits.value})',
             _for_operational_years(self.s_dac_carbon_extracted_annually.value),
         )
         _insert_blank_line_before(REVENUE_CATEGORY_ROW_NAME)
