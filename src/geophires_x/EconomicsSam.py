@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import os
@@ -287,6 +288,11 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.nominal_discount_rate.value, sam_economics.wacc.value = _calculate_nominal_discount_rate_and_wacc_pct(
         model, single_owner
     )
+
+    # noinspection SpellCheckingInspection
+    if hasattr(model.economics, 'DoSDACGTCalculations') and model.economics.DoSDACGTCalculations.value:
+        sam_economics.s_dac_carbon_extracted_annually = copy.deepcopy(model.sdacgteconomics.CarbonExtractedAnnually)
+
     sam_economics.moic.value = _calculate_moic(sam_economics.sam_cash_flow_profile, model)
     sam_economics.project_vir.value = _calculate_project_vir(sam_economics.sam_cash_flow_profile, model)
     sam_economics.project_payback_period.value = _calculate_project_payback_period(

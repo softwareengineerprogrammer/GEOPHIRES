@@ -1,6 +1,8 @@
 import sys
 import os
 import numpy as np
+
+from geophires_x.EconomicsUtils import carbon_extracted_annually_output_parameter
 from geophires_x.Parameter import floatParameter, OutputParameter, ReadParameter, intParameter
 from geophires_x.Units import *
 from geophires_x.OptionList import EndUseOptions
@@ -360,12 +362,8 @@ class EconomicsS_DAC_GT(Economics.Economics):
             PreferredUnits=CurrencyUnit.DOLLARS,
             CurrentUnits=CurrencyUnit.DOLLARS
         )
-        self.CarbonExtractedAnnually = self.OutputParameterDict[self.CarbonExtractedAnnually.Name] = OutputParameter(
-            Name="Tonnes per Year CO2 extracted",
-            UnitType=Units.MASSPERTIME,
-            PreferredUnits=MassPerTimeUnit.TONNEPERYEAR,
-            CurrentUnits=MassPerTimeUnit.TONNEPERYEAR
-        )
+        self.CarbonExtractedAnnually = self.OutputParameterDict[self.CarbonExtractedAnnually.Name] = \
+            carbon_extracted_annually_output_parameter()
         self.S_DAC_GTCummCarbonExtracted = self.OutputParameterDict[
             self.S_DAC_GTCummCarbonExtracted.Name] = OutputParameter(
             Name="Running Carbon Capture",
