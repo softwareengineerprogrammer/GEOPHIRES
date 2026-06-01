@@ -84,7 +84,9 @@ class SamEconomicsCalculations:
     investment_tax_credit: OutputParameter = field(default_factory=investment_tax_credit_output_parameter)
 
     capacity_payment_revenue_sources: list[CapacityPaymentRevenueSource] = field(default_factory=list)
-    s_dac_carbon_extracted_annually: OutputParameter = field(default_factory=carbon_extracted_annually_output_parameter)
+    s_dac_carbon_extracted_annually: OutputParameter | None = (
+        None  # field(default_factory=carbon_extracted_annually_output_parameter)
+    )
 
     @property
     def _pre_revenue_years_count(self) -> int:
@@ -268,6 +270,9 @@ class SamEconomicsCalculations:
     def _insert_s_dac_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
         ret: list[list[Any]] = cf_ret.copy()
 
+        if self.s_dac_carbon_extracted_annually is None:
+            return ret
+
         def _get_row_index(row_name_: str) -> int:
             return [it[0] for it in ret].index(row_name_)
 
@@ -281,7 +286,7 @@ class SamEconomicsCalculations:
             _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
 
         REVENUE_CATEGORY_ROW_NAME = 'REVENUE'
-        ENERGY_CATEGORY_ROW_NAME = 'ENERGY'
+        # ENERGY_CATEGORY_ROW_NAME = 'ENERGY'
 
         def _for_operational_years(_row: list[Any]) -> list[Any]:
             return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
