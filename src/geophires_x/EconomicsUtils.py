@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from geophires_x.GeoPHIRESUtils import is_float, is_int
 from geophires_x.Parameter import OutputParameter, SCHEDULE_DSL_MULTIPLIER_SYMBOL
-from geophires_x.Units import Units, PercentUnit, TimeUnit, CurrencyUnit, CurrencyFrequencyUnit, EnergyCostUnit
+from geophires_x.Units import (
+    Units,
+    PercentUnit,
+    TimeUnit,
+    CurrencyUnit,
+    CurrencyFrequencyUnit,
+    EnergyCostUnit,
+    MassPerTimeUnit,
+)
 
 CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME = 'Construction CAPEX Schedule'
 
@@ -243,6 +251,15 @@ def investment_tax_credit_output_parameter() -> OutputParameter:
         ToolTipText='Represents the total undiscounted ITC sum. '
         'For SAM Economic Models, this accounts for the standard Year 1 Federal ITC as well as any '
         'applicable State ITCs or multi-year credit schedules.',
+    )
+
+
+def carbon_extracted_annually_output_parameter() -> OutputParameter:
+    return OutputParameter(
+        Name="Tonnes per Year CO2 extracted",
+        UnitType=Units.MASSPERTIME,
+        PreferredUnits=MassPerTimeUnit.TONNEPERYEAR,
+        CurrentUnits=MassPerTimeUnit.TONNEPERYEAR,
     )
 
 
