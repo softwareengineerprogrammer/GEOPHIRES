@@ -22,6 +22,7 @@ from geophires_x.EconomicsUtils import (
     investment_tax_credit_output_parameter,
     lcoh_output_parameter,
     lcoc_output_parameter,
+    carbon_extracted_annually_output_parameter,
 )
 from geophires_x.GeoPHIRESUtils import is_float, quantity, is_int
 from geophires_x.Parameter import OutputParameter
@@ -83,6 +84,7 @@ class SamEconomicsCalculations:
     investment_tax_credit: OutputParameter = field(default_factory=investment_tax_credit_output_parameter)
 
     capacity_payment_revenue_sources: list[CapacityPaymentRevenueSource] = field(default_factory=list)
+    s_dac_carbon_extracted_annually: OutputParameter = field(default_factory=carbon_extracted_annually_output_parameter)
 
     @property
     def _pre_revenue_years_count(self) -> int:
@@ -168,6 +170,8 @@ class SamEconomicsCalculations:
             ret = self._insert_royalties_rate_schedule(ret)
 
         ret = self._insert_capacity_payment_line_items(ret)
+
+        ret = self._insert_s_dac_line_items(ret)
 
         ret = self._insert_calculated_levelized_metrics_line_items(ret)
 
@@ -258,6 +262,70 @@ class SamEconomicsCalculations:
             _insert_row_before(
                 CAPACITY_PAYMENT_REVENUE_ROW_NAME, 'equals:', ['' for _it in ret[_get_row_index(revenue_row_name)]][1:]
             )
+
+        return ret
+
+    def _insert_s_dac_line_items(self, cf_ret: list[list[Any]]) -> list[list[Any]]:
+        ret: list[list[Any]] = cf_ret.copy()
+
+        def _get_row_index(row_name_: str) -> int:
+            return [it[0] for it in ret].index(row_name_)
+
+        def _insert_row_before(before_row_name: str, row_name: str, row_content: list[Any]) -> None:
+            ret.insert(
+                _get_row_index(before_row_name),
+                [row_name, *row_content],
+            )
+
+        def _insert_blank_line_before(before_row_name: str) -> None:
+            _insert_row_before(before_row_name, '', ['' for _it in ret[_get_row_index(before_row_name)]][1:])
+
+        REVENUE_CATEGORY_ROW_NAME = 'REVENUE'
+        ENERGY_CATEGORY_ROW_NAME = 'ENERGY'
+        CAPACITY_PAYMENT_REVENUE_ROW_NAME = 'Capacity payment revenue ($)'
+
+        _insert_blank_line_before(REVENUE_CATEGORY_ROW_NAME)
+        # _insert_blank_line_before(CAPACITY_PAYMENT_REVENUE_ROW_NAME)
+
+        def _for_operational_years(_row: list[Any]) -> list[Any]:
+            return [*([''] * (self._pre_revenue_years_count - 1)), 0, *_row]
+
+        _insert_row_before(
+            REVENUE_CATEGORY_ROW_NAME,
+            f'{self.s_dac_carbon_extracted_annually.Name} ({self.s_dac_carbon_extracted_annually.CurrentUnits})',
+            _for_operational_years(self.s_dac_carbon_extracted_annually.value),
+        )
+        _insert_blank_line_before(REVENUE_CATEGORY_ROW_NAME)
+
+        # for i, capacity_payment_revenue_source in enumerate([None]):
+        #     if capacity_payment_revenue_source.amount_provided_label is not None:
+        #
+        #
+        #     revenue_row_name = f'{capacity_payment_revenue_source.name} revenue ($)'
+        #     _insert_row_before(
+        #         CAPACITY_PAYMENT_REVENUE_ROW_NAME,
+        #         revenue_row_name,
+        #         _for_operational_years(capacity_payment_revenue_source.revenue_usd),
+        #     )
+        #
+        #     if capacity_payment_revenue_source.price_label is not None:
+        #         _insert_row_before(
+        #             revenue_row_name,
+        #             capacity_payment_revenue_source.price_label.replace('USD', '$'),
+        #             capacity_payment_revenue_source.price,
+        #         )
+        #
+        #     if len(self.capacity_payment_revenue_sources) > 1 and i < len(self.capacity_payment_revenue_sources) - 1:
+        #         _insert_row_before(
+        #             CAPACITY_PAYMENT_REVENUE_ROW_NAME,
+        #             'plus:',
+        #             ['' for _it in ret[_get_row_index(revenue_row_name)]][1:],
+        #         )
+        #
+        # if len(self.capacity_payment_revenue_sources) > 0:
+        #     _insert_row_before(
+        #         CAPACITY_PAYMENT_REVENUE_ROW_NAME, 'equals:', ['' for _it in ret[_get_row_index(revenue_row_name)]][1:]
+        #     )
 
         return ret
 
