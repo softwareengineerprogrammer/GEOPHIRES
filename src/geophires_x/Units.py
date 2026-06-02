@@ -1,18 +1,26 @@
 # copyright, 2023, Malcolm I Ross
+import logging
 from enum import IntEnum, Enum, auto
 from typing import Any
 
 import pint
 import os
 
+from pint import RedefinitionError
+
 _UREG = None
+
+_log = logging.getLogger(__name__)
 
 
 def get_unit_registry():
     global _UREG
     if _UREG is None:
         _UREG = pint.get_application_registry()
-        _UREG.load_definitions(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'GEOPHIRES3_newunits.txt'))
+        try:
+            _UREG.load_definitions(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'GEOPHIRES3_newunits.txt'))
+        except RedefinitionError as rde:
+            _log.warning(f'Encountered RedefinitionError when attempting to load unit definitions: {rde}')
 
     return _UREG
 
