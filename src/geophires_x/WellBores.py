@@ -950,6 +950,9 @@ class WellBores:
             ToolTipText="Productivity index defined as ratio of production well flow rate over production well inflow "
                         "pressure drop (see docs)"
         )
+
+        well_integrity_max_lifetime_param_name = "Well Integrity Maximum Lifetime"
+        # noinspection SpellCheckingInspection
         self.maxdrawdown = self.ParameterDict[self.maxdrawdown.Name] = floatParameter(
             "Maximum Drawdown",
             DefaultValue=1.0,
@@ -959,11 +962,33 @@ class WellBores:
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
             ErrMessage="assume default maximum drawdown (1)",
-            ToolTipText="Maximum allowable thermal drawdown before redrilling of all wells into new reservoir "
-                        "(most applicable to EGS-type reservoirs with heat farming strategies). E.g. a value of 0.2 "
-                        "means that all wells are redrilled after the production temperature (at the wellhead) has "
-                        "dropped by 20% of its initial temperature"
+            ToolTipText=f"Maximum allowable thermal drawdown before redrilling of all wells into new reservoir "
+                        f"(most applicable to EGS-type reservoirs with heat farming strategies). E.g. a value of 0.2 "
+                        f"means that all wells are redrilled after the production temperature (at the wellhead) has "
+                        f"dropped by 20% of its initial temperature. "
+                        f"Note that redrilling is triggered by whichever occurs first: this thermal drawdown limit or "
+                        f"the chronological limit defined by {well_integrity_max_lifetime_param_name}."
         )
+        self.well_integrity_max_lifetime = self.ParameterDict[self.well_integrity_max_lifetime.Name] = floatParameter(
+            well_integrity_max_lifetime_param_name,
+            DefaultValue=-1.0,
+            Min=0.1,
+            Max=100.0,
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
+            Required=False,
+            Provided=False,
+            ToolTipText=f"Maximum chronological lifetime of the wellbore infrastructure before mechanical/chemical "
+                        f"failure forces a redrilling event, independent of thermal drawdown. Models a deterministic "
+                        f"first-order approximation of well integrity failure (compressive yielding, high-temperature "
+                        f"creep, low-cycle fatigue, cement degradation, sulfide stress cracking, etc.) that is "
+                        f"particularly relevant for Superhot Rock systems where wellbore infrastructure "
+                        f"may typically fail before thermal depletion. Redrilling is triggered at the minimum of the "
+                        f"thermal drawdown index defined by {self.maxdrawdown.Name} and this chronological index. "
+                        f"If not provided, defaults to project lifetime (no mechanical failure)."
+        )
+
         self.IsAGS = self.ParameterDict[self.IsAGS.Name] = boolParameter(
             "Is AGS",
             DefaultValue=False,
@@ -1615,22 +1640,71 @@ class WellBores:
         model.logger.info(f'complete {self.__class__.__name__}: {__name__}')
 
     def calculate_redrilling(self, model: Model) -> None:
-        # Redrilling applies to the built-in analytical reservoir models and user-provided profile.
-        if model.reserv.resoption.value in \
-            [ReservoirModel.MULTIPLE_PARALLEL_FRACTURES, ReservoirModel.LINEAR_HEAT_SWEEP,
-             ReservoirModel.SINGLE_FRACTURE, ReservoirModel.ANNUAL_PERCENTAGE, ReservoirModel.USER_PROVIDED_PROFILE]:
-            index_first_max_drawdown = np.argmax(
-                self.ProducedTemperature.value < (1 - model.wellbores.maxdrawdown.value) *
-                self.ProducedTemperature.value[0])
+        """
+        Redrilling applies to the built-in analytical reservoir models and user-provided profile.
+        """
 
-            if index_first_max_drawdown > 0:  # redrilling necessary
-                self.redrill.value = int(np.floor(len(self.ProducedTemperature.value) / index_first_max_drawdown))
-                ProducedTemperatureRepeated = np.tile(self.ProducedTemperature.value[0:index_first_max_drawdown],
-                                                      self.redrill.value + 1)
-                self.ProducedTemperature.value = ProducedTemperatureRepeated[0:len(self.ProducedTemperature.value)]
-                TResOutputRepeated = np.tile(model.reserv.Tresoutput.value[0:index_first_max_drawdown],
-                                             self.redrill.value + 1)
-                model.reserv.Tresoutput.value = TResOutputRepeated[0:len(self.ProducedTemperature.value)]
+        if model.reserv.resoption.value not in [
+            ReservoirModel.MULTIPLE_PARALLEL_FRACTURES, ReservoirModel.LINEAR_HEAT_SWEEP,
+            ReservoirModel.SINGLE_FRACTURE, ReservoirModel.ANNUAL_PERCENTAGE,
+            ReservoirModel.USER_PROVIDED_PROFILE,
+        ]:
+            return
+
+        total_steps = len(self.ProducedTemperature.value)
+        project_lifetime_yr = model.surfaceplant.plant_lifetime.value
+
+        # Thermal drawdown trigger
+        index_first_max_drawdown = int(np.argmax(
+            self.ProducedTemperature.value
+            < (1 - model.wellbores.maxdrawdown.value) * self.ProducedTemperature.value[0]
+        ))
+
+        # Well integrity (chronological) trigger
+        if self.well_integrity_max_lifetime.Provided and self.well_integrity_max_lifetime.value > 0:
+            timesteps_per_year = total_steps / project_lifetime_yr
+            integrity_failure_index = int(self.well_integrity_max_lifetime.value * timesteps_per_year)
+            # Clamp: a lifetime >= project lifetime means "no mechanical failure"
+            if integrity_failure_index >= total_steps:
+                integrity_failure_index = 0  # treat as "no trigger" sentinel
+        else:
+            integrity_failure_index = 0  # no mechanical failure modeled
+
+        # Competing-risk: take the earliest non-zero trigger
+        candidates = [i for i in (index_first_max_drawdown, integrity_failure_index) if i > 0]
+        if not candidates:
+            return  # no redrilling
+        redrill_trigger_index = min(candidates)
+
+        if redrill_trigger_index <= 0 or redrill_trigger_index >= total_steps:
+            return
+
+        self.redrill.value = int(np.floor(total_steps / redrill_trigger_index))
+        ProducedTemperatureRepeated = np.tile(
+            self.ProducedTemperature.value[0:redrill_trigger_index],
+            self.redrill.value + 1,
+        )
+        self.ProducedTemperature.value = ProducedTemperatureRepeated[0:total_steps]
+        TResOutputRepeated = np.tile(
+            model.reserv.Tresoutput.value[0:redrill_trigger_index],
+            self.redrill.value + 1,
+        )
+        model.reserv.Tresoutput.value = TResOutputRepeated[0:total_steps]
+
+        # Log which mechanism dominated
+        if (integrity_failure_index > 0
+                and (index_first_max_drawdown == 0 or integrity_failure_index < index_first_max_drawdown)):
+            model.logger.info(
+                f"Redrilling driven by {self.well_integrity_max_lifetime.Name} "
+                f"({self.well_integrity_max_lifetime.value} {self.well_integrity_max_lifetime.CurrentUnits}); "
+                f"redrill events = {self.redrill.value}."
+            )
+        else:
+            model.logger.info(
+                f"Redrilling driven by thermal drawdown ({self.maxdrawdown.Name}; "
+                f"{self.maxdrawdown.quantity().to(convertible_unit('percent')).magnitude:.2f}%); "
+                f"redrill events = {self.redrill.value}."
+            )
 
     def _sync_output_params_from_input_params(self) -> None:
         """

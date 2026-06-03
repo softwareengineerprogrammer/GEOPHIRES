@@ -126,6 +126,111 @@ class WellBoresTestCase(BaseTestCase):
                 }
             )
 
+    def test_redrilling_thermal_drawdown_dominates(self):
+        """
+        Verify that if thermal drawdown triggers before well integrity failure,
+        the redrilling count reflects the thermal limit.
+        """
+        max_drawdown = 0.02
+        result = self._get_result(
+            {
+                'Reservoir Model': 4,
+                'Drawdown Parameter': 0.01,
+                'Plant Lifetime': 30,
+                'Maximum Drawdown': max_drawdown,
+                'Well Integrity Maximum Lifetime': 50.0,
+            }
+        )
+
+        redrill_events = int(result.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value'])
+        self.assertGreater(redrill_events, 2)
+
+        profile = result.power_generation_profile
+        header = profile[0]
+        drawdown_idx = next(i for i, h in enumerate(header) if 'THERMAL DRAWDOWN' in str(h).upper())
+        drawdowns = [float(row[drawdown_idx]) for row in profile[1:]]
+
+        # Verify that drawdown hits the minimum defined by max drawdown param the same number of times as redrilling.
+        # Each reset (value jumps back up to ~1.0) indicates a redrill event triggered by hitting the threshold.
+        # We use a difference > 0.005 to filter out minor natural year-over-year increases (~0.001) that can occur
+        # early in analytical thermal profiles.
+        resets = sum(1 for i in range(len(drawdowns) - 1) if drawdowns[i + 1] - drawdowns[i] > 0.005)
+        self.assertEqual(redrill_events, resets)
+
+    def test_redrilling_well_integrity_dominates(self):
+        """
+        Verify that if well integrity failure triggers before thermal drawdown,
+        the redrilling count reflects the chronological integrity limit.
+        """
+        max_drawdown = 0.90
+        result = self._get_result(
+            {
+                'Reservoir Model': 4,
+                'Drawdown Parameter': 0.01,
+                'Plant Lifetime': 30,
+                'Maximum Drawdown': max_drawdown,
+                'Well Integrity Maximum Lifetime': 7.0,
+            }
+        )
+
+        redrill_events = int(result.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value'])
+        self.assertEqual(redrill_events, 4)
+
+        profile = result.power_generation_profile
+        header = profile[0]
+        drawdown_idx = next(i for i, h in enumerate(header) if 'THERMAL DRAWDOWN' in str(h).upper())
+        drawdowns = [float(row[drawdown_idx]) for row in profile[1:]]
+
+        # Verify that drawdown stays above the maximum drawdown value throughout project lifetime
+        threshold = 1.0 - max_drawdown
+        min_drawdown = min(drawdowns)
+        self.assertGreater(min_drawdown, threshold)
+
+        # Verify the chronological resets occurred the correct number of times.
+        # We use a difference > 0.005 to filter out minor natural year-over-year increases.
+        resets = sum(1 for i in range(len(drawdowns) - 1) if drawdowns[i + 1] - drawdowns[i] > 0.005)
+        self.assertEqual(redrill_events, resets)
+
+    def test_redrilling_no_triggers(self):
+        """
+        Verify that if neither threshold is reached before project end,
+        redrilling is 0 (or not triggered).
+        """
+        result = self._get_result(
+            {
+                'Reservoir Model': 4,
+                'Drawdown Parameter': 0.01,
+                'Plant Lifetime': 30,
+                'Maximum Drawdown': 0.90,
+                'Well Integrity Maximum Lifetime': 40.0,
+            }
+        )
+
+        summary = result.result.get('ENGINEERING PARAMETERS', {})
+        if 'Number of times redrilling' in summary:
+            redrill_events = int(summary['Number of times redrilling']['value'])
+            self.assertEqual(0, redrill_events)
+
+    def test_redrilling_examples_equivalence(self) -> None:
+        """
+        example13 and example13b_well-integrity are expected to have identical results
+        with the only difference being whether redrilling is triggered by drawdown or well integrity.
+        """
+
+        def _san(r: GeophiresXResult) -> tuple[int, int, float, float]:
+            return self._sanitize_nan(self._strip_metadata(r))
+
+        drawdown_example: GeophiresXResult = _san(
+            GeophiresXResult(self._get_test_file_path('../examples/example13.out'))
+        )
+        well_integrity_example: GeophiresXResult = _san(
+            GeophiresXResult(self._get_test_file_path('../examples/example13b_well-integrity.out'))
+        )
+        self.assertDictEqual(
+            drawdown_example.result,
+            well_integrity_example.result,
+        )
+
     # noinspection PyMethodMayBeStatic
     def _get_result(self, _params) -> GeophiresXResult:
         params = GeophiresInputParameters(

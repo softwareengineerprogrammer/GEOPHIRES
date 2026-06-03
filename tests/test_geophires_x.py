@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import os
 import tempfile
 import uuid
@@ -214,16 +213,12 @@ class GeophiresXTestCase(BaseTestCase):
                 input_params = GeophiresInputParameters(
                     from_file_path=self._get_test_file_path(Path('examples', example_file_path))
                 )
-                geophires_result: GeophiresXResult = client.get_geophires_result(input_params)
-                del geophires_result.result['metadata']
-                del geophires_result.result['Simulation Metadata']
-
-                expected_result: GeophiresXResult = GeophiresXResult(get_output_file_for_example(example_file_path))
-                del expected_result.result['metadata']
-                del expected_result.result['Simulation Metadata']
-
-                self._sanitize_nan(geophires_result)
-                self._sanitize_nan(expected_result)
+                geophires_result: GeophiresXResult = self._sanitize_nan(
+                    self._strip_metadata(client.get_geophires_result(input_params))
+                )
+                expected_result: GeophiresXResult = self._sanitize_nan(
+                    self._strip_metadata(GeophiresXResult(get_output_file_for_example(example_file_path)))
+                )
 
                 try:
                     self.assertDictEqual(
@@ -275,22 +270,6 @@ class GeophiresXTestCase(BaseTestCase):
 
         if len(regenerate_cmds) > 0:
             print(f'Command to regenerate {len(regenerate_cmds)} failed examples:\n{" && ".join(regenerate_cmds)}')
-
-    # noinspection PyMethodMayBeStatic
-    def _sanitize_nan(self, r: GeophiresXResult) -> None:
-        """
-        Workaround for float('nan') != float('nan')
-        See https://stackoverflow.com/questions/51728427/unittest-how-to-assert-if-the-two-possibly-nan-values-are-equal
-
-        TODO generalize beyond After-tax IRR
-        """
-        irr_key = 'After-tax IRR'
-        if irr_key in r.result['ECONOMIC PARAMETERS']:
-            try:
-                if math.isnan(r.result['ECONOMIC PARAMETERS'][irr_key]['value']):
-                    r.result['ECONOMIC PARAMETERS'][irr_key]['value'] = 'NaN'
-            except TypeError:
-                pass
 
     def _get_unequal_dicts_approximate_percent_difference(self, d1: dict, d2: dict) -> float | None:
         for i in range(99):
