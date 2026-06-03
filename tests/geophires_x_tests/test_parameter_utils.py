@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from geophires_x.EconomicsUtils import expand_schedule_dsl
+from geophires_x.ParameterUtils import expand_schedule_dsl
 from tests.base_test_case import BaseTestCase
 
 
-class EconomicsUtilsTestCase(BaseTestCase):
+class ParameterUtilsTestCase(BaseTestCase):
 
     def test_expand_schedule_dsl(self):
         total_years = 25
