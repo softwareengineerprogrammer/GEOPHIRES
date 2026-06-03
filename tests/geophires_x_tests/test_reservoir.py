@@ -357,3 +357,15 @@ class ReservoirTestCase(BaseTestCase):
                 )
         except AssertionError as ae:
             self._handle_assert_logs_failure(ae)
+
+    def test_drawdown_parameter_schedule(self) -> None:
+        default_result: GeophiresXResult = GeophiresXResult(self._get_test_file_path('../examples/example4.out'))
+        schedule_result: GeophiresXResult = GeophiresXResult(
+            self._get_test_file_path('../examples/example4b_drawdown-schedule.out')
+        )
+
+        def _net_prod(r: GeophiresXResult) -> float:
+            return r.result['SUMMARY OF RESULTS']['Average Net Electricity Production']['value']
+
+        # Schedule version has no drawdown for 10 years
+        self.assertGreater(_net_prod(schedule_result), _net_prod(default_result))
