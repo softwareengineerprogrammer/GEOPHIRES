@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+import copy
+import logging
+
 from geophires_x.GeoPHIRESUtils import is_float, is_int
 from geophires_x.Parameter import SCHEDULE_DSL_MULTIPLIER_SYMBOL
 
 
-def expand_schedule_dsl(schedule_strings: list[str | float], total_years: int) -> list[float]:
+_log = logging.getLogger(__name__)
+
+
+def expand_schedule_dsl(
+    schedule_strings: list[str | float], total_years: int, allow_schedule_length_to_exceed_total_years: bool = False
+) -> list[float]:
     """
     Parse a duration-based scheduling DSL and expand it into a fixed-length time-series array.
 
@@ -83,13 +91,22 @@ def expand_schedule_dsl(schedule_strings: list[str | float], total_years: int) -
                 result.append(value)
                 terminal_value = value
 
-    if len(result) > total_years:
-        raise ValueError(
-            f'Invalid schedule: Schedule expands to {len(result)} years ' f'which exceeds total_years={total_years}.'
-        )
-
     remaining = total_years - len(result)
     if remaining > 0:
         result.extend([terminal_value] * remaining)
+
+    if len(result) > total_years:
+        if not allow_schedule_length_to_exceed_total_years:
+            raise ValueError(
+                f'Invalid schedule: Schedule expands to {len(result)} years '
+                f'which exceeds total_years={total_years}.'
+            )
+        else:
+            pre_truncation_result = copy.copy(result)
+            result = result[:total_years]
+            _log.warning(
+                f'Schedule expands to {len(pre_truncation_result)} years, which exceeds total_years={total_years}. '
+                f'Schedule has been truncated to {total_years} years ({result}; from {pre_truncation_result}).'
+            )
 
     return result

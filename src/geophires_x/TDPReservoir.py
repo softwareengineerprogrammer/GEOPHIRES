@@ -115,7 +115,11 @@ class TDPReservoir(Reservoir):
         max_years = max(1, math.ceil(max_time) + 1)
 
         if self.drawdown_parameter_schedule.Provided:
-            drawdp_schedule_expanded = expand_schedule_dsl(model.reserv.drawdown_parameter_schedule.value, max_years)
+            drawdp_schedule_expanded = expand_schedule_dsl(
+                model.reserv.drawdown_parameter_schedule.value,
+                max_years,
+                allow_schedule_length_to_exceed_total_years=True
+            )
             drawdp_vec = np.array([
                 drawdp_schedule_expanded[min(math.floor(t), len(drawdp_schedule_expanded) - 1)]
                 for t in model.reserv.timevector.value

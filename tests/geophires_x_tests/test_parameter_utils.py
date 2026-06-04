@@ -17,3 +17,13 @@ class ParameterUtilsTestCase(BaseTestCase):
             with self.assertRaises(ValueError) as ve:
                 expand_schedule_dsl(invalid_case, total_years)
                 self.assertIn('Invalid', str(ve))
+
+        with self.assertRaises(ValueError) as ve:
+            expand_schedule_dsl(['0.03', '0.03 * 9', '0.04 * 10', '0.05'], 3)
+
+        self.assertEqual(
+            [0.03] * 3,
+            expand_schedule_dsl(
+                ['0.03', '0.03 * 9', '0.04 * 10', '0.05'], 3, allow_schedule_length_to_exceed_total_years=True
+            ),
+        )
