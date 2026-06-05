@@ -654,13 +654,13 @@ class GeophiresXClientTestCase(BaseTestCase):
 
         # Ensure the returned CSV are as expected.
         csv_lines = csv_result.splitlines()
-        self.assertEqual(csv_lines[0], 'Category,Field,Year,Value,Units')
-        self.assertEqual(csv_lines[1], 'INPUT PARAMETERS,Reservoir Depth,,3,')
-        self.assertEqual(csv_lines[2], 'INPUT PARAMETERS,Gradient 1,,50,')
-        self.assertEqual(csv_lines[3], 'SUMMARY OF RESULTS,End-Use Option,,Direct-Use Heat,')
+        self.assertEqual('Category,Field,Year,Value,Units', csv_lines[0])
+        self.assertEqual('INPUT PARAMETERS,Reservoir Depth,,3,', csv_lines[1])
+        self.assertEqual('INPUT PARAMETERS,Gradient 1,,50,', csv_lines[2])
+        self.assertEqual('SUMMARY OF RESULTS,End-Use Option,,Direct-Use Heat,', csv_lines[3])
         self.assertEqual(
-            csv_lines[len(csv_lines) - 1],
             'HEAT AND/OR ELECTRICITY EXTRACTION AND GENERATION PROFILE,PERCENTAGE OF TOTAL HEAT MINED,25,42.7,%',
+            csv_lines[len(csv_lines) - 1],
         )
 
         # Export the CSV for testing in Excel (or other spreadsheet software).
