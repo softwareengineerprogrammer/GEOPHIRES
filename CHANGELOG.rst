@@ -8,6 +8,8 @@ GEOPHIRES v3 (2023-2026)
 3.13
 ^^^^
 
+3.13.13: `Input params CSV unit and comment parsing <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/167>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.13>`__
+
 3.13.12: `Drawdown Parameter Schedule <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/166>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.12>`__
 
 3.13.10: `Well integrity parameterization to trigger redrilling <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/163>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.10>`__
