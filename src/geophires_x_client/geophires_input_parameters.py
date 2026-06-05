@@ -1,4 +1,6 @@
 import csv
+import json
+import os
 import tempfile
 import uuid
 from dataclasses import dataclass
@@ -231,22 +233,48 @@ class ImmutableGeophiresInputParameters(GeophiresInputParameters):
             raise NotImplementedError('CSV from file path is not implemented.')
 
         if parse_units_and_comments:
-            raise NotImplementedError  # FIXME WIP
+
+            def _get_file_path(file_name: str | Path) -> str:
+                return os.path.join(os.path.abspath(os.path.dirname(__file__)), str(file_name))
+
+            with open(_get_file_path('../geophires_x_schema_generator/geophires-request.json'), encoding='utf-8') as f:
+                request_schema: dict[str, Any] = json.loads(f.read())
 
         f = StringIO()
         w = csv.writer(f)
 
         def _row_entries(param_name: str, param_value_raw: str) -> list[str]:
-            value_entry = param_value_raw
+            value_entry = (str(param_value_raw) if param_value_raw is not None else '').strip()
             units_entry = ''
             comment_entry = ''
+
+            if parse_units_and_comments:
+                # TODO consolidate with other codebase parameter parsing logic...
+                param_schema = request_schema['properties'].get(param_name, {param_name: {}})
+
+                value_non_value_split = (
+                    value_entry.split(' ', maxsplit=1)
+                    if not param_schema.get('type') == 'array'
+                    else value_entry.split(', --', maxsplit=1)
+                )
+                value_entry = value_non_value_split[0]
+                unit_and_comment_split = (
+                    value_non_value_split[1].split(' --', maxsplit=1) if len(value_non_value_split) > 1 else ['', '']
+                )
+
+                default_units_for_param = param_schema.get('units', '')
+                units_entry = unit_and_comment_split[0] if unit_and_comment_split[0] != '' else default_units_for_param
+
+                if len(unit_and_comment_split) > 1:
+                    comment_entry = unit_and_comment_split[1]
+
             return [
                 'INPUT PARAMETERS',
                 param_name,
                 '',  # Year column, N/A for input parameters
                 value_entry,
                 units_entry,
-                # comment_entry
+                comment_entry,
             ]
 
         w.writerows([_row_entries(key, value) for key, value in self.params.items()])

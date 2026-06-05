@@ -655,8 +655,8 @@ class GeophiresXClientTestCase(BaseTestCase):
         # Ensure the returned CSV are as expected.
         csv_lines = csv_result.splitlines()
         self.assertEqual('Category,Field,Year,Value,Units', csv_lines[0])
-        self.assertEqual('INPUT PARAMETERS,Reservoir Depth,,3,', csv_lines[1])
-        self.assertEqual('INPUT PARAMETERS,Gradient 1,,50,', csv_lines[2])
+        self.assertEqual('INPUT PARAMETERS,Reservoir Depth,,3,,', csv_lines[1])
+        self.assertEqual('INPUT PARAMETERS,Gradient 1,,50,,', csv_lines[2])
         self.assertEqual('SUMMARY OF RESULTS,End-Use Option,,Direct-Use Heat,', csv_lines[3])
         self.assertEqual(
             'HEAT AND/OR ELECTRICITY EXTRACTION AND GENERATION PROFILE,PERCENTAGE OF TOTAL HEAT MINED,25,42.7,%',
@@ -667,3 +667,21 @@ class GeophiresXClientTestCase(BaseTestCase):
         result_file = Path(tempfile.gettempdir(), f'geophires-result_{uuid.uuid1()!s}.csv')
         with open(result_file, 'w', newline='', encoding='utf-8') as rf:
             rf.write(csv_result)
+
+    def test_csv_with_input_parameters_parse_units_and_comments(self):
+        csv_input_with_units_and_comments = ImmutableGeophiresInputParameters(
+            params={
+                'Reservoir Depth': '3000 m',
+                'Gradient 1': 50,
+                'End-Use Option': '1, -- Direct-Use Heat',
+                'Construction CAPEX Schedule': '0.014,0.027,0.139,0.431,0.389',
+                'Drawdown Parameter Schedule': '0.003,0.001,0.0 * 10,0.001 * 3,0.002 * 3,0.003 * 3,0.004 * 3,0.005 * 4,0.006, -- No drawdown for first 10 years, then 0.005/year',
+            }
+        ).as_csv(parse_units_and_comments=True)
+
+        # Export the CSV for testing in Excel (or other spreadsheet software).
+        result_file = Path(tempfile.gettempdir(), f'geophires-result_{uuid.uuid1()!s}.csv')
+        with open(result_file, 'w', newline='', encoding='utf-8') as rf:
+            rf.write(csv_input_with_units_and_comments)
+
+        self.assertIsNotNone(csv_input_with_units_and_comments)  # FIXME WIP
