@@ -671,6 +671,7 @@ class GeophiresXClientTestCase(BaseTestCase):
     def test_csv_with_input_parameters_parse_units_and_comments(self):
         csv_input_with_units_and_comments = ImmutableGeophiresInputParameters(
             params={
+                '_COMMENT-0': '# My parameters',
                 'Reservoir Depth': '3000 m',
                 'Gradient 1': 50,
                 'End-Use Option': '1, -- Direct-Use Heat',

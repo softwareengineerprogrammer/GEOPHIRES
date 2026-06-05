@@ -24,6 +24,7 @@ from geophires_docs import _get_logger
 from geophires_docs import _get_project_root
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
+from geophires_x.ParameterUtils import COMMENT_PARAMETER_NAME_PREFIX
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXResult
 from geophires_x_client import ImmutableGeophiresInputParameters
@@ -219,7 +220,7 @@ def get_fpc_category_parameters_table_md(
 
     table_entries = []
     for param_name, param_val_comment in input_params_dict.items():
-        if param_name.startswith(('#', '_COMMENT-')):
+        if param_name.startswith(('#', COMMENT_PARAMETER_NAME_PREFIX)):
             continue
 
         if param_name in parameters_to_exclude:

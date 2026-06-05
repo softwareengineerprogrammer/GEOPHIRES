@@ -16,6 +16,8 @@ from typing import Union
 
 from typing_extensions import override
 
+from geophires_x.ParameterUtils import COMMENT_PARAMETER_NAME_PREFIX
+
 
 class EndUseOption(Enum):
     """
@@ -248,8 +250,12 @@ class ImmutableGeophiresInputParameters(GeophiresInputParameters):
             units_entry = ''
             comment_entry = ''
 
-            if parse_units_and_comments:
+            if param_name.startswith(COMMENT_PARAMETER_NAME_PREFIX):
+                comment_entry = param_value_raw
+                value_entry = ''
+            elif parse_units_and_comments:
                 # TODO consolidate with other codebase parameter parsing logic...
+
                 param_schema = request_schema['properties'].get(param_name, {param_name: {}})
                 is_array_type = param_schema.get('type') == 'array'
 
