@@ -1,9 +1,12 @@
 import sys
+import math
+import numpy as np
 
-from geophires_x.Parameter import floatParameter
+from geophires_x.Parameter import floatParameter, listParameter
 import geophires_x.Model as Model
 from geophires_x.Reservoir import Reservoir
 from geophires_x.Units import DrawdownUnit, Units
+from geophires_x.ParameterUtils import expand_schedule_dsl
 
 
 class TDPReservoir(Reservoir):
@@ -35,16 +38,34 @@ class TDPReservoir(Reservoir):
         # If you choose to subclass this master class, you can do so before or after you create your own parameters.
         # If you do, you can also choose to call this method from you class, which will effectively add
         # set all these parameters to your class.
+
+        default_drawdown_parameter_val = 0.005
+        drawdown_param_min = 0.
+        drawdown_param_max = 0.2
+
+        # noinspection SpellCheckingInspection
         self.drawdp = self.ParameterDict[self.drawdp.Name] = floatParameter(
             "Drawdown Parameter",
-            DefaultValue=0.005,
-            Min=0,
-            Max=0.2,
+            DefaultValue=default_drawdown_parameter_val,
+            Min=drawdown_param_min,
+            Max=drawdown_param_max,
             UnitType=Units.DRAWDOWN,
             PreferredUnits=DrawdownUnit.PERYEAR,
             CurrentUnits=DrawdownUnit.PERYEAR,
             ErrMessage="assume default drawdown parameter",
             ToolTipText="specify the thermal drawdown for reservoir model 3 and 4"
+        )
+
+        self.drawdown_parameter_schedule = self.ParameterDict['Drawdown Parameter Schedule'] = listParameter(
+            'Drawdown Parameter Schedule',
+            DefaultValue=[default_drawdown_parameter_val],
+            Min=drawdown_param_min,
+            Max=drawdown_param_max,
+            UnitType=Units.DRAWDOWN,
+            PreferredUnits=DrawdownUnit.PERYEAR,
+            CurrentUnits=DrawdownUnit.PERYEAR,
+            auto_raise_exception_on_invalid_read=True,
+            ToolTipText='Thermal drawdown schedule for reservoir model 3 and 4 using DSL syntax',
         )
 
         model.logger.info(f'Complete {__class__!s}: {sys._getframe().f_code.co_name}')
@@ -70,6 +91,14 @@ class TDPReservoir(Reservoir):
         # because the call to the super.readparameters will set all the variables,
         # including the ones that are specific to this class
 
+        if self.drawdp.Provided and self.drawdown_parameter_schedule.Provided:
+            raise ValueError(f'Only one of {self.drawdp.Name} and '
+                             f'{self.drawdown_parameter_schedule.Name} may be provided.')
+
+        if self.drawdown_parameter_schedule.Provided:
+            if len(self.drawdown_parameter_schedule.value) < 1:
+                raise ValueError(f'{self.drawdown_parameter_schedule.Name} must have at least one value.')
+
         model.logger.info(f'Complete {__class__!s}: {sys._getframe().f_code.co_name}')
 
     def Calculate(self, model: Model):
@@ -82,7 +111,23 @@ class TDPReservoir(Reservoir):
         model.logger.info(f'Init {__class__!s}: {sys._getframe().f_code.co_name}')
         super().Calculate(model)  # run calculation for the parent.
 
-        model.reserv.Tresoutput.value = (1 - model.reserv.drawdp.value * model.reserv.timevector.value) * \
+        max_time = max(model.reserv.timevector.value) if len(model.reserv.timevector.value) > 0 else 0.0
+        max_years = max(1, math.ceil(max_time) + 1)
+
+        if self.drawdown_parameter_schedule.Provided:
+            drawdp_schedule_expanded = expand_schedule_dsl(
+                model.reserv.drawdown_parameter_schedule.value,
+                max_years,
+                allow_schedule_length_to_exceed_total_years=True
+            )
+            drawdp_vec = np.array([
+                drawdp_schedule_expanded[min(math.floor(t), len(drawdp_schedule_expanded) - 1)]
+                for t in model.reserv.timevector.value
+            ])
+        else:
+            drawdp_vec = model.reserv.drawdp.value
+
+        model.reserv.Tresoutput.value = (1 - drawdp_vec * model.reserv.timevector.value) * \
                                         (model.reserv.Trock.value - model.wellbores.Tinj.value) + \
                                         model.wellbores.Tinj.value  # this is no longer as in thesis (equation 4.16)
 

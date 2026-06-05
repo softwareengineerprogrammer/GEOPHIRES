@@ -10,7 +10,7 @@ class SFReservoir(Reservoir):
     """
     This class models the Single Fracture Reservoir.
     """
-    def __init__(self, model:Model):
+    def __init__(self, model: Model):
         """
         The __init__ function is called automatically when a class is instantiated.
         It initializes the attributes of an object, and sets default values for certain arguments that can be
@@ -19,7 +19,7 @@ class SFReservoir(Reservoir):
         :type model: :class:`~geophires_x.Model.Model`
         :return: None
         """
-        model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Init {__class__}: {sys._getframe().f_code.co_name}')
         super().__init__(model)   # initialize the parent parameters and variables
         sclass = str(__class__).replace("<class \'", "")
         self.MyClass = sclass.replace("\'>", "")
@@ -34,6 +34,8 @@ class SFReservoir(Reservoir):
         # If you choose to subclass this master class, you can do so before or after you create your own parameters.
         # If you do, you can also choose to call this method from you class, which will effectively add
         # and set all these parameters to your class.
+
+        # noinspection SpellCheckingInspection
         self.drawdp = self.ParameterDict[self.drawdp.Name] = floatParameter(
             "Drawdown Parameter",
             DefaultValue=0.005,
@@ -46,7 +48,7 @@ class SFReservoir(Reservoir):
             ToolTipText="specify the thermal drawdown for reservoir model 3 and 4"
         )
 
-        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Complete {__class__}: {sys._getframe().f_code.co_name}')
 
     def __str__(self):
         return 'SFReservoir'
@@ -62,15 +64,15 @@ class SFReservoir(Reservoir):
         :type model: :class:`~geophires_x.Model.Model`
         :return: None
         """
-        model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Init {__class__}: {sys._getframe().f_code.co_name}')
         super().read_parameters(model)    # read the parameters for the parent.
         # if we call super, we don't need to deal with setting the parameters here,
         # just deal with the special cases for the variables in this class
         # because the call to the super.readparameters will set all the variables,
         # including the ones that are specific to this class
-        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Complete {__class__}: {sys._getframe().f_code.co_name}')
 
-    def Calculate(self, model:Model):
+    def Calculate(self, model: Model):
         """
         The Calculate function calculates the values of all the parameters that are calculated by this object.
         It calls the Calculate function of the parent object to calculate the values of the parameters that are
@@ -80,7 +82,7 @@ class SFReservoir(Reservoir):
         :type model: :class:`~geophires_x.Model.Model`
         :return: None
         """
-        model.logger.info("Init " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Init {__class__}: {sys._getframe().f_code.co_name}')
         super().Calculate(model)    # run calculation for the parent.
 
         model.reserv.Tresoutput.value[0] = model.reserv.Trock.value
@@ -92,4 +94,4 @@ class SFReservoir(Reservoir):
                                                         (model.reserv.Trock.value - model.wellbores.Tinj.value) +\
                                                         model.wellbores.Tinj.value
 
-        model.logger.info("Complete " + str(__class__) + ": " + sys._getframe().f_code.co_name)
+        model.logger.info(f'Complete {__class__}: {sys._getframe().f_code.co_name}')

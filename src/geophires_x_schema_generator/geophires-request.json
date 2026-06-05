@@ -421,6 +421,17 @@
       "minimum": 0,
       "maximum": 0.2
     },
+    "Drawdown Parameter Schedule": {
+      "description": "Thermal drawdown schedule for reservoir model 3 and 4 using DSL syntax",
+      "type": "array",
+      "units": "1/year",
+      "category": "Reservoir",
+      "default": [
+        0.005
+      ],
+      "minimum": 0.0,
+      "maximum": 0.2
+    },
     "Gringarten-Stehfest Precision": {
       "description": "Sets the numerical precision (decimal places) for the inverse Laplace transform (Stehfest algorithm) used in the Gringarten calculation for the Multiple Parallel Fractures Reservoir Model. The default value provides maximum result stability; lower values calculate faster but may reduce consistency.",
       "type": "integer",

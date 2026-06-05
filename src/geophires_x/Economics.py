@@ -16,8 +16,8 @@ from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter,
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
-    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, expand_schedule_dsl, \
-    lcoh_output_parameter, lcoc_output_parameter
+    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, lcoh_output_parameter, lcoc_output_parameter
+from geophires_x.ParameterUtils import expand_schedule_dsl
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
     _WellDrillingCostCorrelationCitation
