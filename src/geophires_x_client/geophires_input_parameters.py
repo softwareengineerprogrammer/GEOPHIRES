@@ -220,16 +220,34 @@ class ImmutableGeophiresInputParameters(GeophiresInputParameters):
         """Returns a unique path for the GEOPHIRES output file."""
         return Path(tempfile.gettempdir(), f'geophires-result_{self._instance_id!s}.out')
 
-    def as_csv(self) -> str:
+    def as_csv(self, parse_units_and_comments: bool = False) -> str:
         """
         This method returns the input parameters in CSV (Comma-Separated Values) format, using its
         internal dictionary as the definitive source.  It does not include a header, but uses the
         same columns as GeophiresXResult.as_csv, and is meant to be used in conjunction with the same.
         """
+
         if self.from_file_path:
             raise NotImplementedError('CSV from file path is not implemented.')
 
+        if parse_units_and_comments:
+            raise NotImplementedError  # FIXME WIP
+
         f = StringIO()
         w = csv.writer(f)
-        w.writerows([['INPUT PARAMETERS', key, '', value, ''] for key, value in self.params.items()])
+
+        def _row_entries(param_name: str, param_value_raw: str) -> list[str]:
+            value_entry = param_value_raw
+            units_entry = ''
+            comment_entry = ''
+            return [
+                'INPUT PARAMETERS',
+                param_name,
+                '',  # Year column, N/A for input parameters
+                value_entry,
+                units_entry,
+                # comment_entry
+            ]
+
+        w.writerows([_row_entries(key, value) for key, value in self.params.items()])
         return f.getvalue()
