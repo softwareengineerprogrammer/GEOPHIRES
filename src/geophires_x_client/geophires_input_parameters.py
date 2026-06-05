@@ -251,22 +251,34 @@ class ImmutableGeophiresInputParameters(GeophiresInputParameters):
             if parse_units_and_comments:
                 # TODO consolidate with other codebase parameter parsing logic...
                 param_schema = request_schema['properties'].get(param_name, {param_name: {}})
+                is_array_type = param_schema.get('type') == 'array'
 
                 value_non_value_split = (
-                    value_entry.split(' ', maxsplit=1)
-                    if not param_schema.get('type') == 'array'
-                    else value_entry.split(', --', maxsplit=1)
+                    value_entry.split(' ', maxsplit=1) if not is_array_type else value_entry.split(', --', maxsplit=1)
                 )
-                value_entry = value_non_value_split[0]
-                unit_and_comment_split = (
-                    value_non_value_split[1].split(' --', maxsplit=1) if len(value_non_value_split) > 1 else ['', '']
-                )
+                value_entry = value_non_value_split[0].rstrip(',').rstrip()
+                remainder = value_non_value_split[1] if len(value_non_value_split) > 1 else ''
 
                 default_units_for_param = param_schema.get('units', '')
-                units_entry = unit_and_comment_split[0] if unit_and_comment_split[0] != '' else default_units_for_param
 
-                if len(unit_and_comment_split) > 1:
-                    comment_entry = unit_and_comment_split[1]
+                if is_array_type:
+                    # For array-type params, the ', --' split already consumed the comment delimiter;
+                    # whatever remains is the comment (no units possible from the value string).
+                    comment_entry = remainder.lstrip() if remainder else ''
+                    units_entry = default_units_for_param
+                else:
+                    # For scalar params, remainder is either "<units>" or "-- <comment>"
+                    # (optionally "<units> -- <comment>").
+                    unit_and_comment_split = remainder.split(' --', maxsplit=1) if remainder else ['']
+                    units_part = unit_and_comment_split[0]
+                    if units_part.lstrip().startswith('--'):
+                        # No units, just an inline comment introduced by '-- '.
+                        comment_entry = units_part.lstrip()[2:].lstrip()
+                        units_entry = default_units_for_param
+                    else:
+                        units_entry = units_part if units_part != '' else default_units_for_param
+                        if len(unit_and_comment_split) > 1:
+                            comment_entry = unit_and_comment_split[1].lstrip()
 
             return [
                 'INPUT PARAMETERS',

@@ -684,4 +684,7 @@ class GeophiresXClientTestCase(BaseTestCase):
         with open(result_file, 'w', newline='', encoding='utf-8') as rf:
             rf.write(csv_input_with_units_and_comments)
 
-        self.assertIsNotNone(csv_input_with_units_and_comments)  # FIXME WIP
+        self.assertIsNotNone(csv_input_with_units_and_comments)
+        self.assertCsvFileContentsEqual(
+            self._get_test_file_path('input-parameters-with-parsed-units-and-comments.csv'), result_file
+        )

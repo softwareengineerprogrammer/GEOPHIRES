@@ -1,0 +1,5 @@
+INPUT PARAMETERS,Reservoir Depth,,3000,m,
+INPUT PARAMETERS,Gradient 1,,50,degC/km,
+INPUT PARAMETERS,End-Use Option,,1,,Direct-Use Heat
+INPUT PARAMETERS,Construction CAPEX Schedule,,"0.014,0.027,0.139,0.431,0.389",,
+INPUT PARAMETERS,Drawdown Parameter Schedule,,"0.003,0.001,0.0 * 10,0.001 * 3,0.002 * 3,0.003 * 3,0.004 * 3,0.005 * 4,0.006",1/year,"No drawdown for first 10 years, then 0.005/year"
