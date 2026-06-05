@@ -8,6 +8,8 @@ GEOPHIRES v3 (2023-2026)
 3.13
 ^^^^
 
+3.13.12: `Drawdown Parameter Schedule <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/166>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.12>`__
+
 3.13.10: `Well integrity parameterization to trigger redrilling <https://github.com/softwareengineerprogrammer/GEOPHIRES/pull/163>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.10>`__
 
 3.13.9: `Add hip-ra-x-result.json schema and HipRaXResult <https://github.com/NatLabRockies/GEOPHIRES-X/pull/499>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.9>`__
