@@ -10,6 +10,8 @@ from io import StringIO
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Mapping
 from typing import Optional
 from typing import Union
@@ -236,16 +238,16 @@ class ImmutableGeophiresInputParameters(GeophiresInputParameters):
 
         if parse_units_and_comments:
 
-            def _get_file_path(file_name: str | Path) -> str:
+            def _get_file_path(file_name: Union[str, Path]) -> str:
                 return os.path.join(os.path.abspath(os.path.dirname(__file__)), str(file_name))
 
             with open(_get_file_path('../geophires_x_schema_generator/geophires-request.json'), encoding='utf-8') as f:
-                request_schema: dict[str, Any] = json.loads(f.read())
+                request_schema: Dict[str, Any] = json.loads(f.read())
 
         f = StringIO()
         w = csv.writer(f)
 
-        def _row_entries(param_name: str, param_value_raw: str) -> list[str]:
+        def _row_entries(param_name: str, param_value_raw: str) -> List[str]:
             value_entry = (str(param_value_raw) if param_value_raw is not None else '').strip()
             units_entry = ''
             comment_entry = ''
