@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import tempfile
 import uuid
 from pathlib import Path
@@ -643,6 +644,15 @@ class GeophiresXClientTestCase(BaseTestCase):
 
         self.assertEqual(start_cwd, Path.cwd())
 
+    def _assert_fpc5_input_dict_csv(self, parse_units_and_comments: bool):
+        with open(self._get_test_file_path('fpc5-input-params-dict.json'), encoding='utf-8') as f:
+            fpc5_input_dict = json.loads(f.read())
+
+            fpc_input_dict_as_csv = ImmutableGeophiresInputParameters(params=fpc5_input_dict).as_csv(
+                parse_units_and_comments=parse_units_and_comments
+            )
+            self.assertEqual(len(fpc5_input_dict.keys()), len(fpc_input_dict_as_csv.splitlines()))
+
     def test_csv_with_input_parameters(self):
         with self.assertRaises(NotImplementedError):
             # This should fail because CSV from file path is not implemented.
@@ -670,6 +680,8 @@ class GeophiresXClientTestCase(BaseTestCase):
         with open(result_file, 'w', newline='', encoding='utf-8') as rf:
             rf.write(csv_result)
 
+        self._assert_fpc5_input_dict_csv(parse_units_and_comments=False)
+
     def test_csv_with_input_parameters_parse_units_and_comments(self):
         csv_input_with_units_and_comments = ImmutableGeophiresInputParameters(
             params={
@@ -691,3 +703,5 @@ class GeophiresXClientTestCase(BaseTestCase):
         self.assertCsvFileContentsEqual(
             self._get_test_file_path('input-parameters-with-parsed-units-and-comments.csv'), result_file
         )
+
+        self._assert_fpc5_input_dict_csv(parse_units_and_comments=True)
