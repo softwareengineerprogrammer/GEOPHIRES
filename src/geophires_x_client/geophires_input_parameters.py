@@ -1,4 +1,6 @@
 import csv
+import json
+import os
 import tempfile
 import uuid
 from dataclasses import dataclass
@@ -8,11 +10,15 @@ from io import StringIO
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Mapping
 from typing import Optional
 from typing import Union
 
 from typing_extensions import override
+
+from geophires_x.ParameterUtils import COMMENT_PARAMETER_NAME_PREFIX
 
 
 class EndUseOption(Enum):
@@ -220,16 +226,76 @@ class ImmutableGeophiresInputParameters(GeophiresInputParameters):
         """Returns a unique path for the GEOPHIRES output file."""
         return Path(tempfile.gettempdir(), f'geophires-result_{self._instance_id!s}.out')
 
-    def as_csv(self) -> str:
+    def as_csv(self, parse_units_and_comments: bool = False) -> str:
         """
         This method returns the input parameters in CSV (Comma-Separated Values) format, using its
         internal dictionary as the definitive source.  It does not include a header, but uses the
         same columns as GeophiresXResult.as_csv, and is meant to be used in conjunction with the same.
         """
+
         if self.from_file_path:
             raise NotImplementedError('CSV from file path is not implemented.')
 
+        if parse_units_and_comments:
+
+            def _get_file_path(file_name: Union[str, Path]) -> str:
+                return os.path.join(os.path.abspath(os.path.dirname(__file__)), str(file_name))
+
+            with open(_get_file_path('../geophires_x_schema_generator/geophires-request.json'), encoding='utf-8') as f:
+                request_schema: Dict[str, Any] = json.loads(f.read())
+
         f = StringIO()
         w = csv.writer(f)
-        w.writerows([['INPUT PARAMETERS', key, '', value, ''] for key, value in self.params.items()])
+
+        def _row_entries(param_name: str, param_value_raw: str) -> List[str]:
+            value_entry = (str(param_value_raw) if param_value_raw is not None else '').strip()
+            units_entry = ''
+            comment_entry = ''
+
+            if param_name.startswith(COMMENT_PARAMETER_NAME_PREFIX):
+                comment_entry = param_value_raw
+                value_entry = ''
+            elif parse_units_and_comments:
+                # TODO consolidate with other codebase parameter parsing logic...
+
+                param_schema = request_schema['properties'].get(param_name, {param_name: {}})
+                is_array_type = param_schema.get('type') == 'array'
+
+                value_non_value_split = (
+                    value_entry.split(' ', maxsplit=1) if not is_array_type else value_entry.split(', --', maxsplit=1)
+                )
+                value_entry = value_non_value_split[0].rstrip(',').rstrip()
+                remainder = value_non_value_split[1] if len(value_non_value_split) > 1 else ''
+
+                default_units_for_param = param_schema.get('units', '')
+
+                if is_array_type:
+                    # For array-type params, the ', --' split already consumed the comment delimiter;
+                    # whatever remains is the comment (no units possible from the value string).
+                    comment_entry = remainder.lstrip() if remainder else ''
+                    units_entry = default_units_for_param
+                else:
+                    # For scalar params, remainder is either "<units>" or "-- <comment>"
+                    # (optionally "<units> -- <comment>").
+                    unit_and_comment_split = remainder.split(' --', maxsplit=1) if remainder else ['']
+                    units_part = unit_and_comment_split[0]
+                    if units_part.lstrip().startswith('--'):
+                        # No units, just an inline comment introduced by '-- '.
+                        comment_entry = units_part.lstrip()[2:].lstrip()
+                        units_entry = default_units_for_param
+                    else:
+                        units_entry = units_part if units_part != '' else default_units_for_param
+                        if len(unit_and_comment_split) > 1:
+                            comment_entry = unit_and_comment_split[1].lstrip()
+
+            return [
+                'INPUT PARAMETERS',
+                param_name,
+                '',  # Year column, N/A for input parameters
+                value_entry,
+                units_entry,
+                comment_entry,
+            ]
+
+        w.writerows([_row_entries(key, value) for key, value in self.params.items()])
         return f.getvalue()

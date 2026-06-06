@@ -12,6 +12,7 @@ from geophires_docs import generate_fervo_project_cape_5_md
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x.Parameter import HasQuantity
+from geophires_x.ParameterUtils import COMMENT_PARAMETER_NAME_PREFIX
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
@@ -85,7 +86,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
                 ret[field] = fieldValue.strip()
 
             if include_line_comments and field.startswith('#'):
-                ret[f'_COMMENT-{comment_idx}'] = line.strip()
+                ret[f'{COMMENT_PARAMETER_NAME_PREFIX}{comment_idx}'] = line.strip()
                 comment_idx += 1
 
             # TODO preserve newlines

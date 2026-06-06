@@ -9,6 +9,8 @@ from geophires_x.Parameter import SCHEDULE_DSL_MULTIPLIER_SYMBOL
 
 _log = logging.getLogger(__name__)
 
+COMMENT_PARAMETER_NAME_PREFIX: str = '_COMMENT-'
+
 
 def expand_schedule_dsl(
     schedule_strings: list[str | float], total_years: int, allow_schedule_length_to_exceed_total_years: bool = False

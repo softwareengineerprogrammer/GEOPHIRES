@@ -8,6 +8,7 @@ from typing import Any
 
 from pint.facets.plain import PlainQuantity
 
+from geophires_x.ParameterUtils import COMMENT_PARAMETER_NAME_PREFIX
 from geophires_x_client import GeophiresInputParameters
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
@@ -77,7 +78,7 @@ def _get_input_parameters_dict(  # TODO consolidate with FervoProjectCape5TestCa
             ret[field] = fieldValue.strip()
 
         if include_line_comments and field.startswith('#'):
-            ret[f'_COMMENT-{comment_idx}'] = line.strip()
+            ret[f'{COMMENT_PARAMETER_NAME_PREFIX}{comment_idx}'] = line.strip()
             comment_idx += 1
 
         # TODO preserve newlines
