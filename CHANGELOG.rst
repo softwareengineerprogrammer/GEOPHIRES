@@ -8,7 +8,7 @@ GEOPHIRES v3 (2023-2026)
 3.13
 ^^^^
 
-3.13.13: `Well integrity parameterization to trigger redrilling; Drawdown Parameter Schedule; Input params CSV unit and comment parsing <https://github.com/NatLabRockies/GEOPHIRES-X/pull/502>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.13>`__
+3.13.14: `Well integrity parameterization to trigger redrilling; Drawdown Parameter Schedule; Input params CSV unit and comment parsing; State ITC Amount <https://github.com/NatLabRockies/GEOPHIRES-X/pull/502>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.14>`__
 
 3.13.9: `Add hip-ra-x-result.json schema and HipRaXResult <https://github.com/NatLabRockies/GEOPHIRES-X/pull/499>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.9>`__
 
