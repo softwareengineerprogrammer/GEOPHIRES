@@ -531,7 +531,7 @@ class Outputs:
 
                 additional_capex_modifiers: list[tuple[Parameter, int]] = [
                     (econ.FlatLicenseEtc, 1),
-                    (econ.OtherIncentives, -1),
+                    (econ.OtherIncentives, -1),  # FIXME WIP display after OCC instead of before
                     (econ.TotalGrant, -1)
                 ]
                 for additional_capex_modifier_entry in additional_capex_modifiers:

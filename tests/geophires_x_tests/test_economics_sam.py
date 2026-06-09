@@ -1423,6 +1423,18 @@ class EconomicsSamTestCase(BaseTestCase):
             _itc_output_q(r_fed_itc_rate_and_state_itc_amount),
         )
 
+    def test_other_incentives_and_one_time_flat_fees(self):
+        r: GeophiresXResult = GeophiresXClient().get_geophires_result(
+            ImmutableGeophiresInputParameters(
+                from_file_path=self._get_test_file_path('other-incentives-and-one-time-flat-fees.txt'),
+            )
+        )
+
+        self.assertGreater(
+            r.result['CAPITAL COSTS (M$)']['Total CAPEX']['value'],
+            r.result['CAPITAL COSTS (M$)']['Overnight Capital Cost']['value'],
+        )
+
     @staticmethod
     def _new_model(
         input_file: Path,

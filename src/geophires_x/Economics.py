@@ -3455,7 +3455,14 @@ class Economics:
             self.CCap.value = self.CCap.value - self.RITCValue.value
 
         # Add in the FlatLicenseEtc, OtherIncentives, & TotalGrant
-        self.CCap.value = self.CCap.value + self.FlatLicenseEtc.value - self.OtherIncentives.value - self.TotalGrant.value
+        # Add in the FlatLicenseEtc, OtherIncentives, & TotalGrant
+        if self.econmodel.value != EconomicModel.SAM_SINGLE_OWNER_PPA:
+            self.CCap.value = (
+                    self.CCap.value
+                    + self.FlatLicenseEtc.value
+                    - self.OtherIncentives.value
+                    - self.TotalGrant.value
+            )
 
     def calculate_operating_and_maintenance_costs(self, model: Model) -> None:
         # O&M costs
