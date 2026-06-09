@@ -1216,7 +1216,7 @@ class Economics:
             ErrMessage="assume default investment tax credit rate (0)",
             ToolTipText="Investment tax credit rate (ITC). For SAM Economic Models, this is the federal rate."
         )
-        self.ritc_state = self.ParameterDict[self.ritc_state.Name] = floatParameter(
+        self.ritc_state_amount = self.ParameterDict[self.ritc_state_amount.Name] = floatParameter(
             'State Investment Tax Credit Amount',
             DefaultValue=0.0,
             Min=0.0,
@@ -2786,7 +2786,7 @@ class Economics:
                     self.royalty_supplemental_payments,
                     self.construction_capex_schedule,
                     self.bond_financing_start_year,
-                    self.ritc_state
+                    self.ritc_state_amount
                 ]
                 for sam_em_only_param in sam_em_only_params:
                     if sam_em_only_param.Provided:

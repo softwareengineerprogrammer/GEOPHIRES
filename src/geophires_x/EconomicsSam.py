@@ -680,7 +680,7 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     geophires_itc_tenths = Decimal(econ.RITC.value)
     ret['itc_fed_percent'] = [float(geophires_itc_tenths * Decimal(100))]
 
-    geophires_state_itc_usd = Decimal(econ.ritc_state.quantity().to(convertible_unit('USD')).magnitude)
+    geophires_state_itc_usd = Decimal(econ.ritc_state_amount.quantity().to(convertible_unit('USD')).magnitude)
     ret['itc_sta_amount'] = [float(geophires_state_itc_usd)]
 
     if econ.PTCElec.Provided:
