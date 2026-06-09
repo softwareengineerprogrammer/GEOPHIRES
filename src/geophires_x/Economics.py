@@ -1214,7 +1214,17 @@ class Economics:
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
             ErrMessage="assume default investment tax credit rate (0)",
-            ToolTipText="Investment tax credit rate (see docs)"
+            ToolTipText="Investment tax credit rate (ITC). For SAM Economic Models, this is the federal rate."
+        )
+        self.ritc_state_amount = self.ParameterDict[self.ritc_state_amount.Name] = floatParameter(
+            'State Investment Tax Credit Amount',
+            DefaultValue=0.0,
+            Min=0.0,
+            Max=self.totalcapcost.Max,
+            UnitType=self.totalcapcost.UnitType,
+            PreferredUnits=self.totalcapcost.PreferredUnits,
+            CurrentUnits=self.totalcapcost.CurrentUnits,
+            ToolTipText='State investment tax credit amount (state ITC).'
         )
         self.PTR = self.ParameterDict[self.PTR.Name] = floatParameter(
             "Property Tax Rate",
@@ -2775,7 +2785,8 @@ class Economics:
                     self.royalty_rate_schedule,
                     self.royalty_supplemental_payments,
                     self.construction_capex_schedule,
-                    self.bond_financing_start_year
+                    self.bond_financing_start_year,
+                    self.ritc_state_amount
                 ]
                 for sam_em_only_param in sam_em_only_params:
                     if sam_em_only_param.Provided:
