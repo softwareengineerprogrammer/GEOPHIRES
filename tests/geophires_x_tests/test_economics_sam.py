@@ -1387,6 +1387,23 @@ class EconomicsSamTestCase(BaseTestCase):
 
         self.assertIn('CHP Electrical Plant Cost Allocation Ratio is required', str(re.exception))
 
+    def test_state_itc_amount(self):
+        r: GeophiresXResult = GeophiresXClient().get_geophires_result(
+            ImmutableGeophiresInputParameters(
+                from_file_path=self._get_test_file_path('generic-egs-case-2_sam-single-owner-ppa.txt'),
+                params={
+                    'State Investment Tax Credit Amount': 4,
+                    'Construction Years': 1,
+                },
+            )
+        )
+
+        line_item = 'State ITC amount income ($)'
+        cash_flow_row = self._get_cash_flow_row(r.result['SAM CASH FLOW PROFILE'], line_item)
+        self.assertEqual(4_000_000, cash_flow_row[1])
+
+        # FIXME WIP assert Investment Tax Credit output field is correct state + fed
+
     @staticmethod
     def _new_model(
         input_file: Path,
