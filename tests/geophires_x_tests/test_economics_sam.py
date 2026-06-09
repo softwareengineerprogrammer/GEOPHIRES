@@ -1388,21 +1388,40 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertIn('CHP Electrical Plant Cost Allocation Ratio is required', str(re.exception))
 
     def test_state_itc_amount(self):
-        r: GeophiresXResult = GeophiresXClient().get_geophires_result(
-            ImmutableGeophiresInputParameters(
-                from_file_path=self._get_test_file_path('generic-egs-case-2_sam-single-owner-ppa.txt'),
-                params={
-                    'State Investment Tax Credit Amount': 4,
-                    'Construction Years': 1,
-                },
+        def _get_result(state_itc_amount_musd: float, fed_itc_rate_frac: float = 0.0) -> GeophiresXResult:
+            return GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('generic-egs-case-2_sam-single-owner-ppa.txt'),
+                    params={
+                        'State Investment Tax Credit Amount': state_itc_amount_musd,
+                        'Investment Tax Credit Rate': fed_itc_rate_frac,
+                        'Construction Years': 1,
+                    },
+                )
             )
-        )
+
+        def _itc_output_vu(r: GeophiresXResult) -> dict[str, float]:
+            return r.result['ECONOMIC PARAMETERS']['Investment Tax Credit']
+
+        def _itc_output_q(r: GeophiresXResult) -> dict[str, float]:
+            itc_vu = _itc_output_vu(r)
+            return quantity(itc_vu['value'], itc_vu['unit'])
+
+        r_state_itc_amount_only = _get_result(4)
 
         line_item = 'State ITC amount income ($)'
-        cash_flow_row = self._get_cash_flow_row(r.result['SAM CASH FLOW PROFILE'], line_item)
+        cash_flow_row = self._get_cash_flow_row(r_state_itc_amount_only.result['SAM CASH FLOW PROFILE'], line_item)
         self.assertEqual(4_000_000, cash_flow_row[1])
+        self.assertEqual(quantity(4, 'MUSD'), _itc_output_q(r_state_itc_amount_only))
 
-        # FIXME WIP assert Investment Tax Credit output field is correct state + fed
+        r_fed_itc_rate_only = _get_result(0, 0.3)
+        fed_itc_rate_only_q = _itc_output_q(r_fed_itc_rate_only)
+
+        r_fed_itc_rate_and_state_itc_amount = _get_result(4, 0.3)
+        self.assertEqual(
+            _itc_output_q(r_state_itc_amount_only) + fed_itc_rate_only_q,
+            _itc_output_q(r_fed_itc_rate_and_state_itc_amount),
+        )
 
     @staticmethod
     def _new_model(
