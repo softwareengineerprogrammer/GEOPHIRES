@@ -414,10 +414,12 @@ class SurfacePlant:
 
         default_construction_years = 1
         self.construction_years = self.ParameterDict[self.construction_years.Name] = intParameter(
-            "Construction Years",
+            'Construction Years',
             DefaultValue=default_construction_years,
             AllowableRange=list(range(1, MAX_CONSTRUCTION_YEARS + 1, 1)),
-            UnitType=Units.NONE,
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
             ErrMessage=f'assume default number of years in construction ({default_construction_years})',
             ToolTipText=f'Number of years spent in construction (assumes whole years, no fractions). '
                         f'By default, capital costs are spread evenly over construction years e.g. if total capital '
