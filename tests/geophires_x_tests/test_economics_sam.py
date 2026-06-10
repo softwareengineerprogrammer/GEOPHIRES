@@ -1440,6 +1440,8 @@ class EconomicsSamTestCase(BaseTestCase):
             r.result['CAPITAL COSTS (M$)']['Overnight Capital Cost']['value'],
         )
 
+        # FIXME WIP verify OCC -> Total CAPEX sum, accounting for incentives and grants
+
     @staticmethod
     def _new_model(
         input_file: Path,
