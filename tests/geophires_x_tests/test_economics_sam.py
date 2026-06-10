@@ -1424,9 +1424,14 @@ class EconomicsSamTestCase(BaseTestCase):
         )
 
     def test_other_incentives_and_one_time_flat_fees(self):
+        # TODO test 'One-time Grants Etc'
+
         r: GeophiresXResult = GeophiresXClient().get_geophires_result(
             ImmutableGeophiresInputParameters(
                 from_file_path=self._get_test_file_path('other-incentives-and-one-time-flat-fees.txt'),
+                params={
+                    'Print Output to Console': True,
+                },
             )
         )
 
