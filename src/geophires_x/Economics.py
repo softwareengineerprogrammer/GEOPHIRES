@@ -3454,14 +3454,14 @@ class Economics:
             self.RITCValue.value = self.RITC.value * self.CCap.value
             self.CCap.value = self.CCap.value - self.RITCValue.value
 
-        # Add in the FlatLicenseEtc, OtherIncentives, & TotalGrant
-        # Add in the FlatLicenseEtc, OtherIncentives, & TotalGrant
+        self.CCap.value += self.FlatLicenseEtc.value
+
         if self.econmodel.value != EconomicModel.SAM_SINGLE_OWNER_PPA:
+            # SAM-EM parameterizes these as ibi_oth_amount
             self.CCap.value = (
-                    self.CCap.value
-                    + self.FlatLicenseEtc.value
-                    - self.OtherIncentives.value
-                    - self.TotalGrant.value
+                self.CCap.value
+                - self.OtherIncentives.value
+                - self.TotalGrant.value
             )
 
     def calculate_operating_and_maintenance_costs(self, model: Model) -> None:
