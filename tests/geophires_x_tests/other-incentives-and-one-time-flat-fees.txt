@@ -38,59 +38,58 @@ End-Use Option, 1, -- Electricity
 Power Plant Type, 2, -- Supercritical ORC
 Plant Lifetime, 20
 
-Injectivity Index, 12.8
-Productivity Index, 4.6
+Injectivity Index, 10
+Productivity Index, 5
 
 Reservoir Model, 4, -- ANNUAL_PERCENTAGE
-Drawdown Parameter Schedule, 0.003,0.001,0.0 * 10,0.001 * 3,0.002 * 3,0.003 * 3,0.004 * 3,0.005 * 4,0.006
+Drawdown Parameter Schedule, 0.001 * 10, 0.01
 
 Maximum Drawdown, 1
 
-Reservoir Volume Option, 1, -- FRAC_NUM_SEP (geometry used to size HSA volume; no real fractures)
-Number of Fractures per Stimulated Well, 1
+Reservoir Volume Option, 1, -- FRAC_NUM_SEP
+Number of Fractures per Stimulated Well, 5
 Fracture Shape, 4, -- RECTANGULAR
-Fracture Width, 3300
-Fracture Height, 40
-Fracture Separation, 960
+Fracture Width, 500
+Fracture Height, 100
+Fracture Separation, 250
 
-Production Flow Rate per Well, 107
+Production Flow Rate per Well, 75
 
-Number of Injection Wells per Production Well, 0.75
+Number of Injection Wells per Production Well, 0.5
 
 Production Well Diameter, 8.535
 Injection Well Diameter, 8.535
 
 Ramey Production Wellbore Model, True
-Injection Temperature, 50
+Injection Temperature, 54
 
 Water Loss Fraction, 0.05
 
 Utilization Factor, 0.913
-Plant Outlet Pressure, 9.65 bar
-Production Wellhead Pressure, 10.34 bar
+Plant Outlet Pressure, 9 bar
+Production Wellhead Pressure, 11 bar
 Circulation Pump Efficiency, 0.80
 
 Well Geometry Configuration, 4, -- L: Vertical section plus lateral(s)
 
-Number of Production Wells, 8
+Number of Production Wells, 10
 Number of Multilateral Sections, 8
-Nonvertical Length per Multilateral Section, 1600
-All-in Nonvertical Drilling Costs, 2053.9081603055893
-Combined Income Tax Rate, 0.2448
+Nonvertical Length per Multilateral Section, 1500
+All-in Nonvertical Drilling Costs, 1900
+Combined Income Tax Rate, 0.25
 Well Drilling Cost Correlation, 16
-Royalty Rate Schedule, 0.08
+Royalty Rate Schedule, 0.03
 Bond Financing Start Year, -1
 
 # *** SCENARIO-SPECIFIC RESERVOIR PARAMETERS ***
 # **********************************************
-Gradient 1, 43.4
-Reservoir Depth, 2.8
-Surface Temperature, 10.5
-Ambient Temperature, 3.0
-Reservoir Heat Capacity, 1200.0
+Gradient 1, 45
+Reservoir Depth, 3
+Surface Temperature, 10
+Ambient Temperature, 5
+Reservoir Heat Capacity, 1300.0
 Reservoir Density, 2500.0
-Reservoir Thermal Conductivity, 3.0
-Reservoir Porosity, 0.17
+Reservoir Thermal Conductivity, 2.9
 
 # *** SIMULATION PARAMETERS ***
 # *****************************
