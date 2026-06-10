@@ -529,21 +529,28 @@ class Outputs:
                     # Note ITC is in ECONOMIC PARAMETERS category for SAM-EM (not capital costs)
                     f.write(f'         {econ.RITCValue.display_name}:                         {-1 * econ.RITCValue.value:10.2f} {econ.RITCValue.CurrentUnits.value}\n')
 
-                additional_capex_modifiers: list[tuple[Parameter, int]] = [
+                def _render_additional_capital_cost_modifiers(additional_modifiers: list[tuple[Parameter, int]]) -> None:
+                    for additional_modifier_entry in additional_modifiers:
+                        additional_modifier_param: Parameter = additional_modifier_entry[0]
+                        additional_modifier_multiplier: int = additional_modifier_entry[1]
+
+                        am_render_value = additional_modifier_param.value * additional_modifier_multiplier
+
+                        if additional_modifier_param.Provided:
+                            am_label = Outputs._field_label(additional_modifier_param.Name, 47)
+                            f.write(
+                                f'         {am_label}{am_render_value:10.2f} {additional_modifier_param.CurrentUnits.value}\n')
+
+                additional_occ_modifiers: list[tuple[Parameter, int]] = [
                     (econ.FlatLicenseEtc, 1),
-                    (econ.OtherIncentives, -1),  # FIXME WIP display after OCC instead of before
-                    (econ.TotalGrant, -1)
                 ]
-                for additional_capex_modifier_entry in additional_capex_modifiers:
-                    additional_capex_modifier_param: Parameter = additional_capex_modifier_entry[0]
-                    additional_capex_modifier_multiplier: int = additional_capex_modifier_entry[1]
-
-                    acm_render_value = additional_capex_modifier_param.value * additional_capex_modifier_multiplier
-
-                    if additional_capex_modifier_param.Provided:
-                        acm_label = Outputs._field_label(additional_capex_modifier_param.Name, 47)
-                        f.write(
-                            f'         {acm_label}{acm_render_value:10.2f} {additional_capex_modifier_param.CurrentUnits.value}\n')
+                if not is_sam_econ_model:
+                    # For SAM-EM these modify Total CAPEX, not OCC
+                    additional_occ_modifiers.extend([
+                        (econ.OtherIncentives, -1),
+                        (econ.TotalGrant, -1)
+                    ])
+                _render_additional_capital_cost_modifiers(additional_occ_modifiers)
 
                 if is_sam_econ_model and econ.DoAddOnCalculations.value:
                     # Non-SAM econ models print this in Extended Economics profile
@@ -570,6 +577,13 @@ class Outputs:
                     idc_label = Outputs._field_label(econ.interest_during_construction.display_name, 47)
                     f.write(
                         f'         {idc_label}{econ.interest_during_construction.value:10.2f} {econ.interest_during_construction.CurrentUnits.value}\n')
+
+                additional_total_capex_modifiers: list[tuple[Parameter, int]] = [
+                    (econ.OtherIncentives, -1),
+                    (econ.TotalGrant, -1)
+                    ] if is_sam_econ_model else []
+
+                _render_additional_capital_cost_modifiers(additional_total_capex_modifiers)
 
                 capex_param = econ.CCap if not is_sam_econ_model else econ.capex_total
                 capex_label = Outputs._field_label(capex_param.display_name, 50)

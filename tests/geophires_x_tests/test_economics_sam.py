@@ -1435,12 +1435,40 @@ class EconomicsSamTestCase(BaseTestCase):
             )
         )
 
-        self.assertGreater(
-            r.result['CAPITAL COSTS (M$)']['Total CAPEX']['value'],
-            r.result['CAPITAL COSTS (M$)']['Overnight Capital Cost']['value'],
-        )
+        with open(r.output_file_path, encoding='utf-8') as f:
+            lines = f.readlines()
 
-        # FIXME WIP verify OCC -> Total CAPEX sum, accounting for incentives and grants
+        is_parsing = False
+        occ_val = 0.0
+        total_capex_val = 0.0
+        intermediate_sum = 0.0
+
+        for line in lines:
+            clean_line = line.strip()
+
+            if clean_line.startswith('Overnight Capital Cost:'):
+                is_parsing = True
+                occ_val = float(clean_line.split(':')[1].replace('MUSD', '').strip())
+                continue
+
+            if is_parsing:
+                if clean_line.startswith('Total CAPEX:'):
+                    total_capex_val = float(clean_line.split(':')[1].replace('MUSD', '').strip())
+                    break
+
+                if ':' in clean_line:
+                    val_str = clean_line.split(':')[1].replace('MUSD', '').strip()
+                    try:
+                        intermediate_sum += float(val_str)
+                    except ValueError:
+                        pass
+
+        self.assertAlmostEqual(
+            occ_val + intermediate_sum,
+            total_capex_val,
+            places=2,
+            msg='Total CAPEX should be the sum of OCC and all intermediate items (e.g., inflation, interest, incentives)',
+        )
 
     @staticmethod
     def _new_model(

@@ -238,12 +238,13 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.after_tax_irr.value = sf(_get_after_tax_irr_pct(single_owner, cash_flow_operational_years, model))
 
     sam_economics.project_npv.value = sf(_get_project_npv_musd(single_owner, cash_flow_operational_years, model))
+
     # Add back ibi_oth_amount (OtherIncentives + TotalGrant) which SAM subtracts from
     # total_installed_cost to compute adjusted_installed_cost. Incentives are still applied
-    # by SAM natively in the cash flow / tax basis calculations; we just don't want them to
+    # by SAM natively in the cash flow/tax basis calculations; we just don't want them to
     # also reduce the reported Total CAPEX (which would be inconsistent with Overnight Capital
-    # Cost, since CCap is no longer reduced by incentives for SAM Economic Models -- see
-    # Economics.calculate_capital_costs).
+    # Cost, since CCap is not reduced by incentives for SAM Economic Models - see
+    # Economics.calculate_total_capital_costs).
     _ibi_oth_usd = (
         (model.economics.OtherIncentives.quantity() + model.economics.TotalGrant.quantity()).to('USD').magnitude
     )
