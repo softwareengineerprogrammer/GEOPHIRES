@@ -5,10 +5,14 @@ Changelog
 GEOPHIRES v3 (2023-2026)
 ------------------------
 
-3.13
+3.14
 ^^^^
 
-3.13.15: `Well integrity parameterization to trigger redrilling; Drawdown Parameter Schedule; Input params CSV unit and comment parsing; State ITC Amount <https://github.com/NatLabRockies/GEOPHIRES-X/pull/502>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.15>`__
+3.14: `Well integrity parameterization to trigger redrilling; Drawdown Parameter Schedule; Input params CSV unit and comment parsing; State ITC Amount; SAM-EM Other Incentives and One-time Grants fix <https://github.com/NatLabRockies/GEOPHIRES-X/pull/502>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.14.0>`__ | **Changed:** SAM Economic Models inputs with Other Incentives and One-time Grants Etc parameters now calculate Overnight Capital Cost and Total CAPEX correctly. See `the tracking issue <https://github.com/NatLabRockies/GEOPHIRES-X/issues/504>`__ for details.
+
+
+3.13
+^^^^
 
 3.13.9: `Add hip-ra-x-result.json schema and HipRaXResult <https://github.com/NatLabRockies/GEOPHIRES-X/pull/499>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.13.9>`__
 

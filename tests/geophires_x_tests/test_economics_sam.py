@@ -1423,6 +1423,63 @@ class EconomicsSamTestCase(BaseTestCase):
             _itc_output_q(r_fed_itc_rate_and_state_itc_amount),
         )
 
+    def test_other_incentives_one_time_flat_fees_and_total_grants(self):
+        def _assert_occ_plus_modifiers_equals_total_capex(_r: GeophiresXResult) -> None:
+            with open(_r.output_file_path, encoding='utf-8') as f:
+                lines = f.readlines()
+
+            is_parsing = False
+            occ_val = 0.0
+            total_capex_val = 0.0
+            intermediate_sum = 0.0
+
+            for line in lines:
+                clean_line = line.strip()
+
+                if clean_line.startswith('Overnight Capital Cost:'):
+                    is_parsing = True
+                    occ_val = float(clean_line.split(':')[1].replace('MUSD', '').strip())
+                    continue
+
+                if is_parsing:
+                    if clean_line.startswith('Total CAPEX:'):
+                        total_capex_val = float(clean_line.split(':')[1].replace('MUSD', '').strip())
+                        break
+
+                    if ':' in clean_line:
+                        val_str = clean_line.split(':')[1].replace('MUSD', '').strip()
+                        try:
+                            intermediate_sum += float(val_str)
+                        except ValueError:
+                            pass
+
+            self.assertAlmostEqual(
+                occ_val + intermediate_sum,
+                total_capex_val,
+                places=2,
+                msg='Total CAPEX should be the sum of OCC and all intermediate items (e.g., inflation, interest, incentives)',
+            )
+
+        _assert_occ_plus_modifiers_equals_total_capex(
+            GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('other-incentives-and-one-time-flat-fees.txt'),
+                    params={
+                        # 'Print Output to Console': True,
+                    },
+                )
+            )
+        )
+
+        _assert_occ_plus_modifiers_equals_total_capex(
+            GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('other-incentives-and-one-time-flat-fees.txt'),
+                    params={'Print Output to Console': True, 'One-time Grants Etc': 50},
+                )
+            )
+        )
+
     @staticmethod
     def _new_model(
         input_file: Path,
