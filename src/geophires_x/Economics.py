@@ -3079,9 +3079,25 @@ class Economics:
             )
 
     def calculate_stimulation_costs(self, model: Model) -> PlainQuantity:
+        production_wells_stimulated: bool = self.stimulation_cost_per_production_well.Provided
         if self.ccstimfixed.Valid:
-            stimulation_costs_cstimu = self.ccstimfixed.quantity().to(self.Cstim.CurrentUnits).magnitude
-            self.cstim_per_well.value = (self.ccstimfixed.quantity() / (model.wellbores.ninj.value + model.wellbores.nprod.value)).to(self.cstim_per_well.CurrentUnits).magnitude
+            stimulation_costs_cstim_u = self.ccstimfixed.quantity().to(self.Cstim.CurrentUnits).magnitude
+
+            # Ideally we'd infer per-well costs per the below logic, but the requisite assumptions don't necessarily
+            #   cleanly map to legacy parameterizations...
+            # num_stimulated_wells = model.wellbores.ninj.value
+            # if production_wells_stimulated:
+            #     num_stimulated_wells += model.wellbores.nprod.value
+            #
+            #     self.cstim_per_well.value = (
+            #             self.ccstimfixed.quantity() / num_stimulated_wells
+            #     ).to(self.cstim_per_well.CurrentUnits).magnitude
+            # else:
+            #     self.cstim_per_injection_well.value = (
+            #             self.ccstimfixed.quantity() / num_stimulated_wells
+            #     ).to(self.cstim_per_injection_well.CurrentUnits).magnitude
+
+            ret = quantity(stimulation_costs_cstim_u, self.Cstim.CurrentUnits)
         else:
             direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
                 self.Cstim.CurrentUnits).magnitude
@@ -3097,25 +3113,36 @@ class Economics:
             total_stim_cost_per_production_well_cstim_u = _total_cost_per_well(
                 direct_stim_cost_per_production_well_cstim_u)
 
-            stimulation_costs_cstimu = (
+            stimulation_costs_cstim_u = (
                 total_stim_cost_per_injection_well_cstim_u * model.wellbores.ninj.value
                 + total_stim_cost_per_production_well_cstim_u * model.wellbores.nprod.value
             )
 
-        ret = quantity(stimulation_costs_cstimu, self.Cstim.CurrentUnits)
+            ret = quantity(stimulation_costs_cstim_u, self.Cstim.CurrentUnits)
 
-        self.cstim_per_injection_well.value = quantity(
-            total_stim_cost_per_injection_well_cstim_u, self.Cstim.CurrentUnits).to(
-                self.cstim_per_injection_well.CurrentUnits).magnitude
-        self.cstim_per_production_well.value = quantity(
-            total_stim_cost_per_production_well_cstim_u, self.Cstim.CurrentUnits).to(
-                self.cstim_per_production_well.CurrentUnits).magnitude
+            if self.stimulation_cost_per_injection_well.Provided or self.stimulation_cost_per_production_well.Provided:
+                self.cstim_per_injection_well.value = quantity(
+                    total_stim_cost_per_injection_well_cstim_u, self.Cstim.CurrentUnits).to(
+                        self.cstim_per_injection_well.CurrentUnits).magnitude
 
-        if total_stim_cost_per_injection_well_cstim_u == total_stim_cost_per_production_well_cstim_u:
-            self.cstim_per_well.value = ret.to(
-                self.cstim_per_well.CurrentUnits).magnitude / (model.wellbores.ninj.value + model.wellbores.nprod.value)
-        else:
-            pass  # Leave cstim_per_well value = None
+                if production_wells_stimulated:
+                    self.cstim_per_production_well.value = quantity(
+                        total_stim_cost_per_production_well_cstim_u, self.Cstim.CurrentUnits).to(
+                            self.cstim_per_production_well.CurrentUnits).magnitude
+                else:
+                    # Only injection wells are assumed to be stimulated unless production well cost param is provided,
+                    # so keep this value as None instead of 0
+                    pass
+
+                if total_stim_cost_per_injection_well_cstim_u == total_stim_cost_per_production_well_cstim_u:
+                    self.cstim_per_well.value = ret.to(
+                        self.cstim_per_well.CurrentUnits).magnitude / (model.wellbores.ninj.value + model.wellbores.nprod.value)
+                else:
+                    pass  # Leave cstim_per_well value = None
+            else:
+                # Ideally we'd infer per-well costs per the above logic, but the requisite assumptions don't necessarily
+                #   cleanly map to legacy parameterizations...
+                pass
 
         return ret
 

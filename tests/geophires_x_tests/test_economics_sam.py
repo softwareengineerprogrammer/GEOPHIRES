@@ -1011,6 +1011,9 @@ class EconomicsSamTestCase(BaseTestCase):
                 'Drilling and completion costs per vertical production well',
                 'Drilling and completion costs per vertical injection well',
                 'Drilling and completion costs per non-vertical section',
+                'Stimulation costs per well',
+                'Stimulation costs per production well',
+                'Stimulation costs per injection well',
             ]:
                 capex_line_item_sum += quantity(capex_line_item['value'], capex_line_item['unit']).to(total_capex_unit)
 
