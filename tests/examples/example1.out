@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.9.28
- Simulation Date: 2025-07-02
- Simulation Time:  12:19
- Calculation Time:      0.885 sec
+ GEOPHIRES Version: 3.14.0
+ Simulation Date: 2026-06-11
+ Simulation Time:  09:49
+ Calculation Time:      0.911 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -25,7 +25,7 @@ Simulation Metadata
 
       Economic Model = Fixed Charge Rate (FCR)
       Fixed Charge Rate (FCR):                                5.00
-      Accrued financing during construction:                  0.00 %
+      Accrued financing during construction:                 0.00 %
       Project lifetime:                                      30 yr
       Capacity factor:                                       90.0 %
       Project NPV:                                         -35.81 MUSD
@@ -92,13 +92,13 @@ Simulation Metadata
 
                           ***CAPITAL COSTS (M$)***
 
+         Exploration costs:                                   4.49 MUSD
          Drilling and completion costs:                      17.38 MUSD
          Drilling and completion costs per well:              4.35 MUSD
          Stimulation costs:                                   3.02 MUSD
          Surface power plant costs:                          20.80 MUSD
          Field gathering system costs:                        2.30 MUSD
          Total surface equipment costs:                      23.10 MUSD
-         Exploration costs:                                   4.49 MUSD
       Total capital costs:                                   47.99 MUSD
       Annualized capital costs:                               2.40 MUSD
 
@@ -112,7 +112,6 @@ Simulation Metadata
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
-
       Initial geofluid availability:                          0.11 MW/(kg/s)
       Maximum Total Electricity Generation:                   5.62 MW
       Average Total Electricity Generation:                   5.59 MW

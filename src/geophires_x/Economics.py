@@ -2446,15 +2446,19 @@ class Economics:
         self.RITCValue = self.OutputParameterDict[self.RITCValue.Name] = investment_tax_credit_output_parameter()
         self.cost_one_production_well = self.OutputParameterDict[self.cost_one_production_well.Name] = OutputParameter(
             Name="Cost of One Production Well",
+            display_name='Drilling and completion costs per production well',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
-            CurrentUnits=CurrencyUnit.MDOLLARS
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText='Drilling and completion costs per vertical production well'
         )
         self.cost_one_injection_well = self.OutputParameterDict[self.cost_one_injection_well.Name] = OutputParameter(
             Name="Cost of One Injection Well",
+            display_name='Drilling and completion costs per injection well',
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
-            CurrentUnits=CurrencyUnit.MDOLLARS
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText='Drilling and completion costs per vertical injection well'
         )
         self.cost_lateral_section = self.OutputParameterDict[self.cost_lateral_section.Name] = OutputParameter(
             Name="Cost of the entire (multi-) lateral section of a well",

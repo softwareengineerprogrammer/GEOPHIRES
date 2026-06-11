@@ -425,8 +425,16 @@
           "description": "Drilling and completion cost per well, including indirect costs (default: 5%).",
           "units": "MUSD"
         },
-        "Drilling and completion costs per production well": {},
-        "Drilling and completion costs per injection well": {},
+        "Drilling and completion costs per production well": {
+          "type": "number",
+          "description": "Cost of One Production Well. Drilling and completion costs per vertical production well",
+          "units": "MUSD"
+        },
+        "Drilling and completion costs per injection well": {
+          "type": "number",
+          "description": "Cost of One Injection Well. Drilling and completion costs per vertical injection well",
+          "units": "MUSD"
+        },
         "Drilling and completion costs per vertical production well": {},
         "Drilling and completion costs per vertical injection well": {},
         "Drilling and completion costs per non-vertical section": {
@@ -486,8 +494,6 @@
           "units": "MUSD"
         },
         "One-time Flat License Fees Etc": {},
-        "Other Incentives": {},
-        "One-time Grants Etc": {},
         "Total Add-on CAPEX": {
           "type": "number",
           "description": "AddOn CAPEX Total",
@@ -513,6 +519,8 @@
           "description": "Interest During Construction (IDC) is the total accumulated interest incurred on debt during the construction phase. This cost is capitalized (added to the loan principal and total installed cost) rather than paid in cash.",
           "units": "MUSD"
         },
+        "Other Incentives": {},
+        "One-time Grants Etc": {},
         "Total capital costs": {
           "type": "number",
           "description": "Total Capital Cost",
