@@ -1972,6 +1972,34 @@ class Economics:
                         f'total stimulation cost. '
                         f'For traditional hydrothermal reservoirs, {self.ccstimfixed.Name} should be set to $0.'
         )
+        # noinspection SpellCheckingInspection
+        self.cstim_per_well = self.OutputParameterDict[self.cstim_per_well.Name] = OutputParameter(
+            Name='Stimulation costs per well',
+            value=None,
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.MDOLLARS,
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText='Stimulation cost per well, including direct and indirect costs and contingency.'
+        )
+        # noinspection SpellCheckingInspection
+        self.cstim_per_production_well = self.OutputParameterDict[self.cstim_per_production_well.Name] = OutputParameter(
+            Name='Stimulation costs per production well',
+            value=None,
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.MDOLLARS,
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText='Stimulation cost per producton well, including direct and indirect costs and contingency.'
+        )
+        # noinspection SpellCheckingInspection
+        self.cstim_per_injection_well = self.OutputParameterDict[self.cstim_per_injection_well.Name] = OutputParameter(
+            Name='Stimulation costs per injection well',
+            value=None,
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.MDOLLARS,
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            ToolTipText='Stimulation cost per injection well, including direct and indirect costs and contingency.'
+        )
+
 
         # TODO switch order to align with theoretical basis, which lists indirect costs first
         contingency_and_indirect_costs_tooltip_stem = (
@@ -3052,24 +3080,44 @@ class Economics:
 
     def calculate_stimulation_costs(self, model: Model) -> PlainQuantity:
         if self.ccstimfixed.Valid:
-            stimulation_costs = self.ccstimfixed.quantity().to(self.Cstim.CurrentUnits).magnitude
+            stimulation_costs_cstimu = self.ccstimfixed.quantity().to(self.Cstim.CurrentUnits).magnitude
+            self.cstim_per_well.value = (self.ccstimfixed.quantity() / (model.wellbores.ninj.value + model.wellbores.nprod.value)).to(self.cstim_per_well.CurrentUnits).magnitude
         else:
-            stim_cost_per_injection_well = self.stimulation_cost_per_injection_well.quantity().to(
+            direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
                 self.Cstim.CurrentUnits).magnitude
-            stim_cost_per_production_well = self.stimulation_cost_per_production_well.quantity().to(
+            direct_stim_cost_per_production_well_cstim_u = self.stimulation_cost_per_production_well.quantity().to(
                 self.Cstim.CurrentUnits).magnitude
 
-            stimulation_costs = (
-                (
-                    stim_cost_per_injection_well * model.wellbores.ninj.value
-                    + stim_cost_per_production_well * model.wellbores.nprod.value
-                )
-                * self.ccstimadjfactor.value
-                * self._stimulation_indirect_cost_factor
-                * self._contingency_factor
+            def _total_cost_per_well(direct_cost_per_well) -> float:
+                return (direct_cost_per_well * self.ccstimadjfactor.value * self._stimulation_indirect_cost_factor
+                        * self._contingency_factor)
+
+            total_stim_cost_per_injection_well_cstim_u = _total_cost_per_well(
+                direct_stim_cost_per_injection_well_cstim_u)
+            total_stim_cost_per_production_well_cstim_u = _total_cost_per_well(
+                direct_stim_cost_per_production_well_cstim_u)
+
+            stimulation_costs_cstimu = (
+                total_stim_cost_per_injection_well_cstim_u * model.wellbores.ninj.value
+                + total_stim_cost_per_production_well_cstim_u * model.wellbores.nprod.value
             )
 
-        return quantity(stimulation_costs, self.Cstim.CurrentUnits)
+        ret = quantity(stimulation_costs_cstimu, self.Cstim.CurrentUnits)
+
+        self.cstim_per_injection_well.value = quantity(
+            total_stim_cost_per_injection_well_cstim_u, self.Cstim.CurrentUnits).to(
+                self.cstim_per_injection_well.CurrentUnits).magnitude
+        self.cstim_per_production_well.value = quantity(
+            total_stim_cost_per_production_well_cstim_u, self.Cstim.CurrentUnits).to(
+                self.cstim_per_production_well.CurrentUnits).magnitude
+
+        if total_stim_cost_per_injection_well_cstim_u == total_stim_cost_per_production_well_cstim_u:
+            self.cstim_per_well.value = ret.to(
+                self.cstim_per_well.CurrentUnits).magnitude / (model.wellbores.ninj.value + model.wellbores.nprod.value)
+        else:
+            pass  # Leave cstim_per_well value = None
+
+        return ret
 
     def calculate_field_gathering_costs(self, model: Model) -> None:
         if self.ccgathfixed.Valid:

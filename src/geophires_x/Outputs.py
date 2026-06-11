@@ -498,6 +498,8 @@ class Outputs:
 
                     f.write(f'         {econ.Cstim.display_name}:                             {econ.Cstim.value:10.2f} {econ.Cstim.CurrentUnits.value}\n')
 
+                    self.write_stim_costs_per_well_outputs(econ, f)
+
                     f.write(f'         {econ.Cplant.display_name}:                     {econ.Cplant.value:10.2f} {econ.Cplant.CurrentUnits.value}\n')
                     if model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
                         f.write(f'            {econ.CAPEX_cost_electrical_plant.display_name}:             {econ.CAPEX_cost_electrical_plant.value:10.2f} {econ.CAPEX_cost_electrical_plant.CurrentUnits.value}\n')
@@ -963,6 +965,29 @@ class Outputs:
         f.write(NL)
 
     # noinspection PyMethodMayBeStatic
+    def write_stim_costs_per_well_outputs(self, econ: Economics, f) -> None:
+
+        def _write_output(_stim_cost_per_well_output: OutputParameter) -> None:
+            if _stim_cost_per_well_output.value is not None:
+                scw_label = Outputs._field_label(_stim_cost_per_well_output.display_name, 43)
+                # noinspection PyStringConversionWithoutDunderMethod
+                f.write(
+                    f'             '
+                    f'{scw_label}{_stim_cost_per_well_output.value:10.2f}'
+                    f' '
+                    f'{_stim_cost_per_well_output.CurrentUnits.value}\n'
+                )
+
+        if econ.cstim_per_well.value is not None:
+            _write_output(econ.cstim_per_well)
+        else:
+            for stim_cost_per_well_output in [
+                econ.cstim_per_production_well,
+                econ.cstim_per_injection_well
+            ]:
+                _write_output(stim_cost_per_well_output)
+
+    # noinspection PyMethodMayBeStatic
     def get_sam_cash_flow_profile_output(self, model):
         ret = '\n'
         ret += '                            ***************************\n'
@@ -1005,6 +1030,8 @@ class Outputs:
 
         if close_f:
             f_output_file.close()
+
+
 
     @staticmethod
     def _field_label(field_name: str, print_width_before_value: int) -> str:
