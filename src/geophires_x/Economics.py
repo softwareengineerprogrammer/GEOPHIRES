@@ -3083,8 +3083,12 @@ class Economics:
         if self.ccstimfixed.Valid:
             stimulation_costs_cstim_u = self.ccstimfixed.quantity().to(self.Cstim.CurrentUnits).magnitude
 
-            # Ideally we'd infer per-well costs per the below logic, but the requisite assumptions don't necessarily
-            #   cleanly map to legacy parameterizations...
+            # Ideally we'd infer per-well costs per the below logic, but this doesn't necessarily
+            #   cleanly map to legacy parameterizations that may have implicitly assumed that stimulation costs include
+            #   both production and injection wells, even though the default behavior is and always has been only
+            #   injection wells are stimulated. Production wells are only assumed to be stimulated when
+            #   Reservoir Stimulation Capital Cost per Production Well is provided, which was added in v3.9.32.
+
             # num_stimulated_wells = model.wellbores.ninj.value
             # if production_wells_stimulated:
             #     num_stimulated_wells += model.wellbores.nprod.value
@@ -3140,8 +3144,8 @@ class Economics:
                 else:
                     pass  # Leave cstim_per_well value = None
             else:
-                # Ideally we'd infer per-well costs per the above logic, but the requisite assumptions don't necessarily
-                #   cleanly map to legacy parameterizations...
+                # Ideally we'd infer per-well costs per the above logic; see relevant comment above re: legacy
+                #  parameterizations.
                 pass
 
         return ret
