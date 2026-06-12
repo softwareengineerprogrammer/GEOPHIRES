@@ -496,9 +496,7 @@ class Outputs:
                         cpw_label = Outputs._field_label(econ.drilling_and_completion_costs_per_well.display_name, 47)
                         f.write(f'         {cpw_label}{econ.drilling_and_completion_costs_per_well.value:10.2f} {econ.Cwell.CurrentUnits.value}\n')
 
-                    f.write(f'         {econ.Cstim.display_name}:                             {econ.Cstim.value:10.2f} {econ.Cstim.CurrentUnits.value}\n')
-
-                    self.write_stim_costs_per_well_outputs(econ, f)
+                    self.write_stimulation_costs_outputs(econ, f)
 
                     f.write(f'         {econ.Cplant.display_name}:                     {econ.Cplant.value:10.2f} {econ.Cplant.CurrentUnits.value}\n')
                     if model.surfaceplant.enduse_option.value.is_cogeneration_end_use_option:
@@ -965,7 +963,13 @@ class Outputs:
         f.write(NL)
 
     # noinspection PyMethodMayBeStatic
-    def write_stim_costs_per_well_outputs(self, econ: Economics, f) -> None:
+    def write_stimulation_costs_outputs(self, econ: Economics, f) -> None:
+        f.write(
+            f'         '
+            f'{econ.Cstim.display_name}:                             {econ.Cstim.value:10.2f}'
+            f' '
+            f'{econ.Cstim.CurrentUnits.value}\n'
+        )
 
         def _write_output(_stim_cost_per_well_output: OutputParameter) -> None:
             if _stim_cost_per_well_output.value is not None:
