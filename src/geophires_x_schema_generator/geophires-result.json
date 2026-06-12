@@ -427,12 +427,12 @@
         },
         "Drilling and completion costs per production well": {
           "type": "number",
-          "description": "Cost of One Production Well. Drilling and completion costs per vertical production well",
+          "description": "Cost of One Production Well",
           "units": "MUSD"
         },
         "Drilling and completion costs per injection well": {
           "type": "number",
-          "description": "Cost of One Injection Well. Drilling and completion costs per vertical injection well",
+          "description": "Cost of One Injection Well",
           "units": "MUSD"
         },
         "Drilling and completion costs per vertical production well": {},
