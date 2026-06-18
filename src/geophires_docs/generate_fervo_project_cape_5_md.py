@@ -388,6 +388,9 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
         'max_total_generation_mwe': round(sig_figs(max_total_generation_mwe, 3)),
         'two_year_avg_net_power_mwe_per_production_well': sig_figs(two_year_avg_net_power_mwe_per_production_well, 2),
+        'heat_to_power_conversion_efficiency_pct': sig_figs(
+            _q(surf_equip_sim['Heat to Power Conversion Efficiency']).to('percent').magnitude, 3
+        ),
         'parasitic_loss_pct': sig_figs(parasitic_loss_pct, 3),
         'number_of_times_redrilling': redrills,
         'total_wells_including_redrilling': total_wells_including_redrilling,
