@@ -437,7 +437,13 @@ class EconomicsS_DAC_GT(Economics.Economics):
                     # handle special cases
                     # none in this case so far
         else:
-            model.logger.info("No parameters read becuase no content provided")
+            model.logger.info("No parameters read because no content provided")
+
+
+        if model.economics.DoCarbonCalculations.value:
+            raise NotImplementedError(f'Only one of {self.DoSDACGTCalculations.Name} and '
+                                      f'{model.economics.DoCarbonCalculations.Name} may be True.')
+
         model.logger.info(f"read parameters complete {str(__class__)}: {sys._getframe().f_code.co_name}")
 
     def calculate_CRF(self, wacc: float, num_years: float) -> float:
