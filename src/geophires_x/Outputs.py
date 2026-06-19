@@ -938,15 +938,12 @@ class Outputs:
         econ_CarbonRevenue = copy.deepcopy(econ.CarbonRevenue)
         econ_CarbonCummCashFlow = copy.deepcopy(econ.CarbonCummCashFlow)
 
-        # FIXME WIP account for carbon credit duration; use model.sdacgteconomics.CarbonPrice instead
         if econ.DoSDACGTCalculations.value:
-            # econ_CarbonPrice.value = [model.sdacgteconomics.carbon_credit_price.quantity().to(econ.CarbonPrice.CurrentUnits).magnitude] * len(econ.CarbonPrice.value)
-            # econ_CarbonPrice.value = [model.sdacgteconomics.carbon_credit_price.quantity().to(
-            #     econ.CarbonPrice.CurrentUnits).magnitude] * len(econ.CarbonPrice.value)
-
-            # FIXME WIP...
             econ_CarbonRevenue = copy.deepcopy(model.sdacgteconomics.CarbonRevenue)
-            econ_CarbonRevenue.value = [*([0]*model.surfaceplant.construction_years.value), *(model.sdacgteconomics.CarbonRevenue.value)]
+            econ_CarbonRevenue.value = [
+                *([0]*model.surfaceplant.construction_years.value),
+                *model.sdacgteconomics.CarbonRevenue.value
+            ]
 
             def _convert(gt_param,  econ_param) -> None:
                 gt_param.value = gt_param.quantity().to(econ_param.CurrentUnits).magnitude
@@ -955,14 +952,13 @@ class Outputs:
             _convert(econ_CarbonRevenue, econ.CarbonRevenue)
 
             econ_CarbonCummCashFlow = copy.deepcopy(model.sdacgteconomics.CarbonCummCashFlow)
-            econ_CarbonCummCashFlow.value = [*([0] * model.surfaceplant.construction_years.value),
-                                                         *(model.sdacgteconomics.CarbonCummCashFlow.value)]
+            econ_CarbonCummCashFlow.value = [
+                *([0] * model.surfaceplant.construction_years.value),
+                *model.sdacgteconomics.CarbonCummCashFlow.value
+            ]
 
             _convert(econ_CarbonCummCashFlow, econ.CarbonCummCashFlow)
 
-
-        # econ_CarbonRevenue = econ.CarbonRevenue if not econ.DoSDACGTCalculations.value else model.sdacgteconomics.CarbonRevenue
-        # econ_CarbonCummCashFlow = econ.CarbonCummCashFlow if not econ.DoSDACGTCalculations.value else model.sdacgteconomics.CarbonCummCashFlow
 
         f.write('Start    ('
                 + o(econ.ElecPrice).CurrentUnits.value +
