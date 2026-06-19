@@ -767,12 +767,15 @@ class EconomicsS_DAC_GT(Economics.Economics):
         # Calculate Carbon Revenue based on S-DAC-GT specific credit price and duration
         self.CarbonRevenue.value = [0.0] * model.surfaceplant.plant_lifetime.value
         self.CarbonCummCashFlow.value = [0.0] * model.surfaceplant.plant_lifetime.value
+        model.economics.CarbonPrice.value = [0.0] * model.surfaceplant.plant_lifetime.value
+        model.economics.CarbonPrice.CurrentUnits = self.carbon_credit_price.CurrentUnits
 
         for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
             # Enforce the parameterized statutory limit for tax credits
             applicable_price = self.carbon_credit_price.value if i < self.carbon_credit_duration.value else 0.0
+            model.economics.CarbonPrice.value[i] = applicable_price
 
-            self.CarbonRevenue.value[i] = self.CarbonExtractedAnnually.value[i] * applicable_price
+            self.CarbonRevenue.value[i] = self.CarbonExtractedAnnually.value[i] * model.economics.CarbonPrice.value[i]
             if i == 0:
                 self.CarbonCummCashFlow.value[i] = self.CarbonRevenue.value[i]
             else:

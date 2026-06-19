@@ -940,7 +940,9 @@ class Outputs:
 
         # FIXME WIP account for carbon credit duration; use model.sdacgteconomics.CarbonPrice instead
         if econ.DoSDACGTCalculations.value:
-            econ_CarbonPrice.value = [model.sdacgteconomics.carbon_credit_price.quantity().to(econ.CarbonPrice.CurrentUnits).magnitude] * len(econ.CarbonPrice.value)
+            # econ_CarbonPrice.value = [model.sdacgteconomics.carbon_credit_price.quantity().to(econ.CarbonPrice.CurrentUnits).magnitude] * len(econ.CarbonPrice.value)
+            # econ_CarbonPrice.value = [model.sdacgteconomics.carbon_credit_price.quantity().to(
+            #     econ.CarbonPrice.CurrentUnits).magnitude] * len(econ.CarbonPrice.value)
 
             # FIXME WIP...
             econ_CarbonRevenue = copy.deepcopy(model.sdacgteconomics.CarbonRevenue)
