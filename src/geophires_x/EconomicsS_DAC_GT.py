@@ -45,7 +45,7 @@ class EconomicsS_DAC_GT(Economics.Economics):
         """
         model.logger.info(f"Init {str(__class__)}: {sys._getframe().f_code.co_name}")
 
-        # These dictionaries contains a list of all the parameters set in this object, stored as "Parameter" and
+        # These dictionaries contain a list of all the parameters set in this object, stored as "Parameter" and
         # OutputParameter Objects.  This will allow us later to access them in a user interface and get that list,
         # along with unit type, preferred units, etc.
         self.ParameterDict = {}
