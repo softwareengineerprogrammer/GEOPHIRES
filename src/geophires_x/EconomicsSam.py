@@ -147,7 +147,7 @@ def validate_read_parameters(model: Model) -> None:
 
     if econ.DoSDACGTCalculations.value:
         raise NotImplementedError(
-            'S-DAC is not currently supported SAM Economic Models. '
+            'S-DAC is not currently supported for SAM Economic Models. '
             'See https://github.com/NatLabRockies/GEOPHIRES-X/issues/511.'  # TODO to implement
         )
 
