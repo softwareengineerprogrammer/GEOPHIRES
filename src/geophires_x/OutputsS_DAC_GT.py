@@ -81,21 +81,26 @@ class OutputsS_DAC_GT(Outputs):
                     model.sdacgteconomics.S_DAC_GTCummCashFlow.value
                 sdac_df[f'Cum. Cost Per Tonne ({model.sdacgteconomics.CummCostPerTonne.PreferredUnits.value})|:,.2f'] = \
                     model.sdacgteconomics.CummCostPerTonne.value
+                sdac_df[f'Carbon Revenue ({model.sdacgteconomics.CarbonRevenue.PreferredUnits.value})|:,.2f'] = \
+                    model.sdacgteconomics.CarbonRevenue.value
+                sdac_df[f'Cum. Carbon Revenue ({model.sdacgteconomics.CarbonCummCashFlow.PreferredUnits.value})|:,.2f'] = \
+                    model.sdacgteconomics.CarbonCummCashFlow.value
 
                 f.write(NL)
                 f.write("                **********************" + NL)
                 f.write("                *  S-DAC-GT PROFILE  *" + NL)
                 f.write("                **********************" + NL)
-                f.write("Year       Carbon      Cumm. Carbon     S-DAC-GT           S-DAC-GT Cumm.      Cumm. Cost" + NL)
-                f.write("Since      Captured     Captured       Annual Cost          Cash Flow        Cost Per Tonne" + NL)
+                f.write("Year       Carbon      Cumm. Carbon     S-DAC-GT           S-DAC-GT Cumm.      Cumm. Cost        Annual Carbon" + NL)
+                f.write("Since      Captured     Captured       Annual Cost          Cash Flow        Cost Per Tonne         Revenue" + NL)
                 f.write("Start     ("+model.sdacgteconomics.CarbonExtractedAnnually.PreferredUnits.value +
                                               ")   ("+model.sdacgteconomics.S_DAC_GTCummCarbonExtracted.PreferredUnits.value +
                                                              ")          ("+model.sdacgteconomics.S_DAC_GTAnnualCost.PreferredUnits.value +
                                              ")               ("+model.sdacgteconomics.S_DAC_GTCummCashFlow.PreferredUnits.value +
-                                             ")           ("+model.sdacgteconomics.CummCostPerTonne.PreferredUnits.value + ")" +NL)
+                                             ")           ("+model.sdacgteconomics.CummCostPerTonne.PreferredUnits.value +
+                                             ")         (" + model.sdacgteconomics.CarbonRevenue.PreferredUnits.value + ")" + NL)
                 i = 0
                 for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
-                    f.write(f"   {i+1:3.0f}    {model.sdacgteconomics.CarbonExtractedAnnually.value[i]:,.2f}   {model.sdacgteconomics.S_DAC_GTCummCarbonExtracted.value[i]:,.2f}    {model.sdacgteconomics.S_DAC_GTAnnualCost.value[i]:,.2f}         {model.sdacgteconomics.S_DAC_GTCummCashFlow.value[i]:,.2f}         {model.sdacgteconomics.CummCostPerTonne.value[i]:.2f}" + NL)
+                    f.write(f"   {i+1:3.0f}    {model.sdacgteconomics.CarbonExtractedAnnually.value[i]:,.2f}   {model.sdacgteconomics.S_DAC_GTCummCarbonExtracted.value[i]:,.2f}    {model.sdacgteconomics.S_DAC_GTAnnualCost.value[i]:,.2f}         {model.sdacgteconomics.S_DAC_GTCummCashFlow.value[i]:,.2f}         {model.sdacgteconomics.CummCostPerTonne.value[i]:.2f}         {model.sdacgteconomics.CarbonRevenue.value[i]:,.2f}" + NL)
                     i = i + 1
 
         except BaseException as ex:
@@ -106,7 +111,7 @@ class OutputsS_DAC_GT(Outputs):
             print(msg)
             model.logger.critical(str(ex))
             model.logger.critical(msg)
-            raise RuntimeError(msg, e)
+            raise RuntimeError(msg, ex)
 
         model.logger.info(f'Complete {str(__class__)}: {__name__}')
 

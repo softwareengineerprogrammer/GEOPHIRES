@@ -10,6 +10,8 @@ from typing import Any, Callable
 # ruff: noqa: I001
 from geophires_x.Model import Model
 from geophires_x.SBTEconomics import SBTEconomics
+
+# from geophires_x.EconomicsS_DAC_GT import EconomicsS_DAC_GT  # TODO
 from geophires_x.SBTReservoir import SBTReservoir
 from geophires_x.SBTWellbores import SBTWellbores
 
@@ -83,6 +85,7 @@ class GeophiresXSchemaGenerator:
             (SBTEconomics(dummy_model), 'Economics'),
             (SUTRAEconomics(dummy_model), 'Economics'),
             (EconomicsAddOns(dummy_model), 'Economics'),
+            # (EconomicsS_DAC_GT(dummy_model), 'Economics'),  # TODO reconcile conflicting output units
         ]
 
     def get_schema_title(self) -> str:

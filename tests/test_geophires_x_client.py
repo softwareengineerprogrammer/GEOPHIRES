@@ -593,18 +593,19 @@ class GeophiresXClientTestCase(BaseTestCase):
                 'S-DAC-GT Annual Cost (USD/yr)',
                 'S-DAC-GT Cumm. Cash Flow (USD)',
                 'Cumm. Cost Per Tonne (USD/tonne)',
+                'Annual Carbon Revenue (USD/yr)',
             ],
         )
 
         # Values below need to be synchronized if S-DAC-GT example output values change.
-        self.assertEqual([1, 78330.8, 78330.8, 17411627.98, 17411627.98, 222.28], sdacgt_profile[1])
+        self.assertEqual([1, 78330.8, 78330.8, 17411627.98, 17411627.98, 222.28, 14099544.46], sdacgt_profile[1])
 
         self.assertEqual(
-            [15, 76263.89, 1167207.48, 16952186.81, 259450710.33, 222.28],
+            [15, 76263.89, 1167207.48, 16952186.81, 259450710.33, 222.28, 13727499.34],
             sdacgt_profile[15],
         )
 
-        self.assertEqual([30, 68860.68, 2253170.17, 15306577.89, 500842063.38, 222.28], sdacgt_profile[30])
+        self.assertEqual([30, 68860.68, 2253170.17, 15306577.89, 500842063.38, 222.28, 12394922.28], sdacgt_profile[30])
 
     def test_parse_economic_model(self):
         result = GeophiresXResult(self._get_test_file_path('examples/example3.out'))

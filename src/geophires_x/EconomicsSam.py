@@ -145,6 +145,12 @@ def validate_read_parameters(model: Model) -> None:
                 # temporarily switching/testing and/or migrating between schedule-based and rate-based more user
                 # friendly by only requiring enabling/disabling 2 parameters rather than up to 6.
 
+    if econ.DoSDACGTCalculations.value:
+        raise NotImplementedError(
+            'S-DAC is not currently supported for SAM Economic Models. '
+            'See https://github.com/NatLabRockies/GEOPHIRES-X/issues/511.'  # TODO to implement
+        )
+
 
 def _validate_construction_capex_schedule(
     econ_capex_schedule: listParameter, construction_years: int, model: Model

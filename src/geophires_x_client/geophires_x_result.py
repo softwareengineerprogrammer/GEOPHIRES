@@ -807,6 +807,7 @@ class GeophiresXResult:
                 'S-DAC-GT Annual Cost (USD/yr)',
                 'S-DAC-GT Cumm. Cash Flow (USD)',
                 'Cumm. Cost Per Tonne (USD/tonne)',
+                'Annual Carbon Revenue (USD/yr)',
             ]
 
         try:

@@ -1,7 +1,9 @@
 import sys
 import os
 import numpy as np
-from geophires_x.Parameter import floatParameter, OutputParameter, ReadParameter
+
+from geophires_x.EconomicsUtils import carbon_extracted_annually_output_parameter
+from geophires_x.Parameter import floatParameter, OutputParameter, ReadParameter, intParameter
 from geophires_x.Units import *
 from geophires_x.OptionList import EndUseOptions
 import geophires_x.Model as Model
@@ -43,7 +45,7 @@ class EconomicsS_DAC_GT(Economics.Economics):
         """
         model.logger.info(f"Init {str(__class__)}: {sys._getframe().f_code.co_name}")
 
-        # These dictionaries contains a list of all the parameters set in this object, stored as "Parameter" and
+        # These dictionaries contain a list of all the parameters set in this object, stored as "Parameter" and
         # OutputParameter Objects.  This will allow us later to access them in a user interface and get that list,
         # along with unit type, preferred units, etc.
         self.ParameterDict = {}
@@ -219,6 +221,56 @@ class EconomicsS_DAC_GT(Economics.Economics):
             ErrMessage="assume default Percent Energy Devoted To Process (50%)",
             ToolTipText="Percent Energy Devoted To Process (%)"
         )
+        self.carbon_credit_price = self.ParameterDict[self.carbon_credit_price.Name] = floatParameter(
+            "S-DAC-GT Carbon Credit Price",
+            value=180.0,
+            DefaultValue=180.0,
+            Min=0.0,
+            Max=1000.0,
+            UnitType=Units.COSTPERMASS,
+            PreferredUnits=CostPerMassUnit.DOLLARSPERTONNE,
+            CurrentUnits=CostPerMassUnit.DOLLARSPERTONNE,
+            ErrMessage="assume default Carbon Credit Price (180 USD per tonne CO2)",
+            ToolTipText="Carbon Credit or Market Price (USD per tonne CO2)"
+        )
+
+        self.carbon_credit_duration = self.ParameterDict[self.carbon_credit_duration.Name] = floatParameter(
+            "S-DAC-GT Carbon Credit Duration",
+            value=12.0,
+            DefaultValue=12.0,
+            Min=0.0,
+            Max=100.0,
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
+            ErrMessage="assume default Carbon Credit Duration (12 years)",
+            ToolTipText="Duration for which the carbon credit can be claimed (e.g., 12 years for US 45Q)"
+        )
+
+        self.sorbent_replacement_frequency = self.ParameterDict[self.sorbent_replacement_frequency.Name] = intParameter(
+            "S-DAC-GT Sorbent Replacement Frequency",
+            value=0,
+            DefaultValue=0,
+            AllowableRange=list(range(1, 101, 1)),
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
+            ErrMessage="assume default Sorbent Replacement Frequency (0 years - no discrete replacement)",
+            ToolTipText="Frequency of solid sorbent replacement in years (0 disables step-function replacement costs)"
+        )
+
+        self.sorbent_replacement_cost = self.ParameterDict[self.sorbent_replacement_cost.Name] = floatParameter(
+            "S-DAC-GT Sorbent Replacement Cost",
+            value=0.0,
+            DefaultValue=0.0,
+            Min=0.0,
+            Max=1000.0,
+            UnitType=Units.COSTPERMASS,
+            PreferredUnits=CostPerMassUnit.DOLLARSPERTONNE,
+            CurrentUnits=CostPerMassUnit.DOLLARSPERTONNE,
+            ErrMessage="assume default Sorbent Replacement Cost (0 USD per tonne CO2)",
+            ToolTipText="Cost to replace solid sorbent (USD per tonne CO2 capacity)"
+        )
 
         # local variable initiation
         # Capital Recovery Rate or Fixed Charge Factor - set initially for definitions
@@ -310,12 +362,8 @@ class EconomicsS_DAC_GT(Economics.Economics):
             PreferredUnits=CurrencyUnit.DOLLARS,
             CurrentUnits=CurrencyUnit.DOLLARS
         )
-        self.CarbonExtractedAnnually = self.OutputParameterDict[self.CarbonExtractedAnnually.Name] = OutputParameter(
-            Name="Tonnes per Year CO2 extracted",
-            UnitType=Units.MASSPERTIME,
-            PreferredUnits=MassPerTimeUnit.TONNEPERYEAR,
-            CurrentUnits=MassPerTimeUnit.TONNEPERYEAR
-        )
+        self.CarbonExtractedAnnually = self.OutputParameterDict[self.CarbonExtractedAnnually.Name] = \
+            carbon_extracted_annually_output_parameter()
         self.S_DAC_GTCummCarbonExtracted = self.OutputParameterDict[
             self.S_DAC_GTCummCarbonExtracted.Name] = OutputParameter(
             Name="Running Carbon Capture",
@@ -335,6 +383,21 @@ class EconomicsS_DAC_GT(Economics.Economics):
             PreferredUnits=CostPerMassUnit.DOLLARSPERTONNE,
             CurrentUnits=CostPerMassUnit.DOLLARSPERTONNE
         )
+        self.CarbonRevenue = OutputParameter(
+            Name="Annual Carbon Revenue",
+            UnitType=Units.CURRENCYFREQUENCY,
+            PreferredUnits=CurrencyFrequencyUnit.DOLLARSPERYEAR,
+            CurrentUnits=CurrencyFrequencyUnit.DOLLARSPERYEAR
+        )
+        self.OutputParameterDict[self.CarbonRevenue.Name] = self.CarbonRevenue
+
+        self.CarbonCummCashFlow = OutputParameter(
+            Name="Cumulative Carbon Revenue",
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.DOLLARS,
+            CurrentUnits=CurrencyUnit.DOLLARS
+        )
+        self.OutputParameterDict[self.CarbonCummCashFlow.Name] = self.CarbonCummCashFlow
 
         model.logger.info(f"Complete {str(__class__)}: {sys._getframe().f_code.co_name}")
 
@@ -374,7 +437,13 @@ class EconomicsS_DAC_GT(Economics.Economics):
                     # handle special cases
                     # none in this case so far
         else:
-            model.logger.info("No parameters read becuase no content provided")
+            model.logger.info("No parameters read because no content provided")
+
+
+        if model.economics.DoCarbonCalculations.value:
+            raise NotImplementedError(f'Only one of {self.DoSDACGTCalculations.Name} and '
+                                      f'{model.economics.DoCarbonCalculations.Name} may be True.')
+
         model.logger.info(f"read parameters complete {str(__class__)}: {sys._getframe().f_code.co_name}")
 
     def calculate_CRF(self, wacc: float, num_years: float) -> float:
@@ -481,6 +550,13 @@ class EconomicsS_DAC_GT(Economics.Economics):
         if not (storage_min <= self.storage.value <= storage_max):
             error_message = "S-DAC-GT ERROR: CO2 Storage Cost should be between {} and {}".format(storage_min,
                                                                                                   storage_max)
+            return True, error_message
+
+        if not (self.carbon_credit_duration.Min
+                <= self.carbon_credit_duration.value
+                <= self.carbon_credit_duration.Max):
+            error_message = "S-DAC-GT ERROR: Carbon Credit Duration should be between {} and {}".format(
+                self.carbon_credit_duration.Min, self.carbon_credit_duration.Max)
             return True, error_message
 
         return False, ""
@@ -599,12 +675,13 @@ class EconomicsS_DAC_GT(Economics.Economics):
         # Convert from $/McF to $/kWh_th, but don't change any parameters value directly - it will throw off the rehydration
         NG_price = self.NG_price.value / self.NG_EnergyDensity.value
         NG_totalcost = self.therm.value * NG_price
-        self.LCOH.value, self.kWh_e_per_kWh_th.value = self.geo_therm_cost(model.surfaceplant.electricity_cost_to_buy.value,
-                                                                           self.CAPEX_mult.value, self.OPEX_mult.value,
-                                                                           model.reserv.depth.value * 3280.84,
-                                                                           np.average(model.wellbores.ProducedTemperature.value),
-                                                                           model.wellbores.Tinj.value,
-                                                                           model.wellbores.nprod.value * model.wellbores.prodwellflowrate.value)
+        self.LCOH.value, self.kWh_e_per_kWh_th.value = self.geo_therm_cost(
+            model.surfaceplant.electricity_cost_to_buy.value,
+            self.CAPEX_mult.value, self.OPEX_mult.value,
+            model.reserv.depth.value * 3280.84,
+            np.average(model.wellbores.ProducedTemperature.value),
+            model.wellbores.Tinj.value,
+            model.wellbores.nprod.value * model.wellbores.prodwellflowrate.value)
         geothermal_totalcost = self.LCOH.value * self.therm.value
         co2_power = self.elec.value / 1000 * self.power_co2intensity.value
         co2_elec_heat = self.therm.value / 1000 * self.power_co2intensity.value
@@ -621,7 +698,8 @@ class EconomicsS_DAC_GT(Economics.Economics):
 
         # calculate the net impact of S-DAC-GT on the annual production of the model
         avg_first_law_eff = np.average(model.surfaceplant.FirstLawEfficiency.value)
-        self.tot_heat_energy_consumed_per_tonne.value = (self.elec.value / avg_first_law_eff) + self.therm.value  # kWh_th/tonne
+        self.tot_heat_energy_consumed_per_tonne.value = (
+                                                                self.elec.value / avg_first_law_eff) + self.therm.value  # kWh_th/tonne
         self.tot_cost_per_tonne.value = CAPEX + self.OPEX.value + self.storage.value + self.transport.value  # USD/tonne
         self.percent_thermal_energy_going_to_heat.value = self.therm.value / self.tot_heat_energy_consumed_per_tonne.value
 
@@ -637,18 +715,35 @@ class EconomicsS_DAC_GT(Economics.Economics):
         # That then gives us the revenue, since we have a carbon price model
         # We can also get annual cash flow from it.
         for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
-            self.CarbonExtractedAnnually.value[i] = (self.EnergySplit.value * model.surfaceplant.HeatkWhExtracted.value[i]) / self.tot_heat_energy_consumed_per_tonne.value
+            self.CarbonExtractedAnnually.value[i] = (self.EnergySplit.value * model.surfaceplant.HeatkWhExtracted.value[
+                i]) / self.tot_heat_energy_consumed_per_tonne.value
             if i == 0:
                 self.S_DAC_GTCummCarbonExtracted.value[i] = self.CarbonExtractedAnnually.value[i]
             else:
-                self.S_DAC_GTCummCarbonExtracted.value[i] = self.S_DAC_GTCummCarbonExtracted.value[i - 1] + self.CarbonExtractedAnnually.value[i]
+                self.S_DAC_GTCummCarbonExtracted.value[i] = self.S_DAC_GTCummCarbonExtracted.value[i - 1] + \
+                                                            self.CarbonExtractedAnnually.value[i]
             self.CarbonExtractedTotal.value = self.CarbonExtractedTotal.value + self.CarbonExtractedAnnually.value[i]
             self.S_DAC_GTAnnualCost.value[i] = self.CarbonExtractedAnnually.value[i] * self.tot_cost_per_tonne.value
             if i == 0:
                 self.S_DAC_GTCummCashFlow.value[i] = self.S_DAC_GTAnnualCost.value[i]
             else:
-                self.S_DAC_GTCummCashFlow.value[i] = self.S_DAC_GTCummCashFlow.value[i - 1] + self.S_DAC_GTAnnualCost.value[i]
-            self.CummCostPerTonne.value[i] = self.S_DAC_GTCummCashFlow.value[i] / self.S_DAC_GTCummCarbonExtracted.value[i]
+                self.S_DAC_GTCummCashFlow.value[i] = self.S_DAC_GTCummCashFlow.value[i - 1] + \
+                                                     self.S_DAC_GTAnnualCost.value[i]
+            self.CummCostPerTonne.value[i] = self.S_DAC_GTCummCashFlow.value[i] / \
+                                             self.S_DAC_GTCummCarbonExtracted.value[i]
+
+        max_carbon_capacity_tonnes = np.max(self.CarbonExtractedAnnually.value)
+        self.AnnualOPEX_USD = [0.0] * model.surfaceplant.plant_lifetime.value
+        for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
+            base_opex = self.CarbonExtractedAnnually.value[i] * (
+                        self.OPEX.value + self.storage.value + self.transport.value)
+            replacement_cost = 0.0
+            operational_year = i + 1
+            if self.sorbent_replacement_frequency.value > 0 and (
+                    operational_year % self.sorbent_replacement_frequency.value) == 0:
+                replacement_cost = max_carbon_capacity_tonnes * self.sorbent_replacement_cost.value
+
+            self.AnnualOPEX_USD[i] = base_opex + replacement_cost
 
         # We need to update the heat and electricity generated because we have consumed
         # some (all) of it to do the capture, so when they get used in the final economic calculation (below),
@@ -657,28 +752,34 @@ class EconomicsS_DAC_GT(Economics.Economics):
             if model.surfaceplant.enduse_option.value is not EndUseOptions.HEAT:
                 # all these end-use options have an electricity generation component
                 model.surfaceplant.TotalkWhProduced.value[i] = model.surfaceplant.TotalkWhProduced.value[i] - (
-                    self.CarbonExtractedAnnually.value[i] * self.elec.value)
+                        self.CarbonExtractedAnnually.value[i] * self.elec.value)
                 model.surfaceplant.NetkWhProduced.value[i] = model.surfaceplant.NetkWhProduced.value[i] - (
-                    self.CarbonExtractedAnnually.value[i] * self.elec.value)
+                        self.CarbonExtractedAnnually.value[i] * self.elec.value)
                 if model.surfaceplant.enduse_option.value is not EndUseOptions.ELECTRICITY:
                     model.surfaceplant.HeatkWhProduced.value[i] = model.surfaceplant.HeatkWhProduced.value[i] - (
-                        self.CarbonExtractedAnnually.value[i] * self.therm.value)
+                            self.CarbonExtractedAnnually.value[i] * self.therm.value)
             else:
                 # all the end-use option of direct-use only component
                 model.surfaceplant.HeatkWhProduced.value[i] = (model.surfaceplant.HeatkWhProduced.value[i] -
-                                                               (self.CarbonExtractedAnnually.value[i] * self.therm.value))
+                                                               (self.CarbonExtractedAnnually.value[
+                                                                    i] * self.therm.value))
 
-        # FIXME TODO https://github.com/NREL/GEOPHIRES-X/issues/341?title=S-DAC+does+not+calculate+carbon+revenue
-        # Build a revenue generation model for the carbon capture, assuming the capture is being sequestered and that
-        # there is some sort of credit involved for doing that sequestering
-        # note that there may already be values in the CarbonRevenue array, so we need to
-        # add to them, not just set them. If there isn't values, there, the array will be filed with zeros, so adding won't be a problem
-        #total_duration = model.surfaceplant.plant_lifetime.value
-        #for i in range(0, total_duration, 1):
-        #    model.sdacgteconomics.CarbonRevenue.value[i] = (model.sdacgteconomics.CarbonRevenue.value[i] +
-        #                                              (self.CarbonExtractedAnnually.value[i] * model.economics.CarbonPrice.value[i]))
-        #   if i > 0:
-        #       model.economics.CarbonCummCashFlow.value[i] = model.economics.CarbonCummCashFlow.value[i - 1] + model.economics.CarbonRevenue.value[i]
+        # Calculate Carbon Revenue based on S-DAC-GT specific credit price and duration
+        self.CarbonRevenue.value = [0.0] * model.surfaceplant.plant_lifetime.value
+        self.CarbonCummCashFlow.value = [0.0] * model.surfaceplant.plant_lifetime.value
+        model.economics.CarbonPrice.value = [0.0] * model.surfaceplant.plant_lifetime.value
+        model.economics.CarbonPrice.CurrentUnits = self.carbon_credit_price.CurrentUnits
 
+        for i in range(0, model.surfaceplant.plant_lifetime.value, 1):
+            # Enforce the parameterized statutory limit for tax credits
+            applicable_price = self.carbon_credit_price.value if i < self.carbon_credit_duration.value else 0.0
+            model.economics.CarbonPrice.value[i] = applicable_price
+
+            self.CarbonRevenue.value[i] = self.CarbonExtractedAnnually.value[i] * model.economics.CarbonPrice.value[i]
+            if i == 0:
+                self.CarbonCummCashFlow.value[i] = self.CarbonRevenue.value[i]
+            else:
+                self.CarbonCummCashFlow.value[i] = self.CarbonCummCashFlow.value[i - 1] + \
+                                                   self.CarbonRevenue.value[i]
         self._calculate_derived_outputs(model)
         model.logger.info(f'Complete {str(__class__)}: {sys._getframe().f_code.co_name}')

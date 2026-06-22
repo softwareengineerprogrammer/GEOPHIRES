@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime
 import math
 import time
@@ -933,6 +934,32 @@ class Outputs:
             else:
                 return output_param
 
+        econ_CarbonPrice = copy.deepcopy(econ.CarbonPrice)
+        econ_CarbonRevenue = copy.deepcopy(econ.CarbonRevenue)
+        econ_CarbonCummCashFlow = copy.deepcopy(econ.CarbonCummCashFlow)
+
+        if econ.DoSDACGTCalculations.value:
+            econ_CarbonRevenue = copy.deepcopy(model.sdacgteconomics.CarbonRevenue)
+            econ_CarbonRevenue.value = [
+                *([0]*model.surfaceplant.construction_years.value),
+                *model.sdacgteconomics.CarbonRevenue.value
+            ]
+
+            def _convert(gt_param,  econ_param) -> None:
+                gt_param.value = gt_param.quantity().to(econ_param.CurrentUnits).magnitude
+                gt_param.CurrentUnits = econ_param.CurrentUnits
+
+            _convert(econ_CarbonRevenue, econ.CarbonRevenue)
+
+            econ_CarbonCummCashFlow = copy.deepcopy(model.sdacgteconomics.CarbonCummCashFlow)
+            econ_CarbonCummCashFlow.value = [
+                *([0] * model.surfaceplant.construction_years.value),
+                *model.sdacgteconomics.CarbonCummCashFlow.value
+            ]
+
+            _convert(econ_CarbonCummCashFlow, econ.CarbonCummCashFlow)
+
+
         f.write('Start    ('
                 + o(econ.ElecPrice).CurrentUnits.value +
                 ')(' + o(econ.ElecRevenue).CurrentUnits.value +
@@ -943,9 +970,9 @@ class Outputs:
                 ')   |(' + o(econ.CoolingPrice).CurrentUnits.value +
                 ') (' + o(econ.CoolingRevenue).CurrentUnits.value +
                 ')    (' + o(econ.CoolingCummRevenue).CurrentUnits.value +
-                ')    |(' + o(econ.CarbonPrice).CurrentUnits.value +
-                ')    (' + o(econ.CarbonRevenue).CurrentUnits.value +
-                ')    (' + o(econ.CarbonCummCashFlow).CurrentUnits.value +
+                ')    |(' + o(econ_CarbonPrice).CurrentUnits.value +
+                ')    (' + o(econ_CarbonRevenue).CurrentUnits.value +
+                ')    (' + o(econ_CarbonCummCashFlow).CurrentUnits.value +
                 ')    |(' + o(econ.Coam).CurrentUnits.value +
                 ') (' + o(econ.TotalRevenue).CurrentUnits.value +
                 ')    (' + o(econ.TotalCummRevenue).CurrentUnits.value + ')\n')
@@ -959,7 +986,7 @@ class Outputs:
             else:
                 opex = o(econ.Coam).value
             f.write(
-                f'{ii:3.0f}     {o(econ.ElecPrice).value[ii]:5.2f}          {o(econ.ElecRevenue).value[ii]:5.2f}  {o(econ.ElecCummRevenue).value[ii]:5.2f}     |   {o(econ.HeatPrice).value[ii]:5.2f}    {o(econ.HeatRevenue).value[ii]:5.2f}        {o(econ.HeatCummRevenue).value[ii]:5.2f}    |   {o(econ.CoolingPrice).value[ii]:5.2f}    {o(econ.CoolingRevenue).value[ii]:5.2f}        {o(econ.CoolingCummRevenue).value[ii]:5.2f}     |   {o(econ.CarbonPrice).value[ii]:5.2f}    {o(econ.CarbonRevenue).value[ii]:5.2f}        {o(econ.CarbonCummCashFlow).value[ii]:5.2f}     | {opex:5.2f}     {o(econ.TotalRevenue).value[ii]:5.2f}     {o(econ.TotalCummRevenue).value[ii]:5.2f}\n')
+                f'{ii:3.0f}     {o(econ.ElecPrice).value[ii]:5.2f}          {o(econ.ElecRevenue).value[ii]:5.2f}  {o(econ.ElecCummRevenue).value[ii]:5.2f}     |   {o(econ.HeatPrice).value[ii]:5.2f}    {o(econ.HeatRevenue).value[ii]:5.2f}        {o(econ.HeatCummRevenue).value[ii]:5.2f}    |   {o(econ.CoolingPrice).value[ii]:5.2f}    {o(econ.CoolingRevenue).value[ii]:5.2f}        {o(econ.CoolingCummRevenue).value[ii]:5.2f}     |   {o(econ_CarbonPrice).value[ii]:5.2f}    {o(econ_CarbonRevenue).value[ii]:5.2f}        {o(econ_CarbonCummCashFlow).value[ii]:5.2f}     | {opex:5.2f}     {o(econ.TotalRevenue).value[ii]:5.2f}     {o(econ.TotalCummRevenue).value[ii]:5.2f}\n')
         f.write(NL)
 
     # noinspection PyMethodMayBeStatic

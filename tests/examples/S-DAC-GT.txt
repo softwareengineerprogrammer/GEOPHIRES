@@ -6,6 +6,9 @@
 # But only lists those parameters that are different than their default values
 
 Do S-DAC-GT Calculations, True
+Plant Lifetime, 30
+S-DAC-GT Carbon Credit Duration, 30
+S-DAC-GT Carbon Credit Price, 180.0,        ---[USD/tonne CO2] 45Q tax credit rate or voluntary market price
 
 ***Subsurface technical parameters***
 *************************************
