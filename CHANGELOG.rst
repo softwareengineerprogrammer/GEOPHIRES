@@ -8,7 +8,7 @@ GEOPHIRES v3 (2023-2026)
 3.15
 ^^^^
 
-3.15: `Calculate S-DAC carbon revenue (BICYCLE) <https://github.com/NREL/GEOPHIRES-X/pull/510>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.15.0>`__ | **Changed:** S-DAC carbon revenue is now calculated. See `the tracking issue <https://github.com/NatLabRockies/GEOPHIRES-X/issues/341`__ for details.
+3.15: `Calculate S-DAC carbon revenue (BICYCLE) <https://github.com/NREL/GEOPHIRES-X/pull/510>`__ | `release <https://github.com/NREL/GEOPHIRES-X/releases/tag/v3.15.0>`__ | **Changed:** S-DAC carbon revenue is now calculated. See `the tracking issue <https://github.com/NatLabRockies/GEOPHIRES-X/issues/341>`__ for details.
 
 3.14
 ^^^^
