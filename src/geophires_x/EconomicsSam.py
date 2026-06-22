@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import json
 import logging
 import os
@@ -146,6 +145,12 @@ def validate_read_parameters(model: Model) -> None:
                 # temporarily switching/testing and/or migrating between schedule-based and rate-based more user
                 # friendly by only requiring enabling/disabling 2 parameters rather than up to 6.
 
+    if econ.DoSDACGTCalculations.value:
+        raise NotImplementedError(
+            'S-DAC is not currently supported SAM Economic Models. '
+            'See https://github.com/NatLabRockies/GEOPHIRES-X/issues/511.'  # TODO to implement
+        )
+
 
 def _validate_construction_capex_schedule(
     econ_capex_schedule: listParameter, construction_years: int, model: Model
@@ -288,11 +293,6 @@ def calculate_sam_economics(model: Model) -> SamEconomicsCalculations:
     sam_economics.nominal_discount_rate.value, sam_economics.wacc.value = _calculate_nominal_discount_rate_and_wacc_pct(
         model, single_owner
     )
-
-    # noinspection SpellCheckingInspection
-    if hasattr(model.economics, 'DoSDACGTCalculations') and model.economics.DoSDACGTCalculations.value:
-        sam_economics.s_dac_carbon_extracted_annually = copy.deepcopy(model.sdacgteconomics.CarbonExtractedAnnually)
-
     sam_economics.moic.value = _calculate_moic(sam_economics.sam_cash_flow_profile, model)
     sam_economics.project_vir.value = _calculate_project_vir(sam_economics.sam_cash_flow_profile, model)
     sam_economics.project_payback_period.value = _calculate_project_payback_period(
@@ -604,13 +604,6 @@ def _get_utility_rate_parameters(m: Model) -> dict[str, Any]:
 
     max_total_kWh_produced = np.max(m.surfaceplant.TotalkWhProduced.quantity().to(convertible_unit('kWh')).magnitude)
 
-    if econ.DoSDACGTCalculations.value:
-        # Restore the true gross maximum before S-DAC in-place mutation decremented it
-        sdac_elec_consumption_kwh = (
-            np.max(m.sdacgteconomics.CarbonExtractedAnnually.value) * m.sdacgteconomics.elec.value
-        )
-        max_total_kWh_produced += sdac_elec_consumption_kwh
-
     net_kwh_produced_series: Iterable | float | int = (
         m.surfaceplant.NetkWhProduced.quantity().to(convertible_unit('kWh')).magnitude
     )
@@ -674,36 +667,8 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     royalty_supplemental_payments_by_year_usd = econ.get_royalty_supplemental_payments_schedule_usd(model)[
         _pre_revenue_years_count(model) :
     ]
-
-    sdac_average_opex_usd = 0.0
-    sdac_opex_by_year_usd = [0.0] * model.surfaceplant.plant_lifetime.value
-    if econ.DoSDACGTCalculations.value:
-        sdac_opex_by_year_usd = model.sdacgteconomics.AnnualOPEX_USD
-        avg_carbon_extracted_tonnes = np.average(model.sdacgteconomics.CarbonExtractedAnnually.value)
-        sdac_average_opex_usd = (
-            model.sdacgteconomics.OPEX.value
-            + model.sdacgteconomics.storage.value
-            + model.sdacgteconomics.transport.value
-        ) * avg_carbon_extracted_tonnes
-        if model.sdacgteconomics.sorbent_replacement_frequency.value > 0:
-            max_carbon_capacity_tonnes = np.max(model.sdacgteconomics.CarbonExtractedAnnually.value)
-            replacements_per_lifetime = int(
-                model.surfaceplant.plant_lifetime.value / model.sdacgteconomics.sorbent_replacement_frequency.value
-            )
-            annualized_replacement_usd = (
-                max_carbon_capacity_tonnes
-                * model.sdacgteconomics.sorbent_replacement_cost.value
-                * replacements_per_lifetime
-            ) / model.surfaceplant.plant_lifetime.value
-            sdac_average_opex_usd += annualized_replacement_usd
-
-    opex_base_without_sdac_usd = opex_base_usd - sdac_average_opex_usd
     for year_index in range(model.surfaceplant.plant_lifetime.value):
-        opex_by_year_usd.append(
-            opex_base_without_sdac_usd
-            + royalty_supplemental_payments_by_year_usd[year_index]
-            + sdac_opex_by_year_usd[year_index]
-        )
+        opex_by_year_usd.append(opex_base_usd + royalty_supplemental_payments_by_year_usd[year_index])
 
     if model.surfaceplant.enduse_option.value == EndUseOptions.HEAT:
         # For pure direct-use, pumping is a grid purchase.
@@ -729,62 +694,18 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     ret['federal_tax_rate'], ret['state_tax_rate'] = _get_fed_and_state_tax_rates(econ.CTR.value)
 
     geophires_itc_tenths = Decimal(econ.RITC.value)
+    ret['itc_fed_percent'] = [float(geophires_itc_tenths * Decimal(100))]
 
     geophires_state_itc_usd = Decimal(econ.ritc_state_amount.quantity().to(convertible_unit('USD')).magnitude)
     ret['itc_sta_amount'] = [float(geophires_state_itc_usd)]
 
-    if econ.DoSDACGTCalculations.value and geophires_itc_tenths > 0:
-        # Shield DAC CAPEX from ITC to prevent unlawful MACRS basis reduction
-        max_carbon_capacity_tonnes = max(model.sdacgteconomics.CarbonExtractedAnnually.value)
-        sdac_capex_usd = (
-            model.sdacgteconomics.CAPEX.value * model.sdacgteconomics.CAPEX_mult.value * max_carbon_capacity_tonnes
-        )
-
-        # Geothermal eligible basis = Total Installed Cost - DAC CAPEX
-        eligible_geothermal_basis_usd = ret['total_installed_cost'] - sdac_capex_usd
-        itc_fed_amount_usd = float(Decimal(eligible_geothermal_basis_usd) * geophires_itc_tenths)
-
-        ret['itc_fed_percent'] = [0.0]  # Disable percentage-based ITC on the whole project
-        ret['itc_fed_amount'] = [itc_fed_amount_usd]  # Inject fixed ITC amount for geothermal only
-    else:
-        ret['itc_fed_percent'] = [float(geophires_itc_tenths * Decimal(100))]
-
-    # Build a year-by-year schedule for the Federal Production Tax Credit
-    ptc_fed_amount_schedule = [0.0] * model.surfaceplant.plant_lifetime.value
-
-    # 1. Base Electricity PTC
     if econ.PTCElec.Provided:
-        base_ptc_rate = econ.PTCElec.quantity().to(convertible_unit('USD/kWh')).magnitude
-        ptc_term = int(econ.PTCDuration.quantity().to(convertible_unit('yr')).magnitude)
-        for i in range(min(ptc_term, model.surfaceplant.plant_lifetime.value)):
-            escalation = (1.0 + _pct(econ.RINFL) / 100.0) ** i if econ.PTCInflationAdjusted.value else 1.0
-            ptc_fed_amount_schedule[i] = base_ptc_rate * escalation
+        ret['ptc_fed_amount'] = [econ.PTCElec.quantity().to(convertible_unit('USD/kWh')).magnitude]
 
-    # 2. S-DAC 45Q Equivalent (Mapped as Non-Taxable PBI to avoid MACRS/Exclusivity issues)
-    if econ.DoSDACGTCalculations.value:
-        pbi_oth_amount_schedule = [0.0] * model.surfaceplant.plant_lifetime.value
+        ret['ptc_fed_term'] = econ.PTCDuration.quantity().to(convertible_unit('yr')).magnitude
 
-        for i in range(model.surfaceplant.plant_lifetime.value):
-            # The statutory duration cutoff (e.g., 12 years) is already handled inside EconomicsS_DAC_GT.py
-            # so CarbonRevenue will naturally be 0.0 for years > 12.
-            sdac_revenue_usd = model.sdacgteconomics.CarbonRevenue.value[i]
-            net_kwh_produced = model.surfaceplant.NetkWhProduced.value[i]
-
-            # Convert absolute S-DAC revenue (USD) into an equivalent USD/kWh PBI rate for SAM
-            if net_kwh_produced > 0:
-                pbi_oth_amount_schedule[i] = sdac_revenue_usd / net_kwh_produced
-
-        if any(rate > 0.0 for rate in pbi_oth_amount_schedule):
-            ret['pbi_oth_amount'] = pbi_oth_amount_schedule
-            ret['pbi_oth_term'] = model.surfaceplant.plant_lifetime.value
-            ret['pbi_oth_tax_fed'] = 0.0  # Strictly exclude from Federal taxable gross income
-            ret['pbi_oth_tax_sta'] = 0.0  # Strictly exclude from State taxable gross income
-
-    # Inject the combined array into SAM
-    if any(rate > 0.0 for rate in ptc_fed_amount_schedule):
-        ret['ptc_fed_amount'] = ptc_fed_amount_schedule
-        ret['ptc_fed_term'] = model.surfaceplant.plant_lifetime.value
-        ret['ptc_fed_escal'] = 0.0  # Escalation is already manually calculated in the array above
+        if econ.PTCInflationAdjusted.value:
+            ret['ptc_fed_escal'] = _pct(econ.RINFL)
 
     # 'Property Tax Rate'
     geophires_ptr_tenths = Decimal(econ.PTR.value)

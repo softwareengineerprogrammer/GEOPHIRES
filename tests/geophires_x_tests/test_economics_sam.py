@@ -650,7 +650,7 @@ class EconomicsSamTestCase(BaseTestCase):
                 return EconomicsSamTestCase._get_cash_flow_row(cash_flow, name)
 
             ptc_vals = get_row('Federal PTC income ($)')
-            self.assertListAlmostEqual(expected_ptc_usd_per_kWh, ptc_vals, percent=1.05)
+            self.assertListAlmostEqual(expected_ptc_usd_per_kWh, ptc_vals, percent=1)
 
         assert_ptc({}, [0] * 21)
 
