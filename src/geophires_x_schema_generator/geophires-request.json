@@ -1502,8 +1502,17 @@
       "units": "MUSD",
       "category": "Economics",
       "default": 0,
-      "minimum": 0,
+      "minimum": -1,
       "maximum": 100
+    },
+    "Reservoir Stimulation Capital Cost per Fracture Surface Area": {
+      "description": "Reservoir stimulation capital cost per fracture surface area before indirect costs and contingency. Set Reservoir Stimulation Capital Cost per Production Well = -1 to indicate that production wells are stimulated.",
+      "type": "number",
+      "units": "USD",
+      "category": "Economics",
+      "default": 0.9,
+      "minimum": 0,
+      "maximum": 1000
     },
     "Reservoir Stimulation Capital Cost Adjustment Factor": {
       "description": "Multiplier for reservoir stimulation capital cost correlation",
