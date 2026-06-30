@@ -88,6 +88,7 @@ class Units(IntEnum):
     DECAY_RATE = auto()
     INFLATION_RATE = auto()
     DYNAMIC_VISCOSITY = auto()
+    COSTPERAREA = auto()
 
 
 class AngleUnit(str, Enum):
@@ -208,6 +209,13 @@ class CurrencyFrequencyUnit(str, Enum):
     MMXNPERYEAR = "MXN/yr"
     KMXNPERYEAR = "KMXN/yr"
     MXNPERYEAR = "MXN/yr"
+
+    def get_currency_unit_str(self) -> str:
+        return self.value.split('/')[0]
+
+
+class CostPerAreaUnit(str, Enum):
+    DOLLARSPERMETERS2 = "USD/m**2"
 
     def get_currency_unit_str(self) -> str:
         return self.value.split('/')[0]

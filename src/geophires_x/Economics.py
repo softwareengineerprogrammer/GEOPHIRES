@@ -653,6 +653,8 @@ class Economics:
                         f'For traditional hydrothermal reservoirs, this parameter should be set to $0.'
         )
 
+        before_stim_modifiers_note = f'before adjustment factor, indirect costs, and contingency'
+
         max_stimulation_cost_per_well_MUSD = 100
         self.stimulation_cost_per_injection_well = \
           self.ParameterDict[self.stimulation_cost_per_injection_well.Name] = floatParameter(
@@ -664,7 +666,7 @@ class Economics:
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
             Provided=False,
-            ToolTipText='Reservoir stimulation capital cost per injection well before indirect costs and contingency'
+            ToolTipText=f'Reservoir stimulation capital cost per injection well {before_stim_modifiers_note}'
         )
 
         stimulation_cost_per_production_well_default_value_MUSD = 0
@@ -680,7 +682,7 @@ class Economics:
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
-            ToolTipText=f'Reservoir stimulation capital cost per production well before indirect costs and contingency'
+            ToolTipText=f'Reservoir stimulation capital cost per production well {before_stim_modifiers_note}'
                         f'{stimulation_cost_per_production_well_default_value_note}'
         )
 
@@ -690,16 +692,16 @@ class Economics:
             Min=0,
             Max=1000,
             DefaultValue=0.9,
-            UnitType=Units.CURRENCY,
-            PreferredUnits=CurrencyUnit.DOLLARS,
-            CurrentUnits=CurrencyUnit.DOLLARS,
+            UnitType=Units.COSTPERAREA,
+            PreferredUnits=CostPerAreaUnit.DOLLARSPERMETERS2,
+            CurrentUnits=CostPerAreaUnit.DOLLARSPERMETERS2,
             # TODO/WIP...
-            ToolTipText=f'Reservoir stimulation capital cost per fracture surface area before indirect costs and '
-                        f'contingency. Set {self.stimulation_cost_per_production_well.Name} = '
+            ToolTipText=f'Reservoir stimulation capital cost per fracture surface area {before_stim_modifiers_note}. '
+                        f'Provide {self.stimulation_cost_per_production_well.Name} = '
                         f'{CALCULATED_PARAMETER_PLACEHOLDER_VALUE} to indicate that production wells are stimulated.'
         )
 
-
+        # noinspection SpellCheckingInspection
         self.ccstimadjfactor = self.ParameterDict[self.ccstimadjfactor.Name] = floatParameter(
             "Reservoir Stimulation Capital Cost Adjustment Factor",
             DefaultValue=1.0,
@@ -3169,10 +3171,14 @@ class Economics:
 
             ret = quantity(stimulation_costs_cstim_u, self.Cstim.CurrentUnits)
         else:
-            direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
-                self.Cstim.CurrentUnits).magnitude
-            direct_stim_cost_per_production_well_cstim_u = self.stimulation_cost_per_production_well.quantity().to(
-                self.Cstim.CurrentUnits).magnitude
+            if self.stimulation_cost_per_fracture_surface_area.Provided:
+                raise NotImplementedError # FIXME WIP
+                # model.reserv.fracarea * model.reserv.fracnumb
+            else:
+                direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
+                    self.Cstim.CurrentUnits).magnitude
+                direct_stim_cost_per_production_well_cstim_u = self.stimulation_cost_per_production_well.quantity().to(
+                    self.Cstim.CurrentUnits).magnitude
 
             def _total_cost_per_well(direct_cost_per_well) -> float:
                 return (direct_cost_per_well * self.ccstimadjfactor.value * self._stimulation_indirect_cost_factor
