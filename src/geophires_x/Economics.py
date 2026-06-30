@@ -3148,6 +3148,7 @@ class Economics:
 
     def calculate_stimulation_costs(self, model: Model) -> PlainQuantity:
         production_wells_stimulated: bool = self.stimulation_cost_per_production_well.Provided
+
         if self.ccstimfixed.Valid:
             stimulation_costs_cstim_u = self.ccstimfixed.quantity().to(self.Cstim.CurrentUnits).magnitude
 
@@ -3172,13 +3173,19 @@ class Economics:
             ret = quantity(stimulation_costs_cstim_u, self.Cstim.CurrentUnits)
         else:
             if self.stimulation_cost_per_fracture_surface_area.Provided:
-                raise NotImplementedError # FIXME WIP
-                # model.reserv.fracarea * model.reserv.fracnumb
-            else:
-                direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
-                    self.Cstim.CurrentUnits).magnitude
-                direct_stim_cost_per_production_well_cstim_u = self.stimulation_cost_per_production_well.quantity().to(
-                    self.Cstim.CurrentUnits).magnitude
+                total_fracture_surface_area_q = (model.reserv.fracareacalc.quantity() * model.reserv.fracnumbcalc.value).to(
+                    self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_area_unit_str())
+                direct_stim_cost_q = (total_fracture_surface_area_q *
+                                      self.stimulation_cost_per_fracture_surface_area.quantity())
+                inj_to_prod_cost_ratio = 1 if not production_wells_stimulated else \
+                    model.wellbores.ninj.value / (model.wellbores.nprod.value + model.wellbores.ninj.value)
+                self.stimulation_cost_per_injection_well.value = quantity(inj_to_prod_cost_ratio * direct_stim_cost_q / model.wellbores.ninj.value, self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()).to(self.stimulation_cost_per_injection_well.CurrentUnits).magnitude
+                self.stimulation_cost_per_production_well.value = quantity((1 - inj_to_prod_cost_ratio) * direct_stim_cost_q / model.wellbores.nprod.value, self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()).to(self.stimulation_cost_per_production_well.CurrentUnits).magnitude
+
+            direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
+                self.Cstim.CurrentUnits).magnitude
+            direct_stim_cost_per_production_well_cstim_u = self.stimulation_cost_per_production_well.quantity().to(
+                self.Cstim.CurrentUnits).magnitude
 
             def _total_cost_per_well(direct_cost_per_well) -> float:
                 return (direct_cost_per_well * self.ccstimadjfactor.value * self._stimulation_indirect_cost_factor

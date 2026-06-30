@@ -214,13 +214,6 @@ class CurrencyFrequencyUnit(str, Enum):
         return self.value.split('/')[0]
 
 
-class CostPerAreaUnit(str, Enum):
-    DOLLARSPERMETERS2 = "USD/m**2"
-
-    def get_currency_unit_str(self) -> str:
-        return self.value.split('/')[0]
-
-
 class EnergyCostUnit(str, Enum):
     DOLLARSPERKWH = "USD/kWh"
     DOLLARSPERMWH = "USD/MWh"
@@ -250,6 +243,15 @@ class CostPerMassUnit(str, Enum):
 class CostPerDistanceUnit(str, Enum):
     DOLLARSPERM = "USD/m"
 
+
+class CostPerAreaUnit(str, Enum):
+    DOLLARSPERMETERS2 = "USD/m**2"
+
+    def get_currency_unit_str(self) -> str:
+        return self.value.split('/')[0]
+
+    def get_area_unit_str(self) -> str:
+        return self.value.split('/')[1]
 
 class PressureUnit(str, Enum):
     """Pressure Units"""
