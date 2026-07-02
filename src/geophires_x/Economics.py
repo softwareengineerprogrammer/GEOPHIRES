@@ -3179,8 +3179,26 @@ class Economics:
                                       self.stimulation_cost_per_fracture_surface_area.quantity())
                 inj_to_prod_cost_ratio = 1 if not production_wells_stimulated else \
                     model.wellbores.ninj.value / (model.wellbores.nprod.value + model.wellbores.ninj.value)
-                self.stimulation_cost_per_injection_well.value = quantity(inj_to_prod_cost_ratio * direct_stim_cost_q / model.wellbores.ninj.value, self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()).to(self.stimulation_cost_per_injection_well.CurrentUnits).magnitude
-                self.stimulation_cost_per_production_well.value = quantity((1 - inj_to_prod_cost_ratio) * direct_stim_cost_q / model.wellbores.nprod.value, self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()).to(self.stimulation_cost_per_production_well.CurrentUnits).magnitude
+
+                # Coerces equal injection and production well costs required for stimulation cost per well output
+                # display heuristic
+                per_well_cost_precision = 2
+
+                self.stimulation_cost_per_injection_well.value = round(
+                    quantity(
+                        inj_to_prod_cost_ratio * direct_stim_cost_q / model.wellbores.ninj.value,
+                        self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()
+                    ).to(self.stimulation_cost_per_injection_well.CurrentUnits).magnitude,
+                    per_well_cost_precision
+                )
+
+                self.stimulation_cost_per_production_well.value = round(
+                    quantity(
+                        (1 - inj_to_prod_cost_ratio) * direct_stim_cost_q / model.wellbores.nprod.value,
+                        self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()
+                    ).to(self.stimulation_cost_per_production_well.CurrentUnits).magnitude,
+                    per_well_cost_precision
+                )
 
             direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
                 self.Cstim.CurrentUnits).magnitude
