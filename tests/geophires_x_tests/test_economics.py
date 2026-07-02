@@ -143,19 +143,18 @@ class EconomicsTestCase(BaseTestCase):
                     from_file_path=self._get_test_file_path('generic-egs-case-5_no-stim-costs-specified.txt'),
                     params={
                         'Reservoir Stimulation Capital Cost per Production Well': -1,
-                        'Reservoir Stimulation Capital Cost per Fracture Surface Area': 0.89773,
+                        'Reservoir Stimulation Capital Cost per Fracture Surface Area': 0.87431693989,
                         'Print Output to Console': True,
                     },
                 )
             )
 
         r: GeophiresXResult = _get_result()
-        # FIXME WIP - should match FPC5 more closely
-        #  (probably related to adjustment factor/indirect costs/contingency...)
-        cap_costs = r.result['CAPITAL COSTS (M$)']
-        self.assertAlmostEqual(454.02, cap_costs['Stimulation costs']['value'], delta=13)
 
-        self.assertAlmostEqual(4.83, cap_costs['Stimulation costs per well']['value'], delta=0.14)
+        cap_costs = r.result['CAPITAL COSTS (M$)']
+        self.assertAlmostEqual(454.02, cap_costs['Stimulation costs']['value'], delta=0)
+
+        self.assertAlmostEqual(4.83, cap_costs['Stimulation costs per well']['value'], delta=0)
 
     # noinspection PyMethodMayBeStatic
     def _new_model(
