@@ -1488,7 +1488,7 @@
       "maximum": 1000
     },
     "Reservoir Stimulation Capital Cost per Injection Well": {
-      "description": "Reservoir stimulation capital cost per injection well before indirect costs and contingency",
+      "description": "Reservoir stimulation capital cost per injection well before adjustment factor, indirect costs, and contingency",
       "type": "number",
       "units": "MUSD",
       "category": "Economics",
@@ -1497,13 +1497,22 @@
       "maximum": 100
     },
     "Reservoir Stimulation Capital Cost per Production Well": {
-      "description": "Reservoir stimulation capital cost per production well before indirect costs and contingency. By default, only the injection wells are assumed to be stimulated unless this parameter is provided.",
+      "description": "Reservoir stimulation capital cost per production well before adjustment factor, indirect costs, and contingency. By default, only the injection wells are assumed to be stimulated unless this parameter is provided.",
       "type": "number",
       "units": "MUSD",
       "category": "Economics",
       "default": 0,
-      "minimum": 0,
+      "minimum": -1,
       "maximum": 100
+    },
+    "Reservoir Stimulation Capital Cost per Fracture Surface Area": {
+      "description": "Reservoir stimulation capital cost per fracture surface area before adjustment factor, indirect costs, and contingency. Provide Reservoir Stimulation Capital Cost per Production Well = -1 to indicate that production wells are stimulated.",
+      "type": "number",
+      "units": "USD/m**2",
+      "category": "Economics",
+      "default": 0.9,
+      "minimum": 0,
+      "maximum": 1000
     },
     "Reservoir Stimulation Capital Cost Adjustment Factor": {
       "description": "Multiplier for reservoir stimulation capital cost correlation",

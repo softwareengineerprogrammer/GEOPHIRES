@@ -16,7 +16,8 @@ from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter,
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
     overnight_capital_cost_output_parameter, CONSTRUCTION_CAPEX_SCHEDULE_PARAMETER_NAME, \
-    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, lcoh_output_parameter, lcoc_output_parameter
+    _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET, investment_tax_credit_output_parameter, lcoh_output_parameter, \
+    lcoc_output_parameter, CALCULATED_PARAMETER_PLACEHOLDER_VALUE
 from geophires_x.ParameterUtils import expand_schedule_dsl
 from geophires_x.GeoPHIRESUtils import quantity
 from geophires_x.OptionList import Configuration, WellDrillingCostCorrelation, EconomicModel, EndUseOptions, PlantType, \
@@ -652,6 +653,8 @@ class Economics:
                         f'For traditional hydrothermal reservoirs, this parameter should be set to $0.'
         )
 
+        before_stim_modifiers_note = f'before adjustment factor, indirect costs, and contingency'
+
         max_stimulation_cost_per_well_MUSD = 100
         self.stimulation_cost_per_injection_well = \
           self.ParameterDict[self.stimulation_cost_per_injection_well.Name] = floatParameter(
@@ -663,7 +666,7 @@ class Economics:
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
             Provided=False,
-            ToolTipText='Reservoir stimulation capital cost per injection well before indirect costs and contingency'
+            ToolTipText=f'Reservoir stimulation capital cost per injection well {before_stim_modifiers_note}'
         )
 
         stimulation_cost_per_production_well_default_value_MUSD = 0
@@ -674,15 +677,31 @@ class Economics:
           self.ParameterDict[self.stimulation_cost_per_production_well.Name] = floatParameter(
             'Reservoir Stimulation Capital Cost per Production Well',
             DefaultValue=stimulation_cost_per_production_well_default_value_MUSD,
-            Min=0,
+            Min=-1,
             Max=max_stimulation_cost_per_well_MUSD,
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
-            ToolTipText=f'Reservoir stimulation capital cost per production well before indirect costs and contingency'
+            ToolTipText=f'Reservoir stimulation capital cost per production well {before_stim_modifiers_note}'
                         f'{stimulation_cost_per_production_well_default_value_note}'
         )
 
+        self.stimulation_cost_per_fracture_surface_area = \
+          self.ParameterDict[self.stimulation_cost_per_fracture_surface_area.Name] = floatParameter(
+            'Reservoir Stimulation Capital Cost per Fracture Surface Area',
+            Min=0,
+            Max=1000,
+            DefaultValue=0.9,
+            UnitType=Units.COSTPERAREA,
+            PreferredUnits=CostPerAreaUnit.DOLLARSPERMETERS2,
+            CurrentUnits=CostPerAreaUnit.DOLLARSPERMETERS2,
+            # TODO/WIP...
+            ToolTipText=f'Reservoir stimulation capital cost per fracture surface area {before_stim_modifiers_note}. '
+                        f'Provide {self.stimulation_cost_per_production_well.Name} = '
+                        f'{CALCULATED_PARAMETER_PLACEHOLDER_VALUE} to indicate that production wells are stimulated.'
+        )
+
+        # noinspection SpellCheckingInspection
         self.ccstimadjfactor = self.ParameterDict[self.ccstimadjfactor.Name] = floatParameter(
             "Reservoir Stimulation Capital Cost Adjustment Factor",
             DefaultValue=1.0,
@@ -2822,6 +2841,8 @@ class Economics:
                     if sam_em_only_param.Provided:
                         raise NotImplementedError(f'{sam_em_only_param.Name} is only supported for SAM Economic Models')
 
+            self._validate_read_stimulation_cost_parameters(model)
+
         else:
             model.logger.info("No parameters read because no content provided")
 
@@ -2864,6 +2885,34 @@ class Economics:
                 _set_ratio(0.0)
 
         model.logger.info(f'complete {__class__!s}: {sys._getframe().f_code.co_name}')
+
+    def _validate_read_stimulation_cost_parameters(self, model: Model) -> None:
+        def _raise_mutually_exclusive_error(param1: Parameter, param2: Parameter) -> None:
+            raise ValueError(f'Cannot provide both {param1.Name} and {param2.Name} parameters. ')
+
+        if self.stimulation_cost_per_fracture_surface_area.Provided:
+            if self.ccstimfixed.Provided:
+                _raise_mutually_exclusive_error(
+                    self.ccstimfixed,
+                    self.stimulation_cost_per_fracture_surface_area
+                )
+            if self.stimulation_cost_per_injection_well.Provided:
+                _raise_mutually_exclusive_error(
+                    self.stimulation_cost_per_injection_well,
+                    self.stimulation_cost_per_fracture_surface_area
+                )
+            if self.stimulation_cost_per_production_well.Provided and \
+                    self.stimulation_cost_per_production_well.value != \
+                    CALCULATED_PARAMETER_PLACEHOLDER_VALUE:  # Placeholder indicates production wells are stimulated
+                _raise_mutually_exclusive_error(
+                    self.stimulation_cost_per_production_well,
+                    self.stimulation_cost_per_fracture_surface_area
+                )
+        elif self.stimulation_cost_per_production_well.Provided and self.stimulation_cost_per_production_well.value < 0:
+            raise ValueError(f'{self.stimulation_cost_per_production_well.Name} must be positive')
+
+        # TODO validate fixed stimulation cost param mutual exclusivity with stim cost per well params (warn instead of
+        #  raising error for backwards compatibility where applicable)
 
     def sync_interest_rate(self, model):
         def discount_rate_display() -> str:
@@ -3099,6 +3148,7 @@ class Economics:
 
     def calculate_stimulation_costs(self, model: Model) -> PlainQuantity:
         production_wells_stimulated: bool = self.stimulation_cost_per_production_well.Provided
+
         if self.ccstimfixed.Valid:
             stimulation_costs_cstim_u = self.ccstimfixed.quantity().to(self.Cstim.CurrentUnits).magnitude
 
@@ -3122,6 +3172,34 @@ class Economics:
 
             ret = quantity(stimulation_costs_cstim_u, self.Cstim.CurrentUnits)
         else:
+            if self.stimulation_cost_per_fracture_surface_area.Provided:
+                total_fracture_surface_area_q = (model.reserv.fracareacalc.quantity() * model.reserv.fracnumbcalc.value).to(
+                    self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_area_unit_str())
+                direct_stim_cost_q = (total_fracture_surface_area_q *
+                                      self.stimulation_cost_per_fracture_surface_area.quantity())
+                inj_to_prod_cost_ratio = 1 if not production_wells_stimulated else \
+                    model.wellbores.ninj.value / (model.wellbores.nprod.value + model.wellbores.ninj.value)
+
+                # Coerces equal injection and production well costs required for stimulation cost per well output
+                # display heuristic
+                per_well_cost_precision = 2
+
+                self.stimulation_cost_per_injection_well.value = round(
+                    quantity(
+                        inj_to_prod_cost_ratio * direct_stim_cost_q / model.wellbores.ninj.value,
+                        self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()
+                    ).to(self.stimulation_cost_per_injection_well.CurrentUnits).magnitude,
+                    per_well_cost_precision
+                )
+
+                self.stimulation_cost_per_production_well.value = round(
+                    quantity(
+                        (1 - inj_to_prod_cost_ratio) * direct_stim_cost_q / model.wellbores.nprod.value,
+                        self.stimulation_cost_per_fracture_surface_area.CurrentUnits.get_currency_unit_str()
+                    ).to(self.stimulation_cost_per_production_well.CurrentUnits).magnitude,
+                    per_well_cost_precision
+                )
+
             direct_stim_cost_per_injection_well_cstim_u = self.stimulation_cost_per_injection_well.quantity().to(
                 self.Cstim.CurrentUnits).magnitude
             direct_stim_cost_per_production_well_cstim_u = self.stimulation_cost_per_production_well.quantity().to(

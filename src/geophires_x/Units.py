@@ -88,6 +88,7 @@ class Units(IntEnum):
     DECAY_RATE = auto()
     INFLATION_RATE = auto()
     DYNAMIC_VISCOSITY = auto()
+    COSTPERAREA = auto()
 
 
 class AngleUnit(str, Enum):
@@ -242,6 +243,15 @@ class CostPerMassUnit(str, Enum):
 class CostPerDistanceUnit(str, Enum):
     DOLLARSPERM = "USD/m"
 
+
+class CostPerAreaUnit(str, Enum):
+    DOLLARSPERMETERS2 = "USD/m**2"
+
+    def get_currency_unit_str(self) -> str:
+        return self.value.split('/')[0]
+
+    def get_area_unit_str(self) -> str:
+        return self.value.split('/')[1]
 
 class PressureUnit(str, Enum):
     """Pressure Units"""

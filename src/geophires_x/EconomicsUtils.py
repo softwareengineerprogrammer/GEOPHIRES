@@ -17,6 +17,8 @@ _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET = (
     f'The value is specified as a project year index corresponding to the ' f'Year row in the cash flow profile'
 )
 
+CALCULATED_PARAMETER_PLACEHOLDER_VALUE = -1
+
 
 def BuildPricingModel(
     plantlifetime: int,
