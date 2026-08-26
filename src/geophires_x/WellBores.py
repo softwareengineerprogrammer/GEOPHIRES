@@ -16,7 +16,7 @@ from .OptionList import ReservoirModel, Configuration, WorkingFluid
 
 
 def calculate_total_drilling_lengths_m(Configuration, numnonverticalsections: int, nonvertical_length_km: float,
-                                       InputDepth_km: float, OutputDepth_km: float, nprod:int, ninj:int,
+                                       InputDepth_km: float, OutputDepth_km: float, nprod: int, ninj: int,
                                        junction_depth_km: float = 0.0, angle_rad: float = 0.0) -> tuple:
     """
     returns the total length, vertical length, and non-vertical lengths, depending on the configuration
@@ -70,7 +70,7 @@ def calculate_total_drilling_lengths_m(Configuration, numnonverticalsections: in
         tot_to_junction_m = (O1 / math.sin(angle_rad)) * 2  # there are two of these of each EavorLoop
 
         # now calculate the distance from the junction of the laterals to the end of the laterals [m]
-        O2 = (OutputDepth_km - junction_depth_km) * 1000.0   # in meters
+        O2 = (OutputDepth_km - junction_depth_km) * 1000.0  # in meters
         lateral_pipe_length_m = (O2 / math.sin(angle_rad)) * 2  # there are two of these of each lateral of an EavorLoop
         lateral_pipe_length_m = lateral_pipe_length_m * numnonverticalsections  # there are numnonverticalsections of these
     else:
@@ -199,7 +199,7 @@ def RameyCalc(krock: float, rhorock: float, cprock: float, welldiam: float, tv, 
     framey[0] = framey[1]  # force the first value to be the same as the second to get away from near surface effects
     rameyA = flowrate * cpwater * framey / 2 / math.pi / krock
     TempDrop = -((Trock - Tresoutput) - averagegradient * (depth - rameyA) + (
-        Tresoutput - averagegradient * rameyA - Trock) * np.exp(-depth / rameyA))
+            Tresoutput - averagegradient * rameyA - Trock) * np.exp(-depth / rameyA))
 
     return TempDrop
 
@@ -301,10 +301,11 @@ def InjectionWellPressureDrop(model: Model, Taverage: float, wellflowrate: float
                 * np.linspace(1, 1, len(model.wellbores.ProducedTemperature.value)))
 
     # replace with correlation based on Tinjaverage
-    muwater = viscosity_water_Pa_sec(Taverage, pressure=model.reserv.hydrostatic_pressure()) * np.linspace(1, 1, len(model.wellbores.ProducedTemperature.value))
+    muwater = viscosity_water_Pa_sec(Taverage, pressure=model.reserv.hydrostatic_pressure()) * np.linspace(1, 1,
+                                                                                                           len(model.wellbores.ProducedTemperature.value))
     v = nprod / ninj * wellflowrate * (1.0 + waterloss) / rhowater / (math.pi / 4. * welldiam ** 2)
     Rewater = 4. * nprod / ninj * wellflowrate * (1.0 + waterloss) / (
-        muwater * math.pi * welldiam)  # laminar or turbulent flow?
+            muwater * math.pi * welldiam)  # laminar or turbulent flow?
     Rewateraverage = np.average(Rewater)
     if Rewateraverage < 2300.:  # laminar flow
         f1 = 64. / Rewater
@@ -325,6 +326,7 @@ def InjectionWellPressureDrop(model: Model, Taverage: float, wellflowrate: float
         DPWell = []  # it will be calculated elsewhere
 
     return DPWell, f1, v, rhowater
+
 
 def ProdPressureDropsAndPumpingPowerUsingImpedenceModel(f3: float, vprod: float, rhowaterinj: float,
                                                         rhowaterprod: float, rhowaterreservoir: float, depth: float,
@@ -432,6 +434,7 @@ def InjPressureDropsAndPumpingPowerUsingImpedenceModel(f1: float, vinj: float, r
 
     return newDPOverall, PumpingPower, DPInjWell
 
+
 def get_hydrostatic_pressure_kPa(
         Trock_degC: float,
         Tsurf_degC: float,
@@ -446,7 +449,7 @@ def get_hydrostatic_pressure_kPa(
     CT = 9E-4 / (30.796 * Trock_degC ** (-0.552))
     return 0 + 1. / CP * (math.exp(
         density_water_kg_per_m3(Tsurf_degC, pressure=lithostatic_pressure) * 9.81 * CP / 1000 * (
-            depth_m - CT / 2 * gradient_C_per_km * depth_m ** 2)) - 1)
+                depth_m - CT / 2 * gradient_C_per_km * depth_m ** 2)) - 1)
 
 
 def ProdPressureDropAndPumpingPowerUsingIndexes(
@@ -513,7 +516,7 @@ def ProdPressureDropAndPumpingPowerUsingIndexes(
         else:
             # Above the critical water temperature, vapor no longer occurs and vapor pressure can no longer be
             # calculated. A "dummy" vapor pressure can be assumed as the fluid phase no longer impacts the pump depth.
-            Pminimum_kPa = 100 # 1 bar = 100 kPa
+            Pminimum_kPa = 100  # 1 bar = 100 kPa
 
         if usebuiltinppwellheadcorrelation:
             Pprodwellhead = Pminimum_kPa  # production wellhead pressure [kPa]
@@ -533,8 +536,8 @@ def ProdPressureDropAndPumpingPowerUsingIndexes(
 
         # calculate pumping depth
         pumpdepth_m = depth_m + (Pminimum_kPa - Phydrostaticcalc_kPa + wellflowrate_kg_per_sec / PI_kPa) / (
-            f3 * (rhowaterprod_kg_per_m3 * vprod_m ** 2 / 2.) * (
-            1 / prodwelldiam_m) / 1E3 + rhowaterprod_kg_per_m3 * 9.81 / 1E3)
+                f3 * (rhowaterprod_kg_per_m3 * vprod_m ** 2 / 2.) * (
+                1 / prodwelldiam_m) / 1E3 + rhowaterprod_kg_per_m3 * 9.81 / 1E3)
         pumpdepthfinal_m = np.max(pumpdepth_m)
         if pumpdepthfinal_m < 0.0:
             pumpdepthfinal_m = 0.0
@@ -549,8 +552,8 @@ def ProdPressureDropAndPumpingPowerUsingIndexes(
 
         # calculate production well pumping pressure [kPa]
         DPProdWell = Pprodwellhead - (
-            Phydrostaticcalc_kPa - wellflowrate_kg_per_sec / PI_kPa - rhowaterprod_kg_per_m3 * 9.81 * depth_m / 1E3 - f3 *
-            (rhowaterprod_kg_per_m3 * vprod_m ** 2 / 2.) * (depth_m / prodwelldiam_m) / 1E3)
+                Phydrostaticcalc_kPa - wellflowrate_kg_per_sec / PI_kPa - rhowaterprod_kg_per_m3 * 9.81 * depth_m / 1E3 - f3 *
+                (rhowaterprod_kg_per_m3 * vprod_m ** 2 / 2.) * (depth_m / prodwelldiam_m) / 1E3)
         # [MWe] total pumping power for production wells
         PumpingPowerProd = DPProdWell * nprod * wellflowrate_kg_per_sec / rhowaterprod_kg_per_m3 / pumpeff / 1E3
         PumpingPowerProd = np.array([0. if x < 0. else x for x in PumpingPowerProd])
@@ -659,9 +662,9 @@ def InjPressureDropAndPumpingPowerUsingIndexes(
     Pinjwellhead = [0] * len(Phydrostaticcalc_kPa)
     for i in range(len(Phydrostaticcalc_kPa)):
         Pinjwellhead[i] = (Phydrostaticcalc_kPa[i] +
-                        wellflowrate * (1 + waterloss) * nprod / ninj / IIkPa -
-                        rhowaterinj[i] * 9.81 * depth_m / 1E3 + f1[i] *
-                        (rhowaterinj[i] * vinj[i] ** 2 / 2) * (depth_m / injwelldiam) / 1E3)
+                           wellflowrate * (1 + waterloss) * nprod / ninj / IIkPa -
+                           rhowaterinj[i] * 9.81 * depth_m / 1E3 + f1[i] *
+                           (rhowaterinj[i] * vinj[i] ** 2 / 2) * (depth_m / injwelldiam) / 1E3)
 
     # plant outlet pressure [kPa]
     if usebuiltinoutletplantcorrelation:
@@ -712,12 +715,14 @@ class WellBores:
         self.ParameterDict = {}
         self.OutputParameterDict = {}
 
+        self._well_dead_mask: list[bool] | None = None
+
         max_doublets = 200
         # noinspection SpellCheckingInspection
         self.nprod = self.ParameterDict[self.nprod.Name] = intParameter(
             "Number of Production Wells",
             DefaultValue=2,
-            AllowableRange=list(range(1, max_doublets+1, 1)),
+            AllowableRange=list(range(1, max_doublets + 1, 1)),
             UnitType=Units.NONE,
             Required=False,
             ErrMessage="assume default number of production wells (2)",
@@ -727,7 +732,7 @@ class WellBores:
         self.ninj = self.ParameterDict[self.ninj.Name] = intParameter(
             "Number of Injection Wells",
             DefaultValue=2,
-            AllowableRange=list(range(0, max_doublets+1, 1)),
+            AllowableRange=list(range(0, max_doublets + 1, 1)),
             UnitType=Units.NONE,
             Required=False,
             ErrMessage="assume default number of injection wells (2)",
@@ -736,7 +741,7 @@ class WellBores:
         self.doublets_count = self.ParameterDict[self.doublets_count.Name] = intParameter(
             "Number of Doublets",
             DefaultValue=2,
-            AllowableRange=list(range(0, max_doublets+1, 1)),
+            AllowableRange=list(range(0, max_doublets + 1, 1)),
             UnitType=Units.NONE,
             ToolTipText="Pass this parameter to set the Number of Production Wells and Number of Injection Wells to "
                         "same value."
@@ -746,7 +751,7 @@ class WellBores:
             "Number of Injection Wells per Production Well",
             DefaultValue=1,
             Min=0,
-            Max=max_doublets-1,
+            Max=max_doublets - 1,
             UnitType=Units.NONE,
             Required=False,
             ToolTipText="Number of (identical) injection wells per production well. "
@@ -900,12 +905,12 @@ class WellBores:
                         "does not affect electricity generation. If not provided (or if the default "
                         "exceeds the model-calculated reinjection temperature), the resulting direct-use heat "
                         "production will be marginal."
-                        # TODO re-assess tooltip text when FGEM is incorporated
-                        #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/395?title=FGEM/flexible+geothermal+systems
+            # TODO re-assess tooltip text when FGEM is incorporated
+            #  https://github.com/NatLabRockies/GEOPHIRES-X/issues/395?title=FGEM/flexible+geothermal+systems
         )
         self.Phydrostatic = self.ParameterDict[self.Phydrostatic.Name] = floatParameter(
             "Reservoir Hydrostatic Pressure",
-            DefaultValue=29430, # Calculated from example1
+            DefaultValue=29430,  # Calculated from example1
             Min=1E2,
             Max=1E5,
             UnitType=Units.PRESSURE,
@@ -951,7 +956,7 @@ class WellBores:
                         "pressure drop (see docs)"
         )
 
-        well_integrity_max_lifetime_param_name = "Well Integrity Maximum Lifetime"
+        well_integrity_max_lifetime_param_name = 'Well Integrity Maximum Lifetime'
         # noinspection SpellCheckingInspection
         self.maxdrawdown = self.ParameterDict[self.maxdrawdown.Name] = floatParameter(
             "Maximum Drawdown",
@@ -962,12 +967,14 @@ class WellBores:
             PreferredUnits=PercentUnit.TENTH,
             CurrentUnits=PercentUnit.TENTH,
             ErrMessage="assume default maximum drawdown (1)",
-            ToolTipText=f"Maximum allowable thermal drawdown before redrilling of all wells into new reservoir "
-                        f"(most applicable to EGS-type reservoirs with heat farming strategies). E.g. a value of 0.2 "
-                        f"means that all wells are redrilled after the production temperature (at the wellhead) has "
-                        f"dropped by 20% of its initial temperature. "
-                        f"Note that redrilling is triggered by whichever occurs first: this thermal drawdown limit or "
-                        f"the chronological limit defined by {well_integrity_max_lifetime_param_name}."
+            ToolTipText=(
+                f"Maximum allowable thermal drawdown before redrilling of all wells into new reservoir "
+                f"(most applicable to EGS-type reservoirs with heat farming strategies). E.g. a value of 0.2 "
+                f"means that all wells are redrilled after the production temperature (at the wellhead) has "
+                f"dropped by 20% of its initial temperature. Note that redrilling is triggered by whichever "
+                f"occurs first: this thermal drawdown limit or the chronological limit defined by "
+                f"{well_integrity_max_lifetime_param_name}."
+            )
         )
         self.well_integrity_max_lifetime = self.ParameterDict[self.well_integrity_max_lifetime.Name] = floatParameter(
             well_integrity_max_lifetime_param_name,
@@ -979,14 +986,34 @@ class WellBores:
             CurrentUnits=TimeUnit.YEAR,
             Required=False,
             Provided=False,
-            ToolTipText=f"Maximum chronological lifetime of the wellbore infrastructure before mechanical/chemical "
-                        f"failure forces a redrilling event, independent of thermal drawdown. Models a deterministic "
-                        f"first-order approximation of well integrity failure (compressive yielding, high-temperature "
-                        f"creep, low-cycle fatigue, cement degradation, sulfide stress cracking, etc.) that is "
-                        f"particularly relevant for Superhot Rock systems where wellbore infrastructure "
-                        f"may typically fail before thermal depletion. Redrilling is triggered at the minimum of the "
-                        f"thermal drawdown index defined by {self.maxdrawdown.Name} and this chronological index. "
-                        f"If not provided, defaults to project lifetime (no mechanical failure)."
+            ToolTipText=(
+                f"Maximum chronological lifetime of the wellbore infrastructure before mechanical/chemical "
+                f"failure forces a redrilling event, independent of thermal drawdown. Models a deterministic "
+                f"first-order approximation of well integrity failure (compressive yielding, high-temperature "
+                f"creep, low-cycle fatigue, cement degradation, sulfide stress cracking, etc.) that is "
+                f"particularly relevant for Superhot Rock systems where wellbore infrastructure "
+                f"may typically fail before thermal depletion. Redrilling is triggered at the minimum of the "
+                f"thermal drawdown index defined by {self.maxdrawdown.Name} and this chronological index. "
+                f"If not provided, defaults to project lifetime (no mechanical failure)."
+            )
+        )
+        self.min_years_for_redrill = self.ParameterDict[self.min_years_for_redrill.Name] = floatParameter(
+            "Minimum Remaining Project Years for Redrill",
+            DefaultValue=0.0,
+            Min=0.0,
+            Max=100.0,
+            UnitType=Units.TIME,
+            PreferredUnits=TimeUnit.YEAR,
+            CurrentUnits=TimeUnit.YEAR,
+            Required=False,
+            Provided=False,
+            ToolTipText=(
+                "Minimum number of years remaining in the project lifetime required to justify a redrilling "
+                "event. If a redrill is triggered (via thermal drawdown or well integrity) with fewer years "
+                "remaining than this value, the redrill is aborted. If the aborted trigger was thermal, "
+                "the well continues to produce at declining temperatures. If the aborted trigger was "
+                "mechanical integrity, the well is shut in and production drops to zero."
+            )
         )
 
         self.IsAGS = self.ParameterDict[self.IsAGS.Name] = boolParameter(
@@ -1017,7 +1044,8 @@ class WellBores:
             ErrMessage="assume there is no overpressure",
             ToolTipText="enter the amount of pressure over the hydrostatic pressure in the reservoir (100%=hydrostatic)"
         )
-        self.injection_reservoir_temperature = self.ParameterDict[self.injection_reservoir_temperature.Name] = floatParameter(
+        self.injection_reservoir_temperature = self.ParameterDict[
+            self.injection_reservoir_temperature.Name] = floatParameter(
             "Injection Reservoir Temperature",
             DefaultValue=100.0,
             UnitType=Units.TEMPERATURE,
@@ -1037,7 +1065,8 @@ class WellBores:
             ErrMessage="assume there is not an injection reservoir, so there is no injection reservoir depth",
             ToolTipText="enter the depth of the injection reservoir (1000 m)"
         )
-        self.injection_reservoir_initial_pressure = self.ParameterDict[self.injection_reservoir_initial_pressure.Name] = floatParameter(
+        self.injection_reservoir_initial_pressure = self.ParameterDict[
+            self.injection_reservoir_initial_pressure.Name] = floatParameter(
             "Injection Reservoir Initial Pressure",
             DefaultValue=0.0,
             UnitType=Units.PRESSURE,
@@ -1048,7 +1077,8 @@ class WellBores:
                        "pressure",
             ToolTipText="enter the depth of the injection reservoir initial pressure (use lithostatic pressure)"
         )
-        self.injection_reservoir_inflation_rate = self.ParameterDict[self.injection_reservoir_inflation_rate.Name] = floatParameter(
+        self.injection_reservoir_inflation_rate = self.ParameterDict[
+            self.injection_reservoir_inflation_rate.Name] = floatParameter(
             "Injection Reservoir Inflation Rate",
             DefaultValue=1000.0,
             UnitType=Units.INFLATION_RATE,
@@ -1067,7 +1097,7 @@ class WellBores:
             UnitType=Units.NONE,
             Required=True,
             ErrMessage="assume simple vertical well (3)",
-            ToolTipText = '; '.join([f'{it.int_value}: {it.value}' for it in Configuration])
+            ToolTipText='; '.join([f'{it.int_value}: {it.value}' for it in Configuration])
         )
         # This is a alias for "Closed-loop Configuration" - putting it here for backwards compatibility
         self.Configuration = self.ParameterDict[self.Configuration.Name] = intParameter(
@@ -1168,35 +1198,40 @@ class WellBores:
 
         # Results - used by other objects or printed in output downstream
 
-        self.injection_well_casing_inner_diameter = self.OutputParameterDict[self.injection_well_casing_inner_diameter.Name] = OutputParameter(
+        self.injection_well_casing_inner_diameter = self.OutputParameterDict[
+            self.injection_well_casing_inner_diameter.Name] = OutputParameter(
             Name='Injection well casing ID',
             UnitType=self.injwelldiam.UnitType,
             PreferredUnits=self.injwelldiam.PreferredUnits,
             CurrentUnits=self.injwelldiam.CurrentUnits,
             ToolTipText=self.injwelldiam.ToolTipText,
         )
-        self.production_well_casing_inner_diameter = self.OutputParameterDict[self.production_well_casing_inner_diameter.Name] = OutputParameter(
+        self.production_well_casing_inner_diameter = self.OutputParameterDict[
+            self.production_well_casing_inner_diameter.Name] = OutputParameter(
             Name='Production well casing ID',
             UnitType=self.prodwelldiam.UnitType,
             PreferredUnits=self.prodwelldiam.PreferredUnits,
             CurrentUnits=self.prodwelldiam.CurrentUnits,
             ToolTipText=self.prodwelldiam.ToolTipText,
         )
-        self.production_reservoir_pressure = self.OutputParameterDict[self.production_reservoir_pressure.Name] = OutputParameter(
+        self.production_reservoir_pressure = self.OutputParameterDict[
+            self.production_reservoir_pressure.Name] = OutputParameter(
             Name="Calculated Reservoir Pressure",
             value=self.Phydrostatic.value,
             UnitType=Units.PRESSURE,
             PreferredUnits=PressureUnit.KPASCAL,
             CurrentUnits=PressureUnit.KPASCAL
         )
-        self.average_production_reservoir_pressure = self.OutputParameterDict[self.average_production_reservoir_pressure.Name] = OutputParameter(
+        self.average_production_reservoir_pressure = self.OutputParameterDict[
+            self.average_production_reservoir_pressure.Name] = OutputParameter(
             Name="Average Reservoir Pressure",
             display_name='Average reservoir pressure',
             UnitType=Units.PRESSURE,
             PreferredUnits=PressureUnit.KPASCAL,
             CurrentUnits=PressureUnit.KPASCAL
         )
-        self.injection_reservoir_pressure = self.OutputParameterDict[self.injection_reservoir_pressure.Name] = OutputParameter(
+        self.injection_reservoir_pressure = self.OutputParameterDict[
+            self.injection_reservoir_pressure.Name] = OutputParameter(
             Name="Calculated Injection Reservoir Pressure",
             value=-1,
             UnitType=Units.PRESSURE,
@@ -1216,9 +1251,9 @@ class WellBores:
                         "event incurs the full cost of drilling and stimulating the wellfield. "
                         "The cost of all redrilling events is summed and amortized over the project lifetime as an "
                         "operational expense. "
-                        # "This accounts for the heavy capital expenditure (e.g., sidetracking and stimulating "
-                        # "laterals into fresh rock) required to access undepleted reservoir volume and sustain "
-                        # "target power output."
+            # "This accounts for the heavy capital expenditure (e.g., sidetracking and stimulating "
+            # "laterals into fresh rock) required to access undepleted reservoir volume and sustain "
+            # "target power output."
         )
         self.PumpingPowerProd = self.OutputParameterDict[self.PumpingPowerProd.Name] = OutputParameter(
             Name="PumpingPowerProd",
@@ -1305,7 +1340,8 @@ class WellBores:
             PreferredUnits=PressureUnit.KPASCAL,
             CurrentUnits=PressureUnit.KPASCAL
         )
-        self.NonverticalProducedTemperature = self.OutputParameterDict[self.NonverticalProducedTemperature.Name] = OutputParameter(
+        self.NonverticalProducedTemperature = self.OutputParameterDict[
+            self.NonverticalProducedTemperature.Name] = OutputParameter(
             Name="Nonvertical Produced Temperature",
             value=[0.0],
             UnitType=Units.TEMPERATURE,
@@ -1370,7 +1406,6 @@ class WellBores:
         # If you choose to subclass this master class, you can also choose to override this method (or not),
         # and if you do, do it before or after you call you own version of this method. If you do, you can also choose
         # to call this method from you class, which can modify all these superclass parameters in your class.
-
 
         if len(model.InputParameters) > 0:
 
@@ -1488,12 +1523,15 @@ class WellBores:
 
         # calculate the reservoir pressure as a function of time
         if self.usebuiltinhydrostaticpressurecorrelation:
-            self.production_reservoir_pressure.value = get_hydrostatic_pressure_kPa(model.reserv.Trock.value, model.reserv.Tsurf.value,
-                                                                                model.reserv.depth.quantity().to('m').magnitude,
-                                                                                model.reserv.averagegradient.value,
-                                                                                model.reserv.hydrostatic_pressure())
+            self.production_reservoir_pressure.value = get_hydrostatic_pressure_kPa(model.reserv.Trock.value,
+                                                                                    model.reserv.Tsurf.value,
+                                                                                    model.reserv.depth.quantity().to(
+                                                                                        'm').magnitude,
+                                                                                    model.reserv.averagegradient.value,
+                                                                                    model.reserv.hydrostatic_pressure())
         else:
-            self.production_reservoir_pressure.value = self.Phydrostatic.quantity().to(self.production_reservoir_pressure.CurrentUnits).magnitude
+            self.production_reservoir_pressure.value = self.Phydrostatic.quantity().to(
+                self.production_reservoir_pressure.CurrentUnits).magnitude
 
         self.production_reservoir_pressure.value = ReservoirPressurePredictor(model.surfaceplant.plant_lifetime.value,
                                                                               model.economics.timestepsperyear.value,
@@ -1516,28 +1554,32 @@ class WellBores:
                 if not self.injection_reservoir_depth.Provided:
                     self.injection_reservoir_depth.value = model.reserv.depth.value
                 if not self.injection_reservoir_temperature.Provided:
-                    self.injection_reservoir_temperature.value = (model.reserv.averagegradient.value * self.injection_reservoir_depth.value) + model.reserv.Tsurf.value
+                    self.injection_reservoir_temperature.value = (
+                                                                             model.reserv.averagegradient.value * self.injection_reservoir_depth.value) + model.reserv.Tsurf.value
 
                 injection_reservoir_static_pressure = quantity(static_pressure_MPa(
                     model.reserv.rhorock.value, self.injection_reservoir_depth.quantity().to('m').magnitude), 'MPa')
 
-                if self.injection_reservoir_pressure.value < 0: # they didn't provide a pressure so assume hydrostatic.
-                    self.injection_reservoir_pressure.value = get_hydrostatic_pressure_kPa(self.injection_reservoir_temperature.value,
-                                                                                        model.reserv.Tsurf.value,
-                                                                                        self.injection_reservoir_depth.value,
-                                                                                        model.reserv.averagegradient.value * 1000.0,
-                                                                                        injection_reservoir_static_pressure)
-            self.injection_reservoir_initial_pressure.value = self.injection_reservoir_pressure.value = get_hydrostatic_pressure_kPa(self.injection_reservoir_temperature.value,
-                                                                                   model.reserv.Tsurf.value,
-                                                                                   self.injection_reservoir_depth.value,
-                                                                                   model.reserv.averagegradient.value,
-                                                                                   injection_reservoir_static_pressure)
+                if self.injection_reservoir_pressure.value < 0:  # they didn't provide a pressure so assume hydrostatic.
+                    self.injection_reservoir_pressure.value = get_hydrostatic_pressure_kPa(
+                        self.injection_reservoir_temperature.value,
+                        model.reserv.Tsurf.value,
+                        self.injection_reservoir_depth.value,
+                        model.reserv.averagegradient.value * 1000.0,
+                        injection_reservoir_static_pressure)
+            self.injection_reservoir_initial_pressure.value = self.injection_reservoir_pressure.value = get_hydrostatic_pressure_kPa(
+                self.injection_reservoir_temperature.value,
+                model.reserv.Tsurf.value,
+                self.injection_reservoir_depth.value,
+                model.reserv.averagegradient.value,
+                injection_reservoir_static_pressure)
 
-#            if not self.injection_reservoir_initial_pressure.Provided:
-            self.injection_reservoir_pressure.value = InjectionReservoirPressurePredictor(model.surfaceplant.plant_lifetime.value,
-                                                                                 model.economics.timestepsperyear.value,
-                                                                                 self.injection_reservoir_initial_pressure.value,
-                                                                                    self.injection_reservoir_inflation_rate.value)
+            #            if not self.injection_reservoir_initial_pressure.Provided:
+            self.injection_reservoir_pressure.value = InjectionReservoirPressurePredictor(
+                model.surfaceplant.plant_lifetime.value,
+                model.economics.timestepsperyear.value,
+                self.injection_reservoir_initial_pressure.value,
+                self.injection_reservoir_inflation_rate.value)
         else:
             # assume it is the same as the production reservoir pressure if not
             self.injection_reservoir_pressure.value = self.production_reservoir_pressure.value
@@ -1635,6 +1677,27 @@ class WellBores:
             # negative pumping power values become zero (b/c we are not generating electricity)
             self.PumpingPower.value = [0. if x < 0. else x for x in self.PumpingPower.value]
 
+            # Apply mask to zero out pumping power if the well mechanically failed and wasn't redrilled
+            if hasattr(self, '_well_dead_mask') and self._well_dead_mask is not None:
+                for i in range(len(self.PumpingPower.value)):
+                    if self._well_dead_mask[i]:
+                        if isinstance(self.PumpingPower.value, list):
+                            self.PumpingPower.value[i] = 0.0
+                        elif isinstance(self.PumpingPower.value, np.ndarray):
+                            self.PumpingPower.value[i] = 0.0
+
+                        if hasattr(self, 'PumpingPowerProd') and self.PumpingPowerProd.value is not None:
+                            if isinstance(self.PumpingPowerProd.value, list):
+                                self.PumpingPowerProd.value[i] = 0.0
+                            elif isinstance(self.PumpingPowerProd.value, np.ndarray):
+                                self.PumpingPowerProd.value[i] = 0.0
+
+                        if hasattr(self, 'PumpingPowerInj') and self.PumpingPowerInj.value is not None:
+                            if isinstance(self.PumpingPowerInj.value, list):
+                                self.PumpingPowerInj.value[i] = 0.0
+                            elif isinstance(self.PumpingPowerInj.value, np.ndarray):
+                                self.PumpingPowerInj.value[i] = 0.0
+
         self._sync_output_params_from_input_params()
 
         model.logger.info(f'complete {self.__class__.__name__}: {__name__}')
@@ -1653,6 +1716,7 @@ class WellBores:
 
         total_steps = len(self.ProducedTemperature.value)
         project_lifetime_yr = model.surfaceplant.plant_lifetime.value
+        timesteps_per_year = total_steps / project_lifetime_yr
 
         # Thermal drawdown trigger
         index_first_max_drawdown = int(np.argmax(
@@ -1662,7 +1726,6 @@ class WellBores:
 
         # Well integrity (chronological) trigger
         if self.well_integrity_max_lifetime.Provided and self.well_integrity_max_lifetime.value > 0:
-            timesteps_per_year = total_steps / project_lifetime_yr
             integrity_failure_index = int(self.well_integrity_max_lifetime.value * timesteps_per_year)
             # Clamp: a lifetime >= project lifetime means "no mechanical failure"
             if integrity_failure_index >= total_steps:
@@ -1679,21 +1742,70 @@ class WellBores:
         if redrill_trigger_index <= 0 or redrill_trigger_index >= total_steps:
             return
 
-        self.redrill.value = int(np.floor(total_steps / redrill_trigger_index))
-        ProducedTemperatureRepeated = np.tile(
-            self.ProducedTemperature.value[0:redrill_trigger_index],
-            self.redrill.value + 1,
+        is_thermal_dominant = (
+            index_first_max_drawdown > 0 and
+            (integrity_failure_index == 0 or index_first_max_drawdown < integrity_failure_index)
         )
-        self.ProducedTemperature.value = ProducedTemperatureRepeated[0:total_steps]
-        TResOutputRepeated = np.tile(
-            model.reserv.Tresoutput.value[0:redrill_trigger_index],
-            self.redrill.value + 1,
-        )
-        model.reserv.Tresoutput.value = TResOutputRepeated[0:total_steps]
+
+        min_steps_for_redrill = 0
+        if hasattr(self, 'min_years_for_redrill') and self.min_years_for_redrill.Provided:
+            min_steps_for_redrill = int(self.min_years_for_redrill.value * timesteps_per_year)
+
+        final_PT = []
+        final_TR = []
+        self._well_dead_mask = [False] * total_steps
+        current_step = 0
+        redrills_executed = 0
+
+        while current_step < total_steps:
+            steps_remaining = total_steps - current_step
+
+            if steps_remaining <= redrill_trigger_index:
+                # Final stretch, no trigger hits before the end
+                final_PT.extend(self.ProducedTemperature.value[0:steps_remaining])
+                final_TR.extend(model.reserv.Tresoutput.value[0:steps_remaining])
+                break
+
+            remaining_steps_at_trigger = total_steps - (current_step + redrill_trigger_index)
+
+            if remaining_steps_at_trigger >= min_steps_for_redrill:
+                # Redrill proceeds
+                final_PT.extend(self.ProducedTemperature.value[0:redrill_trigger_index])
+                final_TR.extend(model.reserv.Tresoutput.value[0:redrill_trigger_index])
+                current_step += redrill_trigger_index
+                redrills_executed += 1
+            else:
+                # Redrill aborted due to insufficient remaining project time
+                final_PT.extend(self.ProducedTemperature.value[0:redrill_trigger_index])
+                final_TR.extend(model.reserv.Tresoutput.value[0:redrill_trigger_index])
+
+                steps_after_trigger = remaining_steps_at_trigger
+
+                if is_thermal_dominant:
+                    # Coasting on native thermal decline
+                    final_PT.extend(self.ProducedTemperature.value[
+                                        redrill_trigger_index:redrill_trigger_index + steps_after_trigger])
+                    final_TR.extend(model.reserv.Tresoutput.value[
+                                        redrill_trigger_index:redrill_trigger_index + steps_after_trigger])
+                else:
+                    # Mechanical failure: Well is shut in
+                    tsurf = model.reserv.Tsurf.value
+                    final_PT.extend([tsurf] * steps_after_trigger)
+                    final_TR.extend([tsurf] * steps_after_trigger)
+                    # Mark these steps as dead to zero out pumping power later
+                    dead_start_idx = current_step + redrill_trigger_index
+                    for idx in range(dead_start_idx, dead_start_idx + steps_after_trigger):
+                        if idx < total_steps:
+                            self._well_dead_mask[idx] = True
+
+                break
+
+        self.redrill.value = redrills_executed
+        self.ProducedTemperature.value = np.array(final_PT[:total_steps])
+        model.reserv.Tresoutput.value = np.array(final_TR[:total_steps])
 
         # Log which mechanism dominated
-        if (integrity_failure_index > 0
-                and (index_first_max_drawdown == 0 or integrity_failure_index < index_first_max_drawdown)):
+        if not is_thermal_dominant:
             model.logger.info(
                 f"Redrilling driven by {self.well_integrity_max_lifetime.Name} "
                 f"({self.well_integrity_max_lifetime.value} {self.well_integrity_max_lifetime.CurrentUnits}); "
@@ -1702,7 +1814,7 @@ class WellBores:
         else:
             model.logger.info(
                 f"Redrilling driven by thermal drawdown ({self.maxdrawdown.Name}; "
-                f"{self.maxdrawdown.quantity().to(convertible_unit('percent')).magnitude:.2f}%); "
+                f"{self.maxdrawdown.value * 100:.2f}%); "
                 f"redrill events = {self.redrill.value}."
             )
 

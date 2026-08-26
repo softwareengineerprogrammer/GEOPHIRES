@@ -150,7 +150,7 @@ class WellBoresTestCase(BaseTestCase):
         drawdown_idx = next(i for i, h in enumerate(header) if 'THERMAL DRAWDOWN' in str(h).upper())
         drawdowns = [float(row[drawdown_idx]) for row in profile[1:]]
 
-        # Verify that drawdown hits the minimum defined by max drawdown param the same number of times as redrilling.
+        # Verify that drawdown hits the minimum defined by max drawdown param the same number of times as redrilling
         # Each reset (value jumps back up to ~1.0) indicates a redrill event triggered by hitting the threshold.
         # We use a difference > 0.005 to filter out minor natural year-over-year increases (~0.001) that can occur
         # early in analytical thermal profiles.
@@ -210,6 +210,77 @@ class WellBoresTestCase(BaseTestCase):
         if 'Number of times redrilling' in summary:
             redrill_events = int(summary['Number of times redrilling']['value'])
             self.assertEqual(0, redrill_events)
+
+    def test_redrilling_aborted_thermal_coasts(self):
+        """
+        Verify that if thermal drawdown triggers a redrill but violates the
+        'Minimum Remaining Project Years for Redrill' window, the redrill is aborted
+        and the well simply coasts natively on the thermal decline curve without shutting in.
+        """
+        result = self._get_result(
+            {
+                'Reservoir Model': 4,
+                'Drawdown Parameter': 0.01,
+                'Plant Lifetime': 30,
+                'Maximum Drawdown': 0.20,  # 20% drawdown triggers at ~22 years
+                'Well Integrity Maximum Lifetime': 50.0,
+                'Minimum Remaining Project Years for Redrill': 10.0,  # Aborts because 30 - 22 = 8 < 10
+            }
+        )
+
+        summary = result.result.get('ENGINEERING PARAMETERS', {})
+        redrill_events = int(summary.get('Number of times redrilling', {}).get('value', 0))
+        self.assertEqual(0, redrill_events)
+
+        profile = result.power_generation_profile
+        header = profile[0]
+        temp_idx = next(i for i, h in enumerate(header) if 'GEOFLUID TEMPERATURE' in str(h).upper())
+        temps = [float(row[temp_idx]) for row in profile[1:]]
+
+        # The temperature should coast down smoothly without jumping back up (no resets)
+        resets = sum(1 for i in range(len(temps) - 1) if temps[i + 1] - temps[i] > 5.0)
+        self.assertEqual(0, resets)
+
+        # Final temperature should be substantially higher than ambient, indicating it's still flowing
+        self.assertGreater(temps[-1], 100.0)
+
+    def test_redrilling_aborted_integrity_shuts_in(self):
+        """
+        Verify that if well integrity triggers a redrill but violates the
+        'Minimum Remaining Project Years for Redrill' window, the redrill is aborted
+        and the well is shut in (temp drops to ambient, power drops to zero).
+        """
+        ambient_temp = 15.0
+        result = self._get_result(
+            {
+                'Reservoir Model': 4,
+                'Drawdown Parameter': 0.01,
+                'Plant Lifetime': 30,
+                'Maximum Drawdown': 0.90,
+                'Well Integrity Maximum Lifetime': 22.0,  # Fails at year 22
+                'Minimum Remaining Project Years for Redrill': 10.0,  # Aborts because 30 - 22 = 8 < 10
+                'Surface Temperature': ambient_temp,
+            }
+        )
+
+        summary = result.result.get('ENGINEERING PARAMETERS', {})
+        redrill_events = int(summary.get('Number of times redrilling', {}).get('value', 0))
+        self.assertEqual(0, redrill_events)
+
+        profile = result.power_generation_profile
+        header = profile[0]
+        temp_idx = next(i for i, h in enumerate(header) if 'GEOFLUID TEMPERATURE' in str(h).upper())
+        net_power_idx = next(i for i, h in enumerate(header) if 'NET POWER' in str(h).upper())
+
+        temps = [float(row[temp_idx]) for row in profile[1:]]
+        net_powers = [float(row[net_power_idx]) for row in profile[1:]]
+
+        # The well should shut in, dropping production temp exactly to ambient in the final years
+        self.assertAlmostEqual(temps[-1], ambient_temp, delta=0.1)
+        self.assertLessEqual(net_powers[-1], 0.0)
+
+        # Confirm the well was hot and producing power before the integrity failure
+        self.assertGreater(temps[0], 100.0)
 
     def test_redrilling_examples_equivalence(self) -> None:
         """
