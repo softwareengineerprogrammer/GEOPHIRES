@@ -616,6 +616,10 @@ class Outputs:
                         redrill_label = Outputs._field_label(econ.redrilling_annual_cost.display_name, 47)
                         f.write(f'         {redrill_label}{econ.redrilling_annual_cost.value:10.2f} {econ.redrilling_annual_cost.CurrentUnits.value}\n')
 
+                    if econ.AnnualLicenseEtc.value != 0:
+                        etc_label = Outputs._field_label(econ.AnnualLicenseEtc.Name, 47)
+                        f.write(f'         {etc_label}{econ.AnnualLicenseEtc.value:10.2f} {econ.AnnualLicenseEtc.CurrentUnits.value}\n')
+
                     if econ.DoAddOnCalculations.value and is_sam_econ_model:
                         # Non-SAM econ models print this in Extended Economics profile
                         aoc_label = Outputs._field_label(model.addeconomics.AddOnOPEXTotalPerYear.display_name, 47)

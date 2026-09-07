@@ -315,6 +315,7 @@ class GeophiresXResult:
                 'Average annual auxiliary fuel cost',
                 'Average annual pumping cost',
                 'Redrilling costs',
+                'Annual License Fees Etc',
                 'Total Add-on OPEX',
                 'Total average annual O&M costs',
                 'Total operating and maintenance costs',
