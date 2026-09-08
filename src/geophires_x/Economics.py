@@ -3369,6 +3369,15 @@ class Economics:
             # all other options have power plant
             # TODO migrate relevant constants/calculations below to their respective classes
 
+            def _check_temperature_for_ORC(temperature: float) -> None:
+                if temperature > 200.:
+                    msg = ('The simulated production temperature exceeds 200 degrees Celsius.  The built-in ORC utilization '
+                           'efficiency correlations may not be valid above this temperature.  Consider using a single or double '
+                           'flash plant, or providing a custom correlation via a surface plant module.  For more information, '
+                           'see: https://natlabrockies.github.io/GEOPHIRES-X/Theoretical-Basis-for-GEOPHIRES.html#surface-plant')
+                    print(f'Warning: {msg}')
+                    model.logger.warning(msg)
+
             if model.surfaceplant.plant_type.value == PlantType.SUB_CRITICAL_ORC:
                 MaxProducedTemperature = np.max(model.surfaceplant.TenteringPP.value)
                 if MaxProducedTemperature < 150.:
@@ -3379,6 +3388,7 @@ class Economics:
                     CCAPP1 = C3 * MaxProducedTemperature ** 3 + C2 * MaxProducedTemperature ** 2 + C1 * MaxProducedTemperature + C0
                 else:
                     CCAPP1 = 2231 - 2 * (MaxProducedTemperature - 150.)
+                    _check_temperature_for_ORC(MaxProducedTemperature)
                 x = np.max(model.surfaceplant.ElectricityProduced.value)
                 y = np.max(model.surfaceplant.ElectricityProduced.value)
                 if y == 0.0:
@@ -3396,6 +3406,7 @@ class Economics:
                     CCAPP1 = C3 * MaxProducedTemperature ** 3 + C2 * MaxProducedTemperature ** 2 + C1 * MaxProducedTemperature + C0
                 else:
                     CCAPP1 = 2231 - 2 * (MaxProducedTemperature - 150.)
+                    _check_temperature_for_ORC(MaxProducedTemperature)
                 # factor 1.1 to make supercritical 10% more expansive than subcritical
                 self.Cplantcorrelation = 1.1 * CCAPP1 * math.pow(
                     np.max(model.surfaceplant.ElectricityProduced.value) / 15., -0.06) * np.max(
