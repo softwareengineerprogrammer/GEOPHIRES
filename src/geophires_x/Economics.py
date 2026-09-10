@@ -2524,7 +2524,7 @@ class Economics:
             # TODO tooltip - includes indirect costs
         )
         self.cost_per_vertical_injection_well = self.OutputParameterDict[self.cost_per_vertical_injection_well.Name] = OutputParameter(
-            Name="Drilling and completion costs per vertical production well",
+            Name="Drilling and completion costs per vertical injection well",
             UnitType=Units.CURRENCY,
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS,
