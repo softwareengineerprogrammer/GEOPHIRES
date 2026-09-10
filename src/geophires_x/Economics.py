@@ -2516,6 +2516,20 @@ class Economics:
             PreferredUnits=CurrencyUnit.MDOLLARS,
             CurrentUnits=CurrencyUnit.MDOLLARS
         )
+        self.cost_per_vertical_production_well = self.OutputParameterDict[self.cost_per_vertical_production_well.Name] = OutputParameter(
+            Name="Drilling and completion costs per vertical production well",
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.MDOLLARS,
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            # TODO tooltip - includes indirect costs
+        )
+        self.cost_per_vertical_injection_well = self.OutputParameterDict[self.cost_per_vertical_injection_well.Name] = OutputParameter(
+            Name="Drilling and completion costs per vertical production well",
+            UnitType=Units.CURRENCY,
+            PreferredUnits=CurrencyUnit.MDOLLARS,
+            CurrentUnits=CurrencyUnit.MDOLLARS,
+            # TODO tooltip - includes indirect costs
+        )
         self.cost_to_junction_section = self.OutputParameterDict[self.cost_to_junction_section.Name] = OutputParameter(
             Name="Cost of the entire section of a well from bottom of vertical to junction with laterals",
             UnitType=Units.CURRENCY,
@@ -4101,7 +4115,11 @@ class Economics:
             self.cost_per_lateral_section.value = (
                 self.cost_lateral_section.quantity().to(self.cost_per_lateral_section.CurrentUnits).magnitude
                 / model.wellbores.numnonverticalsections.value
-            )
+            ) * self._wellfield_indirect_cost_factor
+            self.cost_per_vertical_production_well.value = self.cost_one_production_well.quantity().to(
+                self.cost_per_vertical_production_well.CurrentUnits).magnitude * self._wellfield_indirect_cost_factor
+            self.cost_per_vertical_injection_well.value = self.cost_one_injection_well.quantity().to(
+                self.cost_per_vertical_injection_well.CurrentUnits).magnitude * self._wellfield_indirect_cost_factor
 
         if hasattr(self, 'discountrate'):
             self.real_discount_rate.value = self.discountrate.quantity().to(convertible_unit(
