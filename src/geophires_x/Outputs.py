@@ -639,7 +639,7 @@ class Outputs:
                 else:
                     f.write(f'      {econ.Coam.display_name}:            {econ.Coam.value:10.2f} {econ.Coam.CurrentUnits.value}\n')
 
-                f.write('\n\n                           ***SURFACE EQUIPMENT SIMULATION RESULTS***\n')
+                f.write('\n\n                           ***SURFACE EQUIPMENT SIMULATION RESULTS***\n\n')
 
                 if model.surfaceplant.enduse_option.value.has_electricity_component:
                     sp = model.surfaceplant
