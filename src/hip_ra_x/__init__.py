@@ -19,7 +19,7 @@ class HipRaXClient:
 
         sys.argv = ['', input_params.as_file_path(), input_params.output_file_path]
         try:
-            hip_ra_x.main(enable_hip_ra_logging_config=False)
+            hip_ra_x.main(enable_hip_ra_logging_config=False, suppress_input_sys_argv_warnings=True)
         except Exception as e:
             raise RuntimeError(f'HIP-RA-X encountered an exception: {e!s}') from e
         except SystemExit:
