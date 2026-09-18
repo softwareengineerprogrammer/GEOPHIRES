@@ -479,7 +479,7 @@ def UtilEff_func(temperature_degC: float) -> float:
     return util_eff
 
 
-def read_input_file(return_dict_1, logger=None, input_file_name=None):
+def read_input_file(return_dict_1, logger=None, input_file_name=None, suppress_input_sys_argv_warnings=False):
     """
     Read input file and return a dictionary of parameters
     :param return_dict_1: dictionary of parameters
@@ -501,10 +501,14 @@ def read_input_file(return_dict_1, logger=None, input_file_name=None):
 
     # read input data (except input from optional filenames)
     if input_file_name is None:
-        logger.warning('Input file name not provided, checking sys.argv')
+        if not suppress_input_sys_argv_warnings:
+            logger.warning('Input file name not provided, checking sys.argv')
+
         if len(sys.argv) > 1:
             input_file_name = sys.argv[1]
-            logger.warning(f'Using input file from sys.argv: {input_file_name}')
+
+            if not suppress_input_sys_argv_warnings:
+                logger.warning(f'Using input file from sys.argv: {input_file_name}')
 
     if input_file_name is not None:
         content = []

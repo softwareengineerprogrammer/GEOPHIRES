@@ -16,7 +16,7 @@ Pip Package
 
 If you do not need to view or edit GEOPHIRES-X source code, you can consume GEOPHIRES-X as a regular, non-editable python package::
 
-    pip3 install https://github.com/NREL/GEOPHIRES-X/archive/main.zip
+    pip install "git+https://github.com/NREL/GEOPHIRES-X"
 
 
 .. (Eventually package will be published to PyPi, enabling ``pip install geophires-x``)

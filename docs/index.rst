@@ -9,6 +9,7 @@ Contents
    Theoretical-Basis-for-GEOPHIRES
    SAM-Economic-Models
    Monte-Carlo-User-Guide
+   HIP-RA-User-Guide
    How-to-extend-GEOPHIRES-X
 
 .. toctree::
