@@ -63,7 +63,8 @@ setup(
     install_requires=[
         'numpy==1.24; python_version == "3.8"',  # Last version compatible with Python 3.8
         'numpy; python_version > "3.8"',
-        'numpy-financial',
+        # TODO upgrade - see https://github.com/NatLabRockies/GEOPHIRES-X/pull/521#issuecomment-5732305617
+        'numpy-financial==1.0.0',
         'pint',
         'forex_python',
         'jsons',
