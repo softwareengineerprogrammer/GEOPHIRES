@@ -74,6 +74,18 @@ jobs:
             python_arch: 'x64'
             tox_env: 'py312'
             os: 'ubuntu-latest'
+          - name: 'py313 (ubuntu)'
+            python: '3.13'
+            toxpython: 'python3.13'
+            python_arch: 'x64'
+            tox_env: 'py313'
+            os: 'ubuntu-latest'
+#          - name: 'py314 (ubuntu)'
+#            python: '3.14'
+#            toxpython: 'python3.14'
+#            python_arch: 'x64'
+#            tox_env: 'py314'
+#            os: 'ubuntu-latest'
 #          - name: 'pypy38 (ubuntu)'
 #            python: 'pypy-3.8'
 #            toxpython: 'pypy3.8'
@@ -201,7 +213,7 @@ jobs:
         done
 
     - name: upload artifact
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v5
 
     - name: deploy to GitHub Pages
       id: deployment
