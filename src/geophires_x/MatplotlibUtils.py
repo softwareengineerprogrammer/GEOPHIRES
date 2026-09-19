@@ -20,13 +20,17 @@ _logger = logging.getLogger(__name__)
 _NON_INTERACTIVE_BACKENDS = frozenset({'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template'})
 
 
+def _is_running_in_ci() -> bool:
+    return os.environ.get('CI', '').lower() == 'true' or os.environ.get('GITHUB_ACTIONS', '').lower() == 'true'
+
+
 def _is_non_interactive_backend() -> bool:
     return matplotlib.get_backend().lower() in _NON_INTERACTIVE_BACKENDS
 
 
 def plt_show(**kw_args):
-    if _is_non_interactive_backend():
-        _logger.debug(f'Skipping plt.show() - non-interactive backend ({matplotlib.get_backend()})')
+    if _is_running_in_ci() and _is_non_interactive_backend():
+        _logger.debug(f'Skipping plt.show() - non-interactive backend ({matplotlib.get_backend()}) in CI')
         return
 
     try:
