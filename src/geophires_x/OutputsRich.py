@@ -947,10 +947,11 @@ def ShortenArrayToAnnual(array_to_shorten: pd.array, new_length:int, time_steps_
 
     new_array = np.zeros(new_length)
 
-    j = 0
-    for i in range(0, len(array_to_shorten), time_steps_per_year):
+    for j in range(new_length):
+        i = j * time_steps_per_year
+        if i >= len(array_to_shorten):
+            break
         new_array[j] = array_to_shorten[i]
-        j = j + 1
 
     return new_array
 
