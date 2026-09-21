@@ -13,6 +13,7 @@ import geophires_x.Model as Model
 
 from geophires_x.GeoPHIRESUtils import heat_capacity_water_J_per_kg_per_K, quantity, static_pressure_MPa
 from geophires_x.GeoPHIRESUtils import density_water_kg_per_m3
+from geophires_x.GeoPHIRESUtils import number_of_time_steps
 
 _MAX_ALLOWED_FRACTURES = 1_000_000
 
@@ -777,7 +778,7 @@ class Reservoir:
 
         # specify time-stepping vectors
         self.timevector.value = np.linspace(0, model.surfaceplant.plant_lifetime.value,
-                                            model.economics.timestepsperyear.value * model.surfaceplant.plant_lifetime.value)
+                                            number_of_time_steps(model))
         self.Tresoutput.value = np.zeros(len(self.timevector.value))
 
         if self.resoption.value is not ReservoirModel.SUTRA:

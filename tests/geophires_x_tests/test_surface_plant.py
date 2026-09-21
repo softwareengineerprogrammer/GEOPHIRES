@@ -112,3 +112,14 @@ class SurfacePlantTestCase(BaseTestCase):
                 self.skipTest('Skipping due to intermittent failure on GitHub Actions')
             else:
                 raise ae
+
+    def test_one_time_step_per_year_and_one_year_lifetime(self):
+        input_file = Path(__file__).parent.parent / 'examples' / 'Fervo_Project_Cape-2.txt'
+        params = GeophiresInputParameters(
+            from_file_path=input_file,
+            params={'Plant Lifetime': 1, 'Time steps per year': 1},
+        )
+
+        result = GeophiresXClient().get_geophires_result(params)
+
+        self.assertEqual(1, result.result['ECONOMIC PARAMETERS']['Project lifetime']['value'])
