@@ -18,6 +18,15 @@ _YEAR_INDEX_VALUE_EXPLANATION_SNIPPET = (
 )
 
 
+def end_price_or_max(end_price_parameter) -> float:
+    """
+    Returns the end price if the user provided one, otherwise the parameter's maximum, so that an
+    unprovided ending price does not cap escalation. See
+    https://github.com/NatLabRockies/GEOPHIRES-X/issues/449.
+    """
+    return end_price_parameter.value if end_price_parameter.Provided else end_price_parameter.Max
+
+
 def BuildPricingModel(
     plantlifetime: int,
     StartPrice: float,

@@ -39,6 +39,7 @@ from geophires_x.EconomicsSamCashFlow import (
     _calculate_sam_economics_cash_flow_operational_years,
 )
 from geophires_x.EconomicsUtils import (
+    end_price_or_max,
     BuildPricingModel,
     _SAM_EM_MOIC_RETURNS_TAX_QUALIFIER,
 )
@@ -880,7 +881,7 @@ def _get_ppa_price_schedule_per_kWh(model: Model) -> list:
     pricing_model = _ppa_pricing_model(
         model.surfaceplant.plant_lifetime.value,
         econ.ElecStartPrice.value,
-        econ.ElecEndPrice.value,
+        end_price_or_max(econ.ElecEndPrice),
         econ.ElecEscalationStart.value,
         econ.ElecEscalationRate.value,
     )
