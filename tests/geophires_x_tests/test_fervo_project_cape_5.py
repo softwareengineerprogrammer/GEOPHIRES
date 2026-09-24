@@ -364,12 +364,13 @@ class FervoProjectCape5TestCase(BaseTestCase):
         scenario_params = generate_fervo_project_cape_5_md.get_fpc5_scenario_input_parameters(input_params, result)
 
         # Rates and utilization factors stated in the Investment Tax Credit Rate and Utilization Factor discussions and
-        # used in the sensitivity analysis.
+        # used in the sensitivity analysis, and the reduced redrilling scenario's fracture height (+20%).
         self.assertEqual(
             [
                 {'Investment Tax Credit Rate': 0.2768},
                 {'Utilization Factor': 0.867},
                 {'Utilization Factor': 0.822},
+                {'Fracture Height': 120.0},
             ],
             list(scenario_params.values()),
         )
