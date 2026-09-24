@@ -2838,10 +2838,10 @@ class Economics:
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
 
-            if self.HeatStartPrice.value > self.HeatEndPrice.value:
-                s = f'{self.HeatStartPrice.Name} ({self.HeatStartPrice.quantity()}) cannot be ' \
-                    f'greater than {self.HeatEndPrice.Name} ({self.HeatEndPrice.quantity()}).  ' \
-                    f'GEOPHIRES will assume {self.HeatStartPrice.Name} is equal to {self.HeatEndPrice.Name}.'
+            if self.HeatEndPrice.Provided and self.HeatStartPrice.value > self.HeatEndPrice.value:
+                s = f'{self.HeatStartPrice.Name} ({self.HeatStartPrice.quantity()}) is greater than ' \
+                    f'{self.HeatEndPrice.Name} ({self.HeatEndPrice.quantity()}), which caps the heat price. ' \
+                    f'GEOPHIRES will use {self.HeatEndPrice.Name} for every year of the project.'
                 model.logger.warning(s)
 
             if self.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
