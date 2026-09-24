@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 from pathlib import Path
@@ -39,6 +40,18 @@ def _get_fpc5_result_file_path(project_root: Path | None = None) -> Path:
 _PROJECT_ROOT: Path = _get_project_root()
 _FPC5_INPUT_FILE_PATH: Path = _get_fpc5_input_file_path()
 _FPC5_RESULT_FILE_PATH: Path = _get_fpc5_result_file_path()
+
+_FPC5_PPA_MINIMUM_NET_GENERATION_MW: float = 500.0
+
+# Gross capacity of each Gen 2 ORC unit announced for Cape Station Phase II (Turboden, 2025; Jacobs, 2025).
+_FPC5_ORC_UNIT_GROSS_CAPACITY_MW: float = 60.0
+
+
+def _get_fpc5_orc_unit_count(max_total_generation_mw: float) -> int:
+    """
+    :return: Number of Gen 2 ORC units required for nameplate capacity to cover the maximum total (gross) generation.
+    """
+    return math.ceil(max_total_generation_mw / _FPC5_ORC_UNIT_GROSS_CAPACITY_MW)
 
 
 def _get_logger(_name_: str) -> Any:

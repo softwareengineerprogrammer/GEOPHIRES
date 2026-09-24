@@ -20,6 +20,13 @@ _SINGH_ET_AL_BASE_SIMULATION_PARAMETERS: dict[str, Any] = {
     'Maximum Drawdown': '1, -- Redrilling not modeled in Singh et al. scenario. '
     '(The equivalent GEOPHIRES simulation allows drawdown to reach up to 100% without triggering redrilling)',
     'Plant Lifetime': 15,
+    'Reservoir Depth': '2.68, -- Approximate average depth between the upper and lower benches of the Phase I design '
+    'simulated by Singh et al. The case study base case is deeper, corresponding to the Fervo 3.0 well design.',
+    'Nonvertical Length per Multilateral Section': '5000 feet, -- Phase I lateral length (BLM, 2024). '
+    'The case study base case uses the longer lateral of the Fervo 3.0 well design.',
+    'Number of Fractures per Stimulated Well': '150, -- 12 stages for the 5,000 ft Phase I lateral at the case study '
+    'stage length, clusters per stage, and stimulation success rate. '
+    'The case study base case scales the stage count to the longer 3.0 design lateral.',
 }
 
 
