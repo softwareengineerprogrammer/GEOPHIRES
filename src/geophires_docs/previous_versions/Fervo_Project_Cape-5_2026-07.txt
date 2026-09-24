@@ -1,5 +1,5 @@
-# Case Study: 100 MWe EGS Project Modeled on Fervo Cape Station Phase I
-# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html#Fervo_Project_Cape-6-section
+# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station Phase II
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
@@ -16,14 +16,18 @@ Discount Rate, 0.12, -- Typical discount rates for higher-risk projects may be 1
 Inflated Bond Interest Rate, .07, -- 2024b ATB (NREL, 2025)
 
 Inflated Bond Interest Rate During Construction, 0.105, -- Higher than interest rate during normal operation to account for increased risk of default prior to COD. Value aligns with ATB discount rate (NREL, 2025).
-Bond Financing Start Year, -1
+Bond Financing Start Year, -2, -- Equity-only for first 2 construction years (ATB)
 
-Construction Years, 3
+Construction Years, 5, -- Ground broken in 2023 (Fervo Energy, 2023). Expected to reach full scale production in 2028 (Fervo Energy, 2025). See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations.
 
+# ATB advanced scenario
+# Construction CAPEX Schedule, 0.09,0.28,0.1,0.34,0.28
 
+# DOE scenario (alternative)
+# Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
 # DOE-ATB hybrid scenario
-Construction CAPEX Schedule, 0.075,0.525,0.4
+Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389
 
 Investment Tax Credit Rate, 0.3, -- Geothermal Drilling and Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024).
 Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
@@ -89,13 +93,13 @@ Circulation Pump Efficiency, 0.80
 
 # *** Well Bores Parameters ***
 
-Number of Production Wells, 12
+Number of Production Wells, 56, -- Number of production wells required to produce net generation greater than the PPA minimum and total generation less than nameplate capacity (Gen 2 ORCs gross capacity).
 Number of Injection Wells per Production Well, 0.666, -- Modeled on the reference case 5-well bench pattern (3 producers : 2 injectors) described in Singh et al., 2025.
 
 Nonvertical Length per Multilateral Section, 5000 feet, -- Target lateral length given in environmental assessment (BLM, 2024). Note that lateral length is assumed to be an upper bound constraining the number of fractures per well for a given cluster spacing.
 Number of Multilateral Sections, 0, -- This parameter is set to 0 because, for this case study, the cost of horizontal drilling is included within the 'vertical drilling cost.' This approach allows us to more directly convey the overall well drilling and completion cost.
 
-Production Flow Rate per Well, 100
+Production Flow Rate per Well, 107, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec that gradually decrease over time (Singh et al., 2025). The case study flow rate is chosen both as a conservative target for long-term sustainability and to achieve a more economically favorable drawdown and redrilling schedule.
 # The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
 
 Production Well Diameter, 8.535, -- Inner diameter of 9⅝ inch casing size, the next standard casing size up from 7 inches, implied by announcement of "increasing casing diameter" (Fervo Energy, 2025).
