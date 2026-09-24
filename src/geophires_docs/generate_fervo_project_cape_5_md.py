@@ -29,7 +29,7 @@ from geophires_docs import _get_logger
 from geophires_docs import _get_project_root
 from geophires_docs.fervo_project_cape_5_scenarios import FlowRateParametricRow
 from geophires_docs.fervo_project_cape_5_scenarios import get_fpc5_flow_rate_parametric_summary
-from geophires_docs.fervo_project_cape_5_scenarios import get_irr_changes_pct_pts
+from geophires_docs.fervo_project_cape_5_scenarios import get_scenario_results
 from geophires_docs.fervo_project_cape_5_scenarios import load_fpc5_flow_rate_parametric
 from geophires_x.GeoPHIRESUtils import is_int
 from geophires_x.GeoPHIRESUtils import sig_figs
@@ -545,24 +545,33 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
 _ITC_EXCLUDING_INTERCONNECTION_SCENARIO = 'ITC excluding interconnection from basis'
 _CURTAILMENT_5PCT_SCENARIO = 'Curtailment (5% flat derate)'
 _CURTAILMENT_10PCT_SCENARIO = 'Curtailment (10% flat derate)'
+_REDUCED_REDRILLING_SCENARIO = 'Reduced redrilling (greater fracture height)'
+_REDUCED_REDRILLING_FRACTURE_HEIGHT_MULTIPLIER = 1.2
 
 
 def get_fpc5_scenario_values(
     input_params: GeophiresInputParameters,
     result: GeophiresXResult,
-    scenario_irr_changes_pct_pts: dict[str, float] | None = None,
+    scenario_results: dict[str, GeophiresXResult] | None = None,
     flow_rate_parametric_rows: list[FlowRateParametricRow] | None = None,
 ) -> dict[str, Any]:
     """
-    :param scenario_irr_changes_pct_pts: IRR changes for the scenarios returned by
-        get_fpc5_scenario_input_parameters; simulated if not provided.
+    :param scenario_results: Results of the scenarios returned by get_fpc5_scenario_input_parameters, by scenario
+        name; simulated if not provided.
     :param flow_rate_parametric_rows: Production flow rate parametric results; loaded from
         FPC5_FLOW_RATE_PARAMETRIC_CSV_PATH if not provided.
     :return: Template values for scenario results cited in the documentation narrative
+    :raises ValueError: if the reduced redrilling scenario no longer supports its description in the documentation
     """
     scenario_input_params = get_fpc5_scenario_input_parameters(input_params, result)
-    if scenario_irr_changes_pct_pts is None:
-        scenario_irr_changes_pct_pts = get_irr_changes_pct_pts(input_params, result, scenario_input_params)
+    if scenario_results is None:
+        scenario_results = get_scenario_results(input_params, scenario_input_params)
+
+    base_irr_pct = result.result['ECONOMIC PARAMETERS']['After-tax IRR']['value']
+    scenario_irr_changes_pct_pts = {
+        name: scenario_result.result['ECONOMIC PARAMETERS']['After-tax IRR']['value'] - base_irr_pct
+        for name, scenario_result in scenario_results.items()
+    }
 
     if flow_rate_parametric_rows is None:
         flow_rate_parametric_rows = load_fpc5_flow_rate_parametric()
@@ -582,6 +591,9 @@ def get_fpc5_scenario_values(
     ]
 
     return {
+        **_get_reduced_redrilling_scenario_values(
+            params, result, scenario_input_params, scenario_results[_REDUCED_REDRILLING_SCENARIO]
+        ),
         'itc_rate_excluding_interconnection_pct': f'{itc_rate_excluding_interconnection * 100:.2f}',
         'itc_rate_excluding_interconnection_pct_1dp': f'{itc_rate_excluding_interconnection * 100:.1f}',
         'itc_excluding_interconnection_irr_reduction_pct_pts': _irr_reduction_display(
@@ -620,7 +632,8 @@ def get_fpc5_scenario_input_parameters(
         scenario name. The ITC scenario applies the rate to total installed cost that removes the interconnection cost
         (including its share of inflation and interest during construction) from the ITC basis. The curtailment
         scenarios reduce the utilization factor by 5% and 10% as flat derates. Values are rounded as in the
-        sensitivity analysis.
+        sensitivity analysis. The reduced redrilling scenario increases fracture height, and with it fracture surface
+        area and stimulation cost per stimulated well, to extend the thermal plateau.
     """
     params = _get_input_parameters_dict(input_params)
     itc_rate = float(params['Investment Tax Credit Rate'])
@@ -636,6 +649,11 @@ def get_fpc5_scenario_input_parameters(
         },
         _CURTAILMENT_5PCT_SCENARIO: {'Utilization Factor': round(utilization_factor * 0.95, 3)},
         _CURTAILMENT_10PCT_SCENARIO: {'Utilization Factor': round(utilization_factor * 0.90, 3)},
+        _REDUCED_REDRILLING_SCENARIO: {
+            'Fracture Height': round(
+                float(params['Fracture Height']) * _REDUCED_REDRILLING_FRACTURE_HEIGHT_MULTIPLIER, 1
+            )
+        },
     }
 
 
@@ -789,6 +807,71 @@ def _get_first_cycle_peak_production_temperature(
     return years[peak_idx], first_cycle_temps[peak_idx]
 
 
+def _get_reduced_redrilling_scenario_values(
+    params: dict[str, Any],
+    result: GeophiresXResult,
+    scenario_input_params: dict[str, dict[str, Any]],
+    scenario_result: GeophiresXResult,
+) -> dict[str, Any]:
+    base_redrills = int(result.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value'])
+    redrills = int(scenario_result.result['ENGINEERING PARAMETERS']['Number of times redrilling']['value'])
+    min_net_generation_mw = scenario_result.result['SURFACE EQUIPMENT SIMULATION RESULTS'][
+        'Minimum Net Electricity Generation'
+    ]['value']
+    if redrills >= base_redrills or min_net_generation_mw < _FPC5_PPA_MINIMUM_NET_GENERATION_MW:
+        raise ValueError(
+            f'The reduced redrilling scenario yields {redrills} redrilling events (base case: {base_redrills}) and '
+            f'minimum net generation of {min_net_generation_mw} MW; update the scenario or its description in the '
+            f'case study documentation.'
+        )
+
+    redrilling_years = _get_redrilling_years(scenario_result)
+    if len(redrilling_years) != redrills:
+        raise ValueError(
+            f'Reduced redrilling scenario redrilling years detected from production temperature profile '
+            f'({redrilling_years}) do not match Number of times redrilling ({redrills}).'
+        )
+
+    base_fracture_height_m = float(params['Fracture Height'])
+    fracture_height_m = scenario_input_params[_REDUCED_REDRILLING_SCENARIO]['Fracture Height']
+    comparison_metric_labels = [
+        'Fracture surface area per well (10⁶ m²)',
+        'Redrilling events',
+        'Total wells over project lifetime',
+        'Stimulation ($M)',
+        'Total CAPEX ($M)',
+        'Redrilling ($M/yr)',
+        'Minimum net generation (MW)',
+        'LCOE ($/MWh)',
+        'After-tax IRR (%)',
+        'Project NPV ($M)',
+    ]
+    metrics_by_label = {it[0]: it for it in _FPC5_VERSION_COMPARISON_RESULT_METRICS}
+
+    return {
+        'reduced_redrilling_base_fracture_height_m': f'{base_fracture_height_m:g}',
+        'reduced_redrilling_fracture_height_m': f'{fracture_height_m:g}',
+        'reduced_redrilling_fracture_height_increase_pct': (
+            f'{(fracture_height_m / base_fracture_height_m - 1.0) * 100.0:.0f}'
+        ),
+        'reduced_redrilling_base_redrills_word': _get_count_word(base_redrills),
+        'reduced_redrilling_redrills_word': _get_count_word(redrills),
+        'reduced_redrilling_base_redrilling_years_display': _get_years_display(_get_redrilling_years(result)),
+        'reduced_redrilling_redrilling_years_display': _get_years_display(redrilling_years),
+        'reduced_redrilling_comparison_table_md': _get_result_comparison_table_md(
+            result,
+            scenario_result,
+            'Base Case',
+            'Reduced Redrilling',
+            [metrics_by_label[it] for it in comparison_metric_labels],
+        ),
+    }
+
+
+def _get_years_display(years: list[int]) -> str:
+    return f'year{"" if len(years) == 1 else "s"} {_get_list_display(years)}'
+
+
 def _get_count_word(count: int) -> str:
     words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
     return words[count] if 0 <= count < len(words) else str(count)
@@ -870,10 +953,32 @@ def _format_version_comparison_change(
     if is_percent:
         return f'{change:+,.{decimals}f} pts'
 
-    if previous_value == 0:
+    relative_change_pct = 0.0 if previous_value == 0 else change / abs(previous_value) * 100.0
+    if round(relative_change_pct) == 0:
         return f'{change:+,.{decimals}f}'
 
-    return f'{change:+,.{decimals}f} ({change / abs(previous_value) * 100.0:+.0f}%)'
+    return f'{change:+,.{decimals}f} ({relative_change_pct:+.0f}%)'
+
+
+def _get_result_comparison_table_md(
+    result_a: GeophiresXResult,
+    result_b: GeophiresXResult,
+    column_a: str,
+    column_b: str,
+    metrics: list[tuple[str, Callable[[GeophiresXResult], float | None], int, bool]],
+) -> str:
+    table_md = f'| Result | {column_a} | {column_b} | Change |\n|---|---|---|---|\n'
+    for label, getter, decimals, is_percent in metrics:
+        value_a = getter(result_a)
+        value_b = getter(result_b)
+        table_md += (
+            f'| {label} '
+            f'| {_format_version_comparison_number(value_a, decimals)} '
+            f'| {_format_version_comparison_number(value_b, decimals)} '
+            f'| {_format_version_comparison_change(value_a, value_b, decimals, is_percent)} |\n'
+        )
+
+    return table_md.strip()
 
 
 def _result_value(category: str, field: str) -> Callable[[GeophiresXResult], float | None]:
@@ -1121,18 +1226,9 @@ def generate_fpc5_previous_version_result_changes_table_md(
     """
     :return: Markdown table comparing key results of the previous version and this version
     """
-    table_md = '| Result | Previous Version | This Version | Change |\n|---|---|---|---|\n'
-    for label, getter, decimals, is_percent in _FPC5_VERSION_COMPARISON_RESULT_METRICS:
-        previous_value = getter(previous_result)
-        value = getter(result)
-        table_md += (
-            f'| {label} '
-            f'| {_format_version_comparison_number(previous_value, decimals)} '
-            f'| {_format_version_comparison_number(value, decimals)} '
-            f'| {_format_version_comparison_change(previous_value, value, decimals, is_percent)} |\n'
-        )
-
-    return table_md.strip()
+    return _get_result_comparison_table_md(
+        previous_result, result, 'Previous Version', 'This Version', _FPC5_VERSION_COMPARISON_RESULT_METRICS
+    )
 
 
 def generate_fervo_project_cape_5_md(
@@ -1141,7 +1237,7 @@ def generate_fervo_project_cape_5_md(
     res_eng_reference_sim_params: dict[str, Any] | None = None,
     project_root: Path = _PROJECT_ROOT,
     previous_version: tuple[GeophiresInputParameters, GeophiresXResult] | None = None,
-    scenario_irr_changes_pct_pts: dict[str, float] | None = None,
+    scenario_results: dict[str, GeophiresXResult] | None = None,
 ) -> None:
     if res_eng_reference_sim_params is None:
         res_eng_reference_sim_params = {}
@@ -1155,7 +1251,7 @@ def generate_fervo_project_cape_5_md(
     template_values = {
         **get_fpc5_input_parameter_values(input_params, result),
         **result_values,
-        **get_fpc5_scenario_values(input_params, result, scenario_irr_changes_pct_pts),
+        **get_fpc5_scenario_values(input_params, result, scenario_results),
     }
 
     for template_key, md_method in {

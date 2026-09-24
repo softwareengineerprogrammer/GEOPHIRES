@@ -191,27 +191,23 @@ def get_fpc5_flow_rate_parametric_summary(
     )
 
 
-def get_irr_changes_pct_pts(
+def get_scenario_results(
     input_params: GeophiresInputParameters,
-    result: GeophiresXResult,
     scenario_params_by_name: dict[str, dict[str, Any]],
-) -> dict[str, float]:
+) -> dict[str, GeophiresXResult]:
     """
-    :return: Change in after-tax IRR (percentage points) relative to the base case result for each scenario, where
-        each scenario overrides the given base case input parameters.
+    :return: Result of each scenario, by scenario name, where each scenario overrides the given base case input
+        parameters.
     """
-    base_irr_pct = result.result['ECONOMIC PARAMETERS']['After-tax IRR']['value']
     client = GeophiresXClient()
-    irr_changes = {}
+    results = {}
     for scenario_name, scenario_params in scenario_params_by_name.items():
         _log.info(f'Simulating scenario: {scenario_name}...')
-        scenario_result = client.get_geophires_result(
+        results[scenario_name] = client.get_geophires_result(
             ImmutableGeophiresInputParameters(from_file_path=input_params.as_file_path(), params=scenario_params)
         )
-        scenario_irr_pct = scenario_result.result['ECONOMIC PARAMETERS']['After-tax IRR']['value']
-        irr_changes[scenario_name] = scenario_irr_pct - base_irr_pct
 
-    return irr_changes
+    return results
 
 
 if __name__ == '__main__':
