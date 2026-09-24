@@ -4,10 +4,10 @@
 
 Simulation Metadata
 ----------------------
- GEOPHIRES Version: 3.16.1
- Simulation Date: 2026-09-07
- Simulation Time:  07:00
- Calculation Time:      1.806 sec
+ GEOPHIRES Version: 3.17.0
+ Simulation Date: 2026-09-24
+ Simulation Time:  08:17
+ Calculation Time:      4.174 sec
 
                            ***SUMMARY OF RESULTS***
 
@@ -111,9 +111,9 @@ Simulation Metadata
 
          Exploration costs:                                  56.00 MUSD
          Drilling and completion costs:                     712.00 MUSD
-             Drilling and completion costs per vertical production well:         4.19 MUSD
-             Drilling and completion costs per vertical injection well:          4.19 MUSD
-             Drilling and completion costs per non-vertical section:             3.88 MUSD
+             Drilling and completion costs per vertical production well:         4.40 MUSD
+             Drilling and completion costs per vertical injection well:          4.40 MUSD
+             Drilling and completion costs per non-vertical section:             4.08 MUSD
          Stimulation costs:                                 609.09 MUSD
              Stimulation costs per well:                      7.25 MUSD
          Surface power plant costs:                        1552.99 MUSD
@@ -132,11 +132,13 @@ Simulation Metadata
          Power plant maintenance costs:                      26.18 MUSD/yr
          Water costs:                                         2.85 MUSD/yr
          Redrilling costs:                                   88.07 MUSD/yr
+         Annual License Fees Etc:                            21.00 MUSD
          Average Annual Royalty Cost:                        16.66 MUSD/yr
       Total operating and maintenance costs:                163.35 MUSD/yr
 
 
                            ***SURFACE EQUIPMENT SIMULATION RESULTS***
+
       Initial geofluid availability:                          0.22 MW/(kg/s)
       Maximum Total Electricity Generation:                 634.60 MW
       Average Total Electricity Generation:                 632.38 MW
