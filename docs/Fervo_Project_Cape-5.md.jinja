@@ -270,17 +270,7 @@ as the Year 1 and Year 15 thermal endpoints align closely with the numerical sim
 
 However, the analytical Gringarten model's thermal plateau yields a higher aggregate heat extraction than the numerical model's
 gradual decline, representing an optimistic upper bound on performance compared to the conservative heterogeneity
-modeled in ResFrac.
-To bound this risk, an alternative GEOPHIRES simulation was modeled using the ResFrac profile[^upp-resfrac-profile-note].
-Results indicated that to offset the dispersion penalty under heterogeneous flow conditions, the project would require
-a higher initial reservoir temperature (achieved via deeper drilling) to compensate for the loss of the thermal plateau.
-[Click here](https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=834b0096-15b1-4dd3-b262-612e9df1342f)
-to view a variant GEOPHIRES scenario (`Fervo_Project_Cape-6 Variant: ResFrac Profile + Hotter/Deeper Scenario`)
-for a 100 MWe average net production project with a 3 km well depth, yielding approximately 15°C higher production temperatures.
-The current base case is itself at a similar depth (3.06 km); the variant, which is built on the previous version's
-inputs, remains useful as the ResFrac profile counterpart to the Gringarten base case.
-
-[^upp-resfrac-profile-note]: The simulation utilized GEOPHIRES's [Generic User-Provided Temperature Profile reservoir model](https://softwareengineerprogrammer.github.io/GEOPHIRES/Theoretical-Basis-for-GEOPHIRES.html#reservoir-models) with temperature data derived from Figure 18 in Singh et al. (2025).
+modeled in ResFrac (see Reservoir Modeling Fidelity in the [Discussion section](#discussion-section)).
 
 The calibration simulation above represents a 15-year unmitigated thermal decline without redrilling.
 In the full case study results, the model includes redrilling events that restore production temperature when drawdown thresholds are reached,
@@ -521,28 +511,25 @@ and [Fervo_Project_Cape-6.out](https://github.com/softwareengineerprogrammer/GEO
 
 ### Reduced Redrilling Scenario
 
-[Click here](https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=4eb5e843-be61-4518-8fda-7d0b41348e53)
-to view a scenario with reduced redrilling in the web interface, representing an effective longer well life compared to the base case.
-Redrilling is reduced via greater effective fracture surface area per stimulated well, achieved by an increased number of fractures per well and greater fracture height.
-Stimulation cost is increased to nominally reflect the larger required job size.
-Note that this scenario is built on the inputs of the previous version of this case study.
+This scenario increases `Fracture Height` by {{ reduced_redrilling_fracture_height_increase_pct }}% (from
+{{ reduced_redrilling_base_fracture_height_m }} m to {{ reduced_redrilling_fracture_height_m }} m), which increases
+fracture surface area per stimulated well by the same proportion and extends the thermal plateau.
+Stimulation cost, which the case study parameterizes per unit fracture surface area, increases accordingly.
+The number of redrilling events falls from {{ reduced_redrilling_base_redrills_word }}
+({{ reduced_redrilling_base_redrilling_years_display }} of operations) to {{ reduced_redrilling_redrills_word }}
+({{ reduced_redrilling_redrilling_years_display }}), and minimum net generation remains above the
+{{ ppa_minimum_net_generation_mw }} MWe PPA requirement.
 
-{# TODO port scenario to source code instead of out-of-band shared result
-    (probably would want to generate similar to Fervo_Project_Cape-6 #}
+{{ reduced_redrilling_comparison_table_md }}
 
-### ResFrac Profile + Hotter/Deeper Scenario
+GEOPHIRES amortizes the cost of all redrilling events uniformly over the project lifetime (see Redrilling Assumptions
+in the [Discussion section](#discussion-section)), so each avoided event reduces operating costs from the first year of
+operations.
+This overstates the value of avoiding a late redrilling event compared with incurring its cost in the year it occurs.
 
-[Click here](https://gtp.scientificwebservices.com/geophires?shared-geophires-result-id=834b0096-15b1-4dd3-b262-612e9df1342f)
-to view the `Fervo_Project_Cape-6 Variant: ResFrac Profile + Hotter/Deeper Scenario` in the web interface.
-Note that this scenario models two redrilling events (rather than three) and yields 100 MWe average net generation
-(rather than 100 MWe minimum net generation), reflected in the power generation profile below.
-Like `Fervo_Project_Cape-6`, this scenario is built on the inputs of the previous version of this case study.
-
-{# TODO port scenario to source code instead of out-of-band shared result #}
-
-![](_images/fervo_project_cape-6_variant-resfrac-deeper-hotter_power-generation-profile.png)
-
-See the [Simulation Comparison section](#simulation-comparison) for details.
+[Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) to open the
+base case in the GEOPHIRES web interface, and set `Fracture Height` to {{ reduced_redrilling_fracture_height_m }} to
+reproduce this scenario.
 
 <a id="previous-versions-section"></a>
 
@@ -569,6 +556,8 @@ Key differences in the September 2026 Update:
 1. Grid interconnection ($250M) and firm transmission service ($21M/yr) added
 1. PPA starting price of $115/MWh with a 1.5%-equivalent escalator from the second operating year, capped at the year 15 price
 1. Construction period of 4 years; inflation rate of 3.0%; exploration cost re-derived from the current well cost
+1. `ResFrac Profile + Hotter/Deeper Scenario` variant removed. It applied the Singh et al. (2025) temperature profile for the Phase I design to the previous version's 100 MWe inputs at a 3 km depth; the base case now uses the deeper 3.0 design, to which that profile does not apply
+1. Reduced Redrilling Scenario rebuilt on current inputs (greater fracture height) and generated with the documentation instead of linked as a shared result
 
 The following tables list every input parameter whose value differs between the previous version and this version,
 and compare key results.
@@ -638,10 +627,10 @@ Including these may reduce the levered IRR.
 1. Nominal O&M Costs: GEOPHIRES holds fixed O&M costs, including the transmission service cost, flat in nominal terms. At the case study's 3.0% inflation rate, this represents a declining real cost over the 30-year project lifetime, which is optimistic.
 1. Seasonal and Hourly Performance Granularity: As noted in the Surface Plant Parameters, this study uses a fixed annual average ambient temperature. It does not model the seasonal or hourly impacts on air-cooled condenser efficiency. In reality, power output would likely dip during peak summer hours and increase during winter. Future versions of GEOPHIRES may add support for these considerations; [click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/395) to view the relevant GEOPHIRES tracking issue on GitHub.
 1. Redrilling Assumptions: Management of thermal decline is modeled as periodic redrilling events that reset the reservoir's heat content to initial conditions at intervals determined by the `Maximum Drawdown` parameter. The cost of these events is amortized into a uniform annual operating expense. In reality, these events may be scheduled as discrete capital-intensive campaigns punctuated by years of lower spending, or as a continuous program of make-up well drilling to mitigate decline. Fervo describes its approach as a makeup-well drilling program in which later wells benefit from cumulative learnings (Fervo Energy, 2026f). [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/381) to view the relevant GEOPHIRES tracking issue on GitHub.
-1. Reservoir Modeling Fidelity: The base case utilizes the Gringarten analytical model, which produces a characteristic thermal plateau maintained until a sharp breakthrough event. A key open question is whether this idealized profile provides an acceptably accurate approximation of drawdown over time, or if it masks the gradual dispersion caused by flow channeling and heterogeneity. Future work should evaluate whether Gringarten remains the optimal scoping proxy, or if an alternative analytical solution[^alt-analytical-solution-proposal] would offer a superior balance of speed and realism by better mimicking the shape of numerical simulation outputs.
+1. Reservoir Modeling Fidelity: The base case utilizes the Gringarten analytical model, which produces a characteristic thermal plateau maintained until a sharp breakthrough event. A key open question is whether this idealized profile provides an acceptably accurate approximation of drawdown over time, or if it masks the gradual dispersion caused by flow channeling and heterogeneity. The [Project Red case study](Fervo_Project_Red.html) compares the GEOPHIRES Gringarten model against the first two years of measured production temperatures from Fervo's Project Red and finds close alignment when the active fracture count is de-rated for heterogeneous flow; that record does not yet extend to the long-term decline that determines redrilling timing. Future work should evaluate whether Gringarten remains the optimal scoping proxy, or if an alternative analytical solution[^alt-analytical-solution-proposal] would offer a superior balance of speed and realism by better mimicking the shape of numerical simulation outputs.
 1. ORC Efficiency: The power generation results rely on the GEOPHIRES built-in supercritical ORC efficiency correlation, which assumes the selection of an optimal working fluid for each specific geofluid temperature. For further details, please refer to the [Surface Plant section in the Theoretical Basis for GEOPHIRES](Theoretical-Basis-for-GEOPHIRES.html#surface-plant). GEOPHIRES warns that the built-in ORC correlations may not be valid above a production temperature of 200℃; the case study production temperature (approximately {{ average_production_temperature_degc ~ '℃' }}) exceeds this, which adds uncertainty to the modeled conversion efficiency and power plant cost. This limitation may be addressed in the future by [FGEM integration](https://github.com/NatLabRockies/GEOPHIRES-X/issues/395).
 
-[^alt-analytical-solution-proposal]: Possible alternatives might include Residence Time Distribution (RTD) modeling, or a parameterized profile generator based on the Bezier curve approach used in the "ResFrac Profile" variant.
+[^alt-analytical-solution-proposal]: Possible alternatives might include Residence Time Distribution (RTD) modeling, or a parameterized profile generator (for example, Bezier curves fitted to numerical simulation results, as in the ResFrac Profile variant included in previous versions of this case study).
 
 ---
 
