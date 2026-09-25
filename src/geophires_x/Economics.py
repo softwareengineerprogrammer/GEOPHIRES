@@ -11,7 +11,8 @@ import geophires_x.Model as Model
 from geophires_x import EconomicsSam
 from geophires_x.EconomicsSam import calculate_sam_economics
 from geophires_x.EconomicsSamCalculations import SamEconomicsCalculations
-from geophires_x.EconomicsUtils import BuildPricingModel, wacc_output_parameter, nominal_discount_rate_parameter, \
+from geophires_x.EconomicsUtils import BuildPricingModel, end_price_or_max, wacc_output_parameter, \
+    nominal_discount_rate_parameter, \
     real_discount_rate_parameter, after_tax_irr_parameter, moic_parameter, project_vir_parameter, \
     project_payback_period_parameter, inflation_cost_during_construction_output_parameter, \
     interest_during_construction_output_parameter, total_capex_parameter_output_parameter, \
@@ -2837,10 +2838,10 @@ class Economics:
                                                      " adjustment factor = 1.")
                                 ParameterToModify.value = 1.0
 
-            if self.HeatStartPrice.value > self.HeatEndPrice.value:
-                s = f'{self.HeatStartPrice.Name} ({self.HeatStartPrice.quantity()}) cannot be ' \
-                    f'greater than {self.HeatEndPrice.Name} ({self.HeatEndPrice.quantity()}).  ' \
-                    f'GEOPHIRES will assume {self.HeatStartPrice.Name} is equal to {self.HeatEndPrice.Name}.'
+            if self.HeatEndPrice.Provided and self.HeatStartPrice.value > self.HeatEndPrice.value:
+                s = f'{self.HeatStartPrice.Name} ({self.HeatStartPrice.quantity()}) is greater than ' \
+                    f'{self.HeatEndPrice.Name} ({self.HeatEndPrice.quantity()}), which caps the heat price. ' \
+                    f'GEOPHIRES will use {self.HeatEndPrice.Name} for every year of the project.'
                 model.logger.warning(s)
 
             if self.econmodel.value == EconomicModel.SAM_SINGLE_OWNER_PPA:
@@ -3816,19 +3817,19 @@ class Economics:
 
         # build the price models
         self.ElecPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                 self.ElecStartPrice.value, self.ElecEndPrice.value,
+                                                 self.ElecStartPrice.value, end_price_or_max(self.ElecEndPrice),
                                                  self.ElecEscalationStart.value, self.ElecEscalationRate.value,
                                                  self.PTCElecPrice)
         self.HeatPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                 self.HeatStartPrice.value, self.HeatEndPrice.value,
+                                                 self.HeatStartPrice.value, end_price_or_max(self.HeatEndPrice),
                                                  self.HeatEscalationStart.value, self.HeatEscalationRate.value,
                                                  self.PTCHeatPrice)
         self.CoolingPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                    self.CoolingStartPrice.value, self.CoolingEndPrice.value,
+                                                    self.CoolingStartPrice.value, end_price_or_max(self.CoolingEndPrice),
                                                     self.CoolingEscalationStart.value, self.CoolingEscalationRate.value,
                                                     self.PTCCoolingPrice)
         self.CarbonPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                   self.CarbonStartPrice.value, self.CarbonEndPrice.value,
+                                                   self.CarbonStartPrice.value, end_price_or_max(self.CarbonEndPrice),
                                                    self.CarbonEscalationStart.value, self.CarbonEscalationRate.value,
                                                    self.PTCCarbonPrice)
 
