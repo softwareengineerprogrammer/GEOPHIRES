@@ -192,7 +192,7 @@ class CylindricalReservoir(Reservoir):
 
         model.logger.info(f'complete {str(__class__)}: {sys._getframe().f_code.co_name}')
 
-    @lru_cache(maxsize=512)
+    @lru_cache(maxsize=256)
     def Calculate(self, model: Model) -> None:
         """
         The Calculate function is where all the calculations are done.
