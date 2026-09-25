@@ -2,7 +2,7 @@ import sys, math
 import numpy as np
 import geophires_x.Model as Model
 from .Economics import Economics, calculate_cost_of_one_vertical_well, BuildPTCModel, CalculateRevenue, CalculateFinancialPerformance, CalculateLCOELCOHLCOC
-from .EconomicsUtils import BuildPricingModel
+from .EconomicsUtils import BuildPricingModel, end_price_or_max
 from .OptionList import Configuration, WellDrillingCostCorrelation, PlantType
 from geophires_x.Parameter import floatParameter
 from geophires_x.Units import *
@@ -400,19 +400,19 @@ class SBTEconomics(Economics):
 
         # build the price models
         self.ElecPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                           self.ElecStartPrice.value, self.ElecEndPrice.value,
+                                                           self.ElecStartPrice.value, end_price_or_max(self.ElecEndPrice),
                                                            self.ElecEscalationStart.value, self.ElecEscalationRate.value,
                                                            self.PTCElecPrice)
         self.HeatPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                           self.HeatStartPrice.value, self.HeatEndPrice.value,
+                                                           self.HeatStartPrice.value, end_price_or_max(self.HeatEndPrice),
                                                            self.HeatEscalationStart.value, self.HeatEscalationRate.value,
                                                            self.PTCHeatPrice)
         self.CoolingPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                              self.CoolingStartPrice.value, self.CoolingEndPrice.value,
+                                                              self.CoolingStartPrice.value, end_price_or_max(self.CoolingEndPrice),
                                                               self.CoolingEscalationStart.value, self.CoolingEscalationRate.value,
                                                               self.PTCCoolingPrice)
         self.CarbonPrice.value = BuildPricingModel(model.surfaceplant.plant_lifetime.value,
-                                                             self.CarbonStartPrice.value, self.CarbonEndPrice.value,
+                                                             self.CarbonStartPrice.value, end_price_or_max(self.CarbonEndPrice),
                                                              self.CarbonEscalationStart.value, self.CarbonEscalationRate.value,
                                                              self.PTCCarbonPrice)
 

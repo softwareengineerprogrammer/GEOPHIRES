@@ -708,7 +708,7 @@ class SBTReservoir(CylindricalReservoir):
         model.logger.info(f'complete {str(__class__)}: {sys._getframe().f_code.co_name}')
 
 
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=256)
     #@profile
     def Calculate_Coaxial(self, model):
         """

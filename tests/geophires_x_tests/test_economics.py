@@ -228,3 +228,32 @@ class EconomicsTestCase(BaseTestCase):
             m.Calculate()
 
         return m
+
+    def test_unprovided_ending_sale_price_does_not_cap_escalation(self):
+        def input_for_elec_prices(params) -> GeophiresInputParameters:
+            return GeophiresInputParameters(
+                from_file_path=self._get_test_file_path('../examples/example1.txt'),
+                params=dict(
+                    {
+                        'Starting Electricity Sale Price': 0.10,
+                        'Electricity Escalation Rate Per Year': 0.01,
+                        'Electricity Escalation Start Year': 0,
+                        'Plant Lifetime': 10,
+                    },
+                    **params,
+                ),
+            )
+
+        def elec_prices(params) -> list:
+            cashflow = (
+                GeophiresXClient()
+                .get_geophires_result(input_for_elec_prices(params))
+                .result['REVENUE & CASHFLOW PROFILE']
+            )
+            return [row[1] for row in cashflow[2:]]
+
+        prices_unprovided = elec_prices({})
+        prices_explicit_max = elec_prices({'Ending Electricity Sale Price': 1.0})
+
+        self.assertEqual(prices_explicit_max, prices_unprovided)
+        self.assertGreater(prices_unprovided[-1], prices_unprovided[0])
