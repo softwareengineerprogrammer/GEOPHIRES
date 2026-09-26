@@ -445,6 +445,12 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
 
     orc_unit_count = _get_fpc5_orc_unit_count(max_total_generation_mwe)
 
+    min_dscr_year, min_dscr = _get_min_dscr(result)
+    salvage_value_musd = _get_final_year_salvage_value_musd(result)
+    reservoir_heat_content_negative_from_year, final_year_pct_total_heat_mined = _get_reservoir_heat_content_values(
+        result
+    )
+
     return {
         # Economic Results
         'lcoe_usd_per_mwh': round(
@@ -453,9 +459,16 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'lppa_usd_per_mwh': round(_get_levelized_ppa_price_usd_per_mwh(result), 1),
         'irr_pct': sig_figs(econ['After-tax IRR']['value'], 3),
         'operations_year_of_irr': econ['Project lifetime']['value'],
-        'npv_musd': sig_figs(econ['Project NPV']['value'], 3),
+        'npv_musd': round(econ['Project NPV']['value'], 1),
         'project_moic': sig_figs(econ['Project MOIC']['value'], 3),
         'project_vir': sig_figs(econ['Project VIR=PI=PIR']['value'], 3),
+        'real_discount_rate_pct': f"{econ['Real Discount Rate']['value']:g}",
+        'nominal_discount_rate_pct': f"{econ['Nominal Discount Rate']['value']:.1f}",
+        'project_lifetime_yr': econ['Project lifetime']['value'],
+        'min_dscr': f'{min_dscr:.2f}',
+        'min_dscr_year': min_dscr_year,
+        'salvage_value_musd': f'{salvage_value_musd:,.0f}',
+        'salvage_value_pct_of_total_capex': f'{salvage_value_musd / total_capex_musd * 100.0:.0f}',
         # Capital Costs
         'drilling_costs_musd': round(sig_figs(_drilling_costs_musd(result), 3)),
         'drilling_costs_per_well_musd': sig_figs(_drilling_costs_per_well_musd(result), 3),
@@ -465,7 +478,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
             _q(r['CAPITAL COSTS (M$)']['Surface power plant costs']).to('GUSD').magnitude, 3
         ),
         'field_gathering_cost_musd': round(sig_figs(field_gathering_cost_musd, 3)),
-        'field_gathering_cost_pct_occ': round(sig_figs(field_gathering_cost_pct_occ, 1)),
+        'field_gathering_cost_pct_occ': round(field_gathering_cost_pct_occ, 1),
         'occ_gusd': sig_figs(occ_q.to('GUSD').magnitude, 3),
         'total_capex_gusd': sig_figs(total_capex_q.to('GUSD').magnitude, 3),
         'capex_usd_per_kw': round(
@@ -485,6 +498,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
             )
         ),
         'interconnection_share_of_total_capex_musd': round(sig_figs(interconnection_share_of_total_capex_musd, 3)),
+        'occ_usd_per_kw': round(sig_figs((occ_q / max_net_generation_q).to('USD / kW').magnitude, 2)),
         'capex_usd_per_kw_excluding_interconnection': round(
             sig_figs(
                 (
@@ -500,14 +514,14 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
             sig_figs(_surface_power_plant_pct_of_wellfield_and_plant_capex(result), 2)
         ),
         # Operating Costs
-        'transmission_cost_musd_per_yr': sig_figs(transmission_cost_musd_per_yr, 3),
+        'transmission_cost_musd_per_yr': f'{sig_figs(transmission_cost_musd_per_yr, 3):g}',
         # Technical & Engineering Results
         'bht_temp_degc': r['RESERVOIR PARAMETERS']['Bottom-hole temperature']['value'],
         'min_net_generation_mwe': round(sig_figs(min_net_generation_mwe, 3)),
         'avg_net_generation_mwe': round(sig_figs(avg_net_generation_mwe, 3)),
         'max_net_generation_mwe': round(sig_figs(max_net_generation_mwe, 3)),
         'max_total_generation_mwe': round(sig_figs(max_total_generation_mwe, 3)),
-        'two_year_avg_net_power_mwe_per_production_well': sig_figs(two_year_avg_net_power_mwe_per_production_well, 2),
+        'two_year_avg_net_power_mwe_per_production_well': round(two_year_avg_net_power_mwe_per_production_well, 1),
         'heat_to_power_conversion_efficiency_pct': sig_figs(
             _q(surf_equip_sim['Heat to Power Conversion Efficiency']).to('percent').magnitude, 3
         ),
@@ -538,6 +552,8 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'initial_production_temperature_degc_precise': round(initial_production_temperature_degc, 1),
         'first_cycle_peak_year': first_cycle_peak_year,
         'first_cycle_peak_temperature_degc': round(first_cycle_peak_temperature_degc, 1),
+        'reservoir_heat_content_negative_from_year': reservoir_heat_content_negative_from_year,
+        'final_year_pct_total_heat_mined': f'{final_year_pct_total_heat_mined:.1f}',
         # TODO port all input and result values here instead of hardcoding them in the template
     }
 
@@ -547,6 +563,13 @@ _CURTAILMENT_5PCT_SCENARIO = 'Curtailment (5% flat derate)'
 _CURTAILMENT_10PCT_SCENARIO = 'Curtailment (10% flat derate)'
 _REDUCED_REDRILLING_SCENARIO = 'Reduced redrilling (greater fracture height)'
 _REDUCED_REDRILLING_FRACTURE_HEIGHT_MULTIPLIER = 1.2
+_PREVIOUS_VERSION_PPA_TERMS_SCENARIO = 'February 2026 Update PPA terms'
+_PPA_TERMS_PARAM_NAMES = (
+    'Starting Electricity Sale Price',
+    'Electricity Escalation Rate Per Year',
+    'Ending Electricity Sale Price',
+    'Electricity Escalation Start Year',
+)
 
 
 def get_fpc5_scenario_values(
@@ -554,16 +577,20 @@ def get_fpc5_scenario_values(
     result: GeophiresXResult,
     scenario_results: dict[str, GeophiresXResult] | None = None,
     flow_rate_parametric_rows: list[FlowRateParametricRow] | None = None,
+    previous_input_params: GeophiresInputParameters | None = None,
 ) -> dict[str, Any]:
     """
     :param scenario_results: Results of the scenarios returned by get_fpc5_scenario_input_parameters, by scenario
         name; simulated if not provided.
     :param flow_rate_parametric_rows: Production flow rate parametric results; loaded from
         FPC5_FLOW_RATE_PARAMETRIC_CSV_PATH if not provided.
+    :param previous_input_params: Input parameters of the previous version of the case study; see
+        get_fpc5_scenario_input_parameters.
     :return: Template values for scenario results cited in the documentation narrative
-    :raises ValueError: if the reduced redrilling scenario no longer supports its description in the documentation
+    :raises ValueError: if the reduced redrilling scenario or the previous version PPA terms scenario no longer
+        supports its description in the documentation
     """
-    scenario_input_params = get_fpc5_scenario_input_parameters(input_params, result)
+    scenario_input_params = get_fpc5_scenario_input_parameters(input_params, result, previous_input_params)
     if scenario_results is None:
         scenario_results = get_scenario_results(input_params, scenario_input_params)
 
@@ -593,6 +620,9 @@ def get_fpc5_scenario_values(
     return {
         **_get_reduced_redrilling_scenario_values(
             params, result, scenario_input_params, scenario_results[_REDUCED_REDRILLING_SCENARIO]
+        ),
+        **_get_previous_version_ppa_terms_scenario_values(
+            result, scenario_results[_PREVIOUS_VERSION_PPA_TERMS_SCENARIO]
         ),
         'itc_rate_excluding_interconnection_pct': f'{itc_rate_excluding_interconnection * 100:.2f}',
         'itc_rate_excluding_interconnection_pct_1dp': f'{itc_rate_excluding_interconnection * 100:.1f}',
@@ -625,16 +655,25 @@ def get_fpc5_scenario_values(
 
 
 def get_fpc5_scenario_input_parameters(
-    input_params: GeophiresInputParameters, result: GeophiresXResult
+    input_params: GeophiresInputParameters,
+    result: GeophiresXResult,
+    previous_input_params: GeophiresInputParameters | None = None,
 ) -> dict[str, dict[str, Any]]:
     """
-    :return: Input parameter overrides for the single-input scenarios cited in the documentation narrative, by
-        scenario name. The ITC scenario applies the rate to total installed cost that removes the interconnection cost
-        (including its share of inflation and interest during construction) from the ITC basis. The curtailment
-        scenarios reduce the utilization factor by 5% and 10% as flat derates. Values are rounded as in the
-        sensitivity analysis. The reduced redrilling scenario increases fracture height, and with it fracture surface
-        area and stimulation cost per stimulated well, to extend the thermal plateau.
+    :param previous_input_params: Input parameters of the previous version of the case study, from which the previous
+        version PPA terms scenario takes its PPA parameters; loaded from the previous versions directory if not
+        provided.
+    :return: Input parameter overrides for the scenarios cited in the documentation narrative, by scenario name. The
+        ITC scenario applies the rate to total installed cost that removes the interconnection cost (including its
+        share of inflation and interest during construction) from the ITC basis. The curtailment scenarios reduce the
+        utilization factor by 5% and 10% as flat derates. Values are rounded as in the sensitivity analysis. The
+        reduced redrilling scenario increases fracture height, and with it fracture surface area and stimulation cost
+        per stimulated well, to extend the thermal plateau. The previous version PPA terms scenario applies the
+        previous version's PPA starting price, escalation rate, ending price (cap), and escalation start year.
     """
+    if previous_input_params is None:
+        previous_input_params = _get_fpc5_previous_version(_PROJECT_ROOT)[0]
+
     params = _get_input_parameters_dict(input_params)
     itc_rate = float(params['Investment Tax Credit Rate'])
     total_capex_musd = _q(result.result['CAPITAL COSTS (M$)']['Total CAPEX']).to('MUSD').magnitude
@@ -654,7 +693,21 @@ def get_fpc5_scenario_input_parameters(
                 float(params['Fracture Height']) * _REDUCED_REDRILLING_FRACTURE_HEIGHT_MULTIPLIER, 1
             )
         },
+        _PREVIOUS_VERSION_PPA_TERMS_SCENARIO: _get_ppa_terms_input_parameters(previous_input_params),
     }
+
+
+def _get_ppa_terms_input_parameters(input_params: GeophiresInputParameters) -> dict[str, int | float]:
+    """
+    :raises ValueError: if the input parameters do not set all PPA terms explicitly, in which case the scenario would
+        inherit the current version's value for the missing term rather than the (default) value it had
+    """
+    params = _get_input_parameters_dict(input_params)
+    missing_param_names = [it for it in _PPA_TERMS_PARAM_NAMES if it not in params]
+    if len(missing_param_names) > 0:
+        raise ValueError(f'PPA terms not set in previous version input parameters: {missing_param_names}')
+
+    return {it: int(float(params[it])) if is_int(params[it]) else float(params[it]) for it in _PPA_TERMS_PARAM_NAMES}
 
 
 def _number_of_production_wells(result: GeophiresXResult) -> int:
@@ -776,6 +829,60 @@ def _get_levelized_ppa_price_usd_per_mwh(result: GeophiresXResult) -> float:
     raise ValueError(f'{lppa_row_name} not found in SAM cash flow profile.')
 
 
+def _get_sam_cash_flow_operating_year_values(result: GeophiresXResult, row_name: str) -> dict[int, float]:
+    """
+    :return: Values of the first SAM cash flow profile row with the given name, by operating year (1-based);
+        construction years and year 0 are excluded.
+    """
+    cash_flow = result.result.get('SAM CASH FLOW PROFILE') or []
+    if len(cash_flow) == 0:
+        raise ValueError('SAM cash flow profile not found in result.')
+
+    year_headers = cash_flow[0][1:]
+    for row in cash_flow[1:]:
+        if row and row[0] == row_name:
+            values_by_year = {}
+            for year_header, value in zip(year_headers, row[1:]):
+                year = int(str(year_header).replace('Year', '', 1).strip())
+                if year >= 1:
+                    values_by_year[year] = float(value)
+
+            return values_by_year
+
+    raise ValueError(f'{row_name} not found in SAM cash flow profile.')
+
+
+def _get_min_dscr(result: GeophiresXResult) -> tuple[int, float]:
+    """
+    :return: Operating year and value of the minimum pre-tax debt service coverage ratio
+    """
+    dscr_by_year = _get_sam_cash_flow_operating_year_values(result, 'DSCR (pre-tax)')
+    min_dscr_year = min(dscr_by_year, key=lambda year: dscr_by_year[year])
+    return min_dscr_year, dscr_by_year[min_dscr_year]
+
+
+def _get_final_year_salvage_value_musd(result: GeophiresXResult) -> float:
+    salvage_by_year = _get_sam_cash_flow_operating_year_values(result, 'Salvage value ($)')
+    return salvage_by_year[max(salvage_by_year)] / 1e6
+
+
+def _get_reservoir_heat_content_values(result: GeophiresXResult) -> tuple[int | None, float]:
+    """
+    GEOPHIRES computes remaining reservoir heat content as initial heat content minus cumulative heat extracted, which
+    redrilling does not reset.
+
+    :return: First operating year in which the remaining reservoir heat content in the annual profile is negative (None
+        if it is not negative in any year), and the percentage of total heat mined in the final year
+    """
+    profile = result.heat_electricity_extraction_generation_profile
+    year_idx = profile[0].index('YEAR')
+    heat_content_idx = profile[0].index('RESERVOIR HEAT CONTENT (10^15 J)')
+    pct_mined_idx = profile[0].index('PERCENTAGE OF TOTAL HEAT MINED (%)')
+    negative_heat_content_years = [int(row[year_idx]) for row in profile[1:] if float(row[heat_content_idx]) < 0]
+    first_negative_year = negative_heat_content_years[0] if len(negative_heat_content_years) > 0 else None
+    return first_negative_year, float(profile[-1][pct_mined_idx])
+
+
 def _get_annual_production_temperature_profile_degc(result: GeophiresXResult) -> tuple[list[int], list[float]]:
     profile = result.power_generation_profile
     year_idx = profile[0].index('YEAR')
@@ -868,6 +975,38 @@ def _get_reduced_redrilling_scenario_values(
     }
 
 
+def _get_previous_version_ppa_terms_scenario_values(
+    result: GeophiresXResult, scenario_result: GeophiresXResult
+) -> dict[str, Any]:
+    """
+    :raises ValueError: if the scenario no longer supports its description in the documentation, which states that
+        the previous version's (lower) PPA terms reduce the IRR and the LCOE
+    """
+    base_irr_pct = result.result['ECONOMIC PARAMETERS']['After-tax IRR']['value']
+    econ = scenario_result.result['ECONOMIC PARAMETERS']
+    irr_pct = econ['After-tax IRR']['value']
+    npv_musd = econ['Project NPV']['value']
+    base_lcoe_usd_per_mwh = _lcoe_usd_per_mwh(result)
+    lcoe_usd_per_mwh = _lcoe_usd_per_mwh(scenario_result)
+    if irr_pct >= base_irr_pct or lcoe_usd_per_mwh >= base_lcoe_usd_per_mwh:
+        raise ValueError(
+            f'The {_PREVIOUS_VERSION_PPA_TERMS_SCENARIO} scenario yields an IRR of {irr_pct}% (base case: '
+            f'{base_irr_pct}%) and LCOE of ${lcoe_usd_per_mwh:.1f}/MWh (base case: ${base_lcoe_usd_per_mwh:.1f}/MWh); '
+            f'update its description in the case study documentation.'
+        )
+
+    return {
+        'previous_version_ppa_terms_irr_pct': f'{irr_pct:.1f}',
+        'previous_version_ppa_terms_npv_display': _get_signed_musd_display(npv_musd),
+        'previous_version_ppa_terms_lcoe_usd_per_mwh': f'{lcoe_usd_per_mwh:.1f}',
+    }
+
+
+def _get_signed_musd_display(value_musd: float) -> str:
+    rounded_musd = round(value_musd)
+    return f'-${abs(rounded_musd):,}M' if rounded_musd < 0 else f'${rounded_musd:,}M'
+
+
 def _get_years_display(years: list[int]) -> str:
     return f'year{"" if len(years) == 1 else "s"} {_get_list_display(years)}'
 
@@ -888,6 +1027,104 @@ def _get_list_display(items: list[Any]) -> str:
 # Previous version of the case study documented in the Previous Versions section (last updated 2026-07-03). The files
 # are copies of tests/examples/Fervo_Project_Cape-5.{txt,out} as of that version.
 _FPC5_PREVIOUS_VERSION_FILE_STEM = 'Fervo_Project_Cape-5_2026-07'
+
+_FPC5_PREVIOUS_VERSION_LABEL = 'February 2026 Update'
+_FPC5_CURRENT_VERSION_LABEL = 'September 2026 Update'
+
+# Rationale for each input parameter whose value differs from the previous version, shown in the Previous Versions
+# input changes table. See the input file comments for full details and citations.
+_FPC5_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME: dict[str, str] = {
+    'Inflation Rate': (
+        'Updated for 2026 inflation: US CPI-U was 3.4% year over year in July 2026, with core at 2.5% (BLS, 2026b). '
+        'The February 2026 Update used December 2025 inflation.'
+    ),
+    'Starting Electricity Sale Price': (
+        'Midpoint of the $100–130/MWh range Fervo reports for contracts under negotiation (Fervo Energy, 2026f), '
+        'replacing 2024b ATB Geysers–Sacramento pricing.'
+    ),
+    'Electricity Escalation Rate Per Year': (
+        'Linear equivalent of a 1.5% per year compounding escalator on the new starting price (CTVC, 2025), '
+        'replacing an escalator calibrated to reach $100/MWh in project year 11.'
+    ),
+    'Ending Electricity Sale Price': (
+        'Caps escalation at the operating year 15 price, holding the price flat after a 15-year PPA term. '
+        'The February 2026 Update had no effective cap.'
+    ),
+    'Electricity Escalation Start Year': (
+        'First escalation step in the second operating year, matching a PPA that escalates from the first '
+        'anniversary of commercial operation.'
+    ),
+    'Construction Years': (
+        "A SOAK developer is modeled with one fewer year than the 5-year FOAK timeline, informed by Fervo's Phase I "
+        'build pace and rig capacity (Fervo Energy, 2026e; 2026f).'
+    ),
+    'Construction CAPEX Schedule': (
+        'The first two years of the 5-year DOE-ATB hybrid schedule are merged to match the 4-year construction period.'
+    ),
+    'Exploration Capital Cost': (
+        'Re-derived from the 2024b ATB exploration assumption of 5 full-size wells at the new per-well drilling cost.'
+    ),
+    'Well Drilling and Completion Capital Cost Adjustment Factor': (
+        "Geometric mean of the ATB-aligned baseline (0.9) and Fervo's best demonstrated Phase I well (0.58), now "
+        'applied to both the vertical section and the lateral. The February 2026 Update applied 0.9 to the vertical '
+        'section only.'
+    ),
+    'All-in Nonvertical Drilling Costs': (
+        'Per-meter lateral cost from the 2025 NREL drilling cost curve at 3.06 km (Akindipe and Witter, 2025), so the '
+        'lateral is costed explicitly.'
+    ),
+    'Multilaterals Cased': (
+        "Fervo's laterals are cased and cemented for plug-and-perf stimulation (Norbeck et al., 2024)."
+    ),
+    'Reservoir Stimulation Capital Cost per Fracture Surface Area': (
+        'Stimulation is priced per unit fracture area so that cost tracks fracture count and geometry; equivalent to '
+        "the February 2026 Update's $4M per 150-fracture well."
+    ),
+    'Reservoir Stimulation Capital Cost per Production Well': (
+        'Production wells are stimulated and costed from the per-area input.'
+    ),
+    'Reservoir Stimulation Capital Cost per Injection Well': 'Replaced by the per-area input.',
+    'One-time Flat License Fees Etc': (
+        'Grid interconnection cost of $500/kW for 500 MWe, based on PacifiCorp cluster-study estimates for '
+        'geothermal requests in Beaver and Millard Counties (Seel et al., 2026). Not included in the February 2026 '
+        'Update.'
+    ),
+    'Annual License Fees Etc': (
+        "Long-term firm point-to-point transmission service for 500 MW at PacifiCorp's 2017 tariff escalated to 2026 "
+        '(PacifiCorp, 2017). Not included in the February 2026 Update.'
+    ),
+    'Reservoir Depth': (
+        'Depth at which the reservoir reaches about 221℃ (430℉), the Fervo 3.0 design point for Phase II (Fervo '
+        'Energy, 2026f; 2026g). 2.68 km corresponded to the roughly 400℉ Phase I design.'
+    ),
+    'Number of Fractures per Stimulated Well': (
+        '18 stages for the 7,500 ft 3.0 lateral instead of 12 for a 5,000 ft lateral, at the same stage length.'
+    ),
+    'Number of Production Wells': (
+        'Re-sized for the 3.0 design to meet the 500 MWe PPA minimum within the nameplate capacity of 11 Gen 2 ORC '
+        'units, with about 27% more power per well at 430℉ (Fervo Energy, 2026f).'
+    ),
+    'Nonvertical Length per Multilateral Section': (
+        'Lateral length of the Fervo 3.0 design (Fervo Energy, 2026f; 2026g), up from the 5,000 ft Phase I laterals.'
+    ),
+    'Well Geometry Configuration': (
+        'L configuration (vertical section plus one lateral), required to cost the lateral explicitly.'
+    ),
+    'Number of Multilateral Sections per Vertical Section': (
+        'One lateral per well, costed explicitly instead of folded into the vertical well cost.'
+    ),
+    'Number of Multilateral Sections': 'Replaced by Number of Multilateral Sections per Vertical Section.',
+    'Production Well Diameter': (
+        'Inner diameter of the 8⅝ inch casing Fervo disclosed for the 3.0 design (Fervo Energy, 2026f; 2026g), '
+        'replacing the inferred 9⅝ inch casing.'
+    ),
+    'Injection Well Diameter': 'Same as production wells.',
+    'Injectivity Index': (
+        'Derated to yield a parasitic load of at least 20% of net generation, between the 15–20% goal and the 25–35% '
+        'observed in Phase I operations (Norbeck, 2026).'
+    ),
+    'Productivity Index': 'Derated in proportion with the Injectivity Index.',
+}
 
 
 def _get_fpc5_previous_version(project_root: Path) -> tuple[GeophiresInputParameters, GeophiresXResult]:
@@ -1199,14 +1436,20 @@ def generate_fpc5_previous_version_input_changes_table_md(
 ) -> str:
     """
     :return: Markdown table of input parameters whose values differ between the previous version and this version,
-        including parameters that were added or removed
+        including parameters that were added or removed, with the rationale for each change
+    :raises ValueError: if a changed parameter has no rationale in
+        _FPC5_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME
     """
     previous_params = _get_non_comment_input_parameters_dict(previous_input_params)
     params = _get_non_comment_input_parameters_dict(input_params)
 
     param_names = list(params.keys()) + [it for it in previous_params if it not in params]
 
-    table_md = '| Parameter | Previous Version | This Version |\n|---|---|---|\n'
+    table_md = (
+        f'| Parameter | {_FPC5_PREVIOUS_VERSION_LABEL} | {_FPC5_CURRENT_VERSION_LABEL} | Rationale |\n'
+        f'|---|---|---|---|\n'
+    )
+    params_missing_rationale = []
     for param_name in param_names:
         previous_value_display = _get_version_comparison_input_value_display(
             param_name, previous_params.get(param_name)
@@ -1215,7 +1458,18 @@ def generate_fpc5_previous_version_input_changes_table_md(
         if previous_value_display == value_display:
             continue
 
-        table_md += f'| {param_name} | {previous_value_display} | {value_display} |\n'
+        rationale = _FPC5_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME.get(param_name)
+        if rationale is None:
+            params_missing_rationale.append(param_name)
+            continue
+
+        table_md += f'| {param_name} | {previous_value_display} | {value_display} | {rationale} |\n'
+
+    if len(params_missing_rationale) > 0:
+        raise ValueError(
+            f'No rationale for changed input parameters {params_missing_rationale}; add them to '
+            f'_FPC5_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME.'
+        )
 
     return table_md.strip()
 
@@ -1227,7 +1481,11 @@ def generate_fpc5_previous_version_result_changes_table_md(
     :return: Markdown table comparing key results of the previous version and this version
     """
     return _get_result_comparison_table_md(
-        previous_result, result, 'Previous Version', 'This Version', _FPC5_VERSION_COMPARISON_RESULT_METRICS
+        previous_result,
+        result,
+        _FPC5_PREVIOUS_VERSION_LABEL,
+        _FPC5_CURRENT_VERSION_LABEL,
+        _FPC5_VERSION_COMPARISON_RESULT_METRICS,
     )
 
 
@@ -1251,7 +1509,7 @@ def generate_fervo_project_cape_5_md(
     template_values = {
         **get_fpc5_input_parameter_values(input_params, result),
         **result_values,
-        **get_fpc5_scenario_values(input_params, result, scenario_results),
+        **get_fpc5_scenario_values(input_params, result, scenario_results, previous_input_params=previous_version[0]),
     }
 
     for template_key, md_method in {

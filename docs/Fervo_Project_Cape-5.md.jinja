@@ -30,7 +30,7 @@ Key results include **LCOE =** **{{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }}**, **IRR 
 The September 2026 Update aligns the case study's subsurface design with the Fervo 3.0 well design disclosed for
 Cape Station Phase II, models lateral drilling, grid interconnection, and transmission service costs explicitly, and
 updates PPA pricing to Fervo's reported range for contracts under negotiation (Fervo Energy, 2026f).
-See the [Previous Versions section](#previous-versions-section) for a summary of changes.
+See the [Previous Versions section](#previous-versions-section) for a summary of changes from the February 2026 Update.
 
 [Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) to
 interactively explore the case study example in the GEOPHIRES web interface.
@@ -92,8 +92,9 @@ levelized PPA price of {{ '$' ~ lppa_usd_per_mwh ~ '/MWh' }} (nominal) with the 
 The resulting after-tax IRR of {{ irr_pct ~ '%' }} is read as evidence that a Second-of-a-Kind deployment can clear the
 premium over remaining technology risk that a developer would require.
 The finding is contingent on current clean firm power pricing rather than on cost assumptions alone: with the
-previous version's PPA terms ($95/MWh starting price, $0.57/MWh annual escalation, no cap) and all other inputs
-unchanged, the after-tax IRR is approximately 15%.
+February 2026 Update's PPA terms ($95/MWh starting price, $0.57/MWh annual escalation, no cap) and all other inputs
+unchanged, the after-tax IRR is {{ previous_version_ppa_terms_irr_pct ~ '%' }}
+and the NPV is {{ previous_version_ppa_terms_npv_display }}.
 An illustrative example of selection within a range is Fracture Height, which was set to yield an effective fracture
 surface area consistent with the ResFrac simulation results in Singh et al. (2025).
 
@@ -112,7 +113,7 @@ figures on a per-well basis; on a like-for-like basis, it sits between Fervo's d
 unadjusted industry baseline.
 This reflects a developer who capitalizes on established industry knowledge to skip the First-of-a-Kind (FOAK)
 premiums but has not yet achieved the fully optimized learning rates of a mature Nth-of-a-Kind (NOAK) operator.
-Note that the previous version of this case study, at $4.65M per well, corresponded to an effective factor of about
+Note that the February 2026 Update, at $4.65M per well, corresponded to an effective factor of about
 0.58 once the lateral is accounted for, i.e. Fervo's best demonstrated well rather than a SOAK assumption.
 
 ### Intended Use Cases
@@ -206,7 +207,7 @@ This ratio is encoded by the case study's `Number of Injection Wells per Product
 
 The Singh et al. paper models separate upper and lower benches.
 GEOPHIRES does not support wells with different depths, so the case study uses a single `Reservoir Depth`.
-Previous versions set it to 2.68 km, an approximate average depth between the upper and lower benches of the Phase I
+The February 2026 Update set it to 2.68 km, an approximate average depth between the upper and lower benches of the Phase I
 design.
 The current version sets it to 3.06 km, the depth at which the segmented gradient reaches the 430℉ (221℃) average
 reservoir temperature of the Fervo 3.0 well design used for Phase II (Fervo Energy, 2026f; 2026g).
@@ -296,7 +297,7 @@ and in the web interface under the Cash Flow tab.
 | <span title="Levelized Cost of Energy" class="metric-tooltip-text">LCOE</span> | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} | \$80/MWh      | Horne et al, 2025. |
 | <span title="Levelized PPA price (nominal); see Economic Parameters for starting price, escalation, and cap" class="metric-tooltip-text">Levelized PPA Price</span> | {{ '$' ~ lppa_usd_per_mwh ~ '/MWh' }} | \$100–130/MWh | Price range Fervo reports for contracts under negotiation (Fervo Energy, 2026f). See the [PPA price discussion in Sensitivity Analysis](#impact-of-ppa-price-on-lcoe) for the relationship between PPA price and LCOE. |
 | <span title="Internal Rate of Return" class="metric-tooltip-text">After-tax IRR</span> <br/> (at Year {{ operations_year_of_irr }} of Operations) | {{ irr_pct ~ '%' }} | 15–25% | Typical levered returns for energy projects |
-| <span title="Project Net Present Value" class="metric-tooltip-text">NPV</span>  | {{ '$' ~ npv_musd ~ 'M' }} | >$0 | Positive NPVs result in profit  |
+| <span title="Project Net Present Value" class="metric-tooltip-text">NPV</span>  | {{ '$' ~ npv_musd ~ 'M' }} | >$0 | Positive NPVs result in profit. Cash flows are discounted at the {{ real_discount_rate_pct ~ '%' }} real discount rate ({{ nominal_discount_rate_pct ~ '%' }} nominal); see Discount Rate in Economic Parameters. |
 | <span title="aka PI aka Value Investment Ratio (VIR) and Profit Investment Ratio (PIR)" class="metric-tooltip-text">Levered Equity <br/> Profitability Index</span>  | {{ project_vir }} | >1.0 | Calculations greater than 1.0 indicate the future anticipated discounted cash inflows are greater than the anticipated discounted cash outflows.  |
 | <span title="Return on Investment; aka Multiple of Invested Capital (MOIC)" class="metric-tooltip-text">Project ROI</span>  | {{ project_moic }} | | .. N/A  |
 | <span title="Pro-forma cash flow analysis generated by the SAM Single Owner PPA Economic Model" class="metric-tooltip-text">Cash Flow</span>  | [source code](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/main/tests/examples/Fervo_Project_Cape-5.out#L232);<br/>[web interface](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5)[^cash-flow-tab] | | .. N/A  |
@@ -322,7 +323,7 @@ See [GEOPHIRES Economic Outputs documentation](parameters.html#economic-paramete
 | Grid Interconnection Costs | {{ '$' ~ interconnection_cost_musd ~ 'M' }} <br/> ({{ '$' ~ interconnection_cost_usd_per_kw_ppa_capacity ~ '/kW' }}) | $417–$500/kW; <br/> $426/kW | PacifiCorp cluster-study estimates for geothermal interconnection requests in Beaver and Millard Counties, Utah; average for 250–750 MW requests across PacifiCorp, BPA, and Duke (Seel et al., 2026). Entered as `One-time Flat License Fees Etc`; see Economic Parameters. |
 | Overnight Capital Cost | {{ '$' ~ occ_gusd ~ 'B' }}  | | |
 | Total CAPEX | {{ '$' ~ total_capex_gusd ~ 'B' }} <br/> (OCC + interest and inflation during construction) | | |
-| Total CAPEX: $/kW | {{ '$' ~ capex_usd_per_kw ~ '/kW' }} <br/> (based on maximum net electricity generation; {{ '$' ~ capex_usd_per_kw_excluding_interconnection ~ '/kW' }} excluding interconnection) | $7000/kW; $5500/kW; $5000/kW; $4500/kW; $3000–$6000/kW | Cape Station Phase I FOAK overnight capital cost (Fervo Energy, 2026d); Phase II all-in cost target (Fervo Energy, 2026a); McClure, 2024; Horne et al, 2025; Latimer, 2025. Fervo has not disclosed whether its figures include interconnection. |
+| Total CAPEX: $/kW | {{ '$' ~ capex_usd_per_kw ~ '/kW' }} <br/> (based on maximum net electricity generation; {{ '$' ~ capex_usd_per_kw_excluding_interconnection ~ '/kW' }} excluding interconnection; {{ '$' ~ occ_usd_per_kw ~ '/kW' }} overnight capital cost, which excludes inflation and interest during construction) | $7000/kW; $5500/kW; $5000/kW; $4500/kW; $3000–$6000/kW | Cape Station Phase I FOAK overnight capital cost (Fervo Energy, 2026d); Phase II all-in cost target (Fervo Energy, 2026a); McClure, 2024; Horne et al, 2025; Latimer, 2025. Fervo has not disclosed whether its figures include interconnection. |
 {# @formatter:on #}
 
 ### Operating Costs (OPEX)
@@ -339,10 +340,10 @@ See [GEOPHIRES Economic Outputs documentation](parameters.html#economic-paramete
 | Minimum Net Electricity Generation   | {{ min_net_generation_mwe }} MW | 500 MW | The announced 500 MWe capacity (Fervo Energy, 2025b) is interpreted to mean that the PPA penalizes Cape Station if net electricity generation falls below 500 MWe. |
 | Average Net Electricity Generation   | {{ avg_net_generation_mwe }} MW | | |
 | Maximum Net Electricity Generation   | {{ max_net_generation_mwe}} MW | | |
-| Maximum Total Electricity Generation | {{ max_total_generation_mwe }} MW | Upper bound: {{ nameplate_capacity_mw }} MW  | Combined nameplate capacity of {{ orc_unit_count }}×{{ orc_unit_gross_capacity_mw }} MWe Gen 2 ORCs. Phase II comprises eight 50 MWe (net) GeoBlocks (Fervo Energy, 2026a) served by 8×60 MWe Gen 2 ORCs, 3 from Turboden and 5 from Baker Hughes (Turboden, 2025; Jacobs, 2025). This equates to 480 MW gross capacity for Phase II's 400 MW net capacity. At the parasitic load modeled in this case study ({{ parasitic_loss_pct ~ '%' }} of total generation; see Injection Pumping Parasitic Load below), 500 MWe net requires more than {{ (orc_unit_count - 1) * orc_unit_gross_capacity_mw }} MW gross, so an equivalent SOAK 500 MW project would require {{ orc_unit_count }} Gen 2 ORC units. The previous version of this case study assumed 10 units at a parasitic load of about 15%. (Note that the modular Gen 2 ORCs are not individually modeled in this case study, and are assumed to be combined into a single power plant.) |
+| Maximum Total Electricity Generation | {{ max_total_generation_mwe }} MW | Upper bound: {{ nameplate_capacity_mw }} MW  | Combined nameplate capacity of {{ orc_unit_count }}×{{ orc_unit_gross_capacity_mw }} MWe Gen 2 ORCs. Phase II comprises eight 50 MWe (net) GeoBlocks (Fervo Energy, 2026a) served by 8×60 MWe Gen 2 ORCs, 3 from Turboden and 5 from Baker Hughes (Turboden, 2025; Jacobs, 2025). This equates to 480 MW gross capacity for Phase II's 400 MW net capacity. At the parasitic load modeled in this case study ({{ parasitic_loss_pct ~ '%' }} of total generation; see Pumping Parasitic Load below), 500 MWe net requires more than {{ (orc_unit_count - 1) * orc_unit_gross_capacity_mw }} MW gross, so an equivalent SOAK 500 MW project would require {{ orc_unit_count }} Gen 2 ORC units. The February 2026 Update assumed 10 units at a parasitic load of about 15%. (Note that the modular Gen 2 ORCs are not individually modeled in this case study, and are assumed to be combined into a single power plant.) |
 | 2-year Average Net Power Production per Production Well | {{ two_year_avg_net_power_mwe_per_production_well }} MW | 7.6–11.5 MW; <br/> 15 MW (gross) | Figures 4 and 12 (Singh et al., 2025); gross power per production well for the Fervo 3.0 well design (Fervo Energy, 2026g). The case study value is net of pumping parasitic load, and the Fervo figure appears to require flow rates above the {{ production_flow_rate_kg_per_s_display }} kg/s per well modeled in this case study. |
 | Heat to Power Conversion Efficiency  | {{ heat_to_power_conversion_efficiency_pct ~ '%' }} | 19.5% (Likely omits internal plant parasitic loads, such as condenser fans, which GEOPHIRES explicitly accounts for.) | DeGolyer and MacNaughton, 2024. |
-| Injection Pumping Parasitic Load <br/> ({Average Pumping Power}/{Average Total Electricity Generation}) | {{ parasitic_loss_pct ~ '%' }} <br/> ({{ initial_pumping_power_pct_of_net ~ '%' }} of initial net generation) | 16.7%; <br/> 15–20%; <br/> 25–35% | The Phase II procurement strategy (480 MW gross / 400 MW net) implies a design ceiling of 16.7% for total on-site consumption (including injection pumping). Current SOAK targets for parasitic consumption range from 15–20%, reflecting a planned reduction from the ~25–35% observed in Phase I operations (Norbeck, 2026). The case study models parasitic load above the design ceiling because observed Phase I performance is well above it: the Productivity Index and Injectivity Index inputs are derated to place injection pumping power at 20% or more of net generation (see Reservoir Parameters). |
+| Pumping Parasitic Load <br/> ({Average Pumping Power}/{Average Total Electricity Generation}) | {{ parasitic_loss_pct ~ '%' }} <br/> ({{ initial_pumping_power_pct_of_net ~ '%' }} of initial net generation) | 16.7%; <br/> 15–20%; <br/> 25–35% | The Phase II procurement strategy (480 MW gross / 400 MW net) implies a design ceiling of 16.7% for total on-site consumption (including injection pumping). Current SOAK targets for parasitic consumption range from 15–20%, reflecting a planned reduction from the ~25–35% observed in Phase I operations (Norbeck, 2026). The case study models parasitic load above the design ceiling because observed Phase I performance is well above it: the Productivity Index and Injectivity Index inputs are derated to place pumping power (production and injection) at 20% or more of net generation (see Reservoir Parameters). |
 | Total fracture surface area per well | {{ total_fracture_surface_area_per_well_mm2 }}×10⁶ m² <br/> ({{ total_fracture_surface_area_per_well_mft2 }} million ft²) | Project Red: 2.787×10⁶ m² <br/> (30 million ft²) | Greater fracture surface area expected than Project Red (Fercho et al., 2025). |
 | Reservoir Volume | {{ reservoir_volume_m3 }} m³ | | Calculated from fracture area × fracture separation × number of fractures per well × number of wells |
 | Bottom-hole Temperature <br/> (BHT) | {{ bht_temp_degc ~ '℃' }} | 200–241℃; <br/> 221℃ (430℉) | Fercho et al., 2024; Singh et al., 2025. Average reservoir temperature design point of the Fervo 3.0 well design used for Phase II (Fervo Energy, 2026g); Fervo also reports a 3.0 well reaching a 460℉ (238℃) resource (Fervo Energy, 2026a). |
@@ -361,7 +362,7 @@ See [GEOPHIRES Economic Outputs documentation](parameters.html#economic-paramete
 The production temperature profile exhibits distinctive cyclical behavior driven by the interaction between wellbore physics and reservoir thermal evolution:
 
 1. **Thermal Conditioning (Years 1–{{ first_cycle_peak_year }})**: The initial rise in production temperature, from {{ initial_production_temperature_degc_precise }}°C to a peak of approximately {{ first_cycle_peak_temperature_degc }}°C, is driven by the thermal conditioning of the production wellbores. As hot geofluid continuously flows through the wells, the wellbore casing and surrounding rock heat up, reducing conductive heat loss as predicted by the Ramey wellbore model.
-2. **Reservoir Drawdown (Years {{ first_cycle_peak_year + 1 }}–{{ redrilling_years[0] }})**: Following the conditioning peak, temperature declines as the cold front from injection wells reaches the production zone (thermal breakthrough), reducing the produced fluid enthalpy. The larger fracture surface area per well of the 3.0 design delays breakthrough relative to the previous version of this case study, in which drawdown began in year 6.
+2. **Reservoir Drawdown (Years {{ first_cycle_peak_year + 1 }}–{{ redrilling_years[0] }})**: Following the conditioning peak, temperature declines as the cold front from injection wells reaches the production zone (thermal breakthrough), reducing the produced fluid enthalpy. The larger fracture surface area per well of the 3.0 design delays breakthrough relative to the February 2026 Update, in which drawdown began in year 6.
 3. **Redrilling (Years {{ redrilling_years_display }})**: The model triggers a redrilling event when the next time step's temperature would fall below the threshold defined by the `Maximum Drawdown` parameter (shown as the dashed orange line). The production temperature does not necessarily actually reach the threshold; redrilling typically preemptively restores the wellfield before that occurs. The cost of these events is amortized as an operational expense over the project lifetime.
 
 #### Power Generation Profile
@@ -502,7 +503,7 @@ rate.
 The case study also includes a 100 MWe model, `Fervo_Project_Cape-6`, with equivalent capacity to Phase I.
 Note that like the 500 MWe model, `Fervo_Project_Cape-6` represents a SOAK project and not the real-world Phase I implementation as built by Fervo.
 `Fervo_Project_Cape-6` has not yet been updated for the September 2026 Update and reflects the inputs of the
-previous version of this case study.
+February 2026 Update.
 [Click here](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-6) to view the
 100 MWe model in the GEOPHIRES web interface.
 
@@ -538,7 +539,7 @@ reproduce this scenario.
 Documentation is available for the following previous case study versions, which are deprecated in favor of this version.
 
 {# @formatter:off #}
-#### `Fervo_Project_Cape-5` (Previous Revision)
+#### `Fervo_Project_Cape-5` (February 2026 Update)
 
 Source code: [Fervo_Project_Cape-5.txt](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/fe21df0ec4b85430e3abd96e74811f9e19824478/tests/examples/Fervo_Project_Cape-5.txt),
 [Fervo_Project_Cape-5.out](https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/fe21df0ec4b85430e3abd96e74811f9e19824478/tests/examples/Fervo_Project_Cape-5.out),
@@ -556,16 +557,21 @@ Key differences in the September 2026 Update:
 1. Grid interconnection ($250M) and firm transmission service ($21M/yr) added
 1. PPA starting price of $115/MWh with a 1.5%-equivalent escalator from the second operating year, capped at the year 15 price
 1. Construction period of 4 years; inflation rate of 3.0%; exploration cost re-derived from the current well cost
-1. `ResFrac Profile + Hotter/Deeper Scenario` variant removed. It applied the Singh et al. (2025) temperature profile for the Phase I design to the previous version's 100 MWe inputs at a 3 km depth; the base case now uses the deeper 3.0 design, to which that profile does not apply
+1. `ResFrac Profile + Hotter/Deeper Scenario` variant removed. It applied the Singh et al. (2025) temperature profile for the Phase I design to the February 2026 Update's 100 MWe inputs at a 3 km depth; the base case now uses the deeper 3.0 design, to which that profile does not apply
 1. Reduced Redrilling Scenario rebuilt on current inputs (greater fracture height) and generated with the documentation instead of linked as a shared result
 
-The following tables list every input parameter whose value differs between the previous version and this version,
-and compare key results.
-Input parameter comments are not compared; see the input files for the rationale behind each change.
+The following tables list every input parameter whose value differs between the February 2026 Update and the September 2026
+Update, with the rationale for each change, and compare key results.
+See the input files for the full parameter comments and citations.
 
 {{ previous_version_input_changes_table_md }}
 
 {{ previous_version_result_changes_table_md }}
+
+LCOE changes with the PPA price as well as with costs (see [Impact of PPA Price on LCOE](#impact-of-ppa-price-on-lcoe)).
+With the February 2026 Update's PPA terms and all other September 2026 Update inputs, LCOE is
+{{ '$' ~ previous_version_ppa_terms_lcoe_usd_per_mwh ~ '/MWh' }} rather than {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }};
+that difference reflects the PPA price change rather than cost changes.
 
 #### `Fervo_Project_Cape-4`
 
@@ -619,6 +625,8 @@ Including these may reduce the levered IRR.
 1. Reserve Accounts: The cash flow analysis assumes immediate liquidity. It does not model working capital, debt service, or major equipment replacement reserve accounts. Project financial partners may require that the project owner(s) establish and fund reserve accounts. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/460) to view the relevant GEOPHIRES tracking issue on GitHub.
 1. Insurance Premiums: The model does not include a specific line item for insurance. For EGS projects involving deep subsurface risks, insurance premiums could represent an additional annual operating expense. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/369) to view the relevant GEOPHIRES tracking issue on GitHub.
 1. Investment Tax Credit Basis: GEOPHIRES's SAM Single Owner PPA model applies the ITC rate to total installed cost, which includes the grid interconnection cost. Qualified interconnection property is only eligible for the ITC for energy property of 5 MW or less (IRC §48(a)(8)), so the model overstates the credit by approximately {{ '$' ~ (interconnection_share_of_total_capex_musd * 0.3) | round | int ~ 'M' }} (30% of the {{ '$' ~ interconnection_share_of_total_capex_musd ~ 'M' }} interconnection cost including its share of inflation and interest during construction). The case study retains the statutory 30% rate because the same line item carries an unmodeled benefit in the other direction: in non-ISO balancing authorities such as PacifiCorp, network upgrade costs, the majority of interconnection cost, are often refunded to the interconnection customer over up to 20 years with interest once the plant reaches commercial operation (Seel et al., 2026). An ITC rate of {{ itc_rate_excluding_interconnection_pct }}% applied to total installed cost removes the overstatement and reduces the after-tax IRR by approximately {{ itc_excluding_interconnection_irr_reduction_pct_pts }} percentage points. A parameter that excludes a specified amount from the ITC basis, or an ITC amount input, would allow both effects to be modeled explicitly.
+1. Debt Term: GEOPHIRES sets the loan term of the SAM Single Owner PPA model to the plant lifetime, so the case study repays debt in level annual payments over {{ project_lifetime_yr }} years, beyond the 15-year PPA term. The minimum pre-tax debt service coverage ratio (DSCR) is {{ min_dscr }}, in operating year {{ min_dscr_year }}. A loan term no longer than the PPA term would increase annual debt service, reducing the DSCR and, at the same debt fraction, the levered IRR.
+1. Salvage Value and Decommissioning: The SAM Single Owner PPA model credits a salvage value of {{ salvage_value_pct_of_total_capex ~ '%' }} of total CAPEX ({{ '$' ~ salvage_value_musd ~ 'M' }}) as revenue in the final project year. Well plugging and abandonment and other decommissioning costs are not modeled.
 
 ### Technical & Operational Considerations
 
@@ -626,11 +634,11 @@ Including these may reduce the levered IRR.
 1. Curtailment: Curtailment is not modeled. The `Utilization Factor` input represents plant availability, and the GEOPHIRES SAM Economic Model integration does not currently support grid-limit or curtailment inputs. The case study assumes network resource interconnection service sufficient for full output. As an illustration, reducing the `Utilization Factor` by 5% and 10% (to {{ curtailment_5pct_utilization_factor }} and {{ curtailment_10pct_utilization_factor }}) as a flat proxy for curtailment reduces the after-tax IRR by approximately {{ curtailment_5pct_irr_reduction_pct_pts }} and {{ curtailment_10pct_irr_reduction_pct_pts }} percentage points, respectively. A per-year utilization factor schedule would also allow a first-year commissioning ramp to be modeled, such as the ramp-up Fervo reports for the first Phase I GeoBlock as it brings the full well system online after first power (Fervo Energy, 2026e).
 1. Nominal O&M Costs: GEOPHIRES holds fixed O&M costs, including the transmission service cost, flat in nominal terms. At the case study's 3.0% inflation rate, this represents a declining real cost over the 30-year project lifetime, which is optimistic.
 1. Seasonal and Hourly Performance Granularity: As noted in the Surface Plant Parameters, this study uses a fixed annual average ambient temperature. It does not model the seasonal or hourly impacts on air-cooled condenser efficiency. In reality, power output would likely dip during peak summer hours and increase during winter. Future versions of GEOPHIRES may add support for these considerations; [click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/395) to view the relevant GEOPHIRES tracking issue on GitHub.
-1. Redrilling Assumptions: Management of thermal decline is modeled as periodic redrilling events that reset the reservoir's heat content to initial conditions at intervals determined by the `Maximum Drawdown` parameter. The cost of these events is amortized into a uniform annual operating expense. In reality, these events may be scheduled as discrete capital-intensive campaigns punctuated by years of lower spending, or as a continuous program of make-up well drilling to mitigate decline. Fervo describes its approach as a makeup-well drilling program in which later wells benefit from cumulative learnings (Fervo Energy, 2026f). [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/381) to view the relevant GEOPHIRES tracking issue on GitHub.
+1. Redrilling Assumptions: Management of thermal decline is modeled as periodic redrilling events that reset the reservoir's heat content to initial conditions at intervals determined by the `Maximum Drawdown` parameter. The cost of these events is amortized into a uniform annual operating expense. In reality, these events may be scheduled as discrete capital-intensive campaigns punctuated by years of lower spending, or as a continuous program of make-up well drilling to mitigate decline. Fervo describes its approach as a makeup-well drilling program in which later wells benefit from cumulative learnings (Fervo Energy, 2026f). [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/381) to view the relevant GEOPHIRES tracking issue on GitHub.{% if reservoir_heat_content_negative_from_year is not none %} Note that the reservoir heat content and percentage of total heat mined in the annual profile of the result file are cumulative against the initial reservoir and are not reset by redrilling, so the heat content is negative from operating year {{ reservoir_heat_content_negative_from_year }} and {{ final_year_pct_total_heat_mined ~ '%' }} of the initial heat content is mined by the final year. These values reflect that accounting rather than physical depletion: redrilled wells access rock that the initial reservoir heat content does not include.{% endif %}
 1. Reservoir Modeling Fidelity: The base case utilizes the Gringarten analytical model, which produces a characteristic thermal plateau maintained until a sharp breakthrough event. A key open question is whether this idealized profile provides an acceptably accurate approximation of drawdown over time, or if it masks the gradual dispersion caused by flow channeling and heterogeneity. The [Project Red case study](Fervo_Project_Red.html) compares the GEOPHIRES Gringarten model against the first two years of measured production temperatures from Fervo's Project Red and finds close alignment when the active fracture count is de-rated for heterogeneous flow; that record does not yet extend to the long-term decline that determines redrilling timing. Future work should evaluate whether Gringarten remains the optimal scoping proxy, or if an alternative analytical solution[^alt-analytical-solution-proposal] would offer a superior balance of speed and realism by better mimicking the shape of numerical simulation outputs.
 1. ORC Efficiency: The power generation results rely on the GEOPHIRES built-in supercritical ORC efficiency correlation, which assumes the selection of an optimal working fluid for each specific geofluid temperature. For further details, please refer to the [Surface Plant section in the Theoretical Basis for GEOPHIRES](Theoretical-Basis-for-GEOPHIRES.html#surface-plant). GEOPHIRES warns that the built-in ORC correlations may not be valid above a production temperature of 200℃; the case study production temperature (approximately {{ average_production_temperature_degc ~ '℃' }}) exceeds this, which adds uncertainty to the modeled conversion efficiency and power plant cost. This limitation may be addressed in the future by [FGEM integration](https://github.com/NatLabRockies/GEOPHIRES-X/issues/395).
 
-[^alt-analytical-solution-proposal]: Possible alternatives might include Residence Time Distribution (RTD) modeling, or a parameterized profile generator (for example, Bezier curves fitted to numerical simulation results, as in the ResFrac Profile variant included in previous versions of this case study).
+[^alt-analytical-solution-proposal]: Possible alternatives might include Residence Time Distribution (RTD) modeling, or a parameterized profile generator (for example, Bezier curves fitted to numerical simulation results, as in the ResFrac Profile variant included in the February 2026 Update).
 
 ---
 

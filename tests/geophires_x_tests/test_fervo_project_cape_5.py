@@ -364,16 +364,50 @@ class FervoProjectCape5TestCase(BaseTestCase):
         scenario_params = generate_fervo_project_cape_5_md.get_fpc5_scenario_input_parameters(input_params, result)
 
         # Rates and utilization factors stated in the Investment Tax Credit Rate and Utilization Factor discussions and
-        # used in the sensitivity analysis, and the reduced redrilling scenario's fracture height (+20%).
+        # used in the sensitivity analysis, the reduced redrilling scenario's fracture height (+20%), and the February
+        # 2026 Update's PPA terms stated in the Modeling Overview.
         self.assertEqual(
             [
                 {'Investment Tax Credit Rate': 0.2768},
                 {'Utilization Factor': 0.867},
                 {'Utilization Factor': 0.822},
                 {'Fracture Height': 120.0},
+                {
+                    'Starting Electricity Sale Price': 0.095,
+                    'Electricity Escalation Rate Per Year': 0.00057,
+                    'Ending Electricity Sale Price': 1,
+                    'Electricity Escalation Start Year': 1,
+                },
             ],
             list(scenario_params.values()),
         )
+
+    def test_result_values(self) -> None:
+        result = GeophiresXResult(self._get_test_file_path('../examples/Fervo_Project_Cape-5.out'))
+        values = generate_fervo_project_cape_5_md.get_result_values(result)
+
+        self.assertEqual(round(result.result['ECONOMIC PARAMETERS']['Project NPV']['value'], 1), values['npv_musd'])
+
+        # The SAM Single Owner PPA template's salvage percentage
+        self.assertEqual('50', values['salvage_value_pct_of_total_capex'])
+
+        self.assertGreaterEqual(values['min_dscr_year'], 1)
+        self.assertGreater(float(values['min_dscr']), 1.0)
+
+        # The base case redrills, and the remaining reservoir heat content in the annual profile is not reset by
+        # redrilling (see the Redrilling Assumptions discussion in the case study documentation).
+        self.assertGreater(values['number_of_times_redrilling'], 0)
+        self.assertIsNotNone(values['reservoir_heat_content_negative_from_year'])
+        self.assertGreater(float(values['final_year_pct_total_heat_mined']), 100.0)
+
+    def test_signed_musd_display(self) -> None:
+        # noinspection PyProtectedMember
+        display = generate_fervo_project_cape_5_md._get_signed_musd_display
+
+        self.assertEqual('-$13M', display(-12.6))
+        self.assertEqual('$337M', display(337.31))
+        self.assertEqual('$1,234M', display(1234.4))
+        self.assertEqual('$0M', display(-0.4))
 
     def test_previous_version_comparison_tables(self) -> None:
         # noinspection PyProtectedMember
@@ -388,9 +422,19 @@ class FervoProjectCape5TestCase(BaseTestCase):
         input_changes_md = generate_fervo_project_cape_5_md.generate_fpc5_previous_version_input_changes_table_md(
             previous_input_params, input_params
         )
-        self.assertIn('| Reservoir Depth | 2.68 km | 3.06 km |', input_changes_md)
+        self.assertIn('| Reservoir Depth | 2.68 km | 3.06 km | Depth at which the reservoir reaches', input_changes_md)
         self.assertIn('| Number of Multilateral Sections | 0 | Not set |', input_changes_md)
         self.assertNotIn('| Fracture Separation |', input_changes_md)  # Unchanged
+
+        with self.assertRaises(ValueError):
+            # Changed parameters without a rationale are not silently omitted.
+            generate_fervo_project_cape_5_md.generate_fpc5_previous_version_input_changes_table_md(
+                previous_input_params,
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('../examples/Fervo_Project_Cape-5.txt'),
+                    params={'Fracture Separation': 12},
+                ),
+            )
 
         result_changes_md = generate_fervo_project_cape_5_md.generate_fpc5_previous_version_result_changes_table_md(
             previous_result, result
@@ -400,7 +444,7 @@ class FervoProjectCape5TestCase(BaseTestCase):
 
         # Previous and this version compared to themselves
         self.assertEqual(
-            '| Parameter | Previous Version | This Version |\n|---|---|---|',
+            '| Parameter | February 2026 Update | September 2026 Update | Rationale |\n|---|---|---|---|',
             generate_fervo_project_cape_5_md.generate_fpc5_previous_version_input_changes_table_md(
                 input_params, input_params
             ),
