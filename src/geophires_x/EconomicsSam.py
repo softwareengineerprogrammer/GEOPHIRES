@@ -725,7 +725,7 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     ret['real_discount_rate'] = _pct(econ.discountrate)
 
     # Project lifetime
-    ret['term_tenor'] = model.surfaceplant.plant_lifetime.value
+    ret['term_tenor'] = _debt_tenor(model)
     ret['term_int_rate'] = _pct(econ.BIR)
 
     ret['ibi_oth_amount'] = (econ.OtherIncentives.quantity() + econ.TotalGrant.quantity()).to('USD').magnitude
@@ -733,6 +733,22 @@ def _get_single_owner_parameters(model: Model) -> dict[str, Any]:
     ret = {**ret, **_get_capacity_payment_parameters(model)}
 
     return ret
+
+
+def _debt_tenor(model: Model) -> int:
+    econ = model.economics
+    if not econ.debt_tenor.Provided:
+        return model.surfaceplant.plant_lifetime.value
+
+    if econ.debt_tenor.value > model.surfaceplant.plant_lifetime.value:
+        raise ValueError(
+            f'{econ.debt_tenor.Name} ({econ.debt_tenor.value} years) cannot exceed '
+            f'{model.surfaceplant.plant_lifetime.Name} '
+            f'({model.surfaceplant.plant_lifetime.value} years) - debt would remain '
+            f'outstanding at the end of the project.'
+        )
+
+    return econ.debt_tenor.value
 
 
 def _has_capacity_payment_revenue_sources(model: Model) -> bool:
