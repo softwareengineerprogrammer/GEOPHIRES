@@ -1838,6 +1838,15 @@
       "minimum": 0.0,
       "maximum": 1.0
     },
+    "Debt Tenor": {
+      "description": "Number of years over which operating-period debt is amortized (for debt/loans). Defaults to Plant Lifetime if not provided, and may not exceed it. SAM Single Owner PPA economic model only.",
+      "type": "integer",
+      "units": "yr",
+      "category": "Economics",
+      "default": 20,
+      "minimum": 1,
+      "maximum": 100
+    },
     "Inflated Equity Interest Rate": {
       "description": "Inflated equity interest rate (see docs)",
       "type": "number",
