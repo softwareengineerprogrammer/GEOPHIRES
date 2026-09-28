@@ -3407,9 +3407,9 @@ class Economics:
 
             def _check_temperature_for_ORC(temperature: float) -> None:
                 if temperature > 200.:
-                    msg = ('The simulated production temperature exceeds 200 degrees Celsius.  The built-in ORC utilization '
-                           'efficiency correlations may not be valid above this temperature.  Consider using a single or double '
-                           'flash plant, or providing a custom correlation via a surface plant module.  For more information, '
+                    msg = ('The simulated production temperature exceeds 200 degrees Celsius. The built-in ORC utilization '
+                           'efficiency correlations may not be valid above this temperature. Consider using a single or double '
+                           'flash plant, or providing a custom correlation via a surface plant module. For more information, '
                            'see: https://natlabrockies.github.io/GEOPHIRES-X/Theoretical-Basis-for-GEOPHIRES.html#surface-plant')
                     print(f'Warning: {msg}')
                     model.logger.warning(msg)
