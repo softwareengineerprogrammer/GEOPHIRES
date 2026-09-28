@@ -17,12 +17,7 @@ cd "$(dirname "$0")"
 
 echo "Regenerating example: $1..."
 
-# Syncing Fervo_Project_Cape-6 from the 2026-09 revision of Fervo_Project_Cape-5 requires
-# GEOPHIRES_SYNC_FPC6_FROM_FPC5=true. The overrides below do not yet scale Fervo_Project_Cape-5's interconnection and
-# transmission costs to 100 MWe, and the 100 MWe well count and plant sizing have not been re-derived for the Fervo 3.0
-# well design. Until they are, Fervo_Project_Cape-6 retains the inputs derived from the previous revision of
-# Fervo_Project_Cape-5.
-if [[ $1 == "Fervo_Project_Cape-6" && "$GEOPHIRES_SYNC_FPC6_FROM_FPC5" == "true" ]]
+if [[ $1 == "Fervo_Project_Cape-6" ]]
 then
     echo "Syncing Fervo_Project_Cape-6.txt from Fervo_Project_Cape-5.txt..."
 
@@ -63,9 +58,12 @@ fi
 
 if [[ $1 == "Fervo_Project_Cape-5" ]]
 then
-    python ../src/geophires_docs/generate_fervo_project_cape_5_docs.py
-
     ./regenerate-example-result.sh Fervo_Project_Cape-6
+fi
+
+if [[ $1 == "Fervo_Project_Cape-7" ]]
+then
+    python ../src/geophires_docs/generate_fervo_project_cape_7_docs.py
 
     if [ ! -f regenerate-example-result.env ] && [ -f regenerate-example-result.env.template ]; then
         echo "Creating regenerate-example-result.env from template..."

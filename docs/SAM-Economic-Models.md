@@ -159,7 +159,7 @@ For detailed information on how these different configurations are modeled finan
 
 ## Examples
 
-1. [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-5) | [Case Study Documentation](Fervo_Project_Cape-5.html)
+1. [Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=Fervo_Project_Cape-7) | [Case Study Documentation](Fervo_Project_Cape-7.html)
 1. [SAM Single Owner PPA: 50 MWe](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA)
 1. [50 MWe with Add-ons](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-3)
 1. [50 MWe with Royalties](https://gtp.scientificwebservices.com/geophires/?geophires-example-id=example_SAM-single-owner-PPA-4)
