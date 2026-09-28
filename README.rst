@@ -1,519 +1,155 @@
-========
-Overview
-========
+# Case Study: 500 MWe EGS Project Modeled on Fervo Cape Station Phase II (September 2026 Update)
+# See documentation: https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-7.html
+# September 2026 Update: subsurface design aligned with the Fervo 3.0 well design disclosed for Cape Station Phase II
+# (Fervo Energy Q2 2026 earnings call, 2026-08-12). The case study remains a second-of-a-kind (SOAK) analog;
+# the wellfield is re-sized for the 3.0 design rather than matched to Fervo's as-built well count, and
+# lateral drilling cost is now modeled explicitly rather than folded into the vertical well cost.
 
-|GEOPHIRES Logo|
+# *** ECONOMIC/FINANCIAL PARAMETERS ***
+# *************************************
+Economic Model, 5, -- The SAM Single Owner PPA economic model is used to calculate financial results including LCOE, NPV, IRR, and pro-forma cash flow analysis. See [GEOPHIRES documentation of SAM Economic Models](https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html) for details on how System Advisor Model financial models are integrated into GEOPHIRES.
+Inflation Rate, .03, -- US CPI-U was 3.4% year over year in July 2026 (core 2.5%) (BLS, 2026b), down from 4.2% in May 2026, when the energy index was up 23.5% year over year (BLS, 2026a). 3.0% is between core and headline and above the Federal Reserve's 2% target, a conservative assumption for a 30-year horizon. The February 2026 Update used 2.7%, US inflation as of December 2025. Note: [2024b ATB models lower inflation](https://atb.nrel.gov/electricity/2024b/definitions#inflation). GEOPHIRES holds fixed O&M flat in nominal terms; inflation affects capital cost escalation during construction and the nominal discount rate.
 
-.. |GEOPHIRES Logo| image:: geophires-logo.png
-    :alt: GEOPHIRES Logo
+Starting Electricity Sale Price, 0.115, -- Midpoint of the $100-130/MWh range Fervo reports for contracts currently under negotiation, of which approximately half are with hyperscale data center buyers (Fervo Energy, 2026f; 2026g). Above the prices implied by Fervo's existing contracts: Corsac Station's 15-year PPA at $107/MWh (CTVC, 2025), and Fervo's company-wide revenue backlog of approximately $7.2B across 658 MW of binding PPAs (Fervo Energy, 2026g), which implies roughly $91/MWh assuming 15-year terms at 91.3% capacity factor. Pricing for the subsequent 396 MW Google PPA was not disclosed (Fervo Energy, 2026b). The SOAK project is assumed to contract in 2026 or later for a 2030 commercial operation date. The February 2026 Update used $95/MWh, aligned with Geysers - Sacramento pricing in [2024b ATB](https://atb.nrel.gov/electricity/2024/geothermal) (NREL, 2025). See Sensitivity Analysis for effect of different prices on results.
+Electricity Escalation Rate Per Year, 0.00183, -- $1.83/MWh per year. GEOPHIRES supports only linear (additive) escalation; this value reproduces the 15-year present value, at the case study WACC of approximately 8.4%, of a 1.5% per year compounding escalator on the $115/MWh starting price. 1.5% is the escalator in Ormat's 2025 Heber 1 geothermal PPA (CTVC, 2025); Fervo's PPA escalation terms are not disclosed. Reaches $140.6/MWh in operating year 15 versus $141.7/MWh under compounding. The February 2026 Update used $0.57/MWh per year, calibrated to reach $100/MWh at project year 11 from a $95/MWh start.
+Ending Electricity Sale Price, 0.1406, -- Caps escalation at $140.6/MWh, the price reached in operating year 15, so that the price is held flat after the 15-year PPA term rather than continuing to escalate through the 30-year project lifetime. This represents an assumed post-contract re-contracting or merchant price equal to the final contract price. Note that this value does not directly determine price at the end of the project life, but rather acts as a cap on the price to which the starting price can escalate; the February 2026 Update set it to $1/kWh (no effective cap).
+Electricity Escalation Start Year, 0, -- The first escalation step is applied in the second operating year, matching a PPA whose price escalates annually from the first anniversary of commercial operation. The February 2026 Update used 1, which GEOPHIRES applies as the first step in the third operating year.
 
-GEOPHIRES is a free and open-source geothermal techno-economic simulator.
-GEOPHIRES combines reservoir, wellbore, surface plant, and economic models to estimate the capital and operation and maintenance costs,
-instantaneous and lifetime energy production, and overall levelized cost of energy of a geothermal plant.
-Various reservoir conditions (EGS, doublets, etc.) and end-use options (electricity, direct-use heat, cogeneration) can be modeled.
-Users are encouraged to build upon the GEOPHIRES framework to implement their own correlations and models.
-See the `Documentation`_ section below for more information.
+Fraction of Investment in Bonds, .7, -- Approximate debt required to cover CAPEX after $1 billion sponsor equity per [Matson, 2024](https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/). Note that this source says that Fervo ultimately wants to target “15% sponsor equity, 15% bridge loan, and 70% construction to term loans”, but this case study does not attempt to model that capital structure precisely. Reference: Fervo closed a $421.4M non-recourse project debt facility (the Project Granite Facility) for Cape Station Phase I in Q1 2026 (Fervo Energy, 2026a; 2026c). Against the approximately $7,000/kW FOAK cost of the roughly 100 MW Phase I (Fervo Energy, 2026d; 2026e), that is roughly 60% debt. Fervo also entered into an agreement with Liberty Mutual to monetize Phase I tax credits, providing additional non-sponsor capital (Fervo Energy, 2026c).
+Discount Rate, 0.12, -- Typical discount rates for higher-risk projects may be 12–15%. This is a real (inflation-adjusted) rate; the SAM Economic Model discounts nominal cash flows at the equivalent nominal rate, (1 + discount rate) × (1 + inflation rate) − 1.
+Inflated Bond Interest Rate, .07, -- 2024b ATB (NREL, 2025)
 
-This repository is the canonical source for the modern GEOPHIRES simulator, which succeeds the legacy `GEOPHIRES v2.0 <https://github.com/NREL/GEOPHIRES-v2>`__.
-The name GEOPHIRES-X refers to the initial modernized (v3) framework.
-See the `CHANGELOG <CHANGELOG.rst>`__ for a detailed history of changes and release notes.
+Inflated Bond Interest Rate During Construction, 0.105, -- Higher than interest rate during normal operation to account for increased risk of default prior to COD. Value aligns with ATB discount rate (NREL, 2025).
+Bond Financing Start Year, -2, -- Equity-only for the first construction year. The 4-year schedule merges the first two years (exploration and early development) of the 5-year DOE-ATB hybrid schedule, so the equity-only share of overnight capital cost (4.1%) is unchanged from the February 2026 Update, which was equity-only for the first 2 of 5 construction years (ATB).
 
-Free software: `MIT license <LICENSE>`__
+Construction Years, 4, -- Fervo's FOAK timeline at Cape Station ran from ground breaking in September 2023 (Fervo Energy, 2023b) to expected full-scale production in 2028 (Fervo Energy, 2025c), which the February 2026 Update modeled as 5 years. Phase I (approximately 100 MWe in three 33 MWe GeoBlocks) reached first power in September 2026, three years after ground breaking, with contractual COD expected by October 1, 2026 for the first GeoBlock and by January 1, 2027 for the other two; Phase II (400 MWe) is under construction with expected COD in 2028 (Fervo Energy, 2026e). A SOAK developer is modeled with one fewer year: Fervo reports Phase I went from site preparation to a constructed power unit in under two years, and estimates that at steady state each of its three rigs could drill about 1.5 wells per month (Fervo Energy, 2026f), a pace at which this case study's 84-well initial campaign takes roughly 19 months. See [GEOPHIRES documentation](SAM-EM_Multiple-Construction-Years.html) for details on how construction years affect CAPEX, IRR, and other calculations.
 
-.. start-badges
+# ATB advanced scenario (5-year)
+# Construction CAPEX Schedule, 0.09,0.28,0.1,0.34,0.28
 
-.. list-table::
-    :stub-columns: 1
+# DOE scenario (alternative, 5-year)
+# Construction CAPEX Schedule, 0.014,0.027,0.137,0.274,0.548
 
-    * - tests
-      - | |github-actions|
-        | |coverage|
-    * - package
-      - | |commits-since|
-        | |code-style|
-        | |license|
+# DOE-ATB hybrid scenario (5-year, February 2026 Update)
+# Construction CAPEX Schedule, 0.014,0.027,0.139,0.431,0.389
 
-.. TODO add the following to package badge list once PyPy distribution enabled: |version| |wheel| |supported-versions| |supported-implementations|
-..    * - docs
-..      - | |docs|
+# DOE-ATB hybrid scenario compressed to 4 years: first two years of the 5-year schedule (exploration and early development) merged
+Construction CAPEX Schedule, 0.041,0.139,0.431,0.389
 
+Investment Tax Credit Rate, 0.3, -- Statutory rate; Geothermal Drilling and Completions Apprenticeship Program ensures compliance with ITC labor requirements (Southern Utah University, 2024). GEOPHIRES's SAM Single Owner PPA model applies this rate to total installed cost, which includes the interconnection cost entered under One-time Flat License Fees Etc. Under IRC §48(a)(8) qualified interconnection property is in the ITC basis only for energy property of 5 MW or less, so the model overstates the credit by approximately $87M (30% of the $289M interconnection cost including its inflation and interest during construction); an equivalent rate of 0.2768 on total installed cost would remove it and reduces IRR by about 1.4 points. The statutory rate is retained for clarity because the overstatement is offset in direction, and likely in magnitude, by an unmodeled benefit on the same line item: in non-ISO balancing authorities such as PacifiCorp, network upgrade costs, the majority of interconnection cost, are often refunded to the interconnection customer over up to 20 years with interest once the plant reaches commercial operation (Seel et al., 2026). Taxpayer-owned point-of-interconnection facilities may also qualify as integral power conditioning and transfer equipment regardless of project size, which would reduce the overstatement further.
+Combined Income Tax Rate, .2555, -- Federal Corporate Income Tax Rate of 21% plus Utah Corporate Franchise and Income Tax Rate of 4.55%. (Note: This input uses a simple summation of statutory rates; the effective combined rate calculated in the model may differ due to standard federal-state tax interactions.)
+Property Tax Rate, 0.0022, -- Utah Inland Port Authority (UIPA) tax differential incentive
 
-.. |github-actions| image:: https://github.com/NREL/GEOPHIRES-X/actions/workflows/github-actions.yml/badge.svg
-    :alt: GitHub Actions Build Status
-    :target: https://github.com/NREL/GEOPHIRES-X/actions
+Capital Cost for Power Plant for Electricity Generation, 1900, -- [US DOE, 2021](https://betterbuildingssolutioncenter.energy.gov/sites/default/files/attachments/Waste_Heat_to_Power_Fact_Sheet.pdf). Pricing information not publicly available for Turboden or Baker Hughes Gen 2 ORC units (Turboden, 2025; Jacobs, 2025). Note: Fervo states that drilling, completion and well pad facilities are about half of pre-COD CAPEX and surface power generation equipment about half (Fervo Energy, 2026f); this case study yields roughly 47% subsurface (drilling, completion, stimulation and gathering) / 53% surface plant, excluding interconnection and exploration, so the plant cost may be modestly overstated and/or the well costs understated relative to Fervo's actuals.
+Exploration Capital Cost, 56, -- Equivalent to 2024b ATB NF-EGS conservative scenario exploration assumption of 5 full-size wells (NREL, 2025) at this case study's all-in well cost of $8.48M, plus $1M for geophysical and field work, plus 15% contingency, plus 12% indirect costs: (5 × $8.48M + $1M) × 1.15 × 1.12 = $55.9M. The February 2026 Update used $30M, derived the same way from a $4.65M well. Recompute this value whenever the per-well drilling and completion cost changes.
 
-.. |version| image:: https://img.shields.io/pypi/v/geophires-x.svg
-    :alt: PyPI Package latest release
-    :target: https://pypi.org/project/geophires-x
+Well Drilling Cost Correlation, 3, -- 2025 NREL Geothermal Drilling Cost Curve Update (Akindipe and Witter, 2025).
+Well Drilling and Completion Capital Cost Adjustment Factor, 0.72, -- Applied to both the vertical correlation and the lateral cost. Yields $8.5M/well all-in (vertical $4.40M + lateral $4.08M, each including 5% indirect costs) versus $11.8M at factor 1.0 for the 3.06 km TVD, 7,500 ft lateral geometry. Calibration: Fervo's first Cape Station well ($9.4M) and best Phase I well ($4.8M), both 5,000 ft lateral 2.0-design wells, correspond to factors of 1.14 and 0.58 respectively against the same correlation with the lateral costed explicitly. The SOAK value of 0.72 is the geometric mean of the ATB-aligned baseline (0.9) and Fervo's best demonstrated well (0.58), decomposing as 0.70 for a fast follower's learning position times 1.029 for the temperature adjustment at 221℃ (NREL 2025 drilling cost curves). It is about 4% above the INTERMEDIATE1 drilling technology scenario (US DOE, 2019) at factor 1.0 ($8.1M/well for the same geometry, with the lateral at that scenario's per-meter cost). Fervo cites batch drilling among its drilling efficiency gains, reports a record 21-day spud-to-total-depth time on the Sawtooth 7 well, and has trialed rotary steerable systems on deeper wells (Fervo Energy, 2026a; 2026f). Reference points: 0.58 ($6.8M/well) for Fervo-demonstrated performance; 0.9 ($10.6M/well) for the unadjusted ATB baseline; Latimer's stated target of under $4M/well (Latimer, 2025) corresponds to roughly 0.35 and is treated as a NOAK aspiration rather than a SOAK comparable. Note: the February 2026 Update used 0.9 on the vertical correlation only with the lateral folded in, which yielded $4.65M/well at 2.68 km; against the lateral-inclusive correlation that was an effective factor of about 0.58, i.e. Fervo's best demonstrated well rather than a conservative SOAK assumption. See [Sensitivity Analysis](#sensitivity-analysis-section) for effect of different drilling costs on results.
+All-in Nonvertical Drilling Costs, 2360, -- USD per meter of lateral before the adjustment factor and indirect costs. Value from the 2025 NREL geothermal drilling cost curve (Akindipe and Witter, 2025) for the vertical large diameter baseline correlation at 3.06 km, as computed by the SWS Geothermal Platform drilling cost calculator; the calculator assumes the same per-meter cost for lateral and vertical sections. Scaled by the Well Drilling and Completion Capital Cost Adjustment Factor and by Multilaterals Cased.
+Multilaterals Cased, True, -- Fervo's laterals are cased and cemented for plug-and-perf multistage stimulation (Norbeck et al., 2024). GEOPHIRES halves the lateral cost when this is False (the default), on the assumption that casing and cementing are 50% of drilling cost.
 
-.. |wheel| image:: https://img.shields.io/pypi/wheel/geophires-x.svg
-    :alt: PyPI Wheel
-    :target: https://pypi.org/project/geophires-x
+Reservoir Stimulation Capital Cost per Fracture Surface Area, 0.875, -- USD per square meter of nominal (single-face, planar) fracture area, before adjustment factor, indirect costs and contingency; GEOPHIRES multiplies by Fracture Width × Fracture Height × Number of Fractures per Stimulated Well × number of stimulated wells. Equivalent to $4M per 12-stage 5,000 ft lateral (150 fractures) and $6M per 18-stage 7,500 ft lateral (225 fractures) at the case study fracture geometry, i.e. the same per-stage calibration used in the February 2026 Update: high-intensity U.S. shale wells (Baytex Energy, 2024; Quantum Proppant Technologies, 2020), the closest technological analogue for multi-stage EGS (Gradl, 2018). Costs are also driven by the requirement for high-strength ceramic proppant rather than standard sand, which would crush or chemically degrade (diagenesis) over a 30-year lifecycle at 200℃ (Ko et al., 2023; Shiozawa and McClure, 2014) and the premium for ultra-high-temperature (HT) downhole tools. Fervo also reports sourcing equipment to pump at the higher pressures required by the deeper Phase II wells (Fervo Energy, 2026f). Parameterizing by area rather than per well makes stimulation cost track fracture count and geometry automatically in sensitivity and variant scenarios. Note that all-in costs per well are higher than the direct cost because they include indirect costs and contingency. See [Sensitivity Analysis](#sensitivity-analysis-section) for effect of different stimulation costs on results.
+Reservoir Stimulation Capital Cost per Production Well, -1, -- Indicates that production wells are stimulated (in addition to injection wells, which GEOPHIRES stimulates by default); the per-area cost is then apportioned across all wells.
 
-.. |supported-versions| image:: https://img.shields.io/pypi/pyversions/geophires-x.svg
-    :alt: Supported versions
-    :target: https://pypi.org/project/geophires-x
+Field Gathering System Capital Cost Adjustment Factor, 0.54, -- Gathering costs represent 2% of facilities CAPEX per [Matson, 2024](https://www.linkedin.com/pulse/fervo-energy-technology-day-2024-entering-geothermal-decade-matson-n4stc/).
 
-.. |supported-implementations| image:: https://img.shields.io/pypi/implementation/geophires-x.svg
-    :alt: Supported implementations
-    :target: https://pypi.org/project/geophires-x
+One-time Flat License Fees Etc, 250, -- Grid interconnection cost (point-of-interconnection facilities plus transmission network upgrades), $500/kW for 500 MWe. Based on PacifiCorp cluster-study cost estimates for recent geothermal interconnection requests in Beaver and Millard Counties, Utah: $417/kW (ERIS) to $500/kW (NRIS) for a 40 MW request in Beaver County (2021 study) and $450/kW for a 40 MW request in Millard County (2022 study); recent requests of 250-750 MW across PacifiCorp, BPA and Duke averaged $426/kW, and projects with high interconnection costs cluster along the same transmission lines, especially in southern Utah and Wyoming (Seel et al., 2026). The NRIS figure is used because the PPA structure requires firm delivery. Fervo's actual Cape Station interconnection cost is not publicly disclosed; an MLQ.ai analysis of Fervo's IPO filing, reported by Utility Dive, puts Fervo's Cape Station Phase II interconnection and transmission rights at approximately 290 MW against 384 MW of contracted capacity (Utility Dive, 2026). GEOPHIRES adds this parameter to overnight capital cost without indirect cost or contingency loading, spreads it over the construction schedule with inflation and interest during construction, and includes it in the depreciable and property-tax basis. Not modeled: in non-ISO balancing authorities such as PacifiCorp, network upgrade costs paid up front are often refunded to the interconnection customer over up to 20 years with interest once the plant reaches commercial operation (Seel et al., 2026), so the value here is conservative. The February 2026 Update did not include interconnection cost (see the Discussion section of the case study documentation).
+Annual License Fees Etc, 21, -- Long-term firm point-to-point transmission service for 500 MW, $M per year, held flat in nominal terms by GEOPHIRES. PacifiCorp OATT Schedule 7 (firm point-to-point) was $32,029/MW-year and Schedule 1 (scheduling, system control and dispatch) $801/MW-year effective June 2017 (PacifiCorp, 2017); escalated at 3% per year to 2026 (approximately $42,800/MW-year, an assumption pending the 2026 Transmission Formula Annual Update in FERC docket ER26-2546) and applied to the 500 MW contracted capacity. The unescalated 2017 rate gives $16.4M/year; reserving the 525 MW maximum net output gives $22.5M/year. For comparison, BPA's long-term firm point-to-point rate for fiscal years 2024-2025 was $1.648/kW-month, about $20,000/MW-year (BPA, 2026). Assumes delivery within or at the edge of PacifiCorp's system; delivery to a CAISO offtaker across an intervening system (e.g. the Intermountain HVDC line or NV Energy) would add a second firm reservation and charge. Transmission losses (in kind) are not included. Insurance premiums, which the case study documentation lists as unmodeled, are not included in this value.
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/softwareengineerprogrammer/GEOPHIRES-X/v3.18.1.svg
-    :alt: Commits since latest release
-    :target: https://github.com/softwareengineerprogrammer/GEOPHIRES-X/compare/v3.18.1...main
+Royalty Rate, 0.0175, -- The BLM royalty structure is 1.75% of gross proceeds from electricity sales for the first 10 years of production (Code of Federal Regulations, 2024).
+Royalty Rate Escalation Start Year, 11, -- After the first 10 years of production, the royalty rate escalates to 3.5%.
+Royalty Rate Escalation, 0.0175, -- Escalation at Year 11 from 1.75% to 3.5%.
+Royalty Rate Maximum, 0.035, -- No further escalation beyond 3.5%.
 
-.. |docs| image:: https://readthedocs.org/projects/GEOPHIRES-X/badge/?style=flat
-    :target: https://softwareengineerprogrammer.github.io/GEOPHIRES
-    :alt: Documentation Status
 
-.. |coverage| image:: https://codecov.io/gh/softwareengineerprogrammer/GEOPHIRES/graph/badge.svg?token=2SZNNVT28Q
-    :target: https://codecov.io/gh/softwareengineerprogrammer/GEOPHIRES
-    :alt: Coverage Status
+# *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
+# *************************************************
+End-Use Option, 1, -- Electricity
+Power Plant Type, 2, -- Gen 2 ORC units (Turboden, 2025).
+Plant Lifetime, 30, -- Sets the project economic horizon, aligned with Fervo's anticipated 30-year well life (Fervo Energy, 2025a). Modeling Distinction: While Fervo projects physical wellbore integrity for 30 years, GEOPHIRES simulates "redrilling events" to model thermal management of the reservoir volume. This treats the 30-year lifespan as an aggregate of shorter-lived thermal cycles delineated by discrete redrilling events occurring at intervals dictated by the Maximum Drawdown parameter. The modeled cost of each redrilling event is equivalent to the drilling and stimulation cost of the entire wellfield, serving as a conservative cost proxy for the major interventions (e.g., sidetracking and stimulating laterals into fresh rock, or drilling new wells if necessary) required to sustain the PPA target against thermal depletion. Fervo describes its approach as a makeup-well drilling program in which later wells benefit from cumulative learnings (Fervo Energy, 2026f).
 
-.. |code-style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/NREL/GEOPHIRES-X/blob/main/.pre-commit-config.yaml
-    :alt: Code Style: black
+Surface Temperature, 13, -- Surface temperature near Milford, UT (38.4987670, -112.9163432) ([Project InnerSpace, 2025](https://geomap.projectinnerspace.org/test/)).
 
-.. |license| image:: https://img.shields.io/badge/license-MIT-green.svg
-    :target: https://github.com/NREL/GEOPHIRES-X/blob/main/LICENSE
-    :alt: MIT license
+Number of Segments, 3
+Gradient 1, 74, -- Sedimentary overburden. 200℃ at 8500 ft depth (Fercho et al. 2024); 228.89℃ at 9824 ft (Norbeck et al. 2024).
+Thickness 1, 2.5
+Gradient 2, 41, -- Crystalline reservoir
+Thickness 2, 0.5
+Gradient 3, 39.1, -- Sugarloaf appraisal
 
-.. end-badges
-
-Getting Started
-===============
-
-A web interface is available at `gtp.scientificwebservices.com/geophires <https://gtp.scientificwebservices.com/geophires>`__.
-
-To run GEOPHIRES locally or to modify the source code, see the `Getting Started Guide <INSTALL.rst>`__.
-
-
-Documentation
-=============
-
-GEOPHIRES combines reservoir, wellbore, surface plant, and economic and cost models
-and correlations to estimate the capital and operation and maintenance costs,
-instantaneous and lifetime energy production, and overall levelized cost of energy of a
-geothermal plant.
-
-The high-level software architecture is illustrated in the diagram below. Green, orange and blue rectangles
-refer to internal GEOPHIRES components, external user-interface components, and
-external reservoir simulators (TOUGH2), respectively. Rectangles with solid outline are
-always executed during a simulation run; rectangles with dashed outline refer to optional
-or user-provided components.
-
-|GEOPHIRES Architecture Diagram|
-
-.. |GEOPHIRES Architecture Diagram| image:: References/geophires-architecture-diagram_2025-10-17.png
-    :alt: GEOPHIRES Architecture Diagram
-
-GEOPHIRES has a variety of different reservoir models including
-(1) Multiple parallel fractures model (Gringarten);
-(2) 1-Dimensional linear heat sweep model;
-(3) M/A thermal drawdown parameter model;
-(4) Percentage temperature drawdown model;
-(5) User-provided reservoir temperature production data;
-(6) Coupling to TOUGH2 external reservoir simulator;
-(7) SUTRA: Reservoir Thermal Energy Storage (RTES; also known as Underground Thermal Energy Storage - UTES);
-(8) Slender Body Theory (SBT);
-(9) Cylindrical.
-
-GEOPHIRES can simulate three different end-uses of the geothermal heat: (1)
-direct-use heat (e.g. for industrial processing heating or residential space heating);
-(2) electricity (with subcritical ORC, supercritical ORC, single-flash, or double-flash plant);
-(3) co-generation of heat and electricity. The co-generation option considers bottoming
-cycle, topping cycle, and parallel cycle.
-
-GEOPHIRES has 5 economic models to calculate the levelized cost of heat or
-electricity: (1) fixed charge rate (FCR) model;
-(2) standard discounting levelized cost model;
-(3) BICYCLE model;
-(4) CLGS;
-(5) `SAM Single-owner PPA <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html>`__.
-
-The capital and O&M costs for the different geothermal system components (exploration,
-well drilling, surface plant, etc.) are either provided by the user or calculated with built-in
-correlations.
-
-For more information on the theoretical basis for GEOPHIRES see the
-`Theoretical Basis for GEOPHIRES <https://softwareengineerprogrammer.github.io/GEOPHIRES/Theoretical-Basis-for-GEOPHIRES.html>`__
-and `GEOPHIRES Reference Materials <References/README.md#geophires>`__.
-
-Parameters
-----------
-
-Available parameters are documented in the `Parameters Reference <https://softwareengineerprogrammer.github.io/GEOPHIRES/parameters.html>`__.
-
-Note that many parameters are interrelated and/or conditionally dependent on one another;
-reviewing the GEOPHIRES example(s) relevant to your use case in the following section
-is strongly recommended to gain a working understanding of how to construct valid sets of input parameters.
-
-
-Examples
---------
-
-GEOPHIRES includes a variety of example input files demonstrating its features for different types of geothermal systems
-and case studies of real-world geothermal projects.
-Starting with an existing GEOPHIRES example that is similar to your intended use/application can be an easier approach to using GEOPHIRES than constructing your own inputs from scratch.
-
-Example input ``.txt`` files and corresponding case report ``.out`` files are available in the `tests/examples directory <tests/examples>`__ of the repository.
-Example-specific web interface deeplinks are listed in the Link column.
-
-
-.. list-table::
-   :widths: 50 40 5 5
-   :header-rows: 1
-
-   * - Example
-     - Input file
-     - Case report file
-     - Link
-   * - Case Study: 500 MW EGS Modeled on Fervo Cape Station (2026 Update) (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html>`__)
-     - `Fervo_Project_Cape-5.txt <tests/examples/Fervo_Project_Cape-5.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-5.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-5>`__
-   * - 100 MW EGS Modeled on Fervo Cape Station
-     - `Fervo_Project_Cape-6.txt <tests/examples/Fervo_Project_Cape-6.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-6.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-6>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 1: EGS Electricity
-     - `example1.txt <tests/examples/example1.txt>`__
-     - `.out <tests/examples/example1.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example1>`__
-   * - SAM Single Owner PPA: 50 MWe (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/SAM-Economic-Models.html>`__)
-     - `example_SAM-single-owner-PPA.txt <tests/examples/example_SAM-single-owner-PPA.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA>`__
-   * - Example 1 with Add-Ons
-     - `example1_addons.txt <tests/examples/example1_addons.txt>`__
-     - `.out <tests/examples/example1_addons.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example1_addons>`__
-   * - SAM Single Owner PPA: 50 MWe with Add-ons
-     - `example_SAM-single-owner-PPA-3.txt <tests/examples/example_SAM-single-owner-PPA-3.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-3.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-3>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 2: EGS Direct-Use Heat
-     - `example2.txt <tests/examples/example2.txt>`__
-     - `.out <tests/examples/example2.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example2>`__
-   * - SAM Single Owner PPA: Direct-Use Heat
-     - `example_SAM-single-owner-PPA-8_heat.txt <tests/examples/example_SAM-single-owner-PPA-8_heat.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-8_heat.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-8_heat>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 3: EGS Co-generation
-     - `example3.txt <tests/examples/example3.txt>`__
-     - `.out <tests/examples/example3.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example3>`__
-   * - SAM Single Owner PPA: CHP
-     - `example_SAM-single-owner-PPA-7_chp.txt <tests/examples/example_SAM-single-owner-PPA-7_chp.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-7_chp.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7_chp>`__
-   * - SAM Single Owner PPA: CHP with Carbon Credits
-     - `example_SAM-single-owner-PPA-7b_chp-cc.txt <tests/examples/example_SAM-single-owner-PPA-7b_chp-cc.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-7b_chp-cc.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7b_chp-cc>`__
-   * - SAM Single Owner PPA: CHP with Surface Plant Capital Cost
-     - `example_SAM-single-owner-PPA-7c.txt <tests/examples/example_SAM-single-owner-PPA-7c.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-7c.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7c>`__
-   * - SAM Single Owner PPA: CHP: Bottoming Cycle
-     - `example_SAM-single-owner-PPA-7d_chp-bottoming.txt <tests/examples/example_SAM-single-owner-PPA-7d_chp-bottoming.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-7d_chp-bottoming.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7d_chp-bottoming>`__
-   * - SAM Single Owner PPA: CHP: Parallel Cycle
-     - `example_SAM-single-owner-PPA-7e_chp-parallel.txt <tests/examples/example_SAM-single-owner-PPA-7e_chp-parallel.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-7e_chp-parallel.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-7e_chp-parallel>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 4: Hydrothermal Electricity
-     - `example4.txt <tests/examples/example4.txt>`__
-     - `.out <tests/examples/example4.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example4>`__
-   * - Example 4b: Hydrothermal Electricity (Drawdown Schedule)
-     - `example4.txt <tests/examples/example4b_drawdown-schedule.txt>`__
-     - `.out <tests/examples/example4b_drawdown-schedule.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example4b_drawdown-schedule>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 5: User-Provided Reservoir Data (File Parameter)
-     - `example5.txt <tests/examples/example5.txt>`__
-     - `.out <tests/examples/example5.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example5>`__
-   * - Example 5b: User-Provided Reservoir Data (Profile Parameter)
-     - `example5b.txt <tests/examples/example5b.txt>`__
-     - `.out <tests/examples/example5b.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example5b>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 6: TOUGH2 (Multiple Gradients)
-     - `example6.txt <tests/examples/example6.txt>`__
-     - `.out <tests/examples/example6.out>`__
-     - \*
-   * - Example 7: TOUGH2 (Single Gradient)
-     - `example7.txt <tests/examples/example7.txt>`__
-     - `.out <tests/examples/example7.out>`__
-     - \*
-   * -  
-     -  
-     -  
-     -  
-   * - Example 8: Cornell Direct-Use Heat
-     - `example8.txt <tests/examples/example8.txt>`__
-     - `.out <tests/examples/example8.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example8>`__
-   * - Example 9: Cornell Electricity
-     - `example9.txt <tests/examples/example9.txt>`__
-     - `.out <tests/examples/example9.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example9>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 10: Heat Pump
-     - `example10_HP.txt <tests/examples/example10_HP.txt>`__
-     - `.out <tests/examples/example10_HP.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example10_HP>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 11: Absorption Chiller
-     - `example11_AC.txt <tests/examples/example11_AC.txt>`__
-     - `.out <tests/examples/example11_AC.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example11_AC>`__
-   * - SAM Single Owner PPA: Cooling
-     - `example_SAM-single-owner-PPA-9_cooling.txt <tests/examples/example_SAM-single-owner-PPA-9_cooling.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-9_cooling.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-9_cooling>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 12: District Heating
-     - `example12_DH.txt <tests/examples/example12_DH.txt>`__
-     - `.out <tests/examples/example12_DH.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example12_DH>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 13: Redrilling due to Drawdown
-     - `example13.txt <tests/examples/example13.txt>`__
-     - `.out <tests/examples/example13.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example13>`__
-   * - Example 13b: Redrilling due to Well Integrity
-     - `example13.txt <tests/examples/example13b_well-integrity.txt>`__
-     - `.out <tests/examples/example13b_well-integrity.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example13b_well-integrity>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Example 14: Data Center
-     - `example14_data-center.txt <tests/examples/example14_data-center.txt>`__
-     - `.out <tests/examples/example14_data-center.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example14_data-center>`__
-   * -  
-     -  
-     -  
-     -  
-   * - CLGS: Coaxial sCO2: Heat
-     - `[...]Coaxial_sCO2_heat.txt <tests/examples/Beckers_et_al_2023_Tabulated_Database_Coaxial_sCO2_heat.txt>`__
-     - `.out <tests/examples/Beckers_et_al_2023_Tabulated_Database_Coaxial_sCO2_heat.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Beckers_et_al_2023_Tabulated_Database_Coaxial_sCO2_heat>`__
-   * - CLGS: Coaxial Water: Heat
-     - `[...]Coaxial_water_heat.txt <tests/examples/Beckers_et_al_2023_Tabulated_Database_Coaxial_water_heat.txt>`__
-     - `.out <tests/examples/Beckers_et_al_2023_Tabulated_Database_Coaxial_water_heat.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Beckers_et_al_2023_Tabulated_Database_Coaxial_water_heat>`__
-   * - CLGS: Uloop sCO2: Electricity
-     - `[...]Uloop_sCO2_elec.txt <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_sCO2_elec.txt>`__
-     - `.out <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_sCO2_elec.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Beckers_et_al_2023_Tabulated_Database_Uloop_sCO2_elec>`__
-   * - CLGS: Uloop sCO2: Heat
-     - `[...]Uloop_sCO2_heat.txt <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_sCO2_heat.txt>`__
-     - `.out <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_sCO2_heat.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Beckers_et_al_2023_Tabulated_Database_Uloop_sCO2_heat>`__
-   * - CLGS: Uloop Water: Electricity
-     - `[...]Uloop_water_elec.txt <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_water_elec.txt>`__
-     - `.out <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_water_elec.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Beckers_et_al_2023_Tabulated_Database_Uloop_water_elec>`__
-   * - CLGS: Uloop Water: Heat
-     - `[...]Uloop_water_heat.txt <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_water_heat.txt>`__
-     - `.out <tests/examples/Beckers_et_al_2023_Tabulated_Database_Uloop_water_heat.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Beckers_et_al_2023_Tabulated_Database_Uloop_water_heat>`__
-   * - CLGS: SBT High Temperature
-     - `example_SBT_Hi_T.txt <tests/examples/example_SBT_Hi_T.txt>`__
-     - `.out <tests/examples/example_SBT_Hi_T.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SBT_Hi_T>`__
-   * - CLGS: SBT Low Temperature
-     - `example_SBT_Lo_T.txt <tests/examples/example_SBT_Lo_T.txt>`__
-     - `.out <tests/examples/example_SBT_Lo_T.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SBT_Lo_T>`__
-   * - CLGS: SBT ULoop
-     - `example_SBT_ULoop.txt <tests/examples/example_SBT_ULoop.txt>`__
-     - `.out <tests/examples/example_SBT_ULoop.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SBT_ULoop>`__
-   * -  
-     -  
-     -  
-     -  
-   * - SUTRA Example 1
-     - `SUTRAExample1.txt <tests/examples/SUTRAExample1.txt>`__
-     - `.out <tests/examples/SUTRAExample1.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=SUTRAExample1>`__
-   * - Multiple Gradients
-     - `example_multiple_gradients.txt <tests/examples/example_multiple_gradients.txt>`__
-     - `.out <tests/examples/example_multiple_gradients.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_multiple_gradients>`__
-   * - Investment Tax Credit
-     - `example_ITC.txt <tests/examples/example_ITC.txt>`__
-     - `.out <tests/examples/example_ITC.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_ITC>`__
-   * - Production Tax Credit
-     - `example_PTC.txt <tests/examples/example_PTC.txt>`__
-     - `.out <tests/examples/example_PTC.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_PTC>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Fervo Project Red (2023)
-     - `Fervo_Norbeck_Latimer_2023.txt <tests/examples/Fervo_Norbeck_Latimer_2023.txt>`__
-     - `.out <tests/examples/Fervo_Norbeck_Latimer_2023.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Norbeck_Latimer_2023>`__
-   * - Fervo Project Red (2026) (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Red.html>`__)
-     - `Fervo_Project_Red-2026.txt <tests/examples/Fervo_Project_Red-2026.txt>`__
-     - `.out <tests/examples/Fervo_Project_Red-2026.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Red-2026>`__
-   * - Fervo Cape Station 1: 2023 Results
-     - `Fervo_Project_Cape.txt <tests/examples/Fervo_Project_Cape.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape>`__
-   * - Fervo Cape Station 2: 2024 Results
-     - `Fervo_Project_Cape-2.txt <tests/examples/Fervo_Project_Cape-2.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-2.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-2>`__
-   * - Fervo Cape Station 3: 400 MWe Production
-     - `Fervo_Project_Cape-3.txt <tests/examples/Fervo_Project_Cape-3.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-3.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-3>`__
-   * - Fervo Cape Station 4: [Deprecated] Case Study: 500 MWe EGS modeled on Fervo Cape Station (2025) (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-4.html>`__)
-     - `Fervo_Project_Cape-4.txt <tests/examples/Fervo_Project_Cape-4.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-4.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-4>`__
-   * -  
-     -  
-     -  
-     -  
-   * - Superhot Rock (SHR) Example 1
-     - `example_SHR-1.txt <tests/examples/example_SHR-1.txt>`__
-     - `.out <tests/examples/example_SHR-1.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-1>`__
-   * - Superhot Rock (SHR) Example 2
-     - `example_SHR-2.txt <tests/examples/example_SHR-2.txt>`__
-     - `.out <tests/examples/example_SHR-2.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-2>`__
-   * - Superhot Rock (SHR) Example 3 (`analysis <https://scientificwebservices.com/shr/VERTICAL_LARGE_IDEAL_ADJUSTED/graphs/graphs.html>`__)
-     - `example_SHR-3.txt <tests/examples/example_SHR-3.txt>`__
-     - `.out <tests/examples/example_SHR-3.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-3>`__
-   * -  
-     -  
-     -  
-     -  
-   * - SAM Single Owner PPA: 400 MWe BICYCLE Comparison
-     - `example_SAM-single-owner-PPA-2.txt <tests/examples/example_SAM-single-owner-PPA-2.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-2.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-2>`__
-   * - SAM Single Owner PPA: 50 MWe with Royalties
-     - `example_SAM-single-owner-PPA-4.txt <tests/examples/example_SAM-single-owner-PPA-4.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-4.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-4>`__
-   * - SAM Single Owner PPA: Royalty Schedule & Supplemental Payments
-     - `example_SAM-single-owner-PPA-4b.txt <tests/examples/example_SAM-single-owner-PPA-4b.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-4b.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-4b>`_
-   * - SAM Single Owner PPA: Multiple Construction Years
-     - `example_SAM-single-owner-PPA-5.txt <tests/examples/example_SAM-single-owner-PPA-5.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-5.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-5>`__
-   * - SAM Single Owner PPA: Carbon Revenue
-     - `example_SAM-single-owner-PPA-6_carbon-revenue.txt <tests/examples/example_SAM-single-owner-PPA-6_carbon-revenue.txt>`__
-     - `.out <tests/examples/example_SAM-single-owner-PPA-6_carbon-revenue.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SAM-single-owner-PPA-6_carbon-revenue>`__
-.. raw:: html
-
-   <embed>
-      <i>* TOUGH2 is not currently supported in the web interface. Comment on <a href="https://github.com/softwareengineerprogrammer/geothermal-ui/issues/15">this tracking issue</a> to request web interface support for TOUGH2.</i>
-   </embed>
-
-
-HIP-RA: Heat in Place - Resource Assessment
--------------------------------------------
-
-`HIP-RA-X README <src/hip_ra_x/README.md>`__
-
-`HIP-RA-X Parameters Reference <https://softwareengineerprogrammer.github.io/GEOPHIRES/hip_ra_x_parameters.html>`__
-
-A HIP-RA web interface is available at `gtp.scientificwebservices.com/hip-ra <https://gtp.scientificwebservices.com/hip-ra>`__.
-
-
-Monte Carlo
------------
-
-`Monte Carlo User Guide <https://softwareengineerprogrammer.github.io/GEOPHIRES/Monte-Carlo-User-Guide.html>`__
-
-A Monte Carlo web interface is available at `gtp.scientificwebservices.com/monte-carlo <https://gtp.scientificwebservices.com/monte-carlo>`__.
-
-Extending GEOPHIRES-X
----------------------
-`How to extend GEOPHIRES-X <docs/How-to-extend-GEOPHIRES-X.md#how-to-extend-geophires-x>`__ user guide
-
-`Extension example: SUTRA <https://github.com/NREL/GEOPHIRES-X/commit/984cb4da1505667adb2c45cb1297cab6550774bd#diff-5b1ea85ce061b9a1137a46c48d2d293126224d677d3ab38d9b2f4dcfc4e1674e>`__
-
-Resources
----------
-
-`GEOPHIRES v3 User Manual <https://github.com/softwareengineerprogrammer/GEOPHIRES/blob/9c7d95648140886609776f154d25a0dcbf240851/References/GEOPHIRES_v3_UserManual.pdf>`__: A comprehensive, point-in-time snapshot of the software in PDF format, covering installation, usage, example problems, and parameter lists in detail.
-
-`GEOPHIRES Reference Manual <https://softwareengineerprogrammer.github.io/GEOPHIRES/overview.html>`__: A living document with the most current, authoritative information on frequently updated topics like the GEOPHIRES Parameters.
-
-Additional materials can be found in `/References </References/README.md>`__.
-
-Videos
-------
-
-`NREL GEOPHIRES Workshop: Features Overview & Examples <https://www.youtube.com/watch?v=KsFvpvXjOB4>`__
-
-`NREL GEOPHIRES Workshop: Case Studies <https://youtu.be/uMUDTUL6yWg>`__
-
-
-Development
-===========
-
-If you are interested in sharing your extensions with others, or contributing them back to this repository,
-you may want to follow `the Development instructions <CONTRIBUTING.rst#development>`__.
-(You can also create a fork after doing an editable install so don't worry about picking this method if you're unsure.)
-
-.. TODO feedback section - why user feedback is important/valuable, how to file issues/contact authors
-
-.. TODO FAQ/trivia section - "HDR" naming (HDR.out, HDR.json) is for Hot Dry Rock
+Reservoir Depth, 3.06, -- Depth at which the segmented gradient yields a bottom-hole temperature of approximately 221℃ (430℉), the average reservoir temperature design point of the Fervo 3.0 well design used for Cape Station Phase II (Fervo Energy, 2026f; 2026g). The previous value of 2.68 km was extrapolated from surface temperature, gradient, and average production temperature of shallower and deeper producers in Singh et al., 2025, corresponding to the roughly 400℉ Phase I design. Fervo reports 460℉ at the Sawtooth 7 well (Fervo Energy, 2026a), so 430℉ is not an upper bound for the resource.
+
+Reservoir Density, 2800, -- phyllite + quartzite + diorite + granodiorite ([Norbeck et al., 2023](https://doi.org/10.31223/X52X0B))
+Reservoir Heat Capacity, 790
+Reservoir Thermal Conductivity, 3.05
+Reservoir Porosity, 0.0118
+
+Reservoir Model, 1, -- See the [reservoir engineering calibration section](#res-eng-params-calibration-section) for additional details.
+Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
+
+Number of Fractures per Stimulated Well, 225, -- The model assumes an Extreme Limited Entry stimulation design (Fervo Energy, 2023a) utilizing 15 clusters per stage (derived from Singh et al., 2025) and 81–85% stimulation success rate per 2024b ATB Moderate Scenario (NREL, 2025). The previous 12-stage count for a 5,000 ft lateral is scaled proportionally to 18 stages for the 7,500 ft lateral of the Fervo 3.0 design, preserving the stage length of approximately 417 ft. Fervo attributes more stimulated reservoir volume per well and a more gradual decline profile to the longer laterals (Fervo Energy, 2026f).
+Fracture Separation, 9.8255, -- Based on 30 foot cluster spacing (Singh et al., 2025) marginally uprated to align with long-term thermal decline behavior trend towards wider fracture spacing (Fercho et al., 2025).
+
+Fracture Shape, 4, -- Bench design and fracture geometry in Singh et al., 2025 are given in rectangular dimensions.
+Fracture Width, 305, -- Matches intra-bench well spacing of 500 ft (corresponding to fracture length of 1000 ft) (Singh. et al., 2025)
+Fracture Height, 100, -- Actual fracture geometry is irregular and heterogeneous; this height complies with the minimum height required by the implemented bench design (200 ft; 60.96 meters) and yields an effective fracture surface area consistent with simulation results in Singh. et al., 2025.
+
+Water Loss Fraction, 0.01, -- Fervo states that "long-term modeling, calibrated to early field data, predicts high circulation recapture rates" and that previous studies have shown recapture rates of 80% to 99% ([Geothermal Mythbusting: Water Use and Impacts](https://fervoenergy.com/geothermal-mythbusting-water-use-and-impacts/); Fervo Energy, 2025a). The 1% loss fraction corresponds to the top of that range. Modeling in Singh et al., 2025 predicts fluid loss of 0.36% to 0.49%.
+Water Cost Adjustment Factor, 2, -- Local scarcity may increase procurement costs. Development near/on land with active/shut-in oil and gas wells could potentially utilize waste water to recover losses and offset costs.
+
+Ambient Temperature, 11.17, -- Average annual temperature of Milford, Utah ([NCEI](https://www.ncei.noaa.gov/access/us-climate-normals/#dataset=normals-annualseasonal&timeframe=30&station=USC00425654)). Note that this value affects heat to power conversion efficiency. The effects of hourly and seasonal ambient temperature fluctuations on efficiency and power generation are not modeled in this version of the case study.
+
+Utilization Factor, .913, -- (DeGolyer and MacNaughton, 2024)
+Plant Outlet Pressure, 2000 psi, -- McClure, 2024; Singh et al., 2025.
+Circulation Pump Efficiency, 0.80
+
+# *** Well Bores Parameters ***
+
+Number of Production Wells, 50, -- Number of production wells required to produce net generation greater than the PPA minimum and total generation less than nameplate capacity (11 × 60 MWe Gen 2 ORCs = 660 MWe gross; the February 2026 Update assumed 10 units, which cannot deliver 500 MWe net at a parasitic load of 20% or more). Reduced from 56 in the February 2026 Update; Fervo reports approximately 27% more power output for the same amount of steel at 430℉ versus 400℉ (Fervo Energy, 2026f), partly offset by the higher parasitic load now modeled (see Injectivity Index). 49 producers also satisfies the PPA minimum (500.2 MWe) but with lower NPV; 50 provides an 11 MWe margin. The resulting 84 initial wells (50 producers, 34 injectors) for 500 MWe, about 0.17 wells per MWe, is fewer wells per MWe than the up to 80 wells (0.20 per MWe) Fervo anticipates for the 400 MWe Phase II program (Fervo Energy, 2026f). The resulting average of ~12.6 MW gross (~10.5 MWe net) per production well is below the 15 MW gross power per production well Fervo shows for the 3.0 design (Fervo Energy, 2026g), which appears to require flow rates above the 107 kg/s modeled here (see Production Flow Rate per Well).
+Number of Injection Wells per Production Well, 0.666, -- Modeled on the reference case 5-well bench pattern (3 producers : 2 injectors) described in Singh et al., 2025.
+
+Nonvertical Length per Multilateral Section, 7500 feet, -- Lateral length of the Fervo 3.0 well design used for Cape Station Phase II (Fervo Energy, 2026f; 2026g); Phase I used 5,000 ft laterals, the target length given in the environmental assessment (BLM, 2024). Note that lateral length is assumed to be an upper bound constraining the number of fractures per well for a given cluster spacing.
+Well Geometry Configuration, 4, -- L configuration: vertical section to reservoir depth plus one lateral per well. Required for GEOPHIRES to cost the lateral explicitly.
+Number of Multilateral Sections per Vertical Section, 1, -- One lateral per well (producers and injectors); GEOPHIRES multiplies by the total well count, so this does not need updating when the number of wells changes. The February 2026 Update set Number of Multilateral Sections to 0 and folded lateral cost into the vertical well cost via the adjustment factor; the lateral is now costed explicitly (see All-in Nonvertical Drilling Costs and Multilaterals Cased). Requires GEOPHIRES 3.16.1 or later.
+
+Production Flow Rate per Well, 107, -- Cape Station pilot testing reported a sustained flow rate of 95–100 kg/s and maximum flow rate of 107 kg/s (Fervo Energy, 2024). Modeling by Singh et al. suggests initial flow rates of 120–130 kg/sec that gradually decrease over time (Singh et al., 2025). The case study flow rate is chosen both as a conservative target for long-term sustainability and to achieve a more economically favorable drawdown and redrilling schedule. Pumping load is set by the Productivity and Injectivity Index parameters rather than by flow rate; see Injectivity Index.
+# The ATB Advanced Scenario models sustained flow rates of 110 kg/s (NREL, 2024).
+
+Production Well Diameter, 7.825, -- Inner diameter of 8⅝ inch, 36 lb/ft casing. Fervo disclosed 8⅝ inch casing for the 3.0 well design (up from 7 inch in Phase I) (Fervo Energy, 2026f; 2026g); the February 2026 Update inferred 9⅝ inch (8.535 in ID) from a less specific announcement (Fervo Energy, 2025b). Casing weight is not disclosed; API IDs for 8⅝ in range from about 7.5 in (49 lb/ft) to 8.1 in (24 lb/ft).
+Injection Well Diameter, 7.825, -- See Production Well Diameter
+
+Production Wellhead Pressure, 303 psi, -- Modeled at a constant 300 psi in Singh et al., 2025. We use a marginally uprated value to conform to GEOPHIRES's calculated minimum wellhead pressure and nominally align with the gradual increase in WHP for constant flow rates modeled by Singh et al.
+
+Injectivity Index, 1.20, -- Based on ATB Conservative Scenario (NREL, 2025) derated per analyses that suggest lower productivity/injectivitity (Xing et al., 2025; Yearsley and Kombrink, 2024), and further derated in this version (from 1.38) to yield a parasitic load of at least 20% of net generation. Norbeck (2026) reported observed parasitic loads of approximately 25–35% in Phase I operations with a goal of eventually reaching 15–20%; a SOAK case is not credibly modeled below the low end of that goal. The February 2026 Update's ~16% aligned with the 16.7% ceiling implied by Fervo's Phase II procurement of 480 MW gross for 400 MW net, which is a design target rather than observed performance. Result: 21.1% initial and 20.8% average pumping power relative to net generation (17.2% relative to gross generation). The production-side pressure drop is dominated by flow ÷ Productivity Index; the injection side becomes pump-limited once flow ÷ Injectivity Index exceeds the plant outlet pressure, which occurs below an Injectivity Index of roughly 1.38 at 107 kg/s per producer.
+Productivity Index, 0.98, -- See Injectivity Index. Derated from 1.13 in proportion with the Injectivity Index (ratio 1.22 preserved).
+
+Ramey Production Wellbore Model, True, -- Ramey's model estimates the geofluid temperature drop in production wells
+Injection Temperature, 53.6, -- Calibrated with GEOPHIRES model-calculated reinjection temperature (Beckers and McCabe, 2019). Close to upper bound of Project Red injection temperatures (75–125℉; 23.89–51.67℃) (Norbeck and Latimer, 2023). Note: GEOPHIRES enforces a thermodynamic optimum that overrides higher values, such as the 85°C ORC outlet temperature specified in Cape Station's plant design (DeGolyer and MacNaughton, 2024) (intended for silica scaling mitigation), resulting in a "maximum theoretical power" scenario. Support for higher reinjection temperatures may be added in future GEOPHIRES versions.
+Injection Wellbore Temperature Gain, 3, -- Empirical estimate for high-flow rate wells where rapid fluid velocity minimizes heat uptake during descent (Ramey, 1962).
+
+Maximum Drawdown, 0.0025, -- This value represents the fractional drop in production temperature compared to the initial temperature that is allowed before the wellfield is redrilled. It is calibrated to maintain the PPA minimum net electricity generation requirement. It is a very small percentage because it is relative to the initial production temperature; the temperature quickly rises higher due to thermal conditioning and plateaus until breakthrough, so any drawdown relative to the initial value signals that the temperature has already declined from its stabilized peak.
+
+# *** SIMULATION PARAMETERS ***
+# *****************************
+Maximum Temperature, 500
+Time steps per year, 12
+
+Project Latitude, 38.506196
+Project Longitude, -112.918155
+
+# *** ADDITIONAL REFERENCES (September 2026 Update) ***
+# Fervo Energy. (2026a, August 12). Fervo Energy Reports Second Quarter 2026 Results. https://fervoenergy.com/fervo-energy-reports-second-quarter-2026-results/
+# Fervo Energy. (2026b, September 1). Fervo Energy and Google Sign 396 MW PPA. https://fervoenergy.com/fervo-energy-and-google-sign-396-mw-ppa/
+# Fervo Energy. (2026c, June 22). First Quarter 2026 Results. https://ir.fervoenergy.com/news-releases/news-release-details/fervo-energy-reports-first-quarter-2026-results
+# Fervo Energy. (2026d, May 11). Form S-1/A (Amendment No. 3). Cape Station Phase I overnight capital cost of approximately $7,000/kW. https://www.sec.gov/Archives/edgar/data/1853868/000162828026033127/fervoenergy-sx1a3.htm
+# Fervo Energy. (2026e, September 24). Fervo Energy Achieves First Power at Cape Station, a Landmark Moment for the Future of Enhanced Geothermal Systems. https://fervoenergy.com/fervo-energy-achieves-first-power-at-cape-station-a-landmark-moment-for-the-future-of-enhanced-geothermal-systems/
+# Fervo Energy. (2026f, August 12). Fervo Energy (FRVO) Q2 2026 Earnings Call Transcript. The Motley Fool, published August 19, 2026. https://www.fool.com/earnings/call-transcripts/2026/08/19/fervo-energy-frvo-q2-2026-earnings-call-transcript/ (webcast replay: https://edge.media-server.com/mmc/p/va49yxkc/)
+# Fervo Energy. (2026g, August 12). Q2 2026 Quarterly Results [Earnings presentation]. https://ir.fervoenergy.com/static-files/28260ce5-2ac0-458e-bfb7-2d80f3709cae
+# BLS. (2026a, June 10). Consumer Price Index - May 2026. https://www.bls.gov/news.release/archives/cpi_06102026.htm
+# BLS. (2026b, August 12). Consumer Price Index - July 2026. https://www.bls.gov/news.release/archives/cpi_08122026.htm
+# CTVC. (2025, September 2). The $783m PPA that keeps on drilling #260. https://www.ctvc.co/the-783m-ppa-that-keeps-on-drilling-260/
+# PacifiCorp. (2017, June 1). FAQ: Transmission and Ancillary Service Rate Changes. https://www.oasis.oati.com/PPW/PPWdocs/Rate_Update_FAQ_20170601.pdf
+# BPA. (2026, June). BPA Facts (DOE/BP-5493). Transmission rates (fiscal years 2024-2025). https://www.bpa.gov/-/media/Aep/about/publications/general-documents/bpa-facts.pdf
+# US DOE. (2019). GeoVision: Harnessing the Heat Beneath Our Feet (p. 163, drilling cost scenarios). https://www.energy.gov/sites/prod/files/2019/06/f63/GeoVision-full-report-opt.pdf
+# Seel, J., Manderlink, N., Mulvaney Kemp, J., Rand, J., Gorman, W., Wiser, R., Cotton, W., Porter, K. (2026, February). Generator Interconnection Costs to the Transmission System in non-ISO Balancing Authorities. Lawrence Berkeley National Laboratory. https://eta-publications.lbl.gov/sites/default/files/2026-02/lbnl_2026.02.23_ba_interconnection_costs.pdf
+# Utility Dive. (2026, June 5). Fervo Energy faces transmission constraints in the West, analysts say. https://www.utilitydive.com/news/fervo-energy-geothermal-transmission-constraints/822141/
