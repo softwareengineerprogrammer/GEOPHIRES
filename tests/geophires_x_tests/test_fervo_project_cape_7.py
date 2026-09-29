@@ -361,7 +361,13 @@ class FervoProjectCape7TestCase(BaseTestCase):
             from_file_path=self._get_test_file_path('../examples/Fervo_Project_Cape-7.txt')
         )
         result = GeophiresXResult(self._get_test_file_path('../examples/Fervo_Project_Cape-7.out'))
-        scenario_params = generate_fervo_project_cape_7_md.get_fpc7_scenario_input_parameters(input_params, result)
+        # noinspection PyProtectedMember
+        previous_input_params, _ = generate_fervo_project_cape_7_md._get_fpc7_previous_version(
+            Path(self._get_test_file_path('../../')).absolute()
+        )
+        scenario_params = generate_fervo_project_cape_7_md.get_fpc7_scenario_input_parameters(
+            input_params, result, previous_input_params
+        )
 
         # Rates and utilization factors stated in the Investment Tax Credit Rate and Utilization Factor discussions and
         # used in the sensitivity analysis, the reduced redrilling scenario's fracture height (+20%), and the February
