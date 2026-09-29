@@ -12,7 +12,7 @@
 # path), so the plant is costed as a supercritical ORC plant.
 #
 # Requires the superhot-wellbore package:
-#   pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git
+#   pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git@geophires-client
 
 # ******************** RESERVOIR ********************
 Reservoir Model, 1, -- Multiple Parallel Fractures Model (Gringarten et al., 1975)

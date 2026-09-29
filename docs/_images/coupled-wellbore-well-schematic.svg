@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" width="1000" height="760" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+<title id="title">Coupled inflow-wellbore model: geometry and governing equations</title>
+<desc id="desc">Schematic of a production well from the feedzone to the wellhead with radial Darcy inflow, the wellbore control volume, heat loss to the formation, flashing and an optional pump, beside the governing equations.</desc>
+<defs><marker id="arrow-d9822b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="#d9822b"/></marker><marker id="arrow-2f8f6b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="#2f8f6b"/></marker><marker id="arrow-cf1124" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="#cf1124"/></marker><marker id="arrow-7a3e00" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="#7a3e00"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><linearGradient id="geotherm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdf4e7"/><stop offset="1" stop-color="#f4b183"/></linearGradient><pattern id="feedzone" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#f8d9c4"/><line x1="0" y1="0" x2="0" y2="8" stroke="#d98c5f" stroke-width="2"/></pattern></defs>
+<rect x="40" y="90" width="520" height="530" fill="url(#geotherm)"/>
+<rect x="40" y="620" width="520" height="70" fill="url(#feedzone)"/>
+<line x1="30" y1="90" x2="570" y2="90" stroke="#52606d" stroke-width="2"/>
+<text x="50.0" y="82.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">surface</text>
+<text x="50.0" y="708.0" font-size="11.5" fill="#7a3e00" text-anchor="start" font-weight="normal">feedzone: thickness b = Fracture Height, at Reservoir Depth</text>
+<text x="150.0" y="336.1" font-size="12.5" fill="#7a3e00" text-anchor="middle" font-weight="bold">formation</text>
+<text x="150.0" y="350.6" font-size="10.625" fill="#52606d" text-anchor="middle" font-weight="normal">T<tspan baseline-shift="sub" font-size="72%">rock</tspan>(z): the GEOPHIRES gradient</text>
+<text x="150.0" y="364.4" font-size="10.625" fill="#52606d" text-anchor="middle" font-weight="normal">segments, anchored at the</text>
+<text x="150.0" y="378.2" font-size="10.625" fill="#52606d" text-anchor="middle" font-weight="normal">bottom-hole temperature;</text>
+<text x="150.0" y="392.0" font-size="10.625" fill="#52606d" text-anchor="middle" font-weight="normal">fixed over the plant lifetime</text>
+<rect x="289" y="64" width="22" height="626" fill="#ffffff" stroke="#334e68" stroke-width="2"/>
+<rect x="280" y="50" width="40" height="16" rx="3" fill="#334e68"/>
+<path d="M320.0,58.0 L420.0,58.0" fill="none" stroke="#d9822b" stroke-width="2.2" marker-end="url(#arrow-d9822b)"/>
+<text x="428.0" y="55.0" font-size="12" fill="#7a3e00" text-anchor="start" font-weight="bold">wellhead → surface plant</text>
+<text x="428.0" y="68.8" font-size="10.2" fill="#52606d" text-anchor="start" font-weight="normal">P<tspan baseline-shift="sub" font-size="72%">wh</tspan>, h<tspan baseline-shift="sub" font-size="72%">wh</tspan>, T<tspan baseline-shift="sub" font-size="72%">wh</tspan>, phase, steam quality</text>
+<path d="M300.0,586.0 L300.0,560.0" fill="none" stroke="#2f8f6b" stroke-width="1.6" marker-end="url(#arrow-2f8f6b)"/>
+<path d="M300.0,496.0 L300.0,470.0" fill="none" stroke="#2f8f6b" stroke-width="1.6" marker-end="url(#arrow-2f8f6b)"/>
+<path d="M300.0,406.0 L300.0,380.0" fill="none" stroke="#2f8f6b" stroke-width="1.6" marker-end="url(#arrow-2f8f6b)"/>
+<path d="M300.0,316.0 L300.0,290.0" fill="none" stroke="#2f8f6b" stroke-width="1.6" marker-end="url(#arrow-2f8f6b)"/>
+<path d="M300.0,226.0 L300.0,200.0" fill="none" stroke="#2f8f6b" stroke-width="1.6" marker-end="url(#arrow-2f8f6b)"/>
+<circle cx="296" cy="250" r="3" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<circle cx="304" cy="238" r="2.5" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<circle cx="297" cy="224" r="3.5" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<circle cx="305" cy="210" r="3" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<circle cx="296" cy="194" r="4" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<circle cx="303" cy="175" r="4.5" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<circle cx="297" cy="152" r="5" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<circle cx="304" cy="130" r="4.5" fill="#ffffff" stroke="#2f8f6b" stroke-width="1"/>
+<line x1="316" y1="256" x2="370" y2="256" stroke="#2f8f6b" stroke-dasharray="3 3"/>
+<text x="376.0" y="240.3" font-size="12" fill="#0f5132" text-anchor="start" font-weight="bold">flash depth</text>
+<text x="376.0" y="254.2" font-size="10.2" fill="#52606d" text-anchor="start" font-weight="normal">P falls to P<tspan baseline-shift="sub" font-size="72%">sat</tspan>: two-phase above,</text>
+<text x="376.0" y="267.5" font-size="10.2" fill="#52606d" text-anchor="start" font-weight="normal">homogeneous mixture (HEM)</text>
+<rect x="284" y="138" width="32" height="24" rx="4" fill="#fff4d6" stroke="#cb6e17" stroke-width="1.6" stroke-dasharray="4 2"/>
+<text x="300.0" y="154.0" font-size="12" fill="#7c2d12" text-anchor="middle" font-weight="bold">P</text>
+<text x="274.0" y="147.0" font-size="12" fill="#7c2d12" text-anchor="end" font-weight="bold">pump at z<tspan baseline-shift="sub" font-size="72%">p</tspan> (when needed)</text>
+<text x="274.0" y="160.8" font-size="10.2" fill="#52606d" text-anchor="end" font-weight="normal">intake: liquid, P ≥ P<tspan baseline-shift="sub" font-size="72%">sat</tspan> + NPSH margin</text>
+<rect x="276" y="400" width="48" height="50" fill="none" stroke="#123e7c" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="332.0" y="414.0" font-size="12" fill="#123e7c" text-anchor="start" font-weight="bold">Δz</text>
+<path d="M274.0,425.0 L222.0,425.0" fill="none" stroke="#cf1124" stroke-width="1.6" marker-end="url(#arrow-cf1124)"/>
+<text x="218.0" y="421.0" font-size="11.5" fill="#cf1124" text-anchor="end" font-weight="normal">q' = U (T − T<tspan baseline-shift="sub" font-size="72%">rock</tspan>)</text>
+<text x="218.0" y="437.0" font-size="10.5" fill="#52606d" text-anchor="end" font-weight="normal">per metre of well</text>
+<text x="332.0" y="434.6" font-size="9.775" fill="#52606d" text-anchor="start" font-weight="normal">gravity, friction,</text>
+<text x="332.0" y="447.3" font-size="9.775" fill="#52606d" text-anchor="start" font-weight="normal">kinetic energy</text>
+<path d="M80.0,650.0 L270.0,650.0" fill="none" stroke="#7a3e00" stroke-width="2" marker-end="url(#arrow-7a3e00)"/>
+<path d="M520.0,650.0 L330.0,650.0" fill="none" stroke="#7a3e00" stroke-width="2" marker-end="url(#arrow-7a3e00)"/>
+<text x="300.0" y="655.0" font-size="11.5" fill="#7a3e00" text-anchor="middle" font-weight="bold">r<tspan baseline-shift="sub" font-size="72%">w</tspan></text>
+<line x1="312" y1="676" x2="552" y2="676" stroke="#7a3e00" stroke-width="1" marker-end="url(#arrow-7a3e00)"/>
+<rect x="382.5" y="667.1" width="125.0" height="17.8" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="445.0" y="680.1" font-size="11" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">r<tspan baseline-shift="sub" font-size="72%">e</tspan>: drainage radius</text>
+<rect x="35.1" y="623.1" width="229.8" height="17.8" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="150.0" y="636.1" font-size="11" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">far field (r = r<tspan baseline-shift="sub" font-size="72%">e</tspan>): P<tspan baseline-shift="sub" font-size="72%">res</tspan>(t), T<tspan baseline-shift="sub" font-size="72%">res</tspan>(t)</text>
+<rect x="362.1" y="623.1" width="155.8" height="17.8" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="440.0" y="636.1" font-size="11" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">radial Darcy inflow, k·b</text>
+<rect x="600.0" y="30.0" width="380.0" height="70.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="612.0" y="53.7" font-size="12.5" fill="#0f5132" text-anchor="start" font-weight="bold">1  Inflow (steady radial Darcy)</text>
+<text x="612.0" y="70.0" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">ΔP<tspan baseline-shift="sub" font-size="72%">res</tspan> = μ ṁ ln(r<tspan baseline-shift="sub" font-size="72%">e</tspan>/r<tspan baseline-shift="sub" font-size="72%">w</tspan>) / (2π ρ k b)</text>
+<text x="612.0" y="84.4" font-size="10.625" fill="#52606d" text-anchor="start" font-weight="normal">μ, ρ at P<tspan baseline-shift="sub" font-size="72%">res</tspan> and the feedzone temperature (≤ 3 passes)</text>
+<rect x="600.0" y="112.0" width="380.0" height="70.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="612.0" y="135.7" font-size="12.5" fill="#0f5132" text-anchor="start" font-weight="bold">2  Entry into the well (isenthalpic)</text>
+<text x="612.0" y="152.0" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">h<tspan baseline-shift="sub" font-size="72%">fz</tspan> = h(P<tspan baseline-shift="sub" font-size="72%">res</tspan>, T<tspan baseline-shift="sub" font-size="72%">res</tspan>);  state (P<tspan baseline-shift="sub" font-size="72%">bh</tspan>, h<tspan baseline-shift="sub" font-size="72%">fz</tspan>)</text>
+<text x="612.0" y="166.4" font-size="10.625" fill="#52606d" text-anchor="start" font-weight="normal">P<tspan baseline-shift="sub" font-size="72%">bh</tspan> = P<tspan baseline-shift="sub" font-size="72%">res</tspan> − ΔP<tspan baseline-shift="sub" font-size="72%">res</tspan>; may flash at the sandface</text>
+<rect x="600.0" y="194.0" width="380.0" height="70.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="612.0" y="217.7" font-size="12.5" fill="#0f5132" text-anchor="start" font-weight="bold">3  Momentum</text>
+<text x="612.0" y="234.0" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">dP/dz = −ρ<tspan baseline-shift="sub" font-size="72%">m</tspan> g − f ρ<tspan baseline-shift="sub" font-size="72%">m</tspan> v<tspan baseline-shift="super" font-size="72%">2</tspan> / (2D)</text>
+<text x="612.0" y="248.4" font-size="10.625" fill="#52606d" text-anchor="start" font-weight="normal">f: Swamee–Jain on mixture ρ<tspan baseline-shift="sub" font-size="72%">m</tspan>, μ<tspan baseline-shift="sub" font-size="72%">m</tspan>; no acceleration term</text>
+<rect x="600.0" y="276.0" width="380.0" height="70.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="612.0" y="299.7" font-size="12.5" fill="#0f5132" text-anchor="start" font-weight="bold">4  Energy</text>
+<text x="612.0" y="316.0" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">dh/dz = −g + (ṁ/A)<tspan baseline-shift="super" font-size="72%">2</tspan> ρ<tspan baseline-shift="super" font-size="72%">−3</tspan> dρ/dz − U (T − T<tspan baseline-shift="sub" font-size="72%">rock</tspan>) / ṁ</text>
+<text x="612.0" y="330.4" font-size="10.625" fill="#52606d" text-anchor="start" font-weight="normal">U constant in depth and time (default 2.5 W/m/K)</text>
+<rect x="600.0" y="358.0" width="380.0" height="86.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="612.0" y="380.4" font-size="12.5" fill="#0f5132" text-anchor="start" font-weight="bold">5  Fluid properties</text>
+<text x="612.0" y="396.6" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">pure water: IAPWS-95 (CoolProp); IAPWS-97</text>
+<text x="612.0" y="412.9" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">for 21.56–27.06 MPa; two-phase: homogeneous</text>
+<text x="612.0" y="429.1" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">1/ρ<tspan baseline-shift="sub" font-size="72%">m</tspan> = x/ρ<tspan baseline-shift="sub" font-size="72%">g</tspan> + (1 − x)/ρ<tspan baseline-shift="sub" font-size="72%">f</tspan>,  T = T<tspan baseline-shift="sub" font-size="72%">sat</tspan>(P)</text>
+<rect x="600.0" y="456.0" width="380.0" height="62.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="612.0" y="475.7" font-size="12.5" fill="#0f5132" text-anchor="start" font-weight="bold">6  Numerics</text>
+<text x="612.0" y="492.0" font-size="12.5" fill="#1f2933" text-anchor="start" font-weight="normal">explicit Euler, bottom → top, Δz = 10 m</text>
+<text x="612.0" y="506.4" font-size="10.625" fill="#52606d" text-anchor="start" font-weight="normal">flow held; one steady state per solved time step</text>
+<text x="600.0" y="538.0" font-size="11" fill="#52606d" text-anchor="start" font-weight="normal">z positive upward; ṁ per well; A = πD<tspan baseline-shift="super" font-size="72%">2</tspan>/4; v = ṁ/(ρA)</text>
+</svg>

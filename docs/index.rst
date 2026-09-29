@@ -7,6 +7,7 @@ Contents
 
    overview
    Theoretical-Basis-for-GEOPHIRES
+   Coupled-Wellbore-Model
    SAM-Economic-Models
    Monte-Carlo-User-Guide
    HIP-RA-User-Guide

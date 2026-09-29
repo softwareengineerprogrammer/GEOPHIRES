@@ -63,17 +63,16 @@ the pumping power is subtracted from the plant output and the pumps are costed w
 well cannot deliver the flow rate at some reservoir state along the history (and the pump is disabled or not
 admissible), the run aborts with an explanation rather than extrapolating. The feedzone temperature, wellhead
 enthalpy, flowing bottom-hole pressure, the coupled-wellbore power cycle's gross-power estimate, the pump depth and
-power, the
-self-flow wellhead pressure and the wellhead phase are reported as well bore outputs. Note that the GEOPHIRES surface
-plant heat balance assumes liquid water, so the reported heat extraction understates the enthalpy of a steam-dominated
-steam-dominated wellhead stream.
+power, the self-flow wellhead pressure and the wellhead phase are reported as well bore outputs. Note that the
+GEOPHIRES surface plant heat balance assumes liquid water, so the reported heat extraction understates the enthalpy of
+a steam-dominated wellhead stream.
 
 Repeated solves of the same production history within one process (goal seeking on the number of wells re-evaluates
 the same reservoir decline) reuse the wellbore solution from a small in-process memo keyed on the request.
 
 superhot-wellbore is an optional dependency. Install it with::
 
-    pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git
+    pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git@geophires-client
 
 Reference: Scott, S.W. (2026), Thermo-hydraulic drivers of superhot geothermal well performance, Geothermics, 141,
 103784. https://doi.org/10.1016/j.geothermics.2026.103784
@@ -115,8 +114,8 @@ COUPLED_WELLBORE_MODEL_LABEL = (
 )
 
 SUPERHOT_WELLBORE_INSTALL_HINT = (
-    f'{COUPLED_WELLBORE_MODEL_LABEL} requires the superhot-wellbore package, which is not '
-    'installed. Install it with: pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git'
+    f'{COUPLED_WELLBORE_MODEL_LABEL} requires the superhot-wellbore package, which is not installed. Install it '
+    'with: pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git@geophires-client'
 )
 
 DEFAULT_TARGET_WELLHEAD_PRESSURE_MPA = 10.0

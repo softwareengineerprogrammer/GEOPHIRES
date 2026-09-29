@@ -121,7 +121,8 @@ GEOPHIRES has a variety of different reservoir models including
 The production wellbore can be modeled with Ramey's model, a constant temperature drop, or the coupled
 radial-inflow and thermohydraulic wellbore model of the optional
 `superhot-wellbore <https://github.com/softwareengineerprogrammer/superhot-wellbore>`__ package (Scott, 2026),
-which pairs with any of the reservoir models above.
+which pairs with any of the reservoir models above
+(`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Coupled-Wellbore-Model.html>`__).
 
 GEOPHIRES can simulate three different end-uses of the geothermal heat: (1)
 direct-use heat (e.g. for industrial processing heating or residential space heating);
