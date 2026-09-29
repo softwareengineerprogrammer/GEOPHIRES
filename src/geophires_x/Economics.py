@@ -1181,15 +1181,14 @@ class Economics:
         )
         self.debt_tenor = self.ParameterDict[self.debt_tenor.Name] = intParameter(
             "Debt Tenor",
-            DefaultValue=20,
-            AllowableRange=list(range(1, 101, 1)),
+            DefaultValue=CALCULATED_PARAMETER_PLACEHOLDER_VALUE,
+            AllowableRange=model.surfaceplant.plant_lifetime.AllowableRange.copy(),
             UnitType=Units.TIME,
             PreferredUnits=TimeUnit.YEAR,
             CurrentUnits=TimeUnit.YEAR,
-            ErrMessage="assume default debt tenor (plant lifetime)",
-            ToolTipText="Number of years over which operating-period debt is amortized (for debt/loans). "
-                        "Defaults to Plant Lifetime if not provided, and may not exceed it. "
-                        "SAM Single Owner PPA economic model only."
+            ToolTipText=f"Number of years over which operating-period debt is amortized (for debt/loans). "
+                        f"Defaults to {model.surfaceplant.plant_lifetime.Name} if not provided, "
+                        f"and may not exceed it. SAM Single Owner PPA economic model only."
         )
         self.EIR = self.ParameterDict[self.EIR.Name] = floatParameter(
             "Inflated Equity Interest Rate",
