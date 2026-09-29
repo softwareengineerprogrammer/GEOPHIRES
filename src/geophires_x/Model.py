@@ -9,7 +9,7 @@ from geophires_x.GeoPHIRESUtils import read_input_file
 from geophires_x.OutputsAddOns import OutputsAddOns
 from geophires_x.OutputsS_DAC_GT import OutputsS_DAC_GT
 from geophires_x.TDPReservoir import TDPReservoir
-from geophires_x.WellBores import WellBores
+from geophires_x.WellBores import WellBores, PRODUCTION_WELLBORE_MODEL_PARAMETER_NAME
 from geophires_x.SurfacePlant import SurfacePlant
 from geophires_x.SBTEconomics import SBTEconomics
 from geophires_x.SBTWellbores import SBTWellbores
@@ -19,12 +19,13 @@ from geophires_x.SurfacePlantSubcriticalORC import SurfacePlantSubcriticalOrc
 from geophires_x.SurfacePlantSupercriticalORC import SurfacePlantSupercriticalOrc
 from geophires_x.SurfacePlantSingleFlash import SurfacePlantSingleFlash
 from geophires_x.SurfacePlantDoubleFlash import SurfacePlantDoubleFlash
+from geophires_x.SurfacePlantCoupledWellbore import SurfacePlantCoupledWellbore
 from geophires_x.SurfacePlantAbsorptionChiller import SurfacePlantAbsorptionChiller
 from geophires_x.SurfacePlantDistrictHeating import SurfacePlantDistrictHeating
 from geophires_x.SurfacePlantHeatPump import SurfacePlantHeatPump
 from geophires_x.Economics import Economics
 from geophires_x.Outputs import Outputs
-from geophires_x.OptionList import EndUseOptions, PlantType
+from geophires_x.OptionList import EndUseOptions, PlantType, ProductionWellboreModel
 from geophires_x.CylindricalReservoir import CylindricalReservoir
 from geophires_x.MPFReservoir import MPFReservoir
 from geophires_x.LHSReservoir import LHSReservoir
@@ -32,6 +33,7 @@ from geophires_x.SFReservoir import SFReservoir
 from geophires_x.UPPReservoir import UPPReservoir
 from geophires_x.TOUGH2Reservoir import TOUGH2Reservoir
 from geophires_x.SUTRAReservoir import SUTRAReservoir
+from geophires_x.CoupledWellBores import CoupledWellBores
 from geophires_x.SUTRAWellBores import SUTRAWellBores
 from geophires_x.SurfacePlantSUTRA import SurfacePlantSUTRA
 from geophires_x.SUTRAEconomics import SUTRAEconomics
@@ -154,6 +156,21 @@ class Model(object):
                     self.economics: AGSEconomics = AGSEconomics(self)
                     self.outputs: AGSOutputs = AGSOutputs(self, output_file=output_file)
 
+        # Coupled inflow-wellbore production wellbore model (superhot-wellbore package) in place of the standard
+        # wellbore model. Dispatched on the raw input value because the wellbore class must be chosen before any
+        # parameter is read; WellBores.read_parameters reconciles the selector with Ramey Production Wellbore Model.
+        _coupled = self.InputParameters.get(PRODUCTION_WELLBORE_MODEL_PARAMETER_NAME)
+        if _coupled is not None and _coupled.sValue == str(ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.int_value):
+            if type(self.wellbores) is not WellBores:
+                raise ValueError(
+                    f'{PRODUCTION_WELLBORE_MODEL_PARAMETER_NAME} '
+                    f'{ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.int_value} '
+                    f'({ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.value}) cannot be combined with the SUTRA, '
+                    f'SBT or AGS wellbore models.'
+                )
+            self.logger.info('Setup the coupled inflow-wellbore production wellbore model')
+            self.wellbores: CoupledWellBores = CoupledWellBores(self)
+
         # initialize the right Power Plant Type
         if 'Power Plant Type' in self.InputParameters:
             # electricity
@@ -176,6 +193,8 @@ class Model(object):
                 self.surfaceplant = SurfacePlantSUTRA(self)
             elif self.InputParameters['Power Plant Type'].sValue in ['9', 'Industrial']:
                 self.surfaceplant = SurfacePlantIndustrialHeat(self)
+            elif self.InputParameters['Power Plant Type'].sValue in ['10', 'Coupled Wellbore Power Cycle']:
+                self.surfaceplant = SurfacePlantCoupledWellbore(self)
 
         # if we find out we have an add-ons, we need to instantiate it, then read for the parameters
         if 'AddOn Nickname 1' in self.InputParameters:
@@ -237,6 +256,8 @@ class Model(object):
                 self.surfaceplant = SurfacePlantSupercriticalOrc(self)
             elif self.surfaceplant.plant_type.value == PlantType.SINGLE_FLASH:
                 self.surfaceplant = SurfacePlantSingleFlash(self)
+            elif self.surfaceplant.plant_type.value == PlantType.COUPLED_WELLBORE:
+                self.surfaceplant = SurfacePlantCoupledWellbore(self)
             else: # default is double flash
                 self.surfaceplant = SurfacePlantDoubleFlash(self)
 
