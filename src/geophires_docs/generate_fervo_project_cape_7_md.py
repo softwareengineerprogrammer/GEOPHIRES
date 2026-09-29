@@ -661,8 +661,9 @@ def get_fpc7_scenario_input_parameters(
 ) -> dict[str, dict[str, Any]]:
     """
     :param previous_input_params: Input parameters of the previous version of the case study, from which the previous
-        version PPA terms scenario takes its PPA parameters; loaded from the previous versions directory if not
-        provided.
+        version PPA terms scenario takes its PPA parameters. If not provided, it is loaded from the previous version's
+        example in tests/examples relative to the package location, which exists only in a source checkout (not when
+        geophires_docs is installed as a package).
     :return: Input parameter overrides for the scenarios cited in the documentation narrative, by scenario name. The
         ITC scenario applies the rate to total installed cost that removes the interconnection cost (including its
         share of inflation and interest during construction) from the ITC basis. The curtailment scenarios reduce the
