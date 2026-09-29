@@ -118,9 +118,14 @@ GEOPHIRES has a variety of different reservoir models including
 (8) Slender Body Theory (SBT);
 (9) Cylindrical.
 
+The production wellbore can be modeled with Ramey's model, a constant temperature drop, or the coupled
+radial-inflow and thermohydraulic wellbore model of the optional
+`superhot-wellbore <https://github.com/softwareengineerprogrammer/superhot-wellbore>`__ package (Scott, 2026),
+which pairs with any of the reservoir models above.
+
 GEOPHIRES can simulate three different end-uses of the geothermal heat: (1)
 direct-use heat (e.g. for industrial processing heating or residential space heating);
-(2) electricity (with subcritical ORC, supercritical ORC, single-flash, or double-flash plant);
+(2) electricity (with subcritical ORC, supercritical ORC, single-flash, double-flash, or coupled wellbore power cycle plant);
 (3) co-generation of heat and electricity. The co-generation option considers bottoming
 cycle, topping cycle, and parallel cycle.
 
@@ -436,6 +441,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `example_SHR-3.txt <tests/examples/example_SHR-3.txt>`__
      - `.out <tests/examples/example_SHR-3.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=example_SHR-3>`__
+   * - Superhot Rock (SHR) Example 4: Superhot EGS Project Modeled on Fervo Cape Station Phase I with Self-Flowing Wells (Scott, 2026)
+     - `example_SHR-4.txt <tests/examples/example_SHR-4.txt>`__
+     - `.out <tests/examples/example_SHR-4.out>`__
+     - \*\*
    * -  
      -  
      -  
@@ -464,6 +473,8 @@ Example-specific web interface deeplinks are listed in the Link column.
 
    <embed>
       <i>* TOUGH2 is not currently supported in the web interface. Comment on <a href="https://github.com/softwareengineerprogrammer/geothermal-ui/issues/15">this tracking issue</a> to request web interface support for TOUGH2.</i>
+      <br/>
+      <i>** Production Wellbore Model 2 (Coupled Inflow-Wellbore) requires the optional <a href="https://github.com/softwareengineerprogrammer/superhot-wellbore">superhot-wellbore</a> package and is not currently supported in the web interface.</i>
    </embed>
 
 

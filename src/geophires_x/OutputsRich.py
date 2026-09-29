@@ -18,7 +18,7 @@ from geophires_x.Economics import Economics
 from geophires_x.GeoPHIRESUtils import UpgradeSymbologyOfUnits, render_default, InsertImagesIntoHTML
 from geophires_x.MatplotlibUtils import plt_subplots
 from geophires_x.OptionList import EndUseOptions, PlantType, EconomicModel, ReservoirModel, FractureShape, \
-    ReservoirVolume
+    ReservoirVolume, ProductionWellboreModel
 from geophires_x.OutputsUtils import OutputTableItem
 
 from geophires_x.Parameter import intParameter, strParameter
@@ -292,8 +292,7 @@ def print_outputs_rich(
             reservoir_parameters.append(
                 OutputTableItem('They are only used for calculating remaining heat content.'))
 
-        if model.reserv.resoption.value in [ReservoirModel.MULTIPLE_PARALLEL_FRACTURES,
-                                            ReservoirModel.LINEAR_HEAT_SWEEP]:
+        if model.reserv.resoption.value in [ReservoirModel.MULTIPLE_PARALLEL_FRACTURES, ReservoirModel.LINEAR_HEAT_SWEEP]:
             reservoir_parameters.append(OutputTableItem('Fracture model', model.reserv.fracshape.value.value))
             if model.reserv.fracshape.value == FractureShape.CIRCULAR_AREA:
                 reservoir_parameters.append(OutputTableItem('Well separation: fracture diameter',
@@ -350,8 +349,10 @@ def print_outputs_rich(
                 model.surfaceplant.plant_outlet_pressure.value),
                                                         model.surfaceplant.plant_outlet_pressure.CurrentUnits.value))
             if model.wellbores.productionwellpumping.value:
+                # a history in the coupled wellbore model: report the initial value
+                pprodwellhead = np.asarray(model.wellbores.Pprodwellhead.value, dtype=float).flat[0]
                 reservoir_parameters.append(OutputTableItem('Production wellhead pressure',
-                                                            '{0:10.2f}'.format(model.wellbores.Pprodwellhead.value),
+                                                            '{0:10.2f}'.format(pprodwellhead),
                                                             model.wellbores.Pprodwellhead.CurrentUnits.value))
                 reservoir_parameters.append(
                     OutputTableItem('Productivity Index', '{0:10.2f}'.format(model.wellbores.PI.value),
@@ -371,7 +372,7 @@ def print_outputs_rich(
         reservoir_parameters.append(
             OutputTableItem('Reservoir heat capacity', '{0:10.2f}'.format(model.reserv.cprock.value),
                             model.reserv.cprock.CurrentUnits.value))
-        if model.reserv.resoption.value is ReservoirModel.LINEAR_HEAT_SWEEP or (
+        if model.reserv.resoption.value in [ReservoirModel.LINEAR_HEAT_SWEEP] or (
             model.reserv.resoption.value is ReservoirModel.TOUGH2_SIMULATOR and model.reserv.usebuiltintough2model):
             reservoir_parameters.append(
                 OutputTableItem('Reservoir porosity', '{0:10.2f}'.format(model.reserv.porrock.value * 100),
@@ -406,13 +407,42 @@ def print_outputs_rich(
                                                              '{0:10.2f}'.format(np.average(
                                                                  model.surfaceplant.HeatExtracted.value)),
                                                              model.surfaceplant.HeatExtracted.PreferredUnits.value))
-        if model.wellbores.rameyoptionprod.value:
-            reservoir_stimulation_results.append(
-                OutputTableItem('Production Wellbore Heat Transmission Model', 'Ramey Model'))
+        if model.wellbores.rameyoptionprod.value or getattr(model.wellbores, 'uses_coupled_wellbore_model', False):
+            if model.wellbores.rameyoptionprod.value:
+                reservoir_stimulation_results.append(
+                    OutputTableItem('Production Wellbore Heat Transmission Model', 'Ramey Model'))
+            else:
+                reservoir_stimulation_results.append(
+                    OutputTableItem('Production Wellbore Model',
+                                    ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.display_name))
             reservoir_stimulation_results.append(OutputTableItem('Average Production Well Temperature Drop',
                                                                  '{0:10.1f}'.format(np.average(
                                                                      model.wellbores.ProdTempDrop.value)),
                                                                  model.wellbores.ProdTempDrop.PreferredUnits.value))
+            if getattr(model.wellbores, 'uses_coupled_wellbore_model', False):
+                wb = model.wellbores
+                reservoir_stimulation_results.append(
+                    OutputTableItem('Wellhead Fluid Phase', wb.coupled_wellhead_phase.value))
+                reservoir_stimulation_results.append(OutputTableItem('Production Well Self-Flowing Fraction',
+                                                                     '{0:10.1f}'.format(
+                                                                         wb.coupled_self_flowing_fraction.value * 100),
+                                                                     '%'))
+                self_flow_whp = np.asarray(wb.coupled_self_flow_wellhead_pressure.value, dtype=float)
+                if self_flow_whp.size > 0 and np.isfinite(self_flow_whp[0]):
+                    reservoir_stimulation_results.append(OutputTableItem('Initial Self-Flow Wellhead Pressure',
+                                                                         '{0:10.1f}'.format(self_flow_whp[0]),
+                                                                         wb.coupled_self_flow_wellhead_pressure.CurrentUnits.value))
+                if wb.productionwellpumping.value:
+                    reservoir_stimulation_results.append(OutputTableItem('Production Pump Depth',
+                                                                         '{0:10.1f}'.format(wb.coupled_pump_depth.value),
+                                                                         wb.coupled_pump_depth.CurrentUnits.value))
+                    reservoir_stimulation_results.append(OutputTableItem('Average Production Well Pumping Power',
+                                                                         '{0:10.2f}'.format(
+                                                                             np.average(wb.PumpingPowerProd.value)),
+                                                                         wb.PumpingPowerProd.CurrentUnits.value))
+                if wb.coupled_pump_flags.value:
+                    reservoir_stimulation_results.append(
+                        OutputTableItem('Production Pump Flags', wb.coupled_pump_flags.value))
         else:
             reservoir_stimulation_results.append(
                 OutputTableItem('Wellbore Heat Transmission Model = Constant Temperature Drop',
@@ -562,6 +592,13 @@ def print_outputs_rich(
                                                   EndUseOptions.COGENERATION_PARALLEL_EXTRA_ELECTRICITY]:  # there is an electricity componenent:
         surface_equipment_results.append(OutputTableItem('Initial geofluid availability', '{0:10.2f}'.format(
             model.surfaceplant.Availability.value[0]), model.surfaceplant.Availability.PreferredUnits.value))
+        if model.surfaceplant.plant_type.value == PlantType.COUPLED_WELLBORE:
+            surface_equipment_results.append(
+                OutputTableItem('Wellhead Power Cycle', model.surfaceplant.coupled_power_cycle.value))
+            surface_equipment_results.append(
+                OutputTableItem('Power Cycle Path', model.surfaceplant.coupled_plant_path_output.value))
+            surface_equipment_results.append(OutputTableItem('Power Cycle Parasitic Load', '{0:10.1f}'.format(
+                model.surfaceplant.parasitic_load.value * 100), '%'))
         surface_equipment_results.append(OutputTableItem('Maximum Total Electricity Generation', '{0:10.2f}'.format(
             np.max(model.surfaceplant.ElectricityProduced.value)), model.surfaceplant.ElectricityProduced.PreferredUnits.value))
         surface_equipment_results.append(OutputTableItem('Average Total Electricity Generation', '{0:10.2f}'.format(

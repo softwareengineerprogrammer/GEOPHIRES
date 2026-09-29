@@ -20,6 +20,7 @@ from geophires_x.OutputsRich import print_outputs_rich
 from geophires_x.Parameter import ConvertUnitsBack, ConvertOutputUnits, LookupUnits, strParameter, boolParameter, \
     OutputParameter, ReadParameter, ParameterEntry
 from geophires_x.OptionList import EndUseOptions, EconomicModel, ReservoirModel, FractureShape, ReservoirVolume, \
+    ProductionWellboreModel, \
     PlantType
 from geophires_x.Parameter import Parameter
 from geophires_x.Units import EnergyUnit
@@ -433,7 +434,9 @@ class Outputs:
                             f.write(f'      Reservoir hydrostatic pressure:                       {model.wellbores.production_reservoir_pressure.value[0]:10.2f} ' + model.wellbores.production_reservoir_pressure.CurrentUnits.value + NL)
                         f.write(f'      Plant outlet pressure:                            {model.surfaceplant.plant_outlet_pressure.value:10.2f} ' + model.surfaceplant.plant_outlet_pressure.CurrentUnits.value + NL)
                         if model.wellbores.productionwellpumping.value:
-                            f.write(f'      Production wellhead pressure:                     {model.wellbores.Pprodwellhead.value:10.2f} ' + model.wellbores.Pprodwellhead.CurrentUnits.value + NL)
+                            # a history in the coupled wellbore model: report the initial value
+                            pprodwellhead = np.asarray(model.wellbores.Pprodwellhead.value, dtype=float).flat[0]
+                            f.write(f'      Production wellhead pressure:                     {pprodwellhead:10.2f} ' + model.wellbores.Pprodwellhead.CurrentUnits.value + NL)
                             f.write(f'      Productivity Index:                               {model.wellbores.PI.value:10.2f} ' + model.wellbores.PI.CurrentUnits.value + NL)
                         f.write(f'      Injectivity Index:                                {model.wellbores.II.value:10.2f} ' + model.wellbores.II.CurrentUnits.value + NL)
 
@@ -441,7 +444,7 @@ class Outputs:
                     if model.wellbores.rameyoptionprod.value or model.reserv.resoption.value in [ReservoirModel.MULTIPLE_PARALLEL_FRACTURES, ReservoirModel.LINEAR_HEAT_SWEEP, ReservoirModel.SINGLE_FRACTURE, ReservoirModel.TOUGH2_SIMULATOR]:
                         f.write(f'      Reservoir thermal conductivity:                   {model.reserv.krock.value:10.2f} {model.reserv.krock.CurrentUnits.value}{NL}')
                     f.write(f'      Reservoir heat capacity:                          {model.reserv.cprock.value:10.2f} ' + model.reserv.cprock.CurrentUnits.value + NL)
-                    if model.reserv.resoption.value is ReservoirModel.LINEAR_HEAT_SWEEP or (model.reserv.resoption.value is ReservoirModel.TOUGH2_SIMULATOR and model.reserv.usebuiltintough2model):
+                    if model.reserv.resoption.value in [ReservoirModel.LINEAR_HEAT_SWEEP] or (model.reserv.resoption.value is ReservoirModel.TOUGH2_SIMULATOR and model.reserv.usebuiltintough2model):
                         f.write(f'      Reservoir porosity:                               {model.reserv.porrock.value*100:10.2f} ' + model.reserv.porrock.CurrentUnits.value + NL)
                     if model.reserv.resoption.value is ReservoirModel.TOUGH2_SIMULATOR and model.reserv.usebuiltintough2model:
                         f.write(f'      Reservoir permeability:                           {model.reserv.permrock.value:10.2E} ' + model.reserv.permrock.CurrentUnits.value + NL)
@@ -464,8 +467,25 @@ class Outputs:
                     f.write(f'      Average Reservoir Heat Extraction:                {np.average(model.surfaceplant.HeatExtracted.value):10.2f} ' + model.surfaceplant.HeatExtracted.PreferredUnits.value + NL)
                     if model.wellbores.rameyoptionprod.value:
                         f.write('      Production Wellbore Heat Transmission Model = Ramey Model\n')
-                        f.write(f'      Average Production Well Temperature Drop:        {np.average(model.wellbores.ProdTempDrop.value):10.1f} ' + model.wellbores.ProdTempDrop.PreferredUnits.value + NL)
+                        # FIXME should be using CurrentUnits instead of PreferredUnits
+                        f.write(f'      Average {model.wellbores.ProdTempDrop.display_name}:        {np.average(model.wellbores.ProdTempDrop.value):10.1f} {model.wellbores.ProdTempDrop.PreferredUnits.value}\n')
+                    elif getattr(model.wellbores, 'uses_coupled_wellbore_model', False):
+                        f.write('      Production Wellbore Model = '
+                                f'{ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.display_name}\n')
+                        f.write(f'      Average {model.wellbores.ProdTempDrop.display_name}:        {np.average(model.wellbores.ProdTempDrop.value):10.1f} {model.wellbores.ProdTempDrop.CurrentUnits.value}\n')
+                        wb = model.wellbores
+                        f.write(f'      {Outputs._field_label("Wellhead Fluid Phase", 56)}{wb.coupled_wellhead_phase.value}\n')
+                        f.write(f'      {Outputs._field_label("Production Well Self-Flowing Fraction", 56)}{wb.coupled_self_flowing_fraction.value * 100:10.1f} %\n')
+                        self_flow_whp = np.asarray(wb.coupled_self_flow_wellhead_pressure.value, dtype=float)
+                        if self_flow_whp.size > 0 and np.isfinite(self_flow_whp[0]):
+                            f.write(f'      {Outputs._field_label("Initial Self-Flow Wellhead Pressure", 56)}{self_flow_whp[0]:10.1f} {wb.coupled_self_flow_wellhead_pressure.CurrentUnits.value}\n')
+                        if wb.productionwellpumping.value:
+                            f.write(f'      {Outputs._field_label("Production Pump Depth", 56)}{wb.coupled_pump_depth.value:10.1f} {wb.coupled_pump_depth.CurrentUnits.value}\n')
+                            f.write(f'      {Outputs._field_label("Average Production Well Pumping Power", 56)}{np.average(wb.PumpingPowerProd.value):10.2f} {wb.PumpingPowerProd.CurrentUnits.value}\n')
+                        if wb.coupled_pump_flags.value:
+                            f.write(f'      {Outputs._field_label("Production Pump Flags", 56)}{wb.coupled_pump_flags.value}\n')
                     else:
+                        # FIXME should be using CurrentUnits instead of PreferredUnits
                         f.write(f'      Wellbore Heat Transmission Model = Constant Temperature Drop:{model.wellbores.tempdropprod.value:10.1f} ' + model.wellbores.tempdropprod.PreferredUnits.value + NL)
                     if model.wellbores.impedancemodelused.value:
                         f.write(f'      Total Average Pressure Drop:                     {np.average(model.wellbores.DPOverall.value):10.1f} ' + model.wellbores.DPOverall.PreferredUnits.value + NL)
@@ -645,6 +665,10 @@ class Outputs:
                     sp = model.surfaceplant
                     # FIXME switch to CurrentUnits instead of PreferredUnits
                     f.write(f'      Initial geofluid availability:                    {model.surfaceplant.Availability.value[0]:10.2f} ' + model.surfaceplant.Availability.PreferredUnits.value + NL)
+                    if model.surfaceplant.plant_type.value == PlantType.COUPLED_WELLBORE:
+                        f.write(f'      Wellhead Power Cycle: {model.surfaceplant.coupled_power_cycle.value}'.rstrip() + '\n')
+                        f.write(f'      Power Cycle Path: {model.surfaceplant.coupled_plant_path_output.value}\n')
+                        f.write(f'      Power Cycle Parasitic Load:                       {model.surfaceplant.parasitic_load.value * 100:10.1f} %\n')
                     f.write(f'      Maximum Total Electricity Generation:             {np.max(model.surfaceplant.ElectricityProduced.value):10.2f} ' + model.surfaceplant.ElectricityProduced.PreferredUnits.value + NL)
                     f.write(f'      Average Total Electricity Generation:             {np.average(model.surfaceplant.ElectricityProduced.value):10.2f} ' + model.surfaceplant.ElectricityProduced.PreferredUnits.value + NL)
                     f.write(f'      Minimum Total Electricity Generation:             {np.min(model.surfaceplant.ElectricityProduced.value):10.2f} ' + model.surfaceplant.ElectricityProduced.PreferredUnits.value + NL)
