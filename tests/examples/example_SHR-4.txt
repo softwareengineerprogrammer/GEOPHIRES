@@ -16,7 +16,7 @@
 # conditions respond to the reservoir decline, since GEOPHIRES carries one flow rate per well.
 #
 # Requires the superhot-wellbore package:
-#   pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git
+#   pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git@geophires-client
 
 # *** ECONOMIC/FINANCIAL PARAMETERS ***
 # *************************************
