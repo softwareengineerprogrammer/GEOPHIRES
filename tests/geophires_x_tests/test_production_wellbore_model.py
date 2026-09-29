@@ -69,15 +69,21 @@ class ProductionWellboreModelTestCase(BaseTestCase):
         ):
             with self.subTest(selector=selector):
                 params = {'Production Wellbore Model': selector, 'Ramey Production Wellbore Model': ramey_value}
-                with self.assertLogs('root', level='WARNING') as logs:
-                    self.assertSelects(params, expected, ramey=ramey_result)
-                self.assertTrue(
-                    any(
-                        'Ramey Production Wellbore Model' in it and 'Production Wellbore Model' in it
-                        for it in logs.output
-                    ),
-                    logs.output,
-                )
+                try:
+                    with self.assertLogs('root', level='WARNING') as logs:
+                        model = self._model(params)
+                    self.assertTrue(
+                        any(
+                            'Ramey Production Wellbore Model' in it and 'Production Wellbore Model' in it
+                            for it in logs.output
+                        ),
+                        logs.output,
+                    )
+                except AssertionError as ae:
+                    self._handle_assert_logs_failure(ae)
+
+                self.assertIs(model.wellbores.production_wellbore_model.value, expected)
+                self.assertEqual(model.wellbores.rameyoptionprod.value, ramey_result)
 
     def test_redrilling_trigger_temperature_basis(self):
         """Ramey's warm-up delays a produced-temperature trigger; the reservoir-output basis fires on the reservoir."""
