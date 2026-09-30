@@ -1186,7 +1186,10 @@ class Economics:
             UnitType=Units.TIME,
             PreferredUnits=TimeUnit.YEAR,
             CurrentUnits=TimeUnit.YEAR,
-            ToolTipText=f"Number of years over which operating-period debt is amortized (for debt/loans). "
+            ToolTipText=f"Number of years over which debt is repaid (for debt/loans), counted from the Commercial "
+                        f"Operation Date (COD; Year 1). Construction years are not counted: debt drawn during "
+                        f"construction, including capitalized interest during construction, is effectively refinanced "
+                        f"as term debt at COD and repaid in level annual payments over this tenor. "
                         f"Defaults to {model.surfaceplant.plant_lifetime.Name} if not provided, "
                         f"and may not exceed it. SAM Single Owner PPA economic model only."
         )
