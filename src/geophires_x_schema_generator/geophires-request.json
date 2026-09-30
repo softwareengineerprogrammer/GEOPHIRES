@@ -1839,7 +1839,7 @@
       "maximum": 1.0
     },
     "Debt Tenor": {
-      "description": "Number of years over which operating-period debt is amortized (for debt/loans). Defaults to Plant Lifetime if not provided, and may not exceed it. SAM Single Owner PPA economic model only.",
+      "description": "Number of years over which debt is repaid (for debt/loans), counted from the Commercial Operation Date (COD; Year 1). Construction years are not counted: debt drawn during construction, including capitalized interest during construction, is effectively refinanced as term debt at COD and repaid in level annual payments over this tenor. Defaults to Plant Lifetime if not provided, and may not exceed it. SAM Single Owner PPA economic model only.",
       "type": "integer",
       "units": "yr",
       "category": "Economics",

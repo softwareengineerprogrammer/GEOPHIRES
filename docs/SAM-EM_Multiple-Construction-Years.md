@@ -58,8 +58,27 @@ engine.
 This ensures the operational model starts with the correct depreciation basis and loan principal.
 Annual `Installed cost [construction]` values are
 summed to calculate the total installed cost that is passed to SAM (`total_installed_cost`).
-`Issuance of equity [construction]` and `Issuance of debt [construction]` are summed to compute an effective debt:equity
-ratio that is passed to SAM (`debt_percent`).
+The final `Debt balance [construction]`, which includes capitalized IDC, is divided by the total installed cost to
+compute an effective debt percentage that is passed to SAM (`debt_percent`).
+
+### Construction Debt at COD
+
+GEOPHIRES does not model a separate construction loan with its own repayment schedule. Instead, debt drawn during
+construction is effectively refinanced as term debt at COD, similar to a construction loan that converts to a term loan
+when the project begins operating:
+
+1. During construction, debt draws and capitalized IDC accumulate in `Debt balance [construction]`. No interest or
+   principal is paid in cash before COD.
+1. At COD, the final (Year 0) `Debt balance [construction]` becomes the principal of the term debt in SAM
+   (`Size of debt`) through the effective debt percentage.
+1. From Year 1, the term debt accrues interest at `Inflated Bond Interest Rate` (instead of
+   `Inflated Bond Interest Rate During Construction`) and is repaid in level annual payments over `Debt Tenor` years,
+   which defaults to `Plant Lifetime`.
+
+`Debt Tenor` is counted from COD, so debt is outstanding for longer than the tenor when it is drawn before the final
+construction year.
+For example, with 3 construction years (Year -2 to Year 0), debt drawn from the first construction year, and a 15-year
+`Debt Tenor`, debt is outstanding from Year -2 until it is repaid at the end of Year 15.
 
 ## Post-Processing (Timeline-adjusted Metrics)
 
