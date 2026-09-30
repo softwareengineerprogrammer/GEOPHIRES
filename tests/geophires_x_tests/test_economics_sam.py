@@ -517,6 +517,26 @@ class EconomicsSamTestCase(BaseTestCase):
         with self.assertRaises(RuntimeError):
             _get_result_(1)  # Bond financing start year is negative year indexed, so value must be less than 0
 
+    def test_debt_tenor(self):
+        def _debt_balance(params: dict) -> list[float]:
+            r = self._get_result(params)
+            return self._get_cash_flow_row(r.result['SAM CASH FLOW PROFILE'], 'Debt balance ($)')
+
+        default_balance = _debt_balance({'Plant Lifetime': 22})
+        self.assertEqual(0, default_balance[22])
+        self.assertGreater(default_balance[21], 0)
+
+        tenor_balance = _debt_balance({'Plant Lifetime': 22, 'Debt Tenor': 12})
+        self.assertEqual(0, tenor_balance[12])
+        self.assertGreater(tenor_balance[11], 0)
+        self.assertTrue(all(it == 0 for it in tenor_balance[12:]))
+
+        equal_balance = _debt_balance({'Plant Lifetime': 22, 'Debt Tenor': 22})
+        self.assertEqual(default_balance, equal_balance)
+
+        with self.assertRaises(RuntimeError):
+            self._get_result({'Plant Lifetime': 13, 'Debt Tenor': 25})
+
     def test_ppa_pricing_model(self):
         self.assertListEqual(
             [
