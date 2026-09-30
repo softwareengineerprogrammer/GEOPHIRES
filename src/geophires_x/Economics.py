@@ -3407,14 +3407,28 @@ class Economics:
 
             def _check_temperature_for_ORC(temperature: float) -> None:
                 if temperature > 200.:
-                    msg = ('The simulated production temperature exceeds 200 degrees Celsius.  The built-in ORC utilization '
-                           'efficiency correlations may not be valid above this temperature.  Consider using a single or double '
-                           'flash plant, or providing a custom correlation via a surface plant module.  For more information, '
-                           'see: https://natlabrockies.github.io/GEOPHIRES-X/Theoretical-Basis-for-GEOPHIRES.html#surface-plant')
+                    msg = (
+                        'The simulated production temperature exceeds 200 degrees Celsius. The built-in ORC '
+                        'utilization efficiency correlations may not be valid above this temperature. Consider using '
+                        'a single or double flash plant, or providing a custom correlation via a surface plant module. '
+                        'For more information, see: '
+                        'https://natlabrockies.github.io/GEOPHIRES-X/Theoretical-Basis-for-GEOPHIRES.html#surface-plant'
+                    )
                     print(f'Warning: {msg}')
                     model.logger.warning(msg)
 
-            if model.surfaceplant.plant_type.value == PlantType.SUB_CRITICAL_ORC:
+            do_check_temperature_for_ORC = model.surfaceplant.plant_type.value in [
+                PlantType.SUB_CRITICAL_ORC,
+                PlantType.SUPER_CRITICAL_ORC
+            ]
+
+            cost_plant_type = model.surfaceplant.plant_type.value
+            if cost_plant_type == PlantType.COUPLED_WELLBORE:
+                # The coupled wellbore plant is costed as the conventional plant closest to the plant path serving most of
+                # the plant lifetime (SurfacePlantCoupledWellbore.coupled_cost_plant_type).
+                cost_plant_type = model.surfaceplant.coupled_cost_plant_type
+
+            if cost_plant_type == PlantType.SUB_CRITICAL_ORC:
                 MaxProducedTemperature = np.max(model.surfaceplant.TenteringPP.value)
                 if MaxProducedTemperature < 150.:
                     C3 = -1.458333E-3
@@ -3424,7 +3438,6 @@ class Economics:
                     CCAPP1 = C3 * MaxProducedTemperature ** 3 + C2 * MaxProducedTemperature ** 2 + C1 * MaxProducedTemperature + C0
                 else:
                     CCAPP1 = 2231 - 2 * (MaxProducedTemperature - 150.)
-                    _check_temperature_for_ORC(MaxProducedTemperature)
                 x = np.max(model.surfaceplant.ElectricityProduced.value)
                 y = np.max(model.surfaceplant.ElectricityProduced.value)
                 if y == 0.0:
@@ -3432,7 +3445,10 @@ class Economics:
                 z = math.pow(y / 15., -0.06)
                 self.Cplantcorrelation = CCAPP1 * z * x * 1000. / 1E6
 
-            elif model.surfaceplant.plant_type.value == PlantType.SUPER_CRITICAL_ORC:
+                if do_check_temperature_for_ORC:
+                    _check_temperature_for_ORC(MaxProducedTemperature)
+
+            elif cost_plant_type == PlantType.SUPER_CRITICAL_ORC:
                 MaxProducedTemperature = np.max(model.surfaceplant.TenteringPP.value)
                 if MaxProducedTemperature < 150.:
                     C3 = -1.458333E-3
@@ -3442,13 +3458,16 @@ class Economics:
                     CCAPP1 = C3 * MaxProducedTemperature ** 3 + C2 * MaxProducedTemperature ** 2 + C1 * MaxProducedTemperature + C0
                 else:
                     CCAPP1 = 2231 - 2 * (MaxProducedTemperature - 150.)
-                    _check_temperature_for_ORC(MaxProducedTemperature)
+
                 # factor 1.1 to make supercritical 10% more expansive than subcritical
                 self.Cplantcorrelation = 1.1 * CCAPP1 * math.pow(
                     np.max(model.surfaceplant.ElectricityProduced.value) / 15., -0.06) * np.max(
                     model.surfaceplant.ElectricityProduced.value) * 1000. / 1E6
 
-            elif model.surfaceplant.plant_type.value == PlantType.SINGLE_FLASH:
+                if do_check_temperature_for_ORC:
+                    _check_temperature_for_ORC(MaxProducedTemperature)
+
+            elif cost_plant_type == PlantType.SINGLE_FLASH:
                 if np.max(model.surfaceplant.ElectricityProduced.value) < 10.:
                     C2 = 4.8472E-2
                     C1 = -35.2186
@@ -3503,7 +3522,7 @@ class Economics:
                 self.Cplantcorrelation = (0.8 * a * math.pow(np.max(model.surfaceplant.ElectricityProduced.value), b) *
                                           np.max(model.surfaceplant.ElectricityProduced.value) * 1000. / 1E6)
 
-            elif model.surfaceplant.plant_type.value == PlantType.DOUBLE_FLASH:
+            elif cost_plant_type == PlantType.DOUBLE_FLASH:
                 if np.max(model.surfaceplant.ElectricityProduced.value) < 10.:
                     C2 = 4.8472E-2
                     C1 = -35.2186

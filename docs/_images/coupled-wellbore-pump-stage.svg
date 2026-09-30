@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1130" width="1000" height="1130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+<title id="title">Production pump stage of the coupled wellbore model</title>
+<desc id="desc">Decision flowchart of the superhot-wellbore production pump stage for a prescribed flow rate: self-flow check, pump intake search, envelope check, target wellhead pressure and pump pressure rise.</desc>
+<defs><marker id="arrow-616e7c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="#616e7c"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="105.0" y="16.0" width="400.0" height="52.0" rx="26.0" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="305.0" y="38.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Prescribed flow rate ṁ</text>
+<text x="305.0" y="53.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">at a far-field state P<tspan baseline-shift="sub" font-size="72%">res</tspan>, T<tspan baseline-shift="sub" font-size="72%">res</tspan></text>
+<rect x="70.0" y="94.0" width="470.0" height="56.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="305.0" y="118.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Darcy inflow and isenthalpic entry</text>
+<text x="305.0" y="133.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">feedzone state (P<tspan baseline-shift="sub" font-size="72%">bh</tspan>, h<tspan baseline-shift="sub" font-size="72%">fz</tspan>); the state fails if P<tspan baseline-shift="sub" font-size="72%">bh</tspan> &lt; 0.5 MPa</text>
+<rect x="70.0" y="176.0" width="470.0" height="56.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="305.0" y="200.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Unpumped march, feedzone → surface</text>
+<text x="305.0" y="215.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">reaches the surface? WHP<tspan baseline-shift="sub" font-size="72%">self</tspan></text>
+<polygon points="305.0,255.0 505.0,314.0 305.0,373.0 105.0,314.0" fill="#fffbea" stroke="#c99a06" stroke-width="1.4"/>
+<text x="305.0" y="293.4" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">Policy 'never', or policy 'auto'</text>
+<text x="305.0" y="309.6" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">and the well self-flows</text>
+<text x="305.0" y="325.9" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">(reaches the surface with</text>
+<text x="305.0" y="342.1" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">WHP<tspan baseline-shift="sub" font-size="72%">self</tspan> ≥ floor)?</text>
+<rect x="630.0" y="268.0" width="340.0" height="92.0" rx="46.0" fill="#e3f9e5" stroke="#3f9142" stroke-width="1.4"/>
+<text x="800.0" y="296.3" font-size="13" fill="#14532d" text-anchor="middle" font-weight="bold">Unpumped result</text>
+<text x="800.0" y="311.4" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">self-flowing; under never, fails if the</text>
+<text x="800.0" y="325.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">well does not reach the surface, and</text>
+<text x="800.0" y="340.1" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">flags self_flow_below_floor below the floor</text>
+<rect x="630.0" y="392.0" width="340.0" height="66.0" rx="7" fill="#fafafa" stroke="#bcccdc" stroke-width="1.4"/>
+<text x="800.0" y="414.8" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">floor = Coupled Wellbore Minimum Self-Flow</text>
+<text x="800.0" y="428.0" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">Wellhead Pressure, raised to Production</text>
+<text x="800.0" y="441.3" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">Wellhead Pressure when given with a flow rate</text>
+<rect x="70.0" y="412.0" width="470.0" height="84.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="305.0" y="433.8" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Intake search (walk up from the feedzone)</text>
+<text x="305.0" y="450.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">intake = top of the contiguous column that is</text>
+<text x="305.0" y="467.6" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">single-phase liquid (ρ ≥ 322 kg/m<tspan baseline-shift="super" font-size="72%">3</tspan>) with P ≥ P<tspan baseline-shift="sub" font-size="72%">sat</tspan>(T) + NPSH margin</text>
+<text x="305.0" y="482.7" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">NPSH margin: Coupled Wellbore Pump NPSH Margin (344.7 kPa)</text>
+<polygon points="305.0,524.0 455.0,562.0 305.0,600.0 155.0,562.0" fill="#fffbea" stroke="#c99a06" stroke-width="1.4"/>
+<text x="305.0" y="565.7" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">Intake found?</text>
+<polygon points="305.0,625.0 505.0,680.0 305.0,735.0 105.0,680.0" fill="#fffbea" stroke="#c99a06" stroke-width="1.4"/>
+<text x="305.0" y="667.5" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">Intake depth ≤ Pump Maximum Depth</text>
+<text x="305.0" y="683.7" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">and intake T ≤ Pump Maximum</text>
+<text x="305.0" y="700.0" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">Intake Temperature?</text>
+<rect x="630.0" y="548.0" width="340.0" height="168.0" rx="7" fill="#fff4d6" stroke="#cb6e17" stroke-width="1.4"/>
+<text x="642.0" y="583.3" font-size="12" fill="#7c2d12" text-anchor="start" font-weight="bold">Envelope policy (Coupled Wellbore Pump Envelope)</text>
+<text x="642.0" y="597.2" font-size="10.2" fill="#52606d" text-anchor="start" font-weight="normal">flags: no_liquid_intake + two_phase_at_sandface,</text>
+<text x="642.0" y="610.5" font-size="10.2" fill="#52606d" text-anchor="start" font-weight="normal">or depth_limit / temperature_limit + pump_outside_envelope</text>
+<text x="642.0" y="625.4" font-size="12" fill="#1f2933" text-anchor="start" font-weight="normal">flag: pump modelled anyway (no intake:</text>
+<text x="642.0" y="641.0" font-size="12" fill="#1f2933" text-anchor="start" font-weight="normal">unpumped result, success if it reached the surface)</text>
+<text x="642.0" y="656.6" font-size="12" fill="#1f2933" text-anchor="start" font-weight="normal">enforce: the state fails</text>
+<text x="642.0" y="672.2" font-size="12" fill="#1f2933" text-anchor="start" font-weight="normal">omit: unpumped well left below the floor if it</text>
+<text x="642.0" y="687.8" font-size="12" fill="#1f2933" text-anchor="start" font-weight="normal">reaches the surface; otherwise the state fails</text>
+<rect x="70.0" y="770.0" width="470.0" height="70.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="305.0" y="792.0" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Pump target WHP</text>
+<text x="305.0" y="808.9" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">Production Wellhead Pressure (with a prescribed flow rate),</text>
+<text x="305.0" y="825.8" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">else P<tspan baseline-shift="sub" font-size="72%">sat</tspan>(T<tspan baseline-shift="sub" font-size="72%">intake</tspan>) + NPSH margin</text>
+<polygon points="305.0,860.0 455.0,898.0 305.0,936.0 155.0,898.0" fill="#fffbea" stroke="#c99a06" stroke-width="1.4"/>
+<text x="305.0" y="901.7" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">WHP<tspan baseline-shift="sub" font-size="72%">self</tspan> ≥ target?</text>
+<rect x="630.0" y="872.0" width="340.0" height="52.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="800.0" y="894.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">ΔP = 0</text>
+<text x="800.0" y="909.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">zero-rise pump (pumped only for the floor)</text>
+<rect x="70.0" y="962.0" width="470.0" height="74.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="305.0" y="987.3" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Solve the pump pressure rise ΔP</text>
+<text x="305.0" y="1004.2" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">re-march above the pump; secant with bisection, ±0.01 MPa</text>
+<text x="305.0" y="1019.2" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">discharge h<tspan baseline-shift="sub" font-size="72%">2</tspan> = h<tspan baseline-shift="sub" font-size="72%">1</tspan> + ΔP / (ρ<tspan baseline-shift="sub" font-size="72%">1</tspan> η): losses heat the fluid</text>
+<rect x="95.0" y="1062.0" width="420.0" height="56.0" rx="28.0" fill="#e3f9e5" stroke="#3f9142" stroke-width="1.4"/>
+<text x="305.0" y="1086.7" font-size="13" fill="#14532d" text-anchor="middle" font-weight="bold">Pumped well: WHP = target</text>
+<text x="305.0" y="1101.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">pump power ṁ ΔP / (ρ<tspan baseline-shift="sub" font-size="72%">1</tspan> η) per well</text>
+<rect x="630.0" y="980.0" width="340.0" height="138.0" rx="7" fill="#ffe3e3" stroke="#cf1124" stroke-width="1.4"/>
+<text x="800.0" y="1012.8" font-size="12" fill="#610316" text-anchor="middle" font-weight="bold">In GEOPHIRES</text>
+<text x="800.0" y="1026.7" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">a failed state aborts the run, as does a flag</text>
+<text x="800.0" y="1040.0" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">the envelope policy forbids (enforce:</text>
+<text x="800.0" y="1053.2" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">pump_outside_envelope, no_liquid_intake,</text>
+<text x="800.0" y="1066.5" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">choked_flow; omit: choked_flow). Pump power</text>
+<text x="800.0" y="1079.7" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">and depth feed the standard production</text>
+<text x="800.0" y="1093.0" font-size="10.2" fill="#52606d" text-anchor="middle" font-weight="normal">pumping outputs and pump cost.</text>
+<path d="M305.0,68.0 L305.0,94.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M305.0,150.0 L305.0,176.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M305.0,232.0 L305.0,255.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M505.0,314.0 L630.0,314.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="553.8" y="304.8" width="27.3" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="567.5" y="318.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">yes</text>
+<path d="M305.0,373.0 L305.0,412.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="249.5" y="386.8" width="111.0" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="305.0" y="400.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">no (or 'always')</text>
+<path d="M305.0,496.0 L305.0,524.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M455.0,562.0 L600.0,562.0 L600.0,588.0 L630.0,588.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="517.1" y="552.8" width="20.9" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="527.5" y="566.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">no</text>
+<path d="M305.0,600.0 L305.0,625.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="311.3" y="602.8" width="27.3" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="325.0" y="616.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">yes</text>
+<path d="M505.0,680.0 L600.0,680.0 L600.0,676.0 L630.0,676.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="542.1" y="670.8" width="20.9" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="552.5" y="684.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">no</text>
+<path d="M305.0,735.0 L305.0,770.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="311.3" y="742.8" width="27.3" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="325.0" y="756.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">yes</text>
+<path d="M800.0,716.0 L800.0,755.0 L385.0,755.0 L385.0,770.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="783.1" y="730.8" width="33.8" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="800.0" y="744.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">flag</text>
+<path d="M305.0,840.0 L305.0,860.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M455.0,898.0 L630.0,898.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="528.8" y="888.8" width="27.3" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="542.5" y="902.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">yes</text>
+<path d="M305.0,936.0 L305.0,962.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="310.6" y="936.8" width="20.9" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="321.0" y="950.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">no</text>
+<path d="M305.0,1036.0 L305.0,1062.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M800.0,924.0 L800.0,948.0 L580.0,948.0 L580.0,1090.0 L515.0,1090.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+</svg>
