@@ -168,11 +168,11 @@ Example-specific web interface deeplinks are listed in the Link column.
      - Input file
      - Case report file
      - Link
-   * - Case Study: 500 MW EGS Modeled on Fervo Cape Station (2026 Update) (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html>`__)
-     - `Fervo_Project_Cape-5.txt <tests/examples/Fervo_Project_Cape-5.txt>`__
-     - `.out <tests/examples/Fervo_Project_Cape-5.out>`__
-     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-5>`__
-   * - 100 MW EGS Modeled on Fervo Cape Station
+   * - Case Study: 500 MW EGS Modeled on Fervo Cape Station (September 2026 Update) (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-7.html>`__)
+     - `Fervo_Project_Cape-7.txt <tests/examples/Fervo_Project_Cape-7.txt>`__
+     - `.out <tests/examples/Fervo_Project_Cape-7.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-7>`__
+   * - 100 MW EGS Modeled on Fervo Cape Station (February 2026 Update)
      - `Fervo_Project_Cape-6.txt <tests/examples/Fervo_Project_Cape-6.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape-6.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-6>`__
@@ -420,6 +420,10 @@ Example-specific web interface deeplinks are listed in the Link column.
      - `Fervo_Project_Cape-4.txt <tests/examples/Fervo_Project_Cape-4.txt>`__
      - `.out <tests/examples/Fervo_Project_Cape-4.out>`__
      - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-4>`__
+   * - Fervo Cape Station 5: [Deprecated] Case Study: 500 MW EGS Modeled on Fervo Cape Station (February 2026 Update) (`documentation <https://softwareengineerprogrammer.github.io/GEOPHIRES/Fervo_Project_Cape-5.html>`__)
+     - `Fervo_Project_Cape-5.txt <tests/examples/Fervo_Project_Cape-5.txt>`__
+     - `.out <tests/examples/Fervo_Project_Cape-5.out>`__
+     - `link <https://gtp.scientificwebservices.com/geophires?geophires-example-id=Fervo_Project_Cape-5>`__
    * -  
      -  
      -  
