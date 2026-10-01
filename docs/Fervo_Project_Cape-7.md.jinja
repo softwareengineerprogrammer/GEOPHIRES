@@ -618,7 +618,7 @@ Including these may reduce the levered IRR.
 1. Reserve Accounts: The cash flow analysis assumes immediate liquidity. It does not model working capital, debt service, or major equipment replacement reserve accounts. Project financial partners may require that the project owner(s) establish and fund reserve accounts. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/460) to view the relevant GEOPHIRES tracking issue on GitHub.
 1. Insurance Premiums: The model does not include a specific line item for insurance. For EGS projects involving deep subsurface risks, insurance premiums could represent an additional annual operating expense. [Click here](https://github.com/NatLabRockies/GEOPHIRES-X/issues/369) to view the relevant GEOPHIRES tracking issue on GitHub.
 1. Investment Tax Credit Basis: GEOPHIRES's SAM Single Owner PPA model applies the ITC rate to total installed cost, which includes the grid interconnection cost. Qualified interconnection property is only eligible for the ITC for energy property of 5 MW or less (IRC §48(a)(8)), so the model overstates the credit by approximately {{ '$' ~ (interconnection_share_of_total_capex_musd * 0.3) | round | int ~ 'M' }} (30% of the {{ '$' ~ interconnection_share_of_total_capex_musd ~ 'M' }} interconnection cost including its share of inflation and interest during construction). The case study retains the statutory 30% rate because the same line item carries an unmodeled benefit in the other direction: in non-ISO balancing authorities such as PacifiCorp, network upgrade costs, the majority of interconnection cost, are often refunded to the interconnection customer over up to 20 years with interest once the plant reaches commercial operation (Seel et al., 2026). An ITC rate of {{ itc_rate_excluding_interconnection_pct }}% applied to total installed cost removes the overstatement and reduces the after-tax IRR by approximately {{ itc_excluding_interconnection_irr_reduction_pct_pts }} percentage points. A parameter that excludes a specified amount from the ITC basis, or an ITC amount input, would allow both effects to be modeled explicitly.
-1. Debt Term: GEOPHIRES sets the loan term of the SAM Single Owner PPA model to the plant lifetime, so the case study repays debt in level annual payments over {{ project_lifetime_yr }} years, beyond the 15-year PPA term. The minimum pre-tax debt service coverage ratio (DSCR) is {{ min_dscr }}, in operating year {{ min_dscr_year }}. A loan term no longer than the PPA term would increase annual debt service, reducing the DSCR and, at the same debt fraction, the levered IRR.
+1. Debt Term: The case study repays debt in level annual payments over {{ debt_tenor_yr }} years from commercial operation (see Debt Tenor){% if debt_tenor_yr > 15 %}, beyond the 15-year PPA term, so debt service in the final {{ debt_tenor_yr - 15 }} years of the loan depends on the post-PPA price{% endif %}. The minimum pre-tax debt service coverage ratio (DSCR) is {{ min_dscr }}, in operating year {{ min_dscr_year }}.{% if debt_tenor_yr > 15 %} A loan term no longer than the PPA term would increase annual debt service, reducing the DSCR and, at the same debt fraction, the levered IRR.{% endif %}
 1. Salvage Value and Decommissioning: The SAM Single Owner PPA model credits a salvage value of {{ salvage_value_pct_of_total_capex ~ '%' }} of total CAPEX ({{ '$' ~ salvage_value_musd ~ 'M' }}) as revenue in the final project year. Well plugging and abandonment and other decommissioning costs are not modeled.
 
 ### Technical & Operational Considerations
@@ -716,6 +716,14 @@ https://www.fool.com/earnings/call-transcripts/2026/08/19/fervo-energy-frvo-q2-2
 Fervo Energy. (2026g, August 12). Q2 2026 Quarterly Results [Earnings presentation].
 https://ir.fervoenergy.com/static-files/28260ce5-2ac0-458e-bfb7-2d80f3709cae
 
+Fervo Energy. (2026h, August 13). Form 10-Q for the quarter ended June 30, 2026 (Project Granite Facility). U.S.
+Securities and Exchange Commission.
+https://www.sec.gov/Archives/edgar/data/1853868/000162828026056457/frvo-20260630.htm
+
+Fervo Energy. (2026i, March 19). Fervo Energy Secures $421 Million in Non-Recourse Project Financing for Cape
+Station.
+https://fervoenergy.com/fervo-energy-secures-421-million-in-non-recourse-project-financing-for-cape-station/
+
 Gradl, C. (2018). Review of Recent Unconventional Completion Innovations and their Applicability to EGS Wells. Stanford
 Geothermal Workshop.
 https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2018/Gradl.pdf
@@ -764,6 +772,9 @@ Rapid Cost Reductions and Performance Improvements. https://doi.org/10.31223/X5V
 
 Norbeck J., Latimer T. (2023). Commercial-Scale Demonstration of a First-of-a-Kind Enhanced Geothermal
 System. https://doi.org/10.31223/X52X0B
+
+Norton Rose Fulbright. (2025, July 7). Effects of "One Big Beautiful Bill" on Projects.
+https://www.projectfinance.law/publications/effects-of-one-big-beautiful-bill-on-projects
 
 PacifiCorp. (2017, June 1). FAQ: Transmission and Ancillary Service Rate Changes.
 https://www.oasis.oati.com/PPW/PPWdocs/Rate_Update_FAQ_20170601.pdf

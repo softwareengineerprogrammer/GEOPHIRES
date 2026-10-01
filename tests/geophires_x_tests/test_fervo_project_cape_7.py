@@ -399,6 +399,8 @@ class FervoProjectCape7TestCase(BaseTestCase):
 
         self.assertGreaterEqual(values['min_dscr_year'], 1)
         self.assertGreater(float(values['min_dscr']), 1.0)
+        self.assertGreaterEqual(values['debt_tenor_yr'], values['min_dscr_year'])
+        self.assertLessEqual(values['debt_tenor_yr'], values['project_lifetime_yr'])
 
         # The base case redrills, and the remaining reservoir heat content in the annual profile is not reset by
         # redrilling (see the Redrilling Assumptions discussion in the case study documentation).

@@ -467,6 +467,7 @@ def get_result_values(result: GeophiresXResult) -> dict[str, Any]:
         'project_lifetime_yr': econ['Project lifetime']['value'],
         'min_dscr': f'{min_dscr:.2f}',
         'min_dscr_year': min_dscr_year,
+        'debt_tenor_yr': _get_debt_tenor_yr(result),
         'salvage_value_musd': f'{salvage_value_musd:,.0f}',
         'salvage_value_pct_of_total_capex': f'{salvage_value_musd / total_capex_musd * 100.0:.0f}',
         # Capital Costs
@@ -855,11 +856,24 @@ def _get_sam_cash_flow_operating_year_values(result: GeophiresXResult, row_name:
 
 def _get_min_dscr(result: GeophiresXResult) -> tuple[int, float]:
     """
-    :return: Operating year and value of the minimum pre-tax debt service coverage ratio
+    :return: Operating year and value of the minimum pre-tax debt service coverage ratio, over the years with debt
+        service. SAM reports a DSCR of 0 once the debt is repaid, i.e. after the Debt Tenor if it is shorter than the
+        plant lifetime.
     """
     dscr_by_year = _get_sam_cash_flow_operating_year_values(result, 'DSCR (pre-tax)')
-    min_dscr_year = min(dscr_by_year, key=lambda year: dscr_by_year[year])
+    debt_payment_by_year = _get_sam_cash_flow_operating_year_values(result, 'Debt total payment ($)')
+    debt_service_years = [year for year in dscr_by_year if debt_payment_by_year.get(year, 0.0) > 0]
+    min_dscr_year = min(debt_service_years, key=lambda year: dscr_by_year[year])
     return min_dscr_year, dscr_by_year[min_dscr_year]
+
+
+def _get_debt_tenor_yr(result: GeophiresXResult) -> int:
+    """
+    :return: Number of operating years with debt service, i.e. the effective Debt Tenor (the plant lifetime if Debt
+        Tenor is not provided)
+    """
+    debt_payment_by_year = _get_sam_cash_flow_operating_year_values(result, 'Debt total payment ($)')
+    return max(year for year, payment in debt_payment_by_year.items() if payment > 0)
 
 
 def _get_final_year_salvage_value_musd(result: GeophiresXResult) -> float:
@@ -1054,6 +1068,20 @@ _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME: dict[str, str] = {
     'Electricity Escalation Start Year': (
         'First escalation step in the second operating year, matching a PPA that escalates from the first '
         'anniversary of commercial operation.'
+    ),
+    'Debt Tenor': (
+        'New input in GEOPHIRES 3.18; the February 2026 Update repaid debt over the 30-year plant lifetime. 18 years is '
+        'the 2024b ATB debt amortization assumption (NREL, 2025) and the SAM default, 3 years beyond the 15-year PPA '
+        'term.'
+    ),
+    'Fraction of Investment in Bonds': (
+        'Resized for a minimum pre-tax DSCR of at least 1.35, the 2024b ATB geothermal value (NREL, 2025), at the '
+        '18-year Debt Tenor; at 0.7, the minimum DSCR would be 1.23.'
+    ),
+    'Depreciation Schedule': (
+        'New input. 5-year MACRS is the statutory class for facilities that claim the technology-neutral clean '
+        'electricity credits (IRC sections 48E and 45Y), replacing the 20-year straight-line schedule of the SAM '
+        'template. Assumes the owner can use the early-year tax losses, for example through a tax equity partner.'
     ),
     'Construction Years': (
         "A SOAK developer is modeled with one fewer year than the 5-year FOAK timeline, informed by Fervo's Phase I "
