@@ -35,7 +35,11 @@ def get_singh_et_al_base_simulation_result(base_input_params: GeophiresInputPara
         -> tuple[GeophiresInputParameters,GeophiresXResult]:
     singh_et_al_base_simulation_input_params = ImmutableGeophiresInputParameters(
         from_file_path=base_input_params.as_file_path(),
-        params=_SINGH_ET_AL_BASE_SIMULATION_PARAMETERS,
+        params={
+            **_SINGH_ET_AL_BASE_SIMULATION_PARAMETERS,
+            # Ensure debt tenor does not exceed plant lifetime
+            'Debt Tenor': _SINGH_ET_AL_BASE_SIMULATION_PARAMETERS['Plant Lifetime']
+        },
     )
     # fmt:on
 
