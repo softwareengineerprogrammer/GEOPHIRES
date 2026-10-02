@@ -16,11 +16,14 @@
         }
     </style>
 
-# \[Deprecated\] GEOPHIRES Case Study: 500 MW EGS Modeled on Fervo Cape Station (February 2026 Update)
+# GEOPHIRES Case Study: 500 MW EGS Modeled on Fervo Cape Station (February 2026 Update)
 
 .. raw:: html
 
-    <p style="font-style: italic; font-weight: bold;">⚠️️ This is a deprecated version of the case study. <a href="Fervo_Project_Cape-7.html">Click here</a> to view an updated version (<tt>Fervo_Project_Cape-7</tt>).</p>
+    <p style="font-style: italic; font-weight: bold;">
+    <!-- ⚠️️ This is a deprecated version of the case study. -->
+    ℹ️️ <a href="Fervo_Project_Cape-7.html">Click here</a> to view the October 2026 Update preview version (<tt>Fervo_Project_Cape-7</tt>).
+    </p>
 
 ---
 
