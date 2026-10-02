@@ -452,7 +452,7 @@ class FervoProjectCape7TestCase(BaseTestCase):
 
         # Previous and this version compared to themselves
         self.assertEqual(
-            '| Parameter | February 2026 Update | September 2026 Update | Rationale |\n|---|---|---|---|',
+            '| Parameter | February 2026 Update | October 2026 Update | Rationale |\n|---|---|---|---|',
             generate_fervo_project_cape_7_md.generate_fpc7_previous_version_input_changes_table_md(
                 input_params, input_params
             ),

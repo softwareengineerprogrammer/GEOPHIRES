@@ -1044,7 +1044,7 @@ def _get_list_display(items: list[Any]) -> str:
 _FPC7_PREVIOUS_VERSION_EXAMPLE_NAME = 'Fervo_Project_Cape-5'
 
 _FPC7_PREVIOUS_VERSION_LABEL = 'February 2026 Update'
-_FPC7_CURRENT_VERSION_LABEL = 'September 2026 Update'
+_FPC7_CURRENT_VERSION_LABEL = 'October 2026 Update'
 
 # Rationale for each input parameter whose value differs from the previous version, shown in the Previous Versions
 # input changes table. See the input file comments for full details and citations.

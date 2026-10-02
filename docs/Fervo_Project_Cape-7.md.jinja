@@ -16,7 +16,7 @@
         }
     </style>
 
-# GEOPHIRES Case Study: 500 MW EGS Modeled on Fervo Cape Station (September 2026 Update)
+# GEOPHIRES Case Study: 500 MW EGS Modeled on Fervo Cape Station (October 2026 Update)
 
 ## Introduction
 
@@ -27,7 +27,7 @@ a second-of-a-kind (SOAK) analog of Phases I and II of Fervo Energy's [Cape Stat
 
 Key results include **LCOE =** **{{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }}**, **IRR = {{ irr_pct ~ '%' }}**, and **Total CAPEX =** **{{ '$' ~ capex_usd_per_kw ~ '/kW' }}**. [Click here to go to the Results section](#results).
 
-The September 2026 Update aligns the case study's subsurface design with the Fervo 3.0 well design disclosed for
+The October 2026 Update aligns the case study's subsurface design with the Fervo 3.0 well design disclosed for
 Cape Station Phase II, models lateral drilling, grid interconnection, and transmission service costs explicitly, and
 updates PPA pricing to Fervo's reported range for contracts under negotiation (Fervo Energy, 2026f).
 See the [Previous Versions section](#previous-versions-section) for a summary of changes from the February 2026 Update.
@@ -498,7 +498,7 @@ rate.
 
 ### 100 MWe Model (Phase I)
 
-The 100 MWe model, with equivalent capacity to Phase I, has not yet been updated for the September 2026 Update.
+The 100 MWe model, with equivalent capacity to Phase I, has not yet been updated for the October 2026 Update.
 The February 2026 Update's 100 MWe model, `Fervo_Project_Cape-6`, is documented in the
 [February 2026 Update of the case study](Fervo_Project_Cape-5.html#Fervo_Project_Cape-6-section).
 
@@ -540,7 +540,7 @@ and [Fervo_Project_Cape-5.out](https://github.com/softwareengineerprogrammer/GEO
 
 Last Updated: 2026-07-03
 
-Key differences in the September 2026 Update:
+Key differences in the October 2026 Update:
 
 1. Subsurface design aligned with the Fervo 3.0 well design: 3.06 km reservoir depth (221℃ / 430℉), 7,500 ft cased laterals, 8⅝ inch casing, and 225 fractures per well
 1. Lateral drilling cost modeled explicitly (`Well Geometry Configuration`, `Number of Multilateral Sections per Vertical Section`, `Multilaterals Cased`, `All-in Nonvertical Drilling Costs`), with the drilling cost adjustment factor recalibrated to 0.72 against Fervo's disclosed Phase I well costs
@@ -553,7 +553,7 @@ Key differences in the September 2026 Update:
 1. `ResFrac Profile + Hotter/Deeper Scenario` variant removed. It applied the Singh et al. (2025) temperature profile for the Phase I design to the February 2026 Update's 100 MWe inputs at a 3 km depth; the base case now uses the deeper 3.0 design, to which that profile does not apply
 1. Reduced Redrilling Scenario rebuilt on current inputs (greater fracture height) and generated with the documentation instead of linked as a shared result
 
-The following tables list every input parameter whose value differs between the February 2026 Update and the September 2026
+The following tables list every input parameter whose value differs between the February 2026 Update and the October 2026
 Update, with the rationale for each change, and compare key results.
 See the input files for the full parameter comments and citations.
 
@@ -562,7 +562,7 @@ See the input files for the full parameter comments and citations.
 {{ previous_version_result_changes_table_md }}
 
 LCOE changes with the PPA price as well as with costs (see [Impact of PPA Price on LCOE](#impact-of-ppa-price-on-lcoe)).
-With the February 2026 Update's PPA terms and all other September 2026 Update inputs, LCOE is
+With the February 2026 Update's PPA terms and all other October 2026 Update inputs, LCOE is
 {{ '$' ~ previous_version_ppa_terms_lcoe_usd_per_mwh ~ '/MWh' }} rather than {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }};
 that difference reflects the PPA price change rather than cost changes.
 
