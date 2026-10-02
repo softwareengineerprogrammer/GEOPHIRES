@@ -846,6 +846,15 @@
       "minimum": 0.1,
       "maximum": 100.0
     },
+    "Minimum Remaining Project Years for Redrill": {
+      "description": "Minimum number of years remaining in the project lifetime required to justify a redrilling event. If a redrill is triggered (via thermal drawdown or well integrity) with fewer years remaining than this value, the redrill is aborted. If the aborted trigger was thermal, the well continues to produce at declining temperatures. If the aborted trigger was mechanical integrity, the well is shut in and production drops to zero.",
+      "type": "number",
+      "units": "yr",
+      "category": "Well Bores",
+      "default": 0.0,
+      "minimum": 0.0,
+      "maximum": 100.0
+    },
     "Is AGS": {
       "description": "Set to true if the model is for an Advanced Geothermal System (AGS)",
       "type": "boolean",
