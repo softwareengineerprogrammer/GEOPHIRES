@@ -1050,7 +1050,7 @@ _FPC7_CURRENT_VERSION_LABEL = 'October 2026 Update'
 # input changes table. See the input file comments for full details and citations.
 _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME: dict[str, str] = {
     'Inflation Rate': (
-        'Updated for 2026 inflation: US CPI-U was 3.4% year over year in July 2026, with core at 2.5% (BLS, 2026b). '
+        'Updated for 2026 inflation: US CPI-U was 3.4% year over year in August 2026, with core at 2.4% (BLS, 2026b). '
         'The February 2026 Update used December 2025 inflation.'
     ),
     'Starting Electricity Sale Price': (
@@ -1076,7 +1076,7 @@ _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME: dict[str, str] = {
     ),
     'Fraction of Investment in Bonds': (
         'Resized for a minimum pre-tax DSCR of at least 1.35, the 2024b ATB geothermal value (NREL, 2025), at the '
-        '18-year Debt Tenor; at 0.7, the minimum DSCR would be 1.23.'
+        '18-year Debt Tenor; at 0.7, the minimum DSCR would be 1.21.'
     ),
     'Depreciation Schedule': (
         'New input. 5-year MACRS is the statutory class for facilities that claim the technology-neutral clean '
@@ -1085,7 +1085,7 @@ _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME: dict[str, str] = {
     ),
     'Construction Years': (
         "A SOAK developer is modeled with one fewer year than the 5-year FOAK timeline, informed by Fervo's Phase I "
-        'build pace and rig capacity (Fervo Energy, 2026e; 2026f).'
+        'build pace and rig capacity (Fervo Energy, 2026e; 2026f; 2026j).'
     ),
     'Construction CAPEX Schedule': (
         'The first two years of the 5-year DOE-ATB hybrid schedule are merged to match the 4-year construction period.'
@@ -1119,8 +1119,8 @@ _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME: dict[str, str] = {
         'Update.'
     ),
     'Annual License Fees Etc': (
-        "Long-term firm point-to-point transmission service for 500 MW at PacifiCorp's 2017 tariff escalated to 2026 "
-        '(PacifiCorp, 2017). Not included in the February 2026 Update.'
+        "Long-term firm point-to-point transmission service for 500 MW at PacifiCorp's June 2025 OATT formula rate "
+        '(Rocky Mountain Power, 2026) plus Schedule 1 (PacifiCorp, 2017). Not included in the February 2026 Update.'
     ),
     'Reservoir Depth': (
         'Depth at which the reservoir reaches about 221℃ (430℉), the Fervo 3.0 design point for Phase II (Fervo '
@@ -1392,13 +1392,13 @@ def generate_fpc_opex_output_table_md(input_params: GeophiresInputParameters, re
         elif output_param_name == 'Annual License Fees Etc':
             # Output unit is MUSD (matching the input parameter) although the value is an annual cost
             value_unit_display = f'${result_value_unit_dict["value"]}M/yr'
-            reference_value_display = '$16.4M/yr; ~$10M/yr'
+            reference_value_display = '$16.4M/yr; ~$12M/yr'
             reference_source_display = (
                 'Long-term firm point-to-point transmission service for 500 MW, entered as '
                 '`Annual License Fees Etc` (see Economic Parameters). Reference values apply 2017 PacifiCorp '
-                'OATT Schedule 7 and 1 rates (PacifiCorp, 2017) and the BPA fiscal year 2024–2025 long-term firm '
-                'point-to-point rate (BPA, 2026) to 500 MW; the case study value escalates the PacifiCorp rate at '
-                '3% per year to 2026.'
+                'OATT Schedule 7 and 1 rates (PacifiCorp, 2017) and the BPA fiscal year 2026–2028 long-term firm '
+                "point-to-point rate (BPA, 2025) to 500 MW; the case study value applies PacifiCorp's June 2025 OATT "
+                'formula rate (Rocky Mountain Power, 2026).'
             )
         else:
             reference_source_display = _get_output_parameter_description(output_param_name)
