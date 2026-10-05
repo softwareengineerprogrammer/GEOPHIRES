@@ -1155,6 +1155,44 @@ _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME: dict[str, str] = {
     'Productivity Index': 'Derated in proportion with the Injectivity Index.',
 }
 
+# Groups of input parameters that are shown consecutively, in the listed order, in the Previous Versions input changes
+# table. Each group is placed at the position of its first member in the default order (this version's input file
+# order, followed by parameters that were removed from the previous version). Parameters that did not change are
+# omitted from the group. Parameters not listed in any group keep their default position.
+_FPC7_PREVIOUS_VERSION_INPUT_CHANGE_PARAM_NAME_GROUPS: list[list[str]] = [
+    [
+        'Well Geometry Configuration',
+        'Number of Multilateral Sections per Vertical Section',
+        'Number of Multilateral Sections',
+        'Nonvertical Length per Multilateral Section',
+    ],
+    [
+        'Reservoir Stimulation Capital Cost per Fracture Surface Area',
+        'Reservoir Stimulation Capital Cost per Production Well',
+        'Reservoir Stimulation Capital Cost per Injection Well',
+    ],
+]
+
+
+def _get_grouped_param_names(param_names: list[str], param_name_groups: list[list[str]]) -> list[str]:
+    """
+    :param param_names: Parameter names in default order
+    :param param_name_groups: Groups of parameter names to show consecutively, in the listed order, at the position of
+        the first member of the group present in param_names. Group members not present in param_names are ignored.
+    :return: Parameter names with each group's members made consecutive
+    """
+    grouped_param_names = list(param_names)
+    for group in param_name_groups:
+        members = [it for it in group if it in grouped_param_names]
+        if len(members) < 2:
+            continue
+
+        group_idx = min(grouped_param_names.index(it) for it in members)
+        grouped_param_names = [it for it in grouped_param_names if it not in members]
+        grouped_param_names[group_idx:group_idx] = members
+
+    return grouped_param_names
+
 
 def _get_fpc7_previous_version(project_root: Path) -> tuple[GeophiresInputParameters, GeophiresXResult]:
     examples_dir = project_root / 'tests/examples'
@@ -1472,10 +1510,8 @@ def generate_fpc7_previous_version_input_changes_table_md(
 
     param_names = list(params.keys()) + [it for it in previous_params if it not in params]
 
-    table_md = (
-        f'| Parameter | {_FPC7_PREVIOUS_VERSION_LABEL} | {_FPC7_CURRENT_VERSION_LABEL} | Rationale |\n'
-        f'|---|---|---|---|\n'
-    )
+    # (previous value display, value display) by name of changed parameter, in default order
+    changed_param_displays: dict[str, tuple[str, str]] = {}
     params_missing_rationale = []
     for param_name in param_names:
         previous_value_display = _get_version_comparison_input_value_display(
@@ -1485,11 +1521,21 @@ def generate_fpc7_previous_version_input_changes_table_md(
         if previous_value_display == value_display:
             continue
 
-        rationale = _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME.get(param_name)
-        if rationale is None:
+        if param_name not in _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME:
             params_missing_rationale.append(param_name)
             continue
 
+        changed_param_displays[param_name] = (previous_value_display, value_display)
+
+    table_md = (
+        f'| Parameter | {_FPC7_PREVIOUS_VERSION_LABEL} | {_FPC7_CURRENT_VERSION_LABEL} | Rationale |\n'
+        f'|---|---|---|---|\n'
+    )
+    for param_name in _get_grouped_param_names(
+        list(changed_param_displays.keys()), _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_PARAM_NAME_GROUPS
+    ):
+        previous_value_display, value_display = changed_param_displays[param_name]
+        rationale = _FPC7_PREVIOUS_VERSION_INPUT_CHANGE_RATIONALE_BY_PARAM_NAME[param_name]
         table_md += f'| {param_name} | {previous_value_display} | {value_display} | {rationale} |\n'
 
     if len(params_missing_rationale) > 0:

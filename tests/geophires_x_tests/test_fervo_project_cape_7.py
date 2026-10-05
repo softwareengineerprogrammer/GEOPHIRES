@@ -434,6 +434,18 @@ class FervoProjectCape7TestCase(BaseTestCase):
         self.assertIn('| Number of Multilateral Sections | 0 | Not set |', input_changes_md)
         self.assertNotIn('| Fracture Separation |', input_changes_md)  # Unchanged
 
+        # Grouped parameters are consecutive: the removed parameter immediately follows its replacement rather than
+        # being appended after this version's parameters.
+        table_param_names = [it.split('|')[1].strip() for it in input_changes_md.split('\n')[2:]]
+        self.assertEqual(
+            table_param_names.index('Number of Multilateral Sections per Vertical Section') + 1,
+            table_param_names.index('Number of Multilateral Sections'),
+        )
+        self.assertEqual(
+            table_param_names.index('Injectivity Index') + 1,
+            table_param_names.index('Productivity Index'),
+        )
+
         with self.assertRaises(ValueError):
             # Changed parameters without a rationale are not silently omitted.
             generate_fervo_project_cape_7_md.generate_fpc7_previous_version_input_changes_table_md(
@@ -460,6 +472,25 @@ class FervoProjectCape7TestCase(BaseTestCase):
         self.assertNotIn(
             'pts',
             generate_fervo_project_cape_7_md.generate_fpc7_previous_version_result_changes_table_md(result, result),
+        )
+
+    def test_grouped_param_names(self) -> None:
+        # noinspection PyProtectedMember
+        grouped = generate_fervo_project_cape_7_md._get_grouped_param_names
+
+        self.assertEqual(['a', 'b', 'c', 'd'], grouped(['a', 'b', 'c', 'd'], []))
+
+        # Group is placed at the position of its first present member, in the listed order
+        self.assertEqual(['a', 'd', 'b', 'c', 'e'], grouped(['a', 'b', 'c', 'd', 'e'], [['d', 'b']]))
+        self.assertEqual(['a', 'b', 'd', 'c'], grouped(['a', 'b', 'c', 'd'], [['b', 'd']]))
+
+        # Members not present are ignored; groups with fewer than two present members have no effect
+        self.assertEqual(['a', 'c', 'b'], grouped(['a', 'b', 'c'], [['x', 'c', 'b', 'y']]))
+        self.assertEqual(['a', 'b', 'c'], grouped(['a', 'b', 'c'], [['x', 'c']]))
+
+        # Multiple groups
+        self.assertEqual(
+            ['b', 'a', 'e', 'c', 'd', 'f'], grouped(['a', 'b', 'c', 'd', 'e', 'f'], [['b', 'a'], ['e', 'c', 'd']])
         )
 
     def parse_markdown_results_structured(self, markdown_text: str) -> dict:
