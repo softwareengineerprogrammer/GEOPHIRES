@@ -133,6 +133,67 @@ Then, verify that Actions pass on your commit(s) on GitHub
 
 7. Submit a pull request through the GitHub website following `the guidelines <#Pull-Request-Guidelines>`_.
 
+Updating Example Test Results
+-----------------------------
+
+Expected outputs for every GEOPHIRES example are stored in source under
+``tests/examples/*.out``. The ``GeophiresXTestCase.test_geophires_examples``
+unit test runs each example and compares the result against its stored output.
+This comparison is a large part of how the project achieves 80%+ test coverage.
+
+A change that alters calculation results will therefore cause example tests to
+fail. When that happens, the failure message includes the command to regenerate
+the affected example::
+
+    (Run `./tests/regenerate-example-result.sh Example1` if this is expected due to calculation updates)
+
+If several examples fail, a combined command covering all of them is printed at
+the end of the test run.
+
+On Windows, use ``./tests/regenerate-example-result.ps1`` instead.
+
+Before regenerating, make sure your virtualenv is activated and you have run
+``pip install -e .`` -- otherwise the script will fail or generate incorrect
+results.
+
+Should you regenerate?
+^^^^^^^^^^^^^^^^^^^^^^
+
+Regeneration overwrites the expected results, so it is only correct when the new
+results are the intended consequence of your change. A failing example test is
+otherwise telling you something useful.
+
+The failure message helps you decide, since it reports how closely the results
+match -- for example, ``Results are approximately equal within 2%``:
+
+* A small difference, in examples your change was expected to affect, usually
+  means the change worked as intended. Regenerating is appropriate.
+* A large difference, or ``Results are not approximately equal within any
+  percentage <100``, suggests the change did something other than what you
+  intended. Investigate before regenerating.
+* Failures in examples unrelated to your change are worth understanding first.
+  An economics change that alters a reservoir-only example is a signal, not a
+  formality.
+
+After regenerating, inspect the diff with ``git diff tests/examples/`` and
+confirm the changes are ones you can explain. The regenerated values become the
+expected results that future contributors test against.
+
+Float deviation across architectures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A small number of examples produce slightly different results on different
+processor architectures. These are listed in ``cases_to_allow_almost_equal`` in
+``tests/test_geophires_x.py`` and are compared approximately rather than exactly.
+
+If an example fails locally but passes in GitHub Actions, with differences only
+in the last significant digits, this is the likely cause. Do not regenerate in
+that case: the stored results are correct, and regenerating would make them
+correct only on your machine.
+
+Adding further examples to the approximate-comparison list should be avoided
+where possible, since it weakens the test.
+
 Pull Request Guidelines
 -----------------------
 
