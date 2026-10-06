@@ -1623,7 +1623,7 @@
       "maximum": 10000
     },
     "Surface Plant Capital Cost Adjustment Factor": {
-      "description": "Multiplier for built-in surface plant capital cost correlation",
+      "description": "Multiplier applied to surface plant capital cost, whether calculated by the built-in correlation or derived from a provided Capital Cost for Power Plant for Electricity Generation. Not applied when Surface Plant Capital Cost (total) is provided.",
       "type": "number",
       "units": "",
       "category": "Economics",

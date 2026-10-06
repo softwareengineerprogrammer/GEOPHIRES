@@ -229,6 +229,34 @@ class EconomicsTestCase(BaseTestCase):
 
         return m
 
+    def test_surface_plant_capital_cost_adjustment_factor_applies_to_provided_per_kwe_cost(self):
+        """https://github.com/NatLabRockies/GEOPHIRES-X/issues/435"""
+
+        def _get_result(adjustment_factor: float) -> GeophiresXResult:
+            return GeophiresXClient().get_geophires_result(
+                ImmutableGeophiresInputParameters(
+                    from_file_path=self._get_test_file_path('generic-egs-case.txt'),
+                    params={
+                        'Capital Cost for Power Plant for Electricity Generation': 1900,
+                        'Surface Plant Capital Cost Adjustment Factor': adjustment_factor,
+                    },
+                )
+            )
+
+        def _plant_cost(r: GeophiresXResult) -> float:
+            return r.result['CAPITAL COSTS (M$)']['Surface power plant costs']['value']
+
+        cost_half = _plant_cost(_get_result(0.5))
+        cost_default = _plant_cost(_get_result(1.0))
+        cost_one_and_half = _plant_cost(_get_result(1.5))
+
+        # Adjustment factor scales cost derived from the provided per-kWe cost
+        self.assertAlmostEqual(cost_default * 0.5, cost_half, places=1)
+        self.assertAlmostEqual(cost_default * 1.5, cost_one_and_half, places=1)
+
+        self.assertLess(cost_half, cost_default)
+        self.assertGreater(cost_one_and_half, cost_default)
+
     def test_unprovided_ending_sale_price_does_not_cap_escalation(self):
         def input_for_elec_prices(params) -> GeophiresInputParameters:
             return GeophiresInputParameters(
