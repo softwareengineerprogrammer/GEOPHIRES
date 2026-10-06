@@ -859,7 +859,7 @@ class Economics:
             CurrentUnits=PercentUnit.TENTH,
             Provided=False,
             Valid=True,
-            ToolTipText="Multiplier for built-in surface plant capital cost correlation"
+            ToolTipText="Multiplier applied to surface plant capital cost, whether calculated by the built-in correlation or derived from a provided Capital Cost for Power Plant for Electricity Generation. Not applied when Surface Plant Capital Cost (total) is provided."
         )
         self._default_Power_plant_cost_USD_per_kWe = 3000
         self.Power_plant_cost_per_kWe = self.ParameterDict[self.Power_plant_cost_per_kWe.Name] = floatParameter(
@@ -3589,7 +3589,11 @@ class Economics:
                 else:
                     # 1.02 to convert cost from 2012 to 2016
                     # factor 1.10 to convert from 2016 to 2022
-                    direct_plant_cost_MUSD = self.ccplantadjfactor.value * self.Cplantcorrelation * 1.02 * 1.10
+                    direct_plant_cost_MUSD = self.Cplantcorrelation * 1.02 * 1.10
+
+                # Account for adjustment factor, whether cost was user-provided per-kWe or correlation-derived
+                # (consistent with drilling and stimulation cost handling - see #435)
+                direct_plant_cost_MUSD = self.ccplantadjfactor.value * direct_plant_cost_MUSD
 
                 self.Cplant.value = self._indirect_cost_factor * self._contingency_factor * direct_plant_cost_MUSD
                 self.CAPEX_cost_electrical_plant.value = self.Cplant.quantity().to(self.CAPEX_cost_electrical_plant.CurrentUnits).magnitude
