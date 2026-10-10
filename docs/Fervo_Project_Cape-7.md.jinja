@@ -302,7 +302,7 @@ and in the web interface under the Cash Flow tab.
 {# @formatter:off #}
 | Metric        | Result Value   | Reference Value(s) | Reference Source |
 |---------------|----------------|--------------------|------------------|
-| <span title="Levelized Cost of Energy" class="metric-tooltip-text">LCOE</span> | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} | \$80/MWh      | Horne et al, 2025. |
+| <span title="Levelized Cost of Energy" class="metric-tooltip-text">LCOE</span> | {{ '$' ~ lcoe_usd_per_mwh ~ '/MWh' }} | \$80/MWh; <br/> \$67–111/MWh | Horne et al, 2025; Lazard, 2026. |
 | <span title="Levelized PPA price (nominal); see Economic Parameters for starting price, escalation, and cap" class="metric-tooltip-text">Levelized PPA Price</span> | {{ '$' ~ lppa_usd_per_mwh ~ '/MWh' }} | \$100–130/MWh | Price range Fervo reports for contracts under negotiation (Fervo Energy, 2026f). See the [PPA price discussion in Sensitivity Analysis](#impact-of-ppa-price-on-lcoe) for the relationship between PPA price and LCOE. |
 | <span title="Internal Rate of Return" class="metric-tooltip-text">After-tax IRR</span> <br/> (at Year {{ operations_year_of_irr }} of Operations) | {{ irr_pct ~ '%' }} | 15–25% | Typical levered returns for energy projects |
 | <span title="Project Net Present Value" class="metric-tooltip-text">NPV</span>  | {{ '$' ~ npv_musd ~ 'M' }} | >$0 | Positive NPVs result in profit. Cash flows are discounted at the {{ real_discount_rate_pct ~ '%' }} real discount rate ({{ nominal_discount_rate_pct ~ '%' }} nominal); see Discount Rate in Economic Parameters. |
@@ -758,6 +758,9 @@ https://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2023/Ko.pdf
 
 Latimer, T. (2025, February 12). Catching up with enhanced geothermal (D. Roberts,
 Interviewer). https://www.volts.wtf/p/catching-up-with-enhanced-geothermal
+
+Lazard. (2026, July). Lazard's Levelized Cost of Energy+ (LCOE+): Levelized Cost of Energy Comparison—Version 19.0
+(p. 7). https://www.lazard.com/media/kcfconhf/lazards-lcoeplus_vf.pdf
 
 Matson, M. (2024, September 11). Fervo Energy Technology Day 2024: Entering "the Geothermal Decade" with Next-Generation
 Geothermal
