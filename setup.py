@@ -88,6 +88,7 @@ setup(
         'pylocker',
         'nrel-pysam',
         'tabulate',
+        'superhot-wellbore @ git+https://github.com/softwareengineerprogrammer/superhot-wellbore/@geophires-client#egg=superhot-wellbore',
     ],
     extras_require={
         # eg:

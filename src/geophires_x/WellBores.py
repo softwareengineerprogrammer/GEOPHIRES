@@ -9,7 +9,10 @@ from geophires_x.GeoPHIRESUtils import density_water_kg_per_m3
 from geophires_x.GeoPHIRESUtils import viscosity_water_Pa_sec
 from .Units import *
 import geophires_x.Model as Model
-from .OptionList import ReservoirModel, Configuration, WorkingFluid
+from .OptionList import ReservoirModel, Configuration, WorkingFluid, ProductionWellboreModel, \
+    RedrillingTriggerTemperature
+
+PRODUCTION_WELLBORE_MODEL_PARAMETER_NAME = 'Production Wellbore Model'
 
 
 # code from Koenraad
@@ -782,6 +785,22 @@ class WellBores:
             ToolTipText='Inner diameter of injection wellbore (assumed constant along the wellbore) to calculate '
                         'frictional pressure drop and wellbore heat transmission with Rameys model'
         )
+        self.production_wellbore_model = self.ParameterDict[self.production_wellbore_model.Name] = intParameter(
+            PRODUCTION_WELLBORE_MODEL_PARAMETER_NAME,
+            DefaultValue=ProductionWellboreModel.RAMEY.int_value,
+            AllowableRange=[it.int_value for it in ProductionWellboreModel],
+            ValuesEnum=ProductionWellboreModel,
+            UnitType=Units.NONE,
+            ErrMessage='assume default production wellbore model (Ramey)',
+            ToolTipText='; '.join([f'{it.int_value}: {it.value}' for it in ProductionWellboreModel])
+            + '. Supersedes Ramey Production Wellbore Model, which is retained for backwards compatibility and takes '
+            'effect when this parameter is not given. '
+            f'{ProductionWellboreModel.CONSTANT_TEMPERATURE_DROP.int_value} applies Production Wellbore Temperature '
+            f'Drop. {ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.int_value} solves the reservoir inflow and the '
+            'wellbore together, so that the production flow rate, wellhead pressure and wellhead phase are results '
+            'rather than inputs; it requires the superhot-wellbore package and is configured by the Coupled Wellbore '
+            'parameters.',
+        )
         self.rameyoptionprod = self.ParameterDict[self.rameyoptionprod.Name] = boolParameter(
             "Ramey Production Wellbore Model",
             DefaultValue=True,
@@ -789,7 +808,8 @@ class WellBores:
             Required=True,
             ErrMessage="assume default production wellbore model (Ramey model active)",
             ToolTipText="Select whether to use Rameys model to estimate the geofluid temperature drop in the "
-                        "production wells"
+                        "production wells. Superseded by Production Wellbore Model, which takes precedence when both "
+                        "are given."
         )
         self.tempdropprod = self.ParameterDict[self.tempdropprod.Name] = floatParameter(
             "Production Wellbore Temperature Drop",
@@ -968,6 +988,22 @@ class WellBores:
                         f"dropped by 20% of its initial temperature. "
                         f"Note that redrilling is triggered by whichever occurs first: this thermal drawdown limit or "
                         f"the chronological limit defined by {well_integrity_max_lifetime_param_name}."
+        )
+        self.redrilling_trigger_temperature = self.ParameterDict[self.redrilling_trigger_temperature.Name] = intParameter(
+            "Redrilling Trigger Temperature",
+            DefaultValue=RedrillingTriggerTemperature.PRODUCED.int_value,
+            AllowableRange=[it.int_value for it in RedrillingTriggerTemperature],
+            ValuesEnum=RedrillingTriggerTemperature,
+            UnitType=Units.NONE,
+            ErrMessage="assume default redrilling trigger temperature (produced temperature)",
+            ToolTipText='; '.join([f'{it.int_value}: {it.value}' for it in RedrillingTriggerTemperature])
+            + '. The temperature history that Maximum Drawdown is measured on. '
+            f'{RedrillingTriggerTemperature.PRODUCED.int_value}: the produced (wellhead) temperature, including the '
+            'production wellbore heat loss, so that Ramey\'s warm-up can delay the trigger. '
+            f'{RedrillingTriggerTemperature.RESERVOIR.int_value}: the reservoir output temperature, i.e. thermal '
+            'breakthrough of the reservoir itself, independent of the production wellbore model. The coupled '
+            'inflow-wellbore production wellbore model measures the reservoir output temperature either way, because '
+            'its wellhead temperature is only known after the redrilled history is solved.',
         )
         self.well_integrity_max_lifetime = self.ParameterDict[self.well_integrity_max_lifetime.Name] = floatParameter(
             well_integrity_max_lifetime_param_name,
@@ -1458,10 +1494,60 @@ class WellBores:
 
         coerce_int_params_to_enum_values(self.ParameterDict)
 
+        self._resolve_production_wellbore_model(model)
         self._set_well_counts_from_parameters(model)
         self._set_multilateral_section_count_from_parameters(model)
 
         model.logger.info(f"read parameters complete {self.__class__.__name__}: {__name__}")
+
+    def _resolve_production_wellbore_model(self, model: Model) -> None:
+        """
+        Reconcile Production Wellbore Model with Ramey Production Wellbore Model, which it supersedes.
+
+        Ramey Production Wellbore Model remains the internal source of truth for the Ramey/constant-temperature-drop
+        branch (it is what Calculate and the output writers read), so the selector is resolved into it here. The
+        selector is resolved in both directions, so that afterwards its value always names the effective model.
+
+        Note that intParameter.Provided is unusable for this: ReadParameter returns early without setting it when the
+        value read equals the default (Parameter.py), so a deck that writes the default 1 would look unprovided.
+        Presence in InputParameters is the test, as it is for the deprecated Total Nonvertical Length name.
+        """
+        selector = self.production_wellbore_model
+        selector_provided = selector.Name in model.InputParameters
+
+        if getattr(self, 'uses_coupled_wellbore_model', False):
+            # Model.__init__ has already swapped in the coupled wellbore class; that cannot be undone here.
+            selector.value = ProductionWellboreModel.COUPLED_INFLOW_WELLBORE
+            return
+
+        if selector.value is ProductionWellboreModel.COUPLED_INFLOW_WELLBORE:
+            # Model.__init__ matches the raw value exactly, so e.g. '2.0' reaches here without the class swap.
+            msg = (
+                f'{selector.Name} {ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.int_value} '
+                f'({ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.value}) was not applied. It must be given as the '
+                f'exact integer {ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.int_value}, and cannot be combined '
+                f'with the SUTRA, SBT or AGS wellbore models.'
+            )
+            model.logger.error(msg)
+            raise ValueError(msg)
+
+        if not selector_provided:
+            # The legacy boolean is authoritative; mirror it into the selector.
+            selector.value = (
+                ProductionWellboreModel.RAMEY
+                if self.rameyoptionprod.value
+                else ProductionWellboreModel.CONSTANT_TEMPERATURE_DROP
+            )
+            return
+
+        wants_ramey = selector.value is ProductionWellboreModel.RAMEY
+        if self.rameyoptionprod.Provided and self.rameyoptionprod.value != wants_ramey:
+            model.logger.warning(
+                f'Ignoring value of "{self.rameyoptionprod.Name}" ({self.rameyoptionprod.value}) because it is '
+                f'contradicted by "{selector.Name}" ({selector.value.int_value}: {selector.value.value}), which '
+                f'takes precedence'
+            )
+        self.rameyoptionprod.value = wants_ramey
 
     def _set_well_counts_from_parameters(self, model: Model):
         mutually_exclusive_well_count_params = [self.doublets_count, self.ninj_per_production_well]
@@ -1695,7 +1781,7 @@ class WellBores:
 
     def calculate_redrilling(self, model: Model) -> None:
         """
-        Redrilling applies to the built-in analytical reservoir models and user-provided profile.
+        Redrilling applies to the built-in analytical reservoir models and user-provided profiles.
         """
 
         if model.reserv.resoption.value not in [
@@ -1708,11 +1794,13 @@ class WellBores:
         total_steps = len(self.ProducedTemperature.value)
         project_lifetime_yr = model.surfaceplant.plant_lifetime.value
 
-        # Thermal drawdown trigger
-        index_first_max_drawdown = int(np.argmax(
-            self.ProducedTemperature.value
-            < (1 - model.wellbores.maxdrawdown.value) * self.ProducedTemperature.value[0]
-        ))
+        # Thermal drawdown trigger, on the produced temperature or on the reservoir output temperature
+        if self.redrilling_trigger_temperature.value == RedrillingTriggerTemperature.RESERVOIR:
+            trigger_temperature = np.asarray(model.reserv.Tresoutput.value, dtype=float)
+        else:
+            trigger_temperature = np.asarray(self.ProducedTemperature.value, dtype=float)
+        below_max_drawdown = trigger_temperature < (1 - model.wellbores.maxdrawdown.value) * trigger_temperature[0]
+        index_first_max_drawdown = int(np.argmax(below_max_drawdown))
 
         # Well integrity (chronological) trigger
         if self.well_integrity_max_lifetime.Provided and self.well_integrity_max_lifetime.value > 0:

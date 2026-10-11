@@ -10,6 +10,9 @@ from .SurfacePlantUtils import MAX_CONSTRUCTION_YEARS
 from .Units import *
 import geophires_x.Model as Model
 
+# Critical temperature of water [degC]; the liquid-water plant correlations have no state above it.
+WATER_CRITICAL_TEMPERATURE_DEGC = 373.946
+
 
 class SurfacePlant:
     @staticmethod
@@ -107,6 +110,13 @@ class SurfacePlant:
         :param D22: D22
         :return: injection temperature, reinjection temperature, and etau
         """
+        max_entering_temperature = float(np.max(TenteringPP))
+        if max_entering_temperature >= WATER_CRITICAL_TEMPERATURE_DEGC:
+            model.logger.warning(
+                f'The {self.plant_type.value.value} plant correlations are for liquid water, but the plant entering '
+                f'temperature reaches {max_entering_temperature:.1f} degC, above the critical temperature of water, '
+                'where no liquid exists: the electricity, heat extracted and efficiency are extrapolations.'
+            )
         if ambient_temperature < 15.:
             Tfraction = (ambient_temperature - 5.) / 10.
         else:
@@ -279,7 +289,7 @@ class SurfacePlant:
         self.plant_type = self.ParameterDict[self.plant_type.Name] = intParameter(
             "Power Plant Type",
             DefaultValue=PlantType.SUB_CRITICAL_ORC.int_value,
-            AllowableRange=[1, 2, 3, 4, 5, 6, 7, 8, 9],
+            AllowableRange=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ValuesEnum=PlantType,
             UnitType=Units.NONE,
             ErrMessage="assume default power plant type (1: subcritical ORC)",
@@ -699,8 +709,9 @@ class SurfacePlant:
                     elif ParameterToModify.Name == 'Power Plant Type':
                         ParameterToModify.value = PlantType.from_input_string(ParameterReadIn.sValue)
                         if self.enduse_option.value == EndUseOptions.ELECTRICITY:
-                            # simple single- or double-flash power plant assumes no production well pumping
-                            if ParameterToModify.value in [PlantType.SINGLE_FLASH, PlantType.DOUBLE_FLASH]:
+                            # simple single- or double-flash power plant assumes no production well pumping,
+                            # as does the package's power cycle
+                            if ParameterToModify.value in [PlantType.SINGLE_FLASH, PlantType.DOUBLE_FLASH, PlantType.COUPLED_WELLBORE]:
                                 model.wellbores.impedancemodelallowed.value = False
                                 model.wellbores.productionwellpumping.value = False
                                 self.setinjectionpressurefixed = True
@@ -799,6 +810,7 @@ class SurfacePlant:
 
         self.NetElectricityProducedMax.value = np.max(self.NetElectricityProduced.quantity()).to(
             self.NetElectricityProducedMax.CurrentUnits).magnitude
+
 
         if model.surfaceplant.enduse_option.value.has_direct_use_heat_component or model.surfaceplant.plant_type.value in [
             PlantType.ABSORPTION_CHILLER, PlantType.HEAT_PUMP]:
