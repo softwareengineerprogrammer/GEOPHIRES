@@ -373,6 +373,7 @@
         "Minimum Production Temperature": {},
         "Initial Production Temperature": {},
         "Average Reservoir Heat Extraction": {},
+        "Production Wellbore Model": {},
         "Production Wellbore Heat Transmission Model": {},
         "Wellbore Heat Transmission Model": {},
         "Average Production Well Temperature Drop": {},
@@ -388,6 +389,28 @@
         "Average Buoyancy Pressure Drop": {},
         "Average Injection Well Pump Pressure Drop": {},
         "Average Production Well Pump Pressure Drop": {},
+        "Wellhead Fluid Phase": {
+          "type": "string",
+          "description": "Dominant phase of the wellhead stream over the plant lifetime: single_phase_liquid, two_phase, single_phase_vapor or supercritical",
+          "units": null
+        },
+        "Production Well Self-Flowing Fraction": {
+          "type": "number",
+          "description": "Fraction of the plant lifetime over which the production well self-flows (no pump)",
+          "units": ""
+        },
+        "Initial Self-Flow Wellhead Pressure": {},
+        "Production Pump Depth": {
+          "type": "number",
+          "description": "Deepest setting depth of the production pump over the plant lifetime; 0 when the well self-flows throughout",
+          "units": "meter"
+        },
+        "Average Production Well Pumping Power": {},
+        "Production Pump Flags": {
+          "type": "string",
+          "description": "Conditions the production pump stage reported at any time step: temperature_limit, depth_limit, self_flow_below_floor, two_phase_at_sandface, pump_outside_envelope, no_liquid_intake",
+          "units": null
+        },
         "Average Heat Production": {},
         "First Year Heat Production": {},
         "Average Net Electricity Production": {},
@@ -630,6 +653,17 @@
       "type": "object",
       "properties": {
         "Initial geofluid availability": {},
+        "Wellhead Power Cycle": {
+          "type": "string",
+          "description": "The coupled-wellbore power cycle's binary or flash selection: binary for a superheated or vapor-like supercritical wellhead stream, flash for a two-phase one, over the time steps it served; empty when every time step was served by a GEOPHIRES plant correlation",
+          "units": null
+        },
+        "Power Cycle Path": {
+          "type": "string",
+          "description": "Plant path(s) serving the plant lifetime, most frequent first: correlation_orc, correlation_double_flash, wet_double_flash, coupled_wellbore_binary or coupled_wellbore_flash",
+          "units": null
+        },
+        "Power Cycle Parasitic Load": {},
         "Maximum Total Electricity Generation": {},
         "Average Total Electricity Generation": {},
         "Minimum Total Electricity Generation": {},

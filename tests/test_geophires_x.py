@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import os
 import tempfile
 import uuid
@@ -10,6 +11,7 @@ import numpy as np
 
 from geophires_x.GeoPHIRESUtils import sig_figs
 from geophires_x.OptionList import PlantType
+from geophires_x.OptionList import ProductionWellboreModel
 from geophires_x.OptionList import WellDrillingCostCorrelation
 from geophires_x_client import GeophiresXClient
 from geophires_x_client import GeophiresXResult
@@ -174,6 +176,22 @@ class GeophiresXTestCase(BaseTestCase):
         def get_output_file_for_example(example_file: str):
             return self._get_test_file_path(Path('examples', f'{example_file.split(".txt")[0]}.out'))
 
+        superhot_wellbore_available = importlib.util.find_spec('superhot_wellbore') is not None
+
+        def requires_missing_superhot_wellbore(example_file: str) -> bool:
+            """Examples using Production Wellbore Model 2 need the optional superhot-wellbore package."""
+            # Imported here because importing WellBores before Model is a circular import at module load.
+            from geophires_x.WellBores import PRODUCTION_WELLBORE_MODEL_PARAMETER_NAME
+
+            if superhot_wellbore_available or not example_file.endswith('.txt'):
+                return False
+            with open(self._get_test_file_path(Path('examples', example_file)), encoding='utf-8') as f:
+                for line in f:
+                    parts = [it.strip() for it in line.split(',')]
+                    if len(parts) > 1 and parts[0] == PRODUCTION_WELLBORE_MODEL_PARAMETER_NAME:
+                        return parts[1] == str(ProductionWellboreModel.COUPLED_INFLOW_WELLBORE.int_value)
+            return False
+
         # fmt:off
         # @formatter:off
         example_files = sorted(
@@ -183,6 +201,8 @@ class GeophiresXTestCase(BaseTestCase):
                 )
                 # TOUGH not enabled for testing - see https://github.com/NREL/GEOPHIRES-X/issues/318
                 and not example_file_path_.startswith(('example6.txt', 'example7.txt'))
+                # Production Wellbore Model 2 examples require the optional superhot-wellbore package
+                and not requires_missing_superhot_wellbore(example_file_path_)
                 and '.out' not in example_file_path_
                 and '.json' not in example_file_path_
                 and '.csv' not in example_file_path_,

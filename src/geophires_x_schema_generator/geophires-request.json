@@ -729,8 +729,34 @@
       "minimum": 1.0,
       "maximum": 30.0
     },
+    "Production Wellbore Model": {
+      "description": "0: Constant Temperature Drop; 1: Ramey; 2: Coupled Inflow-Wellbore. Supersedes Ramey Production Wellbore Model, which is retained for backwards compatibility and takes effect when this parameter is not given. 0 applies Production Wellbore Temperature Drop. 2 solves the reservoir inflow and the wellbore together, so that the production flow rate, wellhead pressure and wellhead phase are results rather than inputs; it requires the superhot-wellbore package and is configured by the Coupled Wellbore parameters.",
+      "type": "integer",
+      "units": null,
+      "category": "Well Bores",
+      "default": 1,
+      "minimum": 0,
+      "maximum": 2,
+      "enum_values": [
+        {
+          "name": "CONSTANT_TEMPERATURE_DROP",
+          "value": "Constant Temperature Drop",
+          "int_value": 0
+        },
+        {
+          "name": "RAMEY",
+          "value": "Ramey",
+          "int_value": 1
+        },
+        {
+          "name": "COUPLED_INFLOW_WELLBORE",
+          "value": "Coupled Inflow-Wellbore",
+          "int_value": 2
+        }
+      ]
+    },
     "Ramey Production Wellbore Model": {
-      "description": "Select whether to use Rameys model to estimate the geofluid temperature drop in the production wells",
+      "description": "Select whether to use Rameys model to estimate the geofluid temperature drop in the production wells. Superseded by Production Wellbore Model, which takes precedence when both are given.",
       "type": "boolean",
       "units": null,
       "category": "Well Bores",
@@ -836,6 +862,27 @@
       "default": 1.0,
       "minimum": 0.0,
       "maximum": "1.0"
+    },
+    "Redrilling Trigger Temperature": {
+      "description": "0: Produced Temperature; 1: Reservoir Output Temperature. The temperature history that Maximum Drawdown is measured on. 0: the produced (wellhead) temperature, including the production wellbore heat loss, so that Ramey's warm-up can delay the trigger. 1: the reservoir output temperature, i.e. thermal breakthrough of the reservoir itself, independent of the production wellbore model. The coupled inflow-wellbore production wellbore model measures the reservoir output temperature either way, because its wellhead temperature is only known after the redrilled history is solved.",
+      "type": "integer",
+      "units": null,
+      "category": "Well Bores",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "enum_values": [
+        {
+          "name": "PRODUCED",
+          "value": "Produced Temperature",
+          "int_value": 0
+        },
+        {
+          "name": "RESERVOIR",
+          "value": "Reservoir Output Temperature",
+          "int_value": 1
+        }
+      ]
     },
     "Well Integrity Maximum Lifetime": {
       "description": "Maximum chronological lifetime of the wellbore infrastructure before mechanical/chemical failure forces a redrilling event, independent of thermal drawdown. Models a deterministic first-order approximation of well integrity failure (compressive yielding, high-temperature creep, low-cycle fatigue, cement degradation, sulfide stress cracking, etc.) that is particularly relevant for Superhot Rock systems where wellbore infrastructure may typically fail before thermal depletion. Redrilling is triggered at the minimum of the thermal drawdown index defined by Maximum Drawdown and this chronological index. If not provided, defaults to project lifetime (no mechanical failure).",
@@ -1128,6 +1175,105 @@
       "minimum": 1000,
       "maximum": 15000.0
     },
+    "Coupled Wellbore Feedzone Transmissivity": {
+      "description": "Permeability-thickness product (k*b) of the feedzone in millidarcy-metres (md*m), which controls the radial Darcy drawdown in the coupled wellbore model. Leave at -1 to derive it from the Productivity Index at the initial reservoir state; specify it to parameterize the inflow as in Scott (2026).",
+      "type": "number",
+      "units": null,
+      "category": "Well Bores",
+      "default": -1.0,
+      "minimum": -1.0,
+      "maximum": 10000000.0
+    },
+    "Coupled Wellbore Casing Roughness": {
+      "description": "Absolute roughness of the production casing used for the frictional pressure gradient in the coupled wellbore model.",
+      "type": "number",
+      "units": "meter",
+      "category": "Well Bores",
+      "default": 4.6e-05,
+      "minimum": 0.0,
+      "maximum": 0.01
+    },
+    "Coupled Wellbore Heat Loss Coefficient": {
+      "description": "Overall wellbore-to-formation heat transfer coefficient U per metre of well (W/m/K) used for conductive heat loss in the coupled wellbore model, in place of Ramey's model.",
+      "type": "number",
+      "units": "W/m/K",
+      "category": "Well Bores",
+      "default": 2.5,
+      "minimum": 0.0,
+      "maximum": 100.0
+    },
+    "Coupled Wellbore Integration Step": {
+      "description": "Vertical step, in whole metres, of the bottom-to-surface wellbore march in the coupled production wellbore model. The well depth is rounded to a whole number of steps.",
+      "type": "integer",
+      "units": "meter",
+      "category": "Well Bores",
+      "default": 10,
+      "minimum": 1,
+      "maximum": 100
+    },
+    "Coupled Wellbore Maximum Solve Points": {
+      "description": "Maximum number of coupled inflow-wellbore solves over the plant lifetime (or per redrilling period) in the coupled wellbore model. Each solve takes seconds; time steps in between are linearly interpolated. Use 0 to solve at every time step. A reservoir that does not decline is solved once regardless.",
+      "type": "integer",
+      "units": null,
+      "category": "Well Bores",
+      "default": 8,
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "Coupled Wellbore Pump Policy": {
+      "description": "Production pump policy of the coupled wellbore model: never (a well that cannot deliver the prescribed flow rate to the surface aborts the run), auto (a downhole pump is added when the unpumped well does not reach the surface or reaches it below Coupled Wellbore Minimum Self-Flow Wellhead Pressure) or always (pumped whenever a liquid pump intake exists). Circulation Pump Efficiency is the pump efficiency.",
+      "type": "string",
+      "units": null,
+      "category": "Well Bores",
+      "default": "auto",
+      "minimum": null,
+      "maximum": null
+    },
+    "Coupled Wellbore Pump Envelope": {
+      "description": "What happens when the production pump would have to be set deeper than Coupled Wellbore Pump Maximum Depth or with an intake hotter than Coupled Wellbore Pump Maximum Intake Temperature, or when the column has no single-phase liquid intake: flag (the pump is modelled and the condition reported in Production Pump Flags), enforce (the run aborts with the reason) or omit (no such pump is installed: a well that reaches the surface on its own is left self-flowing below Coupled Wellbore Minimum Self-Flow Wellhead Pressure, with the condition reported in Production Pump Flags, and the run aborts only when it does not).",
+      "type": "string",
+      "units": null,
+      "category": "Well Bores",
+      "default": "flag",
+      "minimum": null,
+      "maximum": null
+    },
+    "Coupled Wellbore Pump Maximum Depth": {
+      "description": "Deepest admissible setting depth of the production pump (electric submersible pump envelope) in the coupled wellbore model.",
+      "type": "number",
+      "units": "meter",
+      "category": "Well Bores",
+      "default": 1500.0,
+      "minimum": 0.0,
+      "maximum": 15000.0
+    },
+    "Coupled Wellbore Pump Maximum Intake Temperature": {
+      "description": "Hottest admissible fluid temperature at the production pump intake (electric submersible pump envelope) in the coupled wellbore model.",
+      "type": "number",
+      "units": "degC",
+      "category": "Well Bores",
+      "default": 250.0,
+      "minimum": 0.0,
+      "maximum": 400.0
+    },
+    "Coupled Wellbore Minimum Self-Flow Wellhead Pressure": {
+      "description": "Wellhead pressure below which a well that reaches the surface on its own is pumped anyway (Coupled Wellbore Pump Policy auto). Production Wellhead Pressure, when given together with Production Flow Rate per Well, raises this floor and becomes the pumped wellhead pressure.",
+      "type": "number",
+      "units": "kPa",
+      "category": "Well Bores",
+      "default": 1000.0,
+      "minimum": 0.0,
+      "maximum": 50000.0
+    },
+    "Coupled Wellbore Pump NPSH Margin": {
+      "description": "Margin the pressure must keep above the vapor pressure of the fluid at the production pump intake (net positive suction head and non-condensable gas allowance, 50 psi in the productivity-index pump model); the pumped wellhead pressure keeps the same margin so the wellhead stream stays liquid.",
+      "type": "number",
+      "units": "kPa",
+      "category": "Well Bores",
+      "default": 344.7,
+      "minimum": 0.0,
+      "maximum": 10000.0
+    },
     "End-Use Option": {
       "description": "Select the end-use application of the geofluid heat: 1: Electricity; 2: Direct-Use Heat; 31: Cogeneration Topping Cycle, Heat sales considered as extra income; 32: Cogeneration Topping Cycle, Electricity sales considered as extra income; 41: Cogeneration Bottoming Cycle, Heat sales considered as extra income; 42: Cogeneration Bottoming Cycle, Electricity sales considered as extra income; 51: Cogeneration Parallel Cycle, Heat sales considered as extra income; 52: Cogeneration Parallel Cycle, Electricity sales considered as extra income",
       "type": "integer",
@@ -1180,13 +1326,13 @@
       ]
     },
     "Power Plant Type": {
-      "description": "Specify the type of physical plant. 1: Subcritical ORC; 2: Supercritical ORC; 3: Single-Flash; 4: Double-Flash; 5: Absorption Chiller; 6: Heat Pump; 7: District Heating; 8: Reservoir Thermal Energy Storage; 9: Industrial",
+      "description": "Specify the type of physical plant. 1: Subcritical ORC; 2: Supercritical ORC; 3: Single-Flash; 4: Double-Flash; 5: Absorption Chiller; 6: Heat Pump; 7: District Heating; 8: Reservoir Thermal Energy Storage; 9: Industrial; 10: Coupled Wellbore Power Cycle",
       "type": "integer",
       "units": null,
       "category": "Surface Plant",
       "default": 1,
       "minimum": 1,
-      "maximum": 9,
+      "maximum": 10,
       "enum_values": [
         {
           "name": "SUB_CRITICAL_ORC",
@@ -1232,6 +1378,11 @@
           "name": "INDUSTRIAL",
           "value": "Industrial",
           "int_value": 9
+        },
+        {
+          "name": "COUPLED_WELLBORE",
+          "value": "Coupled Wellbore Power Cycle",
+          "int_value": 10
         }
       ]
     },
@@ -1396,6 +1547,33 @@
       "default": 0.0,
       "minimum": -180,
       "maximum": 180
+    },
+    "Coupled Wellbore Power Cycle Parasitic Load": {
+      "description": "Fraction of the gross turbine power of the coupled-wellbore power cycle consumed by plant parasitic loads (cooling, gas extraction, feed pumps) and generator losses. The coupled-wellbore power cycle reports gross turbine power; Scott (2026) cites 5 to 15 percent for typical geothermal plants. Applies to the coupled-wellbore cycle and to the dry-steam turbine of the wet double flash only; the liquid water plant correlations are net. Production and injection well pumping are accounted for separately.",
+      "type": "number",
+      "units": "",
+      "category": "Surface Plant",
+      "default": 0.1,
+      "minimum": 0.0,
+      "maximum": 0.5
+    },
+    "Coupled Wellbore Plant Policy": {
+      "description": "cycle-only: the coupled-wellbore power cycle (the binary/flash cycle of superhot-wellbore) at every time step. correlation-first: per time step, a sub-critical liquid wellhead is served by GEOPHIRES's supercritical ORC correlation (up to Coupled Wellbore ORC Maximum Wellhead Temperature) or double-flash correlation, a sub-critical two-phase wellhead by a wet double flash (double-flash correlation on the separated liquid plus the dry-steam turbine work of the steam fraction), a dense supercritical wellhead by the liquid correlations and a superheated or vapor-like supercritical wellhead by the coupled-wellbore cycle. best-output: per time step, the admissible path (as under correlation-first, plus the coupled-wellbore cycle for a two-phase wellhead and both liquid correlations for a liquid one, the ORC correlation above its ceiling valued at the ceiling) that yields the most electricity.",
+      "type": "string",
+      "units": null,
+      "category": "Surface Plant",
+      "default": "cycle-only",
+      "minimum": null,
+      "maximum": null
+    },
+    "Coupled Wellbore ORC Maximum Wellhead Temperature": {
+      "description": "Under the correlation-first plant policy, a sub-critical liquid wellhead up to this temperature is served by the supercritical ORC correlation (whose utilization efficiency fit peaks near 245 degC), a hotter one by the double-flash correlation. Under best-output, a hotter liquid wellhead can still take the ORC correlation, valued at this temperature (the enthalpy above it is not converted), when that yields more than the double-flash correlation.",
+      "type": "number",
+      "units": "degC",
+      "category": "Surface Plant",
+      "default": 245.0,
+      "minimum": 150.0,
+      "maximum": 300.0
     },
     "Dead-state Pressure": {
       "description": "",

@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1170" width="1000" height="1170" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+<title id="title">Calculation sequence of the coupled inflow-wellbore production wellbore model</title>
+<desc id="desc">Flowchart from reading the parameters through the reservoir model, the operating point, the standard wellbore pass, the coupled solves along the production history and the failure checks to the surface plant.</desc>
+<defs><marker id="arrow-616e7c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="#616e7c"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="90.0" y="20.0" width="480.0" height="112.0" rx="7" fill="#e3efff" stroke="#2f6fd1" stroke-width="1.4"/>
+<text x="330.0" y="38.9" font-size="13" fill="#123e7c" text-anchor="middle" font-weight="bold">Read parameters</text>
+<text x="330.0" y="55.8" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">Redrilling Trigger Temperature → reservoir output temperature</text>
+<text x="330.0" y="72.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">Ramey, constant temperature drop, productivity-index pump</text>
+<text x="330.0" y="89.6" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">and impedance models → off</text>
+<text x="330.0" y="106.5" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">Maximum Temperature raised if it would cap the well depth</text>
+<text x="330.0" y="121.6" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">a conventional Power Plant Type also requires Plant Outlet Pressure</text>
+<rect x="90.0" y="160.0" width="480.0" height="52.0" rx="7" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.4"/>
+<text x="330.0" y="182.7" font-size="13" fill="#243b53" text-anchor="middle" font-weight="bold">Reservoir model</text>
+<text x="330.0" y="197.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">T<tspan baseline-shift="sub" font-size="72%">res</tspan>(t) at the deck flow rate (Reservoir.Calculate)</text>
+<rect x="90.0" y="240.0" width="480.0" height="88.0" rx="7" fill="#e3efff" stroke="#2f6fd1" stroke-width="1.4"/>
+<text x="330.0" y="263.8" font-size="13" fill="#123e7c" text-anchor="middle" font-weight="bold">Initial far-field state and inflow parameters</text>
+<text x="330.0" y="280.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">P<tspan baseline-shift="sub" font-size="72%">res,0</tspan> = hydrostatic pressure × Overpressure Percentage</text>
+<text x="330.0" y="297.6" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">r<tspan baseline-shift="sub" font-size="72%">e</tspan> = √(V<tspan baseline-shift="sub" font-size="72%">res</tspan> / (n<tspan baseline-shift="sub" font-size="72%">prod</tspan> π h<tspan baseline-shift="sub" font-size="72%">frac</tspan>))   k·b = PI μ ln(r<tspan baseline-shift="sub" font-size="72%">e</tspan>/r<tspan baseline-shift="sub" font-size="72%">w</tspan>) / (2π ρ)</text>
+<text x="330.0" y="312.7" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">(μ, ρ at P<tspan baseline-shift="sub" font-size="72%">res,0</tspan>, T<tspan baseline-shift="sub" font-size="72%">res,0</tspan>; or Coupled Wellbore Feedzone Transmissivity)</text>
+<polygon points="330.0,350.0 495.0,392.0 330.0,434.0 165.0,392.0" fill="#fffbea" stroke="#c99a06" stroke-width="1.4"/>
+<text x="330.0" y="387.6" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">Production Flow Rate</text>
+<text x="330.0" y="403.9" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">per Well given?</text>
+<rect x="650.0" y="350.0" width="320.0" height="86.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="810.0" y="372.8" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Solve the operating point</text>
+<text x="810.0" y="389.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">steady state at P<tspan baseline-shift="sub" font-size="72%">res,0</tspan>, T<tspan baseline-shift="sub" font-size="72%">res,0</tspan>: flow rate that</text>
+<text x="810.0" y="406.6" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">delivers the target wellhead pressure</text>
+<text x="810.0" y="421.7" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">Production Wellhead Pressure, else 10 MPa</text>
+<rect x="650.0" y="462.0" width="320.0" height="56.0" rx="7" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.4"/>
+<text x="810.0" y="486.7" font-size="13" fill="#243b53" text-anchor="middle" font-weight="bold">Re-run the reservoir model</text>
+<text x="810.0" y="501.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">T<tspan baseline-shift="sub" font-size="72%">res</tspan>(t) with the solved flow rate</text>
+<rect x="90.0" y="548.0" width="480.0" height="74.0" rx="7" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.4"/>
+<text x="330.0" y="573.3" font-size="13" fill="#243b53" text-anchor="middle" font-weight="bold">Standard WellBores pass</text>
+<text x="330.0" y="590.2" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">P<tspan baseline-shift="sub" font-size="72%">res</tspan>(t) · redrilling when T<tspan baseline-shift="sub" font-size="72%">res</tspan> falls by Maximum Drawdown</text>
+<text x="330.0" y="605.2" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">(the history is repeated from the trigger) · injection wells and pumps</text>
+<polygon points="330.0,644.0 495.0,686.0 330.0,728.0 165.0,686.0" fill="#fffbea" stroke="#c99a06" stroke-width="1.4"/>
+<text x="330.0" y="681.6" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">Redrilled, and P<tspan baseline-shift="sub" font-size="72%">res</tspan>(t)</text>
+<text x="330.0" y="697.9" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">constant?</text>
+<rect x="650.0" y="652.0" width="320.0" height="68.0" rx="7" fill="#e3efff" stroke="#2f6fd1" stroke-width="1.4"/>
+<text x="810.0" y="682.7" font-size="13" fill="#123e7c" text-anchor="middle" font-weight="bold">Solve one redrilling period</text>
+<text x="810.0" y="697.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">and repeat it for the later periods</text>
+<rect x="90.0" y="770.0" width="480.0" height="92.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="330.0" y="795.8" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Coupled solves along the history (superhot-wellbore)</text>
+<text x="330.0" y="812.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">held flow rate · far-field P<tspan baseline-shift="sub" font-size="72%">res</tspan>(t), T<tspan baseline-shift="sub" font-size="72%">res</tspan>(t)</text>
+<text x="330.0" y="829.6" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">at most Maximum Solve Points states, interpolated between</text>
+<text x="330.0" y="844.7" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">in-process memo keyed on the rounded request</text>
+<polygon points="330.0,882.0 510.0,928.0 330.0,974.0 150.0,928.0" fill="#fffbea" stroke="#c99a06" stroke-width="1.4"/>
+<text x="330.0" y="915.5" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">Every solved state succeeded,</text>
+<text x="330.0" y="931.7" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">and no pump flag the envelope</text>
+<text x="330.0" y="948.0" font-size="12.5" fill="#1f2933" text-anchor="middle" font-weight="normal">policy forbids?</text>
+<rect x="650.0" y="896.0" width="320.0" height="64.0" rx="32.0" fill="#ffe3e3" stroke="#cf1124" stroke-width="1.4"/>
+<text x="810.0" y="924.7" font-size="13" fill="#610316" text-anchor="middle" font-weight="bold">Run aborts</text>
+<text x="810.0" y="939.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">time, reservoir state, pump flags and remedies</text>
+<rect x="90.0" y="1000.0" width="480.0" height="78.0" rx="7" fill="#e3efff" stroke="#2f6fd1" stroke-width="1.4"/>
+<text x="330.0" y="1027.3" font-size="13" fill="#123e7c" text-anchor="middle" font-weight="bold">Wellbore outputs</text>
+<text x="330.0" y="1044.2" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">produced temperature = wellhead temperature · WHP(t) · ΔP<tspan baseline-shift="sub" font-size="72%">res</tspan>(t)</text>
+<text x="330.0" y="1059.2" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">pump power, depth and ΔP → the standard production pumping outputs</text>
+<rect x="130.0" y="1106.0" width="400.0" height="48.0" rx="24.0" fill="#fff1e0" stroke="#d9822b" stroke-width="1.4"/>
+<text x="330.0" y="1126.7" font-size="13" fill="#7a3e00" text-anchor="middle" font-weight="bold">Surface plant, then economics</text>
+<text x="330.0" y="1141.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">Power Plant Type 10 or a conventional plant</text>
+<path d="M330.0,132.0 L330.0,160.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M330.0,212.0 L330.0,240.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M330.0,328.0 L330.0,350.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M330.0,434.0 L330.0,548.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="277.7" y="480.8" width="104.6" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="330.0" y="494.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">yes: prescribed</text>
+<path d="M495.0,392.0 L650.0,393.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="562.1" y="382.8" width="20.9" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="572.5" y="396.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">no</text>
+<path d="M810.0,436.0 L810.0,462.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M810.0,518.0 L810.0,585.0 L570.0,585.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M330.0,622.0 L330.0,644.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M495.0,686.0 L650.0,686.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="558.8" y="676.8" width="27.3" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="572.5" y="690.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">yes</text>
+<path d="M330.0,728.0 L330.0,770.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="268.0" y="738.8" width="123.9" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="330.0" y="752.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">no: whole lifetime</text>
+<path d="M810.0,720.0 L810.0,816.0 L570.0,816.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M330.0,862.0 L330.0,882.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M510.0,928.0 L650.0,928.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="569.6" y="918.8" width="20.9" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="580.0" y="932.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">no</text>
+<path d="M330.0,974.0 L330.0,1000.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="338.3" y="974.8" width="27.3" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="352.0" y="988.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">yes</text>
+<path d="M330.0,1078.0 L330.0,1106.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="670.0" y="31.0" width="16" height="11" rx="2.5" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.2"/>
+<text x="693.0" y="40.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">existing GEOPHIRES calculation</text>
+<rect x="670.0" y="49.0" width="16" height="11" rx="2.5" fill="#e3efff" stroke="#2f6fd1" stroke-width="1.2"/>
+<text x="693.0" y="58.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">CoupledWellBores</text>
+<rect x="670.0" y="67.0" width="16" height="11" rx="2.5" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.2"/>
+<text x="693.0" y="76.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">superhot-wellbore solve</text>
+<rect x="670.0" y="85.0" width="16" height="11" rx="2.5" fill="#fffbea" stroke="#c99a06" stroke-width="1.2"/>
+<text x="693.0" y="94.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">decision</text>
+</svg>

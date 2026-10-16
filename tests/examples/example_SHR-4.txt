@@ -1,0 +1,124 @@
+# Example: Superhot Rock (SHR) 4: Superhot EGS Project with Self-Flowing Wells (Production Wellbore Model 2)
+#
+# A 100 MWe-class superhot EGS project structured like Fervo_Project_Cape-6 (Cape Station Phase I): the same SAM
+# Single Owner PPA economics, Gringarten reservoir model and fracture parameterization, but with the reservoir at
+# superhot conditions (450 deg.C, 30 MPa at 3.5 km), self-flowing production wells and a surface power cycle run on
+# the enthalpy and pressure of the wellhead stream, both modeled with the superhot-wellbore package:
+#   Scott, S.W. (2026), Thermo-hydraulic drivers of superhot geothermal well performance, Geothermics, 141, 103784,
+#   https://doi.org/10.1016/j.geothermics.2026.103784
+# The Gringarten model supplies the thermal decline of the fractured reservoir; the coupled inflow-wellbore production wellbore model
+# supplies the radial Darcy inflow, the isenthalpic expansion into the well and the bottom-to-surface thermohydraulic
+# wellbore simulation (friction, gravity, kinetic energy, conductive heat loss), and hence the wellhead pressure,
+# temperature and enthalpy; the Coupled Wellbore Power Cycle plant (Power Plant Type 10) converts that wellhead stream to
+# electricity with a single-flash or binary cycle. The initial flow rate that delivers the target wellhead pressure of
+# 10 MPa is solved for,
+# the Gringarten decline is computed at that flow rate, and the flow rate is then held constant while the wellhead
+# conditions respond to the reservoir decline, since GEOPHIRES carries one flow rate per well.
+#
+# Requires the superhot-wellbore package:
+#   pip install git+https://github.com/softwareengineerprogrammer/superhot-wellbore.git@geophires-client
+
+# *** ECONOMIC/FINANCIAL PARAMETERS ***
+# *************************************
+# Modeled on Fervo_Project_Cape-6; see that example for the sources of these values.
+Economic Model, 5, -- SAM Single Owner PPA
+Inflation Rate, .027
+
+Starting Electricity Sale Price, 0.095
+Electricity Escalation Rate Per Year, 0.00057
+Ending Electricity Sale Price, 1
+Electricity Escalation Start Year, 1
+
+Fraction of Investment in Bonds, .7
+Discount Rate, 0.12
+Inflated Bond Interest Rate, .07
+Inflated Bond Interest Rate During Construction, 0.105
+Bond Financing Start Year, -1
+
+Construction Years, 3
+Construction CAPEX Schedule, 0.075,0.525,0.4
+
+Investment Tax Credit Rate, 0.3
+Combined Income Tax Rate, .2555
+Property Tax Rate, 0.0022
+
+Exploration Capital Cost, 30
+
+Well Drilling Cost Correlation, 3, -- 2025 NREL Geothermal Drilling Cost Curve Update (Akindipe and Witter, 2025).
+Well Drilling and Completion Capital Cost Adjustment Factor, 1.5, -- Placeholder premium over Fervo_Project_Cape-6 (0.9) for superhot casing, cementing and tool requirements.
+
+Reservoir Stimulation Capital Cost per Injection Well, 4
+Reservoir Stimulation Capital Cost per Production Well, 4
+
+Field Gathering System Capital Cost Adjustment Factor, 0.54
+
+Royalty Rate, 0.0175
+Royalty Rate Escalation Start Year, 11
+Royalty Rate Escalation, 0.0175
+Royalty Rate Maximum, 0.035
+
+
+# *** SURFACE & SUBSURFACE TECHNICAL PARAMETERS ***
+# *************************************************
+End-Use Option, 1, -- Electricity
+Power Plant Type, 10, -- Coupled Wellbore Power Cycle: electricity from the enthalpy and pressure of the wellhead stream with the superhot-wellbore package's binary/flash power cycle. The ORC and flash plant correlations assume liquid water and understate the energy of a superhot wellhead stream.
+Plant Lifetime, 30
+
+Surface Temperature, 10
+
+Number of Segments, 1
+Gradient 1, 125.714, -- 450 deg.C at the 3.5 km feedzone depth with a 10 deg.C surface
+
+Reservoir Depth, 3.5, -- [km] Feedzone depth; the reference depth of the 30 MPa reservoir in Scott (2026).
+
+Reservoir Density, 2700
+Reservoir Heat Capacity, 1000
+Reservoir Thermal Conductivity, 3.0
+Reservoir Porosity, 0.01
+
+Reservoir Model, 1, -- Multiple Parallel Fractures (Gringarten), as in Fervo_Project_Cape-6
+Reservoir Volume Option, 1, -- FRAC_NUM_SEP: Reservoir volume calculated with fracture separation and number of fractures as input
+
+# Gringarten fracture parameterization as in Fervo_Project_Cape-6. It defines the thermal decline and, through the
+# reservoir volume per production well and the fracture height, the drainage cylinder of the Darcy inflow model.
+Number of Fractures per Stimulated Well, 150
+Fracture Separation, 9.8255
+Fracture Shape, 4
+Fracture Width, 305
+Fracture Height, 100
+
+Reservoir Hydrostatic Pressure, 30000, -- [kPa] Far-field reservoir pressure: the reference 30 MPa reservoir in Scott (2026). Overpressure Percentage and Overpressure Depletion Rate would make it decline.
+Productivity Index, 0.35, -- [kg/s/bar] Equivalent to the Scott (2026) reference transmissivity of ~1000 md*m at 450 deg.C and 30 MPa; the effective productivity index of the solved well is higher because expansion cooling raises the fluid density near the wellbore.
+Injectivity Index, 1.38, -- Fervo_Project_Cape-6
+
+Water Loss Fraction, 0.01
+Water Cost Adjustment Factor, 2
+
+Ambient Temperature, 10
+Utilization Factor, .913
+Circulation Pump Efficiency, 0.80
+
+# ******* WELL BORES PARAMETERS *******
+# *************************************
+
+Production Wellbore Model, 2, -- Self-flowing superhot wells simulated with the superhot-wellbore package in place of Ramey's model, the productivity-index inflow model and production well pumping.
+
+Number of Production Wells, 4, -- With the superhot power cycle each self-flowing well yields roughly 30 MWe, so half of Fervo_Project_Cape-6's 8 producers give a 100 MWe-class project.
+Number of Injection Wells per Production Well, 0.75
+
+Production Well Diameter, 8.535, -- [inch] Inner diameter of 9 5/8 inch casing, as for IDDP-1 (0.217 m) in Scott (2026).
+Injection Well Diameter, 8.535
+
+Production Wellhead Pressure, 10 MPa, -- Target wellhead pressure; the initial flow rate that delivers it is solved for. Give Production Flow Rate per Well instead to prescribe the flow rate.
+
+Coupled Wellbore Heat Loss Coefficient, 2.5, -- [W/m/K] Wellbore-to-formation heat loss coefficient (Scott, 2026).
+Coupled Wellbore Casing Roughness, 4.6e-5, -- [m]
+Coupled Wellbore Maximum Solve Points, 4, -- Coupled reservoir-wellbore solves over the plant lifetime; each takes seconds.
+
+Injection Temperature, 70
+Maximum Drawdown, 0.1, -- Fractional drop of the far-field reservoir temperature that triggers redrilling of the wellfield, as in Fervo_Project_Cape-6 (which uses 0.0025 with its lower-temperature reservoir). With this fracture geometry the Gringarten model reaches thermal breakthrough well within the plant lifetime, and a superhot well stops self-flowing once the far-field temperature has fallen far enough, so redrilling is required to sustain production.
+
+# *** SIMULATION PARAMETERS ***
+# *****************************
+Maximum Temperature, 600
+Time steps per year, 12

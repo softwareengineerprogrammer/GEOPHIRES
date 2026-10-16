@@ -318,6 +318,7 @@ class EconomicsSamTestCase(BaseTestCase):
             PlantType.DOUBLE_FLASH,
             PlantType.ABSORPTION_CHILLER,
             PlantType.INDUSTRIAL,
+            PlantType.COUPLED_WELLBORE,
         ]
 
         for plant_type in supported_plant_types:

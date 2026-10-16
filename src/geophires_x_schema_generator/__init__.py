@@ -26,8 +26,10 @@ from geophires_x.GeoPHIRESUtils import json_dumpse
 from geophires_x.Parameter import Parameter
 from geophires_x.SurfacePlantAGS import SurfacePlantAGS
 from geophires_x.SurfacePlantSUTRA import SurfacePlantSUTRA
+from geophires_x.SurfacePlantCoupledWellbore import SurfacePlantCoupledWellbore
 from geophires_x.SUTRAEconomics import SUTRAEconomics
 from geophires_x.SUTRAReservoir import SUTRAReservoir
+from geophires_x.CoupledWellBores import CoupledWellBores
 from geophires_x.SUTRAWellBores import SUTRAWellBores
 from geophires_x.TDPReservoir import TDPReservoir
 from geophires_x.TOUGH2Reservoir import TOUGH2Reservoir
@@ -76,8 +78,10 @@ class GeophiresXSchemaGenerator:
             (dummy_model.wellbores, 'Well Bores'),
             (AGSWellBores(dummy_model), 'Well Bores'),
             (SBTWellbores(dummy_model), 'Well Bores'),
+            (CoupledWellBores(dummy_model), 'Well Bores'),
             (SUTRAWellBores(dummy_model), 'Well Bores'),
             (dummy_model.surfaceplant, 'Surface Plant'),
+            (SurfacePlantCoupledWellbore(dummy_model), 'Surface Plant'),
             (SurfacePlantAGS(dummy_model), 'Surface Plant'),
             (SurfacePlantSUTRA(dummy_model), 'Surface Plant'),
             (dummy_model.economics, 'Economics'),

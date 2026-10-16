@@ -88,6 +88,7 @@ def validate_read_parameters(model: Model) -> None:
         PlantType.DOUBLE_FLASH,
         PlantType.ABSORPTION_CHILLER,
         PlantType.INDUSTRIAL,
+        PlantType.COUPLED_WELLBORE,
     ]
     if model.surfaceplant.plant_type.value not in supported_plant_types:
         raise ValueError(

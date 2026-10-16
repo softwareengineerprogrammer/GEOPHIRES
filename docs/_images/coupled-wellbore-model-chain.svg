@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="title desc">
+<title id="title">Coupled inflow-wellbore model in the GEOPHIRES calculation chain</title>
+<desc id="desc">GEOPHIRES modules run top to bottom; the coupled wellbore model sends one request per production history to superhot-wellbore and receives a production profile with the wellhead state at every time step.</desc>
+<defs><marker id="arrow-616e7c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="#616e7c"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="30.0" y="20.0" width="400.0" height="54.0" rx="7" fill="#ffffff" stroke="#9aa5b1" stroke-width="1.4" stroke-dasharray="5 3"/>
+<text x="230.0" y="43.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="bold">GEOPHIRES input deck</text>
+<text x="230.0" y="58.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">Production Wellbore Model, 2 · Power Plant Type, 10</text>
+<rect x="30.0" y="104.0" width="400.0" height="72.0" rx="7" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.4"/>
+<text x="230.0" y="128.3" font-size="13" fill="#243b53" text-anchor="middle" font-weight="bold">Reservoir model</text>
+<text x="230.0" y="143.3" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">any thermal model: Gringarten MPF, user-provided profile, ...</text>
+<text x="230.0" y="159.5" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">far-field temperature history T<tspan baseline-shift="sub" font-size="72%">res</tspan>(t)</text>
+<rect x="30.0" y="206.0" width="400.0" height="90.0" rx="7" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.4"/>
+<text x="230.0" y="230.8" font-size="13" fill="#243b53" text-anchor="middle" font-weight="bold">WellBores: standard pass</text>
+<text x="230.0" y="247.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">far-field pressure history P<tspan baseline-shift="sub" font-size="72%">res</tspan>(t)</text>
+<text x="230.0" y="262.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">Reservoir Hydrostatic Pressure × Overpressure, depletion</text>
+<text x="230.0" y="279.0" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">redrilling: Maximum Drawdown on T<tspan baseline-shift="sub" font-size="72%">res</tspan>(t) · injection wells</text>
+<rect x="30.0" y="326.0" width="400.0" height="128.0" rx="7" fill="#e3efff" stroke="#2f6fd1" stroke-width="1.4"/>
+<text x="230.0" y="352.9" font-size="13" fill="#123e7c" text-anchor="middle" font-weight="bold">CoupledWellBores (Production Wellbore Model 2)</text>
+<text x="230.0" y="369.8" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">Productivity Index → transmissivity k·b</text>
+<text x="230.0" y="386.7" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">reservoir volume per well → drainage radius r<tspan baseline-shift="sub" font-size="72%">e</tspan></text>
+<text x="230.0" y="403.6" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">operating point: flow rate or target wellhead pressure</text>
+<text x="230.0" y="420.5" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">solve schedule along P<tspan baseline-shift="sub" font-size="72%">res</tspan>(t), T<tspan baseline-shift="sub" font-size="72%">res</tspan>(t) · failure checks</text>
+<text x="230.0" y="435.6" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">sets produced temperature, wellhead pressure, pumping</text>
+<rect x="30.0" y="484.0" width="400.0" height="90.0" rx="7" fill="#fff1e0" stroke="#d9822b" stroke-width="1.4"/>
+<text x="230.0" y="510.1" font-size="13" fill="#7a3e00" text-anchor="middle" font-weight="bold">Surface plant</text>
+<text x="230.0" y="527.0" font-size="13" fill="#1f2933" text-anchor="middle" font-weight="normal">Power Plant Type 10: Coupled Wellbore Power Cycle</text>
+<text x="230.0" y="542.0" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">cycle-only · correlation-first · best-output</text>
+<text x="230.0" y="556.4" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">(or a conventional plant type, given Plant Outlet Pressure)</text>
+<rect x="30.0" y="604.0" width="400.0" height="72.0" rx="7" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.4"/>
+<text x="230.0" y="629.5" font-size="13" fill="#243b53" text-anchor="middle" font-weight="bold">Economics</text>
+<text x="230.0" y="644.6" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">plant costed as a conventional plant type (by plant path);</text>
+<text x="230.0" y="658.9" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">production pumps costed with the standard correlation</text>
+<path d="M230.0,74.0 L230.0,104.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M230.0,176.0 L230.0,206.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M230.0,296.0 L230.0,326.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M230.0,454.0 L230.0,484.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M230.0,574.0 L230.0,604.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="550.0" y="196.0" width="430.0" height="480.0" rx="12" fill="#e1f5ee" fill-opacity="0.45" stroke="#2f8f6b" stroke-width="1.6" stroke-dasharray="7 4"/>
+<text x="564.0" y="218.0" font-size="14" fill="#0f5132" text-anchor="start" font-weight="bold">superhot-wellbore</text>
+<text x="564.0" y="235.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">coupled inflow-wellbore simulation (Scott, 2026)</text>
+<rect x="572.0" y="254.0" width="386.0" height="60.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="765.0" y="280.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Radial Darcy inflow</text>
+<text x="765.0" y="295.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">far-field P<tspan baseline-shift="sub" font-size="72%">res</tspan>, T<tspan baseline-shift="sub" font-size="72%">res</tspan> → sandface; k·b, r<tspan baseline-shift="sub" font-size="72%">e</tspan>, r<tspan baseline-shift="sub" font-size="72%">w</tspan></text>
+<rect x="572.0" y="336.0" width="386.0" height="50.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="765.0" y="357.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Entry into the well</text>
+<text x="765.0" y="372.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">isenthalpic expansion to the flowing bottom-hole pressure</text>
+<rect x="572.0" y="408.0" width="386.0" height="64.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="765.0" y="436.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Bottom-to-surface wellbore march</text>
+<text x="765.0" y="451.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">friction · gravity · kinetic energy · heat loss U·(T − T<tspan baseline-shift="sub" font-size="72%">rock</tspan>(z))</text>
+<rect x="572.0" y="494.0" width="386.0" height="56.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="765.0" y="518.7" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Production pump stage</text>
+<text x="765.0" y="533.8" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">when the well does not self-flow (Coupled Wellbore Pump Policy)</text>
+<rect x="572.0" y="572.0" width="183.0" height="80.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="663.5" y="601.5" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Wellhead state</text>
+<text x="663.5" y="616.6" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">P, T, h, phase,</text>
+<text x="663.5" y="630.9" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">steam quality</text>
+<rect x="775.0" y="572.0" width="183.0" height="80.0" rx="7" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.4"/>
+<text x="866.5" y="600.3" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">Coupled-wellbore</text>
+<text x="866.5" y="617.2" font-size="13" fill="#0f5132" text-anchor="middle" font-weight="bold">power cycle</text>
+<text x="866.5" y="632.2" font-size="11.049999999999999" fill="#52606d" text-anchor="middle" font-weight="normal">gross power, exergy</text>
+<path d="M765.0,314.0 L765.0,336.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M765.0,386.0 L765.0,408.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M765.0,472.0 L765.0,494.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M664.6,550.0 L663.5,572.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M755.0,612.0 L775.0,612.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<path d="M430.0,364.4 L465.0,364.4 L465.0,284.0 L572.0,284.0" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="438.5" y="320.8" width="53.1" height="18.4" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="465.0" y="334.3" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">request</text>
+<path d="M550.0,640.0 L505.0,640.0 L505.0,423.3 L430.0,423.3" fill="none" stroke="#616e7c" stroke-width="1.5" marker-end="url(#arrow-616e7c)"/>
+<rect x="468.8" y="543.6" width="72.4" height="32.8" rx="3" fill="#ffffff" fill-opacity="0.92"/>
+<text x="505.0" y="557.1" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">production</text>
+<text x="505.0" y="571.5" font-size="11.5" fill="#52606d" text-anchor="middle" font-weight="normal" font-style="italic">profile</text>
+<rect x="640.0" y="31.0" width="16" height="11" rx="2.5" fill="#ffffff" stroke="#9aa5b1" stroke-width="1.2" stroke-dasharray="5 3"/>
+<text x="663.0" y="40.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">input</text>
+<rect x="640.0" y="49.0" width="16" height="11" rx="2.5" fill="#f0f4f8" stroke="#829ab1" stroke-width="1.2"/>
+<text x="663.0" y="58.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">existing GEOPHIRES module</text>
+<rect x="640.0" y="67.0" width="16" height="11" rx="2.5" fill="#e3efff" stroke="#2f6fd1" stroke-width="1.2"/>
+<text x="663.0" y="76.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">GEOPHIRES module added for this model</text>
+<rect x="640.0" y="85.0" width="16" height="11" rx="2.5" fill="#fff1e0" stroke="#d9822b" stroke-width="1.2"/>
+<text x="663.0" y="94.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">surface plant (added: Power Plant Type 10)</text>
+<rect x="640.0" y="103.0" width="16" height="11" rx="2.5" fill="#e1f5ee" stroke="#2f8f6b" stroke-width="1.2"/>
+<text x="663.0" y="112.0" font-size="11.5" fill="#52606d" text-anchor="start" font-weight="normal">superhot-wellbore package</text>
+</svg>

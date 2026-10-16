@@ -86,6 +86,7 @@ class PlantType(GeophiresInputEnum):
     DISTRICT_HEATING = 7, "District Heating"
     RTES = 8, "Reservoir Thermal Energy Storage"
     INDUSTRIAL = 9, "Industrial"
+    COUPLED_WELLBORE = 10, "Coupled Wellbore Power Cycle"
 
     @staticmethod
     def from_input_string(input_string: str):
@@ -173,6 +174,70 @@ class ReservoirModel(GeophiresInputEnum):
         else:
             # No suffix is present
             return f'{val_str} Model'
+
+
+class ProductionWellboreModel(GeophiresInputEnum):
+    """
+    How the state of the geofluid at the production wellhead is determined.
+
+    Note that, unlike ReservoirModel.MULTIPLE_PARALLEL_FRACTURES ("... (Gringarten)"), the values carry no citation:
+    the raw value is matched in Model.__init__, so it is an API string rather than display text. Citations belong in
+    the tooltip and the documentation.
+    """
+
+    CONSTANT_TEMPERATURE_DROP = 0, 'Constant Temperature Drop'
+    RAMEY = 1, 'Ramey'
+    COUPLED_INFLOW_WELLBORE = 2, 'Coupled Inflow-Wellbore'
+
+    @staticmethod
+    def from_input_string(input_string: str):
+        """
+        :rtype: ProductionWellboreModel
+        """
+
+        for member in __class__:
+            if input_string == str(member.int_value):
+                return member
+
+        raise ValueError(f'Unknown Production Wellbore Model input value: {input_string}')
+
+    @staticmethod
+    def from_int(int_val):
+        for member in __class__:
+            if member.int_value == int_val:
+                return member
+
+    @property
+    def display_name(self) -> str:
+        """Returns a formatted string for display purposes. Format: "<value> Model"."""
+        return f'{self.value} Model'
+
+
+class RedrillingTriggerTemperature(GeophiresInputEnum):
+    """
+    Which temperature history the thermal-drawdown redrilling trigger (Maximum Drawdown) is measured on.
+    """
+
+    PRODUCED = 0, 'Produced Temperature'
+    RESERVOIR = 1, 'Reservoir Output Temperature'
+
+    @staticmethod
+    def from_input_string(input_string: str):
+        """
+        :rtype: RedrillingTriggerTemperature
+        """
+
+        for member in __class__:
+            if input_string == str(member.int_value):
+                return member
+
+        raise ValueError(f'Unknown Redrilling Trigger Temperature input value: {input_string}')
+
+    @staticmethod
+    def from_int(int_val):
+        for member in __class__:
+            if member.int_value == int_val:
+                return member
 
 
 class ReservoirVolume(GeophiresInputEnum):
