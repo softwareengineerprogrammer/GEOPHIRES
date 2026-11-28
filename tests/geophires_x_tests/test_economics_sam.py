@@ -1605,7 +1605,8 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertEqual(len(cf_single[1]), len(cf_single[0]))
         self.assertEqual(cf_single[1][1:4], ['2026', '2027', '2028'])
         self.assertEqual(cf_single[1][-1], str(2026 + len(cf_single[0]) - 2))
-        self.assertEqual(cf_single[2][0], 'CONSTRUCTION')
+        self.assertEqual(cf_single[2], [''] * len(cf_single[0]))
+        self.assertEqual(cf_single[3][0], 'CONSTRUCTION')
 
         # Economic metrics are identical with and without Construction Start Calendar Year
         self.assertEqual(m_single.economics.ProjectNPV.value, m_default.economics.ProjectNPV.value)
@@ -1629,7 +1630,8 @@ class EconomicsSamTestCase(BaseTestCase):
         self.assertEqual(cf_multi[0][1:5], ['Year -2', 'Year -1', 'Year 0', 'Year 1'])
         self.assertEqual(cf_multi[1][0], 'Calendar year')
         self.assertEqual(cf_multi[1][1:5], ['2026', '2027', '2028', '2029'])
-        self.assertEqual(cf_multi[2][0], 'CONSTRUCTION')
+        self.assertEqual(cf_multi[2], [''] * len(cf_multi[0]))
+        self.assertEqual(cf_multi[3][0], 'CONSTRUCTION')
 
         # Round-trip test: .out -> GeophiresXResult -> as_csv()
         client = GeophiresXClient()
@@ -1661,7 +1663,7 @@ class EconomicsSamTestCase(BaseTestCase):
         parsed_cf = res_with_cal_year.result['SAM CASH FLOW PROFILE']
         self.assertIsNotNone(parsed_cf)
         self.assertEqual(parsed_cf[1][0], 'Calendar year')
-        self.assertEqual(parsed_cf[1][1:4], [2026, 2027, 2028])
+        self.assertEqual(parsed_cf[1][1:4], ['2026', '2027', '2028'])
 
         csv_text = res_with_cal_year.as_csv()
         csv_calendar_rows = [

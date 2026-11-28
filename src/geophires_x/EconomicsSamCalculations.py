@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy_financial as npf
 
-from geophires_x.EconomicsSamCashFlow import _SAM_CASH_FLOW_NAN_STR
+from geophires_x.EconomicsSamCashFlow import _SAM_CASH_FLOW_NAN_STR, SAM_CASH_FLOW_CALENDAR_YEAR_ROW_NAME
 from geophires_x.EconomicsSamPreRevenue import PreRevenueCostsAndCashflow, _AFTER_TAX_NET_CASH_FLOW_ROW_NAME
 from geophires_x.EconomicsUtils import (
     overnight_capital_cost_output_parameter,
@@ -128,7 +128,8 @@ class SamEconomicsCalculations:
 
         if self.construction_start_calendar_year is not None:
             calendar_years = [str(self.construction_start_calendar_year + i) for i in range(len(ret[0]) - 1)]
-            ret.insert(1, ['Calendar year', *calendar_years])
+            ret.insert(1, [SAM_CASH_FLOW_CALENDAR_YEAR_ROW_NAME, *calendar_years])
+            ret.insert(2, [''] * len(ret[0]))
 
         def _get_row_index(row_name_: str) -> int:
             return [it[0] for it in ret].index(row_name_)

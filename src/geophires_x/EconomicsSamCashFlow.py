@@ -16,6 +16,8 @@ import geophires_x.Model as Model
 
 _SAM_CASH_FLOW_NAN_STR = 'NaN'
 
+SAM_CASH_FLOW_CALENDAR_YEAR_ROW_NAME = 'Calendar year'
+
 
 @lru_cache(maxsize=12)
 def _calculate_sam_economics_cash_flow_operational_years(model: Model, single_owner: Singleowner) -> list[list[Any]]:

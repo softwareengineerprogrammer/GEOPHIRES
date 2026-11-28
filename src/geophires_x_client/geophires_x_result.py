@@ -10,6 +10,7 @@ from types import MappingProxyType
 from typing import Any
 from typing import ClassVar
 
+from geophires_x.EconomicsSamCashFlow import SAM_CASH_FLOW_CALENDAR_YEAR_ROW_NAME
 from geophires_x.GeoPHIRESUtils import is_float
 from geophires_x.GeoPHIRESUtils import is_int
 
@@ -916,6 +917,12 @@ class GeophiresXResult:
             rd = csv.reader(StringIO(profile_text), delimiter='\t', skipinitialspace=True)
             profile_lines = []
             for row in rd:
+                if len(row) > 0 and row[0].strip() == SAM_CASH_FLOW_CALENDAR_YEAR_ROW_NAME:
+                    # Calendar years are labels, not quantities. Keep them as strings, as in the SAM cash flow profile
+                    # itself, so that consumers do not format them as numbers (e.g. 2,026).
+                    profile_lines.append([entry_display.strip() for entry_display in row])
+                    continue
+
                 row_clean = []
                 for entry_display in row:
                     row_clean.append(
